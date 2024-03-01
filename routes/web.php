@@ -40,3 +40,9 @@ Route::get('/homevisit', function () {
 Route::get('/homevisitsingle', function () {
     return View::make('pages.homevisitsingle');
 });
+Route::get('/join-with-us', function () {
+    return View::make('pages.join');
+});
+Route::get('/dashboard', function () {
+    return View::make('pages.admin.dashboard');
+});

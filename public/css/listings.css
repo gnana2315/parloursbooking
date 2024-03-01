@@ -342,6 +342,29 @@ section
 	background: #ffb400;
 	content: '';
 }
+.form_section_title
+{
+	display: inline-block;
+	padding-top: 11px;
+}
+
+.form_section_title h3
+{
+	padding: 0 15px 15px;
+}
+
+.form_section_title::after
+{
+	display: block;
+	position: absolute;
+	top: 0;
+	left: 15px;
+	width: 34px;
+	height: 2px;
+	background: #ffb400;
+	content: '';
+}
+
 .container_custom .container
 {
 	max-width: 100%;
@@ -947,7 +970,7 @@ section
 .footer
 {
 	background: #FFFFFF;
-	margin-top: -37px;
+	/* margin-top: -37px; */
 	z-index: 1;
 }
 .footer_container
@@ -1016,4 +1039,26 @@ section
   height: 25px; /* Slider handle height */
   background: #04AA6D; /* Green background */
   cursor: pointer; /* Cursor on hover */
+}
+.submit_button{
+    border: none;
+    outline: none;
+    background: #ffb400;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    color: #FFFFFF;
+	float:right;
+}
+.back-to-home{
+	border: none;
+    outline: none;
+    background: #2b0c0b;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    color: #FFB400;
+	float:left;
 }

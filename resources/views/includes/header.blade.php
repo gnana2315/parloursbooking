@@ -15,7 +15,7 @@
         <div class="log_reg">
             <ul class="d-flex flex-row align-items-center justify-content-start">
                 <!--li><a href="#">Login</a></li-->
-                <li><a href="#">Join with Us</a></li>
+                <li><a href="/join-with-us">Join with Us</a></li>
             </ul>
         </div>
         <!--div class="hamburger">
