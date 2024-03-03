@@ -11,15 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pb_persons', function (Blueprint $table) {
-            $table->id('pbp_id');
-            $table->string('pbp_intial');
-            $table->string('pbp_firstname');
-            $table->string('pbp_lastname');
-            $table->string('pbp_nicno');
-            $table->string('pbp_contactno');
-            $table->string('pbp_address');
-            $table->integer('pbp_status');
+        Schema::create('servicefor', function (Blueprint $table) {
+            $table->id('pbsf_id');
+            $table->string('pbsf_name');
+            $table->integer('pbsf_status');
             $table->timestamps();
             $table->softDeletes($column = 'deleted_at', $precision = 0);
         });
@@ -30,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::drop('pb_persons');
+        Schema::drop('servicefor');
     }
 };

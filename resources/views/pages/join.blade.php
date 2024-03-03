@@ -9,25 +9,57 @@
         <div class="row">
             <div class="col-xl-12">
                 <div class="listing_filter">
-                    <form>
+                    @if ($message = Session::get('success'))
+                        <div class="alert alert-success">
+                            <p>{{ $message }}</p>
+                        </div>
+                    @elseif ($message = Session::get('failed'))
+                        <div class="alert alert-danger">
+                            <p>{{ $message }}</p>
+                        </div>
+                    @endif
+                    @if ($errors->any())
+                        <div class="alert alert-danger">
+                            <strong>Error!</strong> <br>
+                            <ul>
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+                    <form action="/register" method="POST" enctype="multipart/form-data">
+                        @csrf
                         <div class="form_section_title"><h3>Business Details</h3></div>
                         <div class="row">
-                            <div class="col-lg-3 col-md-3 col-xl-3">
+                            <div class="col-lg-2 col-md-2 col-xl-2">
                                 <div class="form-group">
                                     <label for="userreg_businesstype">Business Type</label>
                                     <select name="userreg_businesstype" id="userreg_businesstype" class="form-control">
                                         <option>Please select a business type</option>
-                                        <option>Men</option>
-                                        <option>Women</option>
-                                        <option>Unisex</option>
-                                        <option>Home Visit</option>
+                                        <option value="1">Men</option>
+                                        <option value="2">Women</option>
+                                        <option value="3">Unisex</option>
+                                        <option value="4">Home Visit</option>
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-lg-9 col-md-9 col-xl-9">
+                            <div class="col-lg-5 col-md-5 col-xl-5">
                                 <div class="form-group">
                                     <label for="userreg_businessname">Business Name</label>
                                     <input type="text" class="form-control" id="userreg_businessname" name="userreg_businessname" placeholder="Enter your Business Name">
+                                </div>
+                            </div>
+                            <div class="col-lg-2 col-md-2 col-xl-2">
+                                <div class="form-group">
+                                    <label for="userreg_businesslogo">Business Logo (JPG/PNG - Below 2MB)</label>
+                                    <input type="file" class="form-control" id="userreg_businesslogo" name="userreg_businesslogo">
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-xl-3">
+                                <div class="form-group">
+                                    <label for="userreg_businessdoc">Parlour Certificate Document (PDF or JPG format)</label>
+                                    <input type="file" class="form-control" id="userreg_businessdoc" name="userreg_businessdoc">
                                 </div>
                             </div>
                         </div>
@@ -40,14 +72,14 @@
                             </div>
                             <div class="col-lg-4 col-md-4 col-xl-4">
                                 <div class="form-group">
-                                    <label for="userreg_businessregdoc">Business Registration Document</label>
-                                    <input type="file" class="form-control" id="userreg_businessregdoc" name="userreg_businessregdoc" placeholder="Enter your Business Registration No">
+                                    <label for="userreg_businessregdoc">Business Registration Document (PDF or JPG format)</label>
+                                    <input type="file" class="form-control" id="userreg_businessregdoc" name="userreg_businessregdoc">
                                 </div>
                             </div>
                             <div class="col-lg-4 col-md-4 col-xl-4">
                                 <div class="form-group">
                                     <label for="userreg_businessregemail">Business Email Address</label>
-                                    <input type="email" class="form-control" id="userreg_businessregemail" name="userreg_businessregemail" placeholder="Enter your Business Registration No">
+                                    <input type="email" class="form-control" id="userreg_businessregemail" name="userreg_businessregemail" placeholder="Enter your Business Email">
                                 </div>
                             </div>
                         </div>
@@ -59,7 +91,7 @@
                                     <br>
                                     <input type="text" class="form-control" id="userreg_businessregaddressline2" name="userreg_businessregaddressline2" placeholder="Enter your Business Address Line 2">
                                     <br>
-                                    <input type="text" class="form-control" id="userreg_businessregadddresscity" name="userreg_businessregadddresscity" placeholder="Enter your Business Address City">
+                                    <input type="text" class="form-control" id="userreg_businessregaddresscity" name="userreg_businessregaddresscity" placeholder="Enter your Business Address City">
                                 </div>
                             </div>
                             <div class="col-lg-4 col-md-4 col-xl-4">
@@ -101,7 +133,7 @@
                             <div class="col-lg-4 col-md-4 col-xl-4">
                                 <div class="form-group">
                                     <label for="userreg_businessownernicno">Business Owner's NIC No</label>
-                                    <input type="number" class="form-control" id="userreg_businessownernicno" name="userreg_businessownernicno" placeholder="Enter your NIC No">
+                                    <input type="text" class="form-control" id="userreg_businessownernicno" name="userreg_businessownernicno" placeholder="Enter your NIC No">
                                 </div>
                             </div>
                         </div>

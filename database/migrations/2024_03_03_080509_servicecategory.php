@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pb_usertype', function (Blueprint $table) {
-            $table->id('pbut_id');
-            $table->string('pbut_name');
-            $table->integer('pbut_status');
+        Schema::create('servicecategory', function (Blueprint $table) {
+            $table->id('pbsc_id');
+            $table->string('pbsc_name');
+            $table->integer('pbsc_status');
             $table->timestamps();
             $table->softDeletes($column = 'deleted_at', $precision = 0);
         });
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::drop('pb_usertype');
+        Schema::drop('servicecategory');
     }
 };

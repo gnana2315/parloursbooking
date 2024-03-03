@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Usercontroller;
 
 /*
 |--------------------------------------------------------------------------
@@ -40,9 +41,11 @@ Route::get('/homevisit', function () {
 Route::get('/homevisitsingle', function () {
     return View::make('pages.homevisitsingle');
 });
-Route::get('/join-with-us', function () {
-    return View::make('pages.join');
-});
+// Route::get('/join-with-us', function () {
+//     return View::make('pages.join');
+// });
+Route::get('/join-with-us', [Usercontroller::class, 'index']);
+Route::post('/register', [Usercontroller::class, 'register']);
 Route::get('/dashboard', function () {
     return View::make('pages.admin.dashboard');
 });

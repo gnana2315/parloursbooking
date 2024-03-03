@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pb_users', function (Blueprint $table) {
+        Schema::create('users', function (Blueprint $table) {
             $table->id('pbu_id');
             $table->integer('pbu_usertype');
             $table->integer('pbu_personid');
@@ -30,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::drop('pb_users');
+        Schema::drop('users');
     }
 };
