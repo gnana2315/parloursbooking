@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 use App\Models\vendor;
+use App\Models\person;
+use App\Models\User;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -9,10 +11,14 @@ use Illuminate\Http\Request;
 class Usercontroller extends Controller
 {
     protected $vendor;
+    protected $person;
+    protected $User;
 
-    public function __construct(vendor $vendor)
+    public function __construct(vendor $vendor, person $person, User $User)
     {
         $this->vendor = $vendor;
+        $this->person = $person;
+        $this->User = $User;
     }
     //registration page load
     public function index(){      
@@ -20,7 +26,7 @@ class Usercontroller extends Controller
     }
 
     public function register(Request $request){
-        // dd($$request);
+        // dd($request);
         $businessLogoName = '';
         $businessParlourCertificate = '';
         $businessRegistrationCertificate = '';
@@ -105,6 +111,7 @@ class Usercontroller extends Controller
         }else{
             $businessAddress = $request->input('userreg_businessregaddressline1').','.$request->input('userreg_businessregaddresscity').'.';
         }
+        // vendor data construction
         $vendor_data = [
             'pbv_servicetype' => $request->input('userreg_businesstype'),
             'pbv_name' => $request->input('userreg_businessname'),
@@ -118,13 +125,62 @@ class Usercontroller extends Controller
             'pbv_city' => $request->input('userreg_businessregaddresscity'),
             'pbp_status' => '0'
         ];
+
+        
         // dd($vendor_data);
         $vendorInsert = $this->vendor->create($vendor_data);
         if($vendorInsert){
+            
+            // logo & document upload
             $request->userreg_businesslogo->move(public_path('vendors/'.$documentFolderName.'/'), $businessLogoName);
             $request->userreg_businessdoc->move(public_path('vendors/'.$documentFolderName.'/'), $businessParlourCertificate);
             $request->userreg_businessregdoc->move(public_path('vendors/'.$documentFolderName.'/'), $businessRegistrationCertificate);
-            return redirect('/join-with-us')->with('success', 'Vendor has been registered successfully.');
+
+            $businessOwnerAddress = '';
+            //person address constructor
+            if($request->input('userreg_businessowneraddressline2') != ''){
+                $businessOwnerAddress = $request->input('userreg_businessowneraddressline1').','.$request->input('userreg_businessowneraddressline2').','.$request->input('userreg_businessownercity').'.';
+            }else{
+                $businessOwnerAddress = $request->input('userreg_businessowneraddressline1').','.$request->input('userreg_businessownercity').'.';
+            }
+
+            // person data construction
+            $person_data = [
+                'pbv_id' => $vendorInsert->id,
+                'pbp_intial' => $request->input('userreg_businessownertitle'),
+                'pbp_firstname' => $request->input('userreg_businessownerfirstname'),
+                'pbp_lastname' => $request->input('userreg_businessownerlastname'),
+                'pbp_nicno' => $request->input('userreg_businessownernicno'),
+                'pbp_contactno' => $request->input('userreg_businessownercontactno'),
+                'pbp_email' => $request->input('userreg_businessowneremail'),
+                'pbp_address' => $businessOwnerAddress,
+                'pbp_status' => '1'
+            ];
+
+            $personInsert = $this->person->create($person_data);
+            
+            if($personInsert){
+
+                // user data construction
+                $user_data = [
+                    'pbu_usertype' => $request->input('userreg_businessusertype'),
+                    'pbu_personid' => $personInsert->id,
+                    'pbu_name' => $request->input('userreg_businessusername'),
+                    'pbu_email' => $request->input('userreg_businessowneremail'),
+                    'pbu_password' => $request->input('userreg_businessuserpassword'),
+                    'pbu_status' => '1'
+                ];
+                // dd($user_data);
+                $userInsert = $this->User->create($user_data);
+                
+                if($userInsert){
+                    return redirect('/join-with-us')->with('success', 'Vendor has been registered successfully.');
+                }else{
+                    return redirect('/join-with-us')->with('failed', 'Error!, Vendor has been not registered.');    
+                }
+            }else{
+                return redirect('/join-with-us')->with('failed', 'Error!, Vendor has been not registered.');
+            }
         }else{
             return redirect('/join-with-us')->with('failed', 'Error!, Vendor has been not registered.');
         }

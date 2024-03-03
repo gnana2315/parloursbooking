@@ -169,7 +169,7 @@
                                 <label for="userreg_businessusertype">User Type</label>
                                 <div class="form-group">
                                     <select name="userreg_businessusertype" id="userreg_businessusertype" class="form-control" readonly>
-                                        <option selected>Vendor</option>
+                                        <option value="3" selected>Vendor</option>
                                     </select>
                                 </div>
                             </div>
