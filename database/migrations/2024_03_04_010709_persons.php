@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('pbp_firstname');
             $table->string('pbp_lastname');
             $table->string('pbp_nicno');
+            $table->string('pbp_nic');
             $table->string('pbp_contactno');
             $table->string('pbp_email')->unique();
             $table->string('pbp_address');

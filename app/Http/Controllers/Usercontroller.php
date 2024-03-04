@@ -21,7 +21,7 @@ class Usercontroller extends Controller
         $this->User = $User;
     }
     //registration page load
-    public function index(){      
+    public function index(){     
         return view('pages.join');
     }
 
@@ -144,6 +144,11 @@ class Usercontroller extends Controller
                 $businessOwnerAddress = $request->input('userreg_businessowneraddressline1').','.$request->input('userreg_businessownercity').'.';
             }
 
+            //ownerNIC function
+            if ($request->hasFile('userreg_businessownernic')) {            
+                $businessOwnerNIC = $documentFolderName.'_ownerNIC_'.time().'.'.$request->file('userreg_businessownernic')->extension(); 
+            }
+
             // person data construction
             $person_data = [
                 'pbv_id' => $vendorInsert->id,
@@ -151,6 +156,7 @@ class Usercontroller extends Controller
                 'pbp_firstname' => $request->input('userreg_businessownerfirstname'),
                 'pbp_lastname' => $request->input('userreg_businessownerlastname'),
                 'pbp_nicno' => $request->input('userreg_businessownernicno'),
+                'pbp_nic' => $businessOwnerNIC,
                 'pbp_contactno' => $request->input('userreg_businessownercontactno'),
                 'pbp_email' => $request->input('userreg_businessowneremail'),
                 'pbp_address' => $businessOwnerAddress,
@@ -160,7 +166,9 @@ class Usercontroller extends Controller
             $personInsert = $this->person->create($person_data);
             
             if($personInsert){
-
+                // Owner NIC document upload
+                $request->userreg_businessownernic->move(public_path('vendors/'.$documentFolderName.'/'), $businessOwnerNIC);
+            
                 // user data construction
                 $user_data = [
                     'pbu_usertype' => $request->input('userreg_businessusertype'),
@@ -174,6 +182,11 @@ class Usercontroller extends Controller
                 $userInsert = $this->User->create($user_data);
                 
                 if($userInsert){
+                    //construct email content
+                    // $mail_data = [
+                    //     'subject' => 'Vendor Registration of '.$request->input('userreg_businessname'),
+                    //     ''
+                    // ];
                     return redirect('/join-with-us')->with('success', 'Vendor has been registered successfully.');
                 }else{
                     return redirect('/join-with-us')->with('failed', 'Error!, Vendor has been not registered.');    

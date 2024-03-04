@@ -139,13 +139,9 @@
                         </div>
                         <div class="row">                            
                             <div class="col-lg-6 col-md-6 col-xl-6">
-                                <label for="userreg_businessowneraddress">Business Owner's Address</label>
+                                <label for="userreg_businessownernic">Business Owner's NIC (PDF or JPG)</label>
                                 <div class="form-group">
-                                    <input type="text" class="form-control" id="userreg_businessowneraddressline1" name="userreg_businessowneraddressline1" placeholder="Enter your Address Line 1">
-                                    <br>
-                                    <input type="text" class="form-control" id="userreg_businessowneraddressline2" name="userreg_businessowneraddressline2" placeholder="Enter your Address Line 2">
-                                    <br>
-                                    <input type="text" class="form-control" id="userreg_businessownercity" name="userreg_businessownercity" placeholder="Enter your City">
+                                    <input type="file" class="form-control" id="userreg_businessownernic" name="userreg_businessownernic">
                                 </div>
                             </div>
                             <div class="col-lg-3 col-md-3 col-xl-3">
@@ -158,6 +154,18 @@
                                 <label for="userreg_businessowneremail">Business Owner's Email</label>
                                 <div class="form-group">
                                     <input type="email" class="form-control" id="userreg_businessowneremail" name="userreg_businessowneremail" placeholder="Enter your Email">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">                            
+                            <div class="col-lg-12 col-md-12 col-xl-12">
+                                <label for="userreg_businessowneraddress">Business Owner's Address</label>
+                                <div class="form-group">
+                                    <input type="text" class="form-control" id="userreg_businessowneraddressline1" name="userreg_businessowneraddressline1" placeholder="Enter your Address Line 1">
+                                    <br>
+                                    <input type="text" class="form-control" id="userreg_businessowneraddressline2" name="userreg_businessowneraddressline2" placeholder="Enter your Address Line 2">
+                                    <br>
+                                    <input type="text" class="form-control" id="userreg_businessownercity" name="userreg_businessownercity" placeholder="Enter your City">
                                 </div>
                             </div>
                         </div>
