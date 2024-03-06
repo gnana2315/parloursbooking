@@ -7,6 +7,8 @@ use App\Models\User;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Mail;
+use App\Mail\vendorRegistrationMail;
 
 class Usercontroller extends Controller
 {
@@ -51,7 +53,7 @@ class Usercontroller extends Controller
                 'userreg_businessownercontactno' => 'required|max:10',
                 'userreg_businessowneremail' => 'required|email|unique:persons,pbp_email',
                 'userreg_businessusername' => 'required|unique:users,pbu_name',
-                'userreg_businessuserpassword' => 'required|max:8',
+                'userreg_businessuserpassword' => 'required|min:8',
             ],
             [
                 'userreg_businesstype.required' => 'Business Type Required',
@@ -82,7 +84,7 @@ class Usercontroller extends Controller
                 'userreg_businessusername.required' => 'Business Owner User Name Required',
                 'userreg_businessusername.unique' => 'This User Name already used. Please try different User Name.',
                 'userreg_businessuserpassword.required' => 'Business Owner Password Required',
-                'userreg_businessuserpassword.max' => 'Password length will be minimum 8 characters',
+                'userreg_businessuserpassword.min' => 'Password length will be minimum 8 characters',
             ]
         );
         
@@ -183,10 +185,15 @@ class Usercontroller extends Controller
                 
                 if($userInsert){
                     //construct email content
-                    // $mail_data = [
-                    //     'subject' => 'Vendor Registration of '.$request->input('userreg_businessname'),
-                    //     ''
-                    // ];
+                    $mail_data = [
+                        'email' => $request->input('userreg_businessowneremail'),
+                        'businessname' => $request->input('userreg_businessname'),
+                        'name' => $request->input('userreg_businessownertitle').'.'.$request->input('userreg_businessownerfirstname')
+                    ];
+
+                    //$this->vendorRegistrationEmail($mail_data);
+                    Mail::to($request->input('userreg_businessowneremail'))->send(new vendorRegistrationMail($mail_data));
+
                     return redirect('/join-with-us')->with('success', 'Vendor has been registered successfully.');
                 }else{
                     return redirect('/join-with-us')->with('failed', 'Error!, Vendor has been not registered.');    
@@ -198,4 +205,17 @@ class Usercontroller extends Controller
             return redirect('/join-with-us')->with('failed', 'Error!, Vendor has been not registered.');
         }
     }
+
+    // public function vendorRegistrationEmail($data)
+    // {
+    //     // dd($data);
+    //     // $content = [
+    //     //     'subject' => 'Vendor Registration of '.$data->businessname,',',
+    //     //     'body' => 'This is the email body of how to send email from laravel 10 with mailtrap.'
+    //     // ];
+
+    //     Mail::to('gnana2315@gmail.com')->send(new vendorRegistrationMail($data));
+
+    //     return "Email has been sent.";
+    // }
 }
