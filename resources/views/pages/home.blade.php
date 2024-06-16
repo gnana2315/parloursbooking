@@ -347,41 +347,60 @@
         </div>
     </div>
 </div-->
-<!--div class="how container_custom">
+<div class="how container_custom">
     <div class="container">
         <div class="row">
             <div class="col">
-                <div class="section_title text-center"><h1>How Directory<span>Plus+</span> works</h1></div>
+                <div class="section_title text-center"><h1>Why Should You Book a <span>Home visit Service?</span></h1></div>
                 <div class="icon_box_container d-flex flex-row align-items-start justify-content-between flex-wrap">
                     <div class="icon_box d-flex flex-column align-items-center justify-content-start text-center">
                         <div class="icon_box_num">01.</div>
-                        <div class="icon_box_icon"><img src="images/icon_6.svg" alt="https://www.flaticon.com/authors/monkik"></div>
-                        <div class="icon_box_title">Choose a category</div>
+                        <!--div class="icon_box_icon"><img src="images/icon_6.svg" alt="Convenience_&_Flexibility"></div-->
+                        <div class="icon_box_title">Convenience & Flexibility</div>
                         <div class="icon_box_text">
-                            <p>Donec cursus, risus non fermentum lacinia, felis lectus interdum velit, in pulvinar enim justo at sem. Quisque ut semper neque. Suspendisse quam est</p>
+                            <p>Saloon home visits whenever it's convenient for you. There's no need to waste time waiting for an appointment or traveling to a salon. You may plan your at-home beauty services with parloursbooking.com at a time that works for you, so you never have to worry about messing with your everyday schedule.</p>
                         </div>
                     </div>
                     <div class="icon_box d-flex flex-column align-items-center justify-content-start text-center">
                         <div class="icon_box_num">02.</div>
-                        <div class="icon_box_icon"><img src="images/icon_7.svg" alt="https://www.flaticon.com/authors/monkik"></div>
-                        <div class="icon_box_title">Find your pick</div>
+                        <div class="icon_box_title">Personalized Experience</div>
                         <div class="icon_box_text">
-                            <p>Donec cursus, risus non fermentum lacinia, felis lectus interdum velit, in pulvinar enim justo at sem. Quisque ut semper neque. Suspendisse quam est</p>
+                            <p>Tailor your cosmetic treatments to meet your specific requirements. You may decide in advance what treatments you need and make reservations for them, whether you just need a quick manicure or a full-blown spa day. You will always receive exactly what you want thanks to this individualized approach.</p>
                         </div>
                     </div>
                     <div class="icon_box d-flex flex-column align-items-center justify-content-start text-center">
                         <div class="icon_box_num">03.</div>
-                        <div class="icon_box_icon"><img src="images/icon_8.svg" alt="https://www.flaticon.com/authors/monkik"></div>
-                        <div class="icon_box_title">Go & have fun</div>
+                        <div class="icon_box_title">Hygiene & Safety</div>
                         <div class="icon_box_text">
-                            <p>Donec cursus, risus non fermentum lacinia, felis lectus interdum velit, in pulvinar enim justo at sem. Quisque ut semper neque. Suspendisse quam est</p>
+                            <p>Safety and cleanliness come first with our salon at home services. Before usage, all instruments and equipment are fully cleaned, and our personnel adhere to stringent hygiene guidelines. Because your health and safety are our top objectives, you may enjoy your treatments with total peace of mind.</p>
+                        </div>
+                    </div>
+                    <div class="icon_box d-flex flex-column align-items-center justify-content-start text-center">
+                        <div class="icon_box_num">04.</div>
+                        <div class="icon_box_title">Professional Expertise</div>
+                        <div class="icon_box_text">
+                            <p>Our team of highly skilled and knowledgeable specialists provides our home salon services. Because of their expertise in a variety of beauty procedures, our professionals guarantee that you will always receive excellent care. Our crew is prepared to give you the finest service possible, whether it be massages, facials, or manicures & pedicures.</p>
+                        </div>
+                    </div>
+                    <div class="icon_box d-flex flex-column align-items-center justify-content-start text-center">
+                        <div class="icon_box_num">05.</div>
+                        <div class="icon_box_title">Affordable Pricing</div>
+                        <div class="icon_box_text">
+                            <p>Take advantage of high-end beauty services at home without going over budget. All of our in-home salon services are reasonably priced at ParloursBooking, making opulent treatments accessible and reasonably priced. You may enjoy your pampering session worry-free because there are no hidden expenses thanks to our straightforward pricing.</p>
+                        </div>
+                    </div>
+                    <div class="icon_box d-flex flex-column align-items-center justify-content-start text-center">
+                        <div class="icon_box_num">06.</div>
+                        <div class="icon_box_title">Easy Booking Process</div>
+                        <div class="icon_box_text">
+                            <p>You may easily and quickly book your at-home beauty services on the parloursbooking.com website. With only a few clicks on our intuitive interface, you can explore, choose, and book the treatments you want. With this easy booking process, you may get salon-caliber services at home more conveniently than ever before, saving you time and effort.</p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div-->
+</div>
 <!--div class="cta_2">
     <div class="container">
         <div class="row row-lg-eq-height">
