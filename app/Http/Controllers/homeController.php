@@ -17,6 +17,10 @@ class homeController extends Controller
 
     public function index(){
         $getAllSEOData = $this->seo_key_words->where('pbseo_status', '=', '1')->get();
-        return view('pages.home')->with('seoWords', $getAllSEOData);
+        $data = [
+            'seoWords' => $getAllSEOData,
+        ];
+        return view('pages.home', $data);
+        // return view('pages.home')->with('seoWords', $getAllSEOData);
     }
 }
