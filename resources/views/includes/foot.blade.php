@@ -1,5 +1,5 @@
 
-<script src="{{ URL::asset('js/jquery-3.3.1.min.js')}}"></script>
+<!-- <script src="{{ URL::asset('js/jquery-3.3.1.min.js')}}"></script> -->
 <script src="{{ URL::asset('css/bootstrap-4.1.2/popper.js')}}"></script>
 <script src="{{ URL::asset('css/bootstrap-4.1.2/bootstrap.min.js')}}"></script>
 <script src="{{ URL::asset('plugins/greensock/TweenMax.min.js')}}"></script>

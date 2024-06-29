@@ -14,8 +14,8 @@
         <!--div class="add_listing text-center trans_200"><a href="#">+Add Listing</a></div-->
         <div class="log_reg">
             <ul class="d-flex flex-row align-items-center justify-content-start">
-                <!--li><a href="#">Login</a></li-->
                 <li><a href="/join-with-us">Join with Us</a></li>
+                <li><a href="/login">Login</a></li>
             </ul>
         </div>
         <!--div class="hamburger">

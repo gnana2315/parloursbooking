@@ -22,3 +22,7 @@
 <link rel="stylesheet" href="{{ URL::asset('admin/plugins/daterangepicker/daterangepicker.css') }}">
 <!-- summernote -->
 <link rel="stylesheet" href="{{ URL::asset('admin/plugins/summernote/summernote-bs4.min.css') }}">
+<!-- jQuery -->
+<script src="{{ URL::asset('admin/plugins/jquery/jquery.js') }}"></script>
+<!-- jQuery UI 1.11.4 -->
+<script src="{{ URL::asset('admin/plugins/jquery-ui/jquery-ui.min.js') }}"></script>

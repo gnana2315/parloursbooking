@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -22,13 +22,14 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
+	protected $primaryKey = 'pbu_id';
     protected $fillable = [
         'pbu_id',
         'pbu_usertype',
         'pbu_personid',
         'pbu_name',
         'pbu_email',
-        'pbu_password',
+        'password',
         'pbu_status',
         'created_at',
         'updated_at',
@@ -40,7 +41,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $hidden = [
-        'pbu_password',
+        'password',
         'remember_token',
     ];
 
@@ -51,5 +52,16 @@ class User extends Authenticatable
      */
     protected $casts = [
         'pbu_email_verified_at' => 'datetime',
+        'password' => 'hashed',
     ];
+
+    public function hasRole($usertype)
+    {
+        return $this->getAttribute('pbu_usertype') == $usertype;
+    }
+
+    public function hasStatus($status)
+    {
+        return $this->getAttribute('pbu_status') == $status;
+    }
 }

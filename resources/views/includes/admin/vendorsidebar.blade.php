@@ -14,7 +14,7 @@
                 <img src="{{ URL::asset('admin/img/user2-160x160.jpg') }}" class="img-circle elevation-2" alt="User Image">
             </div>
             <div class="info">
-                <a href="#" class="d-block">Admin</a>
+                <a href="#" class="d-block">Vendor</a>
             </div>
         </div>
 
@@ -41,48 +41,16 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="/vendor" class="nav-link">
+                    <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-th"></i>
-                        <p>Vendors</p>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="/reports" class="nav-link">
-                        <i class="nav-icon fas fa-copy"></i>
-                        <p>Reports</p>
-                    </a>
+                        <p>Services</p>
+                    </a> 
                 </li>
                 <li class="nav-item">
                     <a href="#" class="nav-link">
-                        <i class="nav-icon far fa-gears"></i>
-                        <p>System Config<i class="fas fa-angle-down right"></i></p>
+                        <i class="nav-icon fas fa-copy"></i>
+                        <p>Price List</p>
                     </a>
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="/serviceCategoriesView" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Service Categories</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="/serviceTypesView" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Service Types</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="/seoIndex" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>SEO</p>
-                            </a>
-                        </li>
-                        <!--li class="nav-item">
-                            <a href="pages/forms/validation.html" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Validation</p>
-                            </a>
-                        </li-->
-                    </ul>
                 </li>
                 <!--li class="nav-item">
                     <a href="#" class="nav-link">
@@ -95,7 +63,39 @@
                         <i class="nav-icon fas fa-tree"></i>
                         <p>UI Elements<i class="fas fa-angle-left right"></i></p>
                     </a>
-                </li>                
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-edit"></i>
+                        <p>Forms<i class="fas fa-angle-left right"></i></p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="pages/forms/general.html" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>General Elements</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="pages/forms/advanced.html" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Advanced Elements</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="pages/forms/editors.html" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Editors</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="pages/forms/validation.html" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Validation</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
                 <li class="nav-item">
                     <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-table"></i>

@@ -1,13 +1,9 @@
-<!-- jQuery -->
-<script src="{{ URL::asset('admin/plugins/jquery/jquery.min.js') }}"></script>
-<!-- jQuery UI 1.11.4 -->
-<script src="{{ URL::asset('admin/plugins/jquery-ui/jquery-ui.min.js') }}"></script>
 <!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
 <script>
     $.widget.bridge('uibutton', $.ui.button)
 </script>
 <!-- Bootstrap 4 -->
-<script src="{{ URL::asset('admin/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+<script src="{{ URL::asset('admin/plugins/bootstrap/js/bootstrap.min.js') }}"></script>
 <!-- ChartJS -->
 <script src="{{ URL::asset('admin/plugins/chart.js/Chart.min.js') }}"></script>
 <!-- Sparkline -->
@@ -27,6 +23,6 @@
 <!-- overlayScrollbars -->
 <script src="{{ URL::asset('admin/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js') }}"></script>
 <!-- AdminLTE App -->
-<script src="{{ URL::asset('admin/js/adminlte.js') }}"></script>
+<script src="{{ URL::asset('admin/js/adminlte.min.js') }}"></script>
 <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
 <script src="{{ URL::asset('admin/js/pages/dashboard.js') }}"></script>

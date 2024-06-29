@@ -1,26 +1,32 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\vendor;
+use App\Models\vendors;
 use App\Models\person;
 use App\Models\User;
+use App\Models\userLogs;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Hash;
+use Session;
+use Auth;
 use Mail;
 use App\Mail\vendorRegistrationMail;
 
 class Usercontroller extends Controller
 {
-    protected $vendor;
+    protected $vendors;
     protected $person;
     protected $User;
+    protected $userLogs;
 
-    public function __construct(vendor $vendor, person $person, User $User)
+    public function __construct(vendors $vendors, person $person, User $User, userLogs $userLogs)
     {
-        $this->vendor = $vendor;
+        $this->vendors = $vendors;
         $this->person = $person;
         $this->User = $User;
+        $this->userLogs = $userLogs;
     }
     //registration page load
     public function index(){     
@@ -127,10 +133,9 @@ class Usercontroller extends Controller
             'pbv_city' => $request->input('userreg_businessregaddresscity'),
             'pbp_status' => '0'
         ];
-
         
         // dd($vendor_data);
-        $vendorInsert = $this->vendor->create($vendor_data);
+        $vendorInsert = $this->vendors->create($vendor_data);
         if($vendorInsert){
             
             // logo & document upload
@@ -153,7 +158,7 @@ class Usercontroller extends Controller
 
             // person data construction
             $person_data = [
-                'pbv_id' => $vendorInsert->id,
+                'pbv_id' => $vendorInsert->pbv_id,
                 'pbp_intial' => $request->input('userreg_businessownertitle'),
                 'pbp_firstname' => $request->input('userreg_businessownerfirstname'),
                 'pbp_lastname' => $request->input('userreg_businessownerlastname'),
@@ -177,20 +182,31 @@ class Usercontroller extends Controller
                     'pbu_personid' => $personInsert->id,
                     'pbu_name' => $request->input('userreg_businessusername'),
                     'pbu_email' => $request->input('userreg_businessowneremail'),
-                    'pbu_password' => $request->input('userreg_businessuserpassword'),
+                    // 'pbu_password' => Hash::make($request->input('userreg_businessuserpassword')),
+                    'password' => $request->input('userreg_businessuserpassword'),
                     'pbu_status' => '1'
                 ];
                 // dd($user_data);
                 $userInsert = $this->User->create($user_data);
                 
                 if($userInsert){
+                    // construct userlog content
+                    $log_message = 'Vendor registered and created the profile.';
+                    $userlog_data = [
+                        'pbu_id' => $userInsert->pbu_id,
+                        'pbul_description' => $log_message,
+                        'pbul_time' => date('Y-m-d H:i:s'),
+                        'pbul_status' => '1'
+                    ];
+
+                    $this->userLogs->create($userlog_data);
                     //construct email content
                     $mail_data = [
                         'email' => $request->input('userreg_businessowneremail'),
                         'businessname' => $request->input('userreg_businessname'),
                         'name' => $request->input('userreg_businessownertitle').'.'.$request->input('userreg_businessownerfirstname')
                     ];
-
+                    
                     //$this->vendorRegistrationEmail($mail_data);
                     Mail::to($request->input('userreg_businessowneremail'))->send(new vendorRegistrationMail($mail_data));
 
@@ -206,6 +222,85 @@ class Usercontroller extends Controller
         }
     }
 
+    public function load_login()
+    {
+        return view('pages.login');
+    }
+
+    public function userLogin(Request $request)
+    {
+        $request->validate(
+            [                
+                'pbu_email' => 'required',
+                'password' => 'required'
+            ],
+            [
+                'pbu_useremail.required' => 'User Email Required',
+                'password.required' => 'User Password Required'
+            ]
+        );
+        $userDetails = $this->User->get();
+        $userType= "";
+        foreach($userDetails as $userDetail){
+            if($userDetail->pbu_email == $request->input('pbu_email')){                
+                $userType = ($userDetail->pbu_usertype);
+                $userID = ($userDetail->pbu_id);
+            }
+        }
+        $credentials = $request->only('pbu_email', 'password');
+        if (auth()->attempt($credentials)) {
+
+            // user log record
+            $log_message = 'Vendor logged into the profile.';
+            $userlog_data = [
+                'pbu_id' => $userID,
+                'pbul_description' => $log_message,
+                'pbul_time' => date('Y-m-d H:i:s'),
+                'pbul_status' => '1'
+            ];
+
+            $this->userLogs->create($userlog_data);
+            if($userType == '0'){
+                if (!auth()->user()->pbu_email_verified_at) {
+                    return redirect('/login')->with('failed', 'Error!, You are not authorized.');
+                }else{
+                    return redirect('/superdashboard')->with('Success', 'Success!, You are authorized.');
+                }
+            }else if($userType == '1'){ 
+                if (!auth()->user()->pbu_email_verified_at) {
+                    return redirect('/login')->with('failed', 'Error!, You are not authorized.');
+                }else{
+                    return redirect('/dashboard')->with('Success', 'Success!, You are authorized.');
+                }
+            }else if($userType == '2'){
+                if (!auth()->user()->pbu_email_verified_at) {
+                    return redirect('/login')->with('failed', 'Error!, You are not authorized.');
+                }else{
+                    return redirect('/userdashboard')->with('Success', 'Success!, You are authorized.');
+                }
+
+            }
+        }else{            
+            return redirect('/login')->with('failed', 'Error!, Invalid Login');
+        }
+        //dd(Auth::user());
+    }
+
+    public function logout()
+    {
+        // user log record
+        $log_message = 'Vendor logged out from the profile.';
+        $userlog_data = [
+            'pbu_id' => auth()->user()->pbu_id,
+            'pbul_description' => $log_message,
+            'pbul_time' => date('Y-m-d H:i:s'),
+            'pbul_status' => '1'
+        ];
+        $this->userLogs->create($userlog_data);
+        
+        auth()->logout(); 
+        return redirect('/login');
+    }
     // public function vendorRegistrationEmail($data)
     // {
     //     // dd($data);
