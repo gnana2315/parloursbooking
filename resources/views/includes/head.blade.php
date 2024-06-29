@@ -2,12 +2,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="description" content="Parloursbooking.com is mission is to bring people and beauty service businesses together by enabling them to easily reserve their services online no matter which, where they are or when they want to book! which provides customers with the best and most user-friendly software solutions.">
-<!-- @if($seoWords != '')
-@foreach($seoWords as $seoWord)
-<meta name="keywords" content="{{ $seoWord->pbseo_words }}">
-@endforeach
-@endif -->
-<meta name="keywords" content="{{ $seoWord->pbseo_words ?? 'Default Title' }}">
+<meta name="keywords" content="{{ $seoWords[0]->pbseo_words ?? 'Default Title' }}">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" type="text/css" href="{{ URL::asset('css/bootstrap-4.1.2/bootstrap.min.css')}}">
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.min.css">
