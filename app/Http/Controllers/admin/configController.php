@@ -135,7 +135,7 @@ class configController extends Controller
 
         if($serviceCategoryUpdate){
             // user log record
-            $log_message = auth()->user()->pbu_name.' updated the '.$serviceCategoryInsert->pbsc_name;
+            $log_message = auth()->user()->pbu_name.' updated the '.$serviceCategoryUpdate->pbsc_name;
             $userlog_data = [
                 'pbu_id' => auth()->user()->pbu_id,
                 'pbul_description' => $log_message,

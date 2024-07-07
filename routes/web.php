@@ -9,6 +9,7 @@ use App\Http\Controllers\superAdminController;
 use App\Http\Controllers\admin\configController;
 use App\Http\Controllers\admin\vendorsController;
 use App\Http\Controllers\admin\reportsController;
+use App\Http\Controllers\admin\servicesController;
 
 use App\Http\Controllers\userAdminController;
 use App\Http\Controllers\SendMailController;
@@ -92,6 +93,12 @@ Route::group(['middleware' => 'auth.check'], function () {
         });
         Route::group(['middleware' => 'isUser'], function () {
             Route::get('/userdashboard', [userAdminController::class, 'index']);
+
+            Route::get('/userservices', [servicesController::class, 'index']);
+            Route::post('/insertService', [servicesController::class, 'insertService']);
+            Route::get('/get_service/{id}', [servicesController::class, 'getService']);
+            Route::post('/updateService', [servicesController::class, 'updateService']);            
+            Route::get('/delete_service/{id}', [servicesController::class, 'deleteService']);
         });
     });
 });
