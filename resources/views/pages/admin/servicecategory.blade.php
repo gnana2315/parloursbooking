@@ -87,7 +87,7 @@
                         @csrf
                         <div class="form-group">
                             <label for="newServiceCategory" class="col-form-label">Service Category</label>
-                            <input id="newServiceCategory" name="newServiceCategory" placeholder="Enter the Service Category" required>
+                            <input type="text" class="form-control" id="newServiceCategory" name="newServiceCategory" placeholder="Enter the Service Category" required>
                         </div>
                         <div class="form-group">
                             <button type="submit" class="btn btn-warning float-right" name="newServiceCategorySubmit" id="newServiceCategorySubmit">Save</button>

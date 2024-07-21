@@ -56,14 +56,15 @@
                                                 <td><label class="ribbon bg-danger">Admin need to Verify</label></td>
                                             @endif
                                             <td>
-                                                <a href="/viewVendor/{{ $vendor->pbv_id }}" class="btn btn-info" type="button" title="View Vendor Details" name="viewVendor" id="viewVendor"><i class="fa fa-eye"></i></a>
+                                                <a href="/viewVendor/{{ $vendor->pbv_id }}" class="btn btn-info" type="button" title="View Vendor Details" name="viewVendor" id="viewVendor" target="_blank"><i class="fa fa-eye"></i></a>
                                                 |
                                                 <button class="btn btn-success" type="button" title="Print Vendor Details" name="printVendor" id="printVendor" value="{{ $vendor->pbv_id }}"><i class="fa fa-print"></i></button>
                                                 |
-                                                @if( $vendor->pbp_status == 1)
-                                                    <button class="btn btn-danger" type="button" title="Disable Vendor" name="disableVendor" id="disableVendor" value="{{ $vendor->pbv_id }}"><i class="fa fa-power-off"></i></button>
+                                                @if( $vendor->pbu_status == 1)
+                                                    <button class="btn btn-danger" type="button" title="Disable Vendor" name="disableVendor" id="disableVendor" value="{{ $vendor->pbu_id }}"><i class="fa fa-power-off"></i></button>
                                                 @else
-                                                    <button class="btn btn-success" type="button" title="Approve Vendor" name="enableVendor" id="enableVendor" value="{{ $vendor->pbv_id }}"><i class="fa fa-power-off"></i></button>
+                                                    <button class="btn btn-success" type="button" title="Approve Vendor" name="enableVendor" id="enableVendor" value="{{ $vendor->pbu_id }}"><i class="fa fa-power-off"></i></button>
+                                                    <!-- <form method="POST" action="/enable_vendor">@csrf<input type="hidden" name="enableuid" value="{{ $vendor->pbu_id }}" /><button type="submit" class="btn btn-success" title="Approve Vendor" name="enableVendor" id="enableVendor"><i class="fa fa-power-off"></i></button></form> -->
                                                 @endif
                                             </td>
                                         </tr>

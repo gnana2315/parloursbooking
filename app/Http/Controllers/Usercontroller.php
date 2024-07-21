@@ -13,6 +13,7 @@ use Session;
 use Auth;
 use Mail;
 use App\Mail\vendorRegistrationMail;
+use App\Notifications\VerifyEmailNotification;
 
 class Usercontroller extends Controller
 {
@@ -184,7 +185,7 @@ class Usercontroller extends Controller
                     'pbu_email' => $request->input('userreg_businessowneremail'),
                     // 'pbu_password' => Hash::make($request->input('userreg_businessuserpassword')),
                     'password' => $request->input('userreg_businessuserpassword'),
-                    'pbu_status' => '1'
+                    'pbu_status' => '0'
                 ];
                 // dd($user_data);
                 $userInsert = $this->User->create($user_data);
@@ -273,7 +274,7 @@ class Usercontroller extends Controller
                     return redirect('/dashboard')->with('Success', 'Success!, You are authorized.');
                 }
             }else if($userType == '2'){
-                if (!auth()->user()->pbu_email_verified_at) {
+                if (auth()->user()->pbu_status != 1) {
                     return redirect('/login')->with('failed', 'Error!, You are not authorized.');
                 }else{
                     return redirect('/userdashboard')->with('Success', 'Success!, You are authorized.');

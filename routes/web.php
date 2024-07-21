@@ -88,6 +88,7 @@ Route::group(['middleware' => 'auth.check'], function () {
 
             Route::get('/vendors', [vendorsController::class, 'index']);
             Route::get('/vendorlist', [vendorsController::class, 'getAllVendorsList']);
+            Route::get('/viewVendor/{id}', [vendorsController::class, 'viewVendor']);
 
             Route::get('/reports', [reportsController::class, 'index']);
         });

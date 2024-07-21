@@ -19,17 +19,18 @@
     </section>
 
     <?php
-        $vendorLogoPath = str_replace(' ', '', $vendor->pbv_name).'/'.$vendor->pbv_logo;
-        $vendor_created_date = $vendor->created_at;
-        $curent_date_time = date('Y-m-d H:i:s');
+        foreach($vendor as $v){
+            $vendorLogoPath = str_replace(' ', '', $v->pbv_name).'/'.$v->pbv_logo;
+            $vendor_created_date = $v->created_at;
+            $curent_date_time = date('Y-m-d H:i:s');
 
-        $start_datetime = new DateTime($vendor_created_date); 
-        $diff = $start_datetime->diff(new DateTime($curent_date_time));
+            $start_datetime = new DateTime($vendor_created_date); 
+            $diff = $start_datetime->diff(new DateTime($curent_date_time));
 
-        $FolderName = preg_replace('/\s+/', '', $vendor->pbv_name);
-        $parlour_certificate_url = $FolderName.'/'.$vendor->pbv_parlourcertificate;
-        $br_doc_url = $FolderName.'/'.$vendor->pbv_brdoc;
-        $owners_nic_url = $FolderName.'/'.$vendor->pbp_nic;
+            $FolderName = preg_replace('/\s+/', '', $v->pbv_name);
+            $parlour_certificate_url = $FolderName.'/'.$v->pbv_parlourcertificate;
+            $br_doc_url = $FolderName.'/'.$v->pbv_brdoc;
+            $owners_nic_url = $FolderName.'/'.$v->pbp_nic;
     ?>
     <section class="content">
         <div class="container-fluid">
@@ -40,8 +41,8 @@
                             <div class="text-center">
                                 <img class="profile-user-img img-fluid img-circle" src="{{ asset('/vendors/'.$vendorLogoPath) }}" alt="User profile picture">
                             </div>
-                            <h3 class="profile-username text-center">{{ $vendor->pbv_name }}</h3>
-                            <p class="text-muted text-center">{{ $vendor->pbv_brno }}</p>
+                            <h3 class="profile-username text-center">{{ $v->pbv_name }}</h3>
+                            <p class="text-muted text-center">{{ $v->pbv_brno }}</p>
                             <!--ul class="list-group list-group-unbordered mb-3">
                                 <li class="list-group-item">
                                     <b>Followers</b> <a class="float-right">1,322</a>
@@ -63,20 +64,20 @@
                         </div>
                         <div class="card-body">
                             <strong><i class="fas fa-book mr-1"></i> Service Type</strong>
-                            <p class="text-muted">{{ $vendor->pbsc_name }}</p>
+                            <p class="text-muted">{{ $v->pbsc_name }}</p>
                             <strong><i class="fas fa-map-marker-alt mr-1"></i> Location</strong>
                             <p class="text-muted">
-                                @if($vendor->pbv_address != '')
-                                    {{ $vendor->pbv_address }},
+                                @if($v->pbv_address != '')
+                                    {{ $v->pbv_address }},
                                 @endif
-                                @if($vendor->pbv_city != '')
-                                    {{ $vendor->pbv_city }}
+                                @if($v->pbv_city != '')
+                                    {{ $v->pbv_city }}
                                 @endif
                             </p>
                             <strong><i class="fas fa-phone-alt"></i> Contact No</strong>
-                            <p class="text-muted">{{ $vendor->pbv_contactno }}</p>
+                            <p class="text-muted">{{ $v->pbv_contactno }}</p>
                             <strong><i class="fas fa-envelope"></i> Email Address</strong>
-                            <p class="text-muted">{{ $vendor->pbv_email }}</p>
+                            <p class="text-muted">{{ $v->pbv_email }}</p>
                         </div>
                     </div>
                     <div class="card card-secondary">
@@ -85,19 +86,19 @@
                         </div>
                         <div class="card-body">
                             <strong><i class="fas fa-book mr-1"></i> Owner Name</strong>
-                            <p class="text-muted">{{ $vendor->pbp_intial }} {{ $vendor->pbp_firstname }} {{ $vendor->pbp_lastname }}</p>
+                            <p class="text-muted">{{ $v->pbp_intial }} {{ $v->pbp_firstname }} {{ $v->pbp_lastname }}</p>
                             <strong><i class="fas fa-map-marker-alt mr-1"></i> Location</strong>
                             <p class="text-muted">
-                                @if($vendor->pbp_address != '')
-                                    {{ $vendor->pbp_address }}
+                                @if($v->pbp_address != '')
+                                    {{ $v->pbp_address }}
                                 @endif
                             </p>
                             <strong><i class="fas fa-id-badge"></i> NIC No</strong>
-                            <p class="text-muted">{{ $vendor->pbp_nicno }}</p>
+                            <p class="text-muted">{{ $v->pbp_nicno }}</p>
                             <strong><i class="fas fa-phone-alt"></i> Contact No</strong>
-                            <p class="text-muted">{{ $vendor->pbp_contactno }}</p>
+                            <p class="text-muted">{{ $v->pbp_contactno }}</p>
                             <strong><i class="fas fa-envelope"></i> Email Address</strong>
-                            <p class="text-muted">{{ $vendor->pbp_email }}</p>
+                            <p class="text-muted">{{ $v->pbp_email }}</p>
                         </div>
                     </div>
                 </div>
@@ -106,7 +107,7 @@
                         <div class="card-header p-2">
                             <ul class="nav nav-pills">
                                 <li class="nav-item"><a class="nav-link active" href="#attachments" data-toggle="tab">Attachments</a></li>
-                                <li class="nav-item"><a class="nav-link" href="#activity" data-toggle="tab" data-value="{{ $vendor->pbu_id }}" id="activity_logs">Activity</a></li>
+                                <li class="nav-item"><a class="nav-link" href="#activity" data-toggle="tab" data-value="{{ $v->pbu_id }}" id="activity_logs">Activity</a></li>
                                 <li class="nav-item"><a class="nav-link" href="#timeline" data-toggle="tab">Timeline</a></li>
                                 <li class="nav-item"><a class="nav-link" href="#settings" data-toggle="tab">Settings</a></li>
                             </ul>
@@ -117,10 +118,10 @@
                                     <div class="post clearfix">
                                         <div class="user-block">
                                             <span class="username">
-                                                <a href="#">{{ $vendor->pbv_name }}</a>
+                                                <a href="#">{{ $v->pbv_name }}</a>
                                             </span>
                                             <span class="description">
-                                                {{ $vendor->created_at }}
+                                                {{ $v->created_at }}
                                                 <?php
                                                     if($diff->y > 0){
                                                         echo " - ".$diff->y." Years Ago";
@@ -154,10 +155,10 @@
                                     <div class="post clearfix">
                                         <div class="user-block">
                                             <span class="username">
-                                                <a href="#">{{ $vendor->pbv_name }}</a>
+                                                <a href="#">{{ $v->pbv_name }}</a>
                                             </span>
                                             <span class="description">
-                                                {{ $vendor->created_at }}
+                                                {{ $v->created_at }}
                                                 <?php
                                                     if($diff->y > 0){
                                                         echo " - ".$diff->y." Years Ago";
@@ -191,10 +192,10 @@
                                     <div class="post clearfix">
                                         <div class="user-block">
                                             <span class="username">
-                                                <a href="#">{{ $vendor->pbv_name }}</a>
+                                                <a href="#">{{ $v->pbv_name }}</a>
                                             </span>
                                             <span class="description">
-                                                {{ $vendor->created_at }}
+                                                {{ $v->created_at }}
                                                 <?php
                                                     if($diff->y > 0){
                                                         echo " - ".$diff->y." Years Ago";
@@ -437,6 +438,7 @@
             </div>
         </div>
     </section>
+    <?php } ?>
 </div>
 <script>
     $(document).ready(function(){
