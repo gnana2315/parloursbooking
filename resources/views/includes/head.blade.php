@@ -10,3 +10,6 @@
 <link rel="stylesheet" type="text/css" href="{{ URL::asset('plugins/OwlCarousel2-2.3.4/owl.carousel.css')}}">
 <link rel="stylesheet" type="text/css" href="{{ URL::asset('plugins/OwlCarousel2-2.3.4/owl.theme.default.css')}}">
 <link rel="stylesheet" type="text/css" href="{{ URL::asset('plugins/OwlCarousel2-2.3.4/animate.css')}}">
+<script src="{{ URL::asset('js/jquery-3.3.1.min.js')}}"></script>
+<script src="{{ URL::asset('css/bootstrap-4.1.2/popper.js')}}"></script>
+<script src="{{ URL::asset('css/bootstrap-4.1.2/bootstrap.min.js')}}"></script>

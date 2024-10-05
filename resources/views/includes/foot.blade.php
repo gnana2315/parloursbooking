@@ -1,7 +1,3 @@
-
-<script src="{{ URL::asset('js/jquery-3.3.1.min.js')}}"></script>
-<script src="{{ URL::asset('css/bootstrap-4.1.2/popper.js')}}"></script>
-<script src="{{ URL::asset('css/bootstrap-4.1.2/bootstrap.min.js')}}"></script>
 <script src="{{ URL::asset('plugins/greensock/TweenMax.min.js')}}"></script>
 <script src="{{ URL::asset('plugins/greensock/TimelineMax.min.js')}}"></script>
 <script src="{{ URL::asset('plugins/scrollmagic/ScrollMagic.min.js')}}"></script>
@@ -33,6 +29,23 @@
     GFG_Fun();
 </script>
 <script>
+	$(document).ready(function() {
+        var path = window.location.pathname;
+        if (path === '/' || path === '/index.php' || path === '/home.php') {
+            $('.header').addClass('home_header');
+        } else {
+            $('.header').removeClass('home_header');
+        }
+	});
+
+    $(window).on('load', function() {
+        // Hide the loader and show the content
+        $('#loader').fadeOut(50000, function() {
+            $('#content').fadeIn(100);
+        });
+    });
+
+
     $("#servicesBookNow").on('click', function(){
         var items = [];
         var tableBody = '';

@@ -419,12 +419,16 @@ section
 	left: 0;
 	width: 100%;
 	z-index: 100;
-	/*background: #492a5b;*/
+	background: #492a5b;
 	-webkit-transition: all 400ms ease;
 	-moz-transition: all 400ms ease;
 	-ms-transition: all 400ms ease;
 	-o-transition: all 400ms ease;
 	transition: all 400ms ease;
+}
+.home_header
+{
+	background: rgba(255,255,255,0);
 }
 .header.scrolled
 {
@@ -518,7 +522,8 @@ section
 .log_reg ul li:not(:last-of-type)::after
 {
 	display: inline-block;
-	content: '/';
+	/*content: '/';*/
+	content: '';
 	margin-left: 6px;
 	margin-right: 6px;
 	font-size: 16px;

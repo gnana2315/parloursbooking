@@ -4,7 +4,33 @@
         @include('includes.head')
     </head>
     <body>
+        <div id="loader" class="loader"></div>
 		<div class="super_container">
+            <div class="topbar">                
+                <div class="d-flex flex-row align-items-center justify-content-start">
+                    <ul class="d-flex flex-row align-items-center justify-content-start social_media_icons">
+                        <li><a href="/"><img src="images/facebook.png" class="svg" alt="facebook"></a></li>
+                        <li><a href="/"><img src="images/instagram.png" class="svg" alt="instagram"></a></li>						
+                        <li><a href="/"><img src="images/whatsapp.png" class="svg" alt="whatsapp"></a></li>
+                        <li><a href="/"><img src="images/youtube.png" class="svg" alt="youtube"></a></li>
+                        <li><a href="/"><img src="images/tiktok.png" class="svg" alt="tiktok"></a></li>
+                    </ul>
+                    <ul class="d-flex flex-row align-items-center justify-content-end ml-auto social_media_icons">
+                        <li class="contact_us_elements">
+                            <a href="/">
+                                <img src="images/email.png" alt="email" class="svg">
+                                <p>info@parloursbooking.com</p>
+                            </a>
+                        </li>
+                        <li class="contact_us_elements">
+                            <a href="/">
+                                <img src="images/call.png" alt="call" class="svg">
+                                <p>+94 71 123 456</p>
+                            </a>
+                        </li>						
+                    </ul>
+                </div>
+            </div>
 			<header class="header">
                 @include('includes.header')
             </header>
