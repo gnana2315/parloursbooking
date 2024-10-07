@@ -8,7 +8,7 @@
     <div class="home_slider_container">
         <div class="owl-carousel owl-theme home_slider">
             <div class="slide">
-                <div class="background_image" style="background-image:url(images/index2.jpg)"></div>
+                <div class="background_image" style="background-image:url(images/index3b.jpg)"></div>
                 <div class="home_container">
                     <div class="container">
                         <div class="row">
@@ -52,14 +52,14 @@
                                                                 </div>
                                                             </a>
                                                         </div>
-                                                        <div class="category text-center">
+                                                        <!--div class="category text-center">
                                                             <a href="/homevisit">
                                                                 <div class="d-flex flex-md-column flex-row align-items-md-center align-items-md-center align-items-center justify-content-center">
                                                                     <div class="cat_icon"><img src="images/home.png" class="svg" alt="tatoo-machine"></div>
                                                                     <div class="cat_title">Home Visit</div>
                                                                 </div>
                                                             </a>
-                                                        </div>
+                                                        </div-->
                                                         <!--div class="category text-center">
                                                             <a href="listings.html">
                                                                 <div class="d-flex flex-md-column flex-row align-items-md-center align-items-md-start align-items-center justify-content-start">
@@ -351,7 +351,7 @@
     <div class="container">
         <div class="row">
             <div class="col">
-                <div class="section_title text-center"><h1>Why Should You Book a <span>Home visit Service?</span></h1></div>
+                <div class="section_title text-center"><h1 style="color:#fff;">Why Should You Book a <span>Home visit Service?</span></h1></div>
                 <div class="icon_box_container d-flex flex-row align-items-start justify-content-between flex-wrap">
                     <div class="icon_box d-flex flex-column align-items-center justify-content-start text-center">
                         <div class="icon_box_num">01.</div>

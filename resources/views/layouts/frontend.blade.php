@@ -9,22 +9,22 @@
             <div class="topbar">                
                 <div class="d-flex flex-row align-items-center justify-content-start">
                     <ul class="d-flex flex-row align-items-center justify-content-start social_media_icons">
-                        <li><a href="/"><img src="images/facebook.png" class="svg" alt="facebook"></a></li>
-                        <li><a href="/"><img src="images/instagram.png" class="svg" alt="instagram"></a></li>						
-                        <li><a href="/"><img src="images/whatsapp.png" class="svg" alt="whatsapp"></a></li>
-                        <li><a href="/"><img src="images/youtube.png" class="svg" alt="youtube"></a></li>
-                        <li><a href="/"><img src="images/tiktok.png" class="svg" alt="tiktok"></a></li>
+                        <li><a href="/"><img src="images/facebook_black.png" class="svg" alt="facebook"></a></li>
+                        <li><a href="/"><img src="images/instagram_black.png" class="svg" alt="instagram"></a></li>						
+                        <li><a href="/"><img src="images/whatsapp_black.png" class="svg" alt="whatsapp"></a></li>
+                        <li><a href="/"><img src="images/youtube_black.png" class="svg" alt="youtube"></a></li>
+                        <li><a href="/"><img src="images/tiktok_black.png" class="svg" alt="tiktok"></a></li>
                     </ul>
                     <ul class="d-flex flex-row align-items-center justify-content-end ml-auto social_media_icons">
                         <li class="contact_us_elements">
                             <a href="/">
-                                <img src="images/email.png" alt="email" class="svg">
+                                <img src="images/email_black.png" alt="email" class="svg">
                                 <p>info@parloursbooking.com</p>
                             </a>
                         </li>
                         <li class="contact_us_elements">
                             <a href="/">
-                                <img src="images/call.png" alt="call" class="svg">
+                                <img src="images/call_black.png" alt="call" class="svg">
                                 <p>+94 71 123 456</p>
                             </a>
                         </li>						

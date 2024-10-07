@@ -17,7 +17,7 @@
                 <li><a href="/mens">Male</a></li>
                 <li><a href="/women">Female</a></li>						
                 <li><a href="/unisex">Unisex</a></li>
-                <li><a href="/homevisit">Home Visit</a></li>
+                <!--li><a href="/homevisit">Home Visit</a></li-->
                 <li><a href="/join-with-us">Join with Us</a></li>
                 <li><a href="/login">Login</a></li>
             </ul>

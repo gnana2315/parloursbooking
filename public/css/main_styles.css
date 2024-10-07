@@ -473,16 +473,18 @@ section
 }
 .contact_us_elements p{
 	padding-left: 5px;
-	color: #360f64;
+	/*color: #360f64;*/
+	color: #000;
 }
 
 .header
 {
 	position: fixed;
-	top: 30px;
+	top: 40px;
 	left: 0;
 	width: 100%;
 	z-index: 100;
+	background: rgba(0,0,0,1);
 	/*background: rgba(54,15,100,0.9);*/
 	-webkit-transition: all 400ms ease;
 	-moz-transition: all 400ms ease;
@@ -492,8 +494,9 @@ section
 }
 .header.scrolled
 {
-	background: rgba(54,15,100,0.9);
-	/* background: #2b0c0b; */
+	background: rgba(0,0,0,1);
+	/*background: rgba(54,15,100,0.9);
+	 background: #2b0c0b; */
 	top:40px;
 }
 .header.active
@@ -719,7 +722,8 @@ section
 .home
 {
 	height: 857px;
-	background: #360f64;
+	/*background: #360f64;*/
+	background: #000;
 	overflow: hidden;
 }
 .home_slider_container
@@ -768,7 +772,7 @@ section
 {
 	position: absolute;
 	left: 0;
-	top: 36.2%;
+	top: 40%;
 	width: 100%;
 }
 .home_content
@@ -865,7 +869,8 @@ section
 	height: 57px;
 	border: none;
 	outline: none;
-	background: #ffb400;
+	/*background: #ffb400;*/
+	background: #000;
 	border-radius: 5px;
 	cursor: pointer;
 	font-size: 16px;
@@ -1182,7 +1187,8 @@ section
 
 .how
 {
-	background: #e1ecf4;
+	/*background: #e1ecf4;*/
+	background: #000;
 	padding-top: 94px;
 	padding-bottom: 42px;
 }
