@@ -7,9 +7,9 @@
 <div class="home">
     <div class="home_slider_container">
         <div class="owl-carousel owl-theme home_slider">
-            <div class="slide">
-                <div class="background_image" style="background-image:url(images/index.jpg)"></div>               
-                <div class="overlay"></div>              
+            <div class="slide" style="background:#d2b6aa;">
+                <!--div class="background_image" style="background-image:url(images/index.jpg)"></div>               
+                <div class="overlay"></div-->              
                 <div class="home_container">
                     <div class="container">
                         <div class="row">
