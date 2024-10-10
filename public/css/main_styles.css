@@ -447,7 +447,8 @@ section
 	padding:5px 0;
 	width: 100%;
 	z-index: 100;
-	background: #ffb400;
+	background: #837b68;
+	/* background: #ffb400; */
 	/*background: rgba(54,15,100,0.9);*/
 	-webkit-transition: all 400ms ease;
 	-moz-transition: all 400ms ease;
@@ -484,7 +485,7 @@ section
 	left: 0;
 	width: 100%;
 	z-index: 100;
-	background: rgba(0,0,0,1);
+	/* background: #4b291f; */
 	/*background: rgba(54,15,100,0.9);*/
 	-webkit-transition: all 400ms ease;
 	-moz-transition: all 400ms ease;
@@ -494,7 +495,7 @@ section
 }
 .header.scrolled
 {
-	background: rgba(0,0,0,1);
+	background: #837b68;
 	/*background: rgba(54,15,100,0.9);
 	 background: #2b0c0b; */
 	top:40px;
@@ -870,7 +871,7 @@ section
 	border: none;
 	outline: none;
 	/*background: #ffb400;*/
-	background: #000;
+	background: #837b68;
 	border-radius: 5px;
 	cursor: pointer;
 	font-size: 16px;
@@ -1188,7 +1189,7 @@ section
 .how
 {
 	/*background: #e1ecf4;*/
-	background: #000;
+	background: #837b68;
 	padding-top: 94px;
 	padding-bottom: 42px;
 }
@@ -1423,4 +1424,13 @@ section
 .footer_nav ul li.active a
 {
 	color: #ffb400;
+}
+
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%; /* Cover the container */
+    height: 100%; /* Cover the container */
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent overlay */
 }

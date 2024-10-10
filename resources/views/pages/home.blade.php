@@ -8,7 +8,8 @@
     <div class="home_slider_container">
         <div class="owl-carousel owl-theme home_slider">
             <div class="slide">
-                <div class="background_image" style="background-image:url(images/index3b.jpg)"></div>
+                <div class="background_image" style="background-image:url(images/index.jpg)"></div>               
+                <div class="overlay"></div>              
                 <div class="home_container">
                     <div class="container">
                         <div class="row">
@@ -31,7 +32,7 @@
                                                         <div class="category text-center">
                                                             <a href="/mens">
                                                                 <div class="d-flex flex-md-column flex-row align-items-md-center align-items-md-center align-items-center justify-content-center">
-                                                                    <div class="cat_icon"><img src="images/masculine.png" class="svg" alt="hair-cut-tool"></div>
+                                                                    <div class="cat_icon"><img src="images/male_837b68.png" class="svg" alt="hair-cut-tool"></div>
                                                                     <div class="cat_title">Male</div>
                                                                 </div>
                                                             </a>
@@ -39,7 +40,7 @@
                                                         <div class="category text-center">
                                                             <a href="/women">
                                                                 <div class="d-flex flex-md-column flex-row align-items-md-center align-items-md-center align-items-center justify-content-center">
-                                                                    <div class="cat_icon"><img src="images/femenine.png" class="svg" alt="makeup"></div>
+                                                                    <div class="cat_icon"><img src="images/female_837b68.png" class="svg" alt="makeup"></div>
                                                                     <div class="cat_title">Female</div>
                                                                 </div>
                                                             </a>
@@ -47,7 +48,7 @@
                                                         <div class="category text-center">
                                                             <a href="/unisex">
                                                                 <div class="d-flex flex-md-column flex-row align-items-md-center align-items-md-center align-items-center justify-content-center">
-                                                                    <div class="cat_icon"><img src="images/unisex.png" class="svg" alt="tatoo-machine"></div>
+                                                                    <div class="cat_icon"><img src="images/unisex_837b68.png" class="svg" alt="tatoo-machine"></div>
                                                                     <div class="cat_title">Unisex</div>
                                                                 </div>
                                                             </a>
