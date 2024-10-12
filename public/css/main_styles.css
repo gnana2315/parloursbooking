@@ -963,12 +963,12 @@ section
 }
 .cat_title
 {
-	font-family: "Tangerine", cursive!important;
-	font-weight: 1000;
-	font-style: bold;
-	/* font-family: 'Poppins', sans-serif!important; */
-	font-size: 26px;
-	/* font-weight: 500; */
+	/* font-family: "Tangerine", cursive!important;
+	font-weight: 700;
+	font-style: normal; */
+	font-family: 'Poppins', sans-serif!important;
+	font-size: 25px;
+	font-weight: 500;
 	color: #000;
 	line-height: 1;
 	margin-top: 15px;

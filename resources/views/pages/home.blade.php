@@ -33,7 +33,7 @@
                                                             <a href="/mens">
                                                                 <div class="d-flex flex-md-column flex-row align-items-md-center align-items-md-center align-items-center justify-content-center">
                                                                     <div class="cat_icon"><img src="images/male_black.png" class="svg" alt="hair-cut-tool"></div>
-                                                                    <div class="cat_title">Male</div>
+                                                                    <div class="cat_title">Gents</div>
                                                                 </div>
                                                             </a>
                                                         </div>
@@ -41,7 +41,7 @@
                                                             <a href="/women">
                                                                 <div class="d-flex flex-md-column flex-row align-items-md-center align-items-md-center align-items-center justify-content-center">
                                                                     <div class="cat_icon"><img src="images/female_black.png" class="svg" alt="makeup"></div>
-                                                                    <div class="cat_title">Female</div>
+                                                                    <div class="cat_title">Ladies</div>
                                                                 </div>
                                                             </a>
                                                         </div>

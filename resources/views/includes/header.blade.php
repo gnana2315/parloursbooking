@@ -14,8 +14,8 @@
         <!--div class="add_listing text-center trans_200"><a href="#">+Add Listing</a></div-->
         <div class="log_reg">
             <ul class="d-flex flex-row align-items-center justify-content-start">                
-                <li><a href="/mens">Male</a></li>
-                <li><a href="/women">Female</a></li>						
+                <li><a href="/mens">Gents</a></li>
+                <li><a href="/women">Ladies</a></li>						
                 <li><a href="/unisex">Unisex</a></li>
                 <!--li><a href="/homevisit">Home Visit</a></li-->
                 <li><a href="/join-with-us">Join with Us</a></li>
