@@ -32,7 +32,7 @@
                                                         <div class="category text-center">
                                                             <a href="/mens">
                                                                 <div class="d-flex flex-md-column flex-row align-items-md-center align-items-md-center align-items-center justify-content-center">
-                                                                    <div class="cat_icon"><img src="images/male_837b68.png" class="svg" alt="hair-cut-tool"></div>
+                                                                    <div class="cat_icon"><img src="images/male_black.png" class="svg" alt="hair-cut-tool"></div>
                                                                     <div class="cat_title">Male</div>
                                                                 </div>
                                                             </a>
@@ -40,7 +40,7 @@
                                                         <div class="category text-center">
                                                             <a href="/women">
                                                                 <div class="d-flex flex-md-column flex-row align-items-md-center align-items-md-center align-items-center justify-content-center">
-                                                                    <div class="cat_icon"><img src="images/female_837b68.png" class="svg" alt="makeup"></div>
+                                                                    <div class="cat_icon"><img src="images/female_black.png" class="svg" alt="makeup"></div>
                                                                     <div class="cat_title">Female</div>
                                                                 </div>
                                                             </a>
@@ -48,7 +48,7 @@
                                                         <div class="category text-center">
                                                             <a href="/unisex">
                                                                 <div class="d-flex flex-md-column flex-row align-items-md-center align-items-md-center align-items-center justify-content-center">
-                                                                    <div class="cat_icon"><img src="images/unisex_837b68.png" class="svg" alt="tatoo-machine"></div>
+                                                                    <div class="cat_icon"><img src="images/unisex_black.png" class="svg" alt="tatoo-machine"></div>
                                                                     <div class="cat_title">Unisex</div>
                                                                 </div>
                                                             </a>
