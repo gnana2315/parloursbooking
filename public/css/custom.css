@@ -229,7 +229,7 @@
 .work_hours
 {
 	height: 64px;
-	background:#f6c1ac;
+	background:#d2b6aa;
 	/* background: #e1ecf4; */
 	padding-left: 30px;
 	padding-right: 49px;
@@ -262,7 +262,7 @@
 	padding-top: 41px;
 	padding-bottom: 39px;
 	/* background: #e1ecf4; */
-	background: #f6c1ac;
+	background: #d2b6aa;
 	margin-top: 19px;
 }
 .sidebar_info ul li:not(:last-of-type)

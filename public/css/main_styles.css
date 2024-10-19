@@ -451,7 +451,8 @@ section
 	padding:5px 0;
 	width: 100%;
 	z-index: 100;
-	background:#f6c1ac;
+	background:#000;
+	/* background:#f6c1ac; */
 	/* background: #625d50; */
 	/* background: #f6c1ac; */
 	/*background: rgba(54,15,100,0.9);*/
@@ -469,6 +470,10 @@ section
 .social_media_icons li{
 	padding: 0 5px;
 }
+.social_media_icons li a img{
+	width: 100%;
+	max-width:24px;
+}
 .contact_us_elements a{	
 	display:inline-flex;
 }
@@ -480,7 +485,7 @@ section
 .contact_us_elements p{
 	padding-left: 5px;
 	/*color: #360f64;*/
-	color: #000;
+	color: #fff;
 }
 
 .header
@@ -1053,7 +1058,7 @@ section
 	width: 35px;
 	height: 35px;
 	border-radius: 50%;
-	background: #f6c1ac;
+	background: #000;
 	line-height: 35px;
 	text-align: center;
 	font-size: 18px;
@@ -1284,7 +1289,7 @@ section
 	height: 62px;
 	border-radius: 50%;
 	/* background: #f6c1ac; */
-	background: #f6c1ac;
+	background: #000;
 	line-height: 62px;
 	text-align: center;
 	font-size: 24px;
