@@ -29,7 +29,8 @@ class vendors extends Model
         'pbv_contactno',
         'pbv_address',
         'pbv_city',
-        'pbp_status',
+        'pbv_accept_terms',
+        'pbv_status',
         'created_at',
         'updated_at',
         'deleted_at'

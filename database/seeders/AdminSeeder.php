@@ -18,6 +18,7 @@ class AdminSeeder extends Seeder
         User::create(
             [
                 'pbu_usertype' => '0',
+                'pbu_vid' => '0',
                 'pbu_personid' => '0',
                 'pbu_name' => 'SuperAdmin',
                 'pbu_email' => 'parloursbooking@gmail.com',
@@ -32,6 +33,7 @@ class AdminSeeder extends Seeder
         User::create(
             [
                 'pbu_usertype' => '1',
+                'pbu_vid' => '1',
                 'pbu_personid' => '1',
                 'pbu_name' => 'Admin',
                 'pbu_email' => 'info@parloursbooking.com',

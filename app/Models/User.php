@@ -26,9 +26,11 @@ class User extends Authenticatable
     protected $fillable = [
         'pbu_id',
         'pbu_usertype',
+        'pbu_vid',
         'pbu_personid',
         'pbu_name',
         'pbu_email',
+        'pbu_verification_token',
         'password',
         'pbu_status',
         'created_at',

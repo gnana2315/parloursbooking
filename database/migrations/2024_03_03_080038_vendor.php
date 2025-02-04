@@ -23,7 +23,8 @@ return new class extends Migration
             $table->string('pbv_contactno');
             $table->string('pbv_address');
             $table->string('pbv_city');
-            $table->integer('pbp_status');
+            $table->integer('pbv_accept_terms');
+            $table->integer('pbv_status');
             $table->timestamps();
             $table->softDeletes($column = 'deleted_at', $precision = 0);
         });

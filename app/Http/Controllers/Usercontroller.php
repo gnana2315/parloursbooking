@@ -61,6 +61,7 @@ class Usercontroller extends Controller
                 'userreg_businessowneremail' => 'required|email|unique:persons,pbp_email',
                 'userreg_businessusername' => 'required|unique:users,pbu_name',
                 'userreg_businessuserpassword' => 'required|min:8',
+                'userreg_terms' => 'required'
             ],
             [
                 'userreg_businesstype.required' => 'Business Type Required',
@@ -92,6 +93,7 @@ class Usercontroller extends Controller
                 'userreg_businessusername.unique' => 'This User Name already used. Please try different User Name.',
                 'userreg_businessuserpassword.required' => 'Business Owner Password Required',
                 'userreg_businessuserpassword.min' => 'Password length will be minimum 8 characters',
+                'userreg_terms' => 'You must agree to the terms and conditions.'
             ]
         );
         
@@ -132,7 +134,8 @@ class Usercontroller extends Controller
             'pbv_contactno' => $request->input('userreg_businessregcontactno'),
             'pbv_address' => $businessAddress,
             'pbv_city' => $request->input('userreg_businessregaddresscity'),
-            'pbp_status' => '0'
+            'pbv_accept_terms' => '1',
+            'pbv_status' => '0'
         ];
         
         // dd($vendor_data);
@@ -176,13 +179,17 @@ class Usercontroller extends Controller
             if($personInsert){
                 // Owner NIC document upload
                 $request->userreg_businessownernic->move(public_path('vendors/'.$documentFolderName.'/'), $businessOwnerNIC);
-            
+                
+                $timestamp = now()->timestamp; // Current timestamp
+                $code = strtoupper(substr(md5($timestamp), 0, 6)); // 6-character code
                 // user data construction
                 $user_data = [
                     'pbu_usertype' => $request->input('userreg_businessusertype'),
+                    'pbu_vid' => $vendorInsert->pbv_id,
                     'pbu_personid' => $personInsert->id,
                     'pbu_name' => $request->input('userreg_businessusername'),
                     'pbu_email' => $request->input('userreg_businessowneremail'),
+                    'pbu_verification_token' => $code,
                     // 'pbu_password' => Hash::make($request->input('userreg_businessuserpassword')),
                     'password' => $request->input('userreg_businessuserpassword'),
                     'pbu_status' => '0'
@@ -252,7 +259,15 @@ class Usercontroller extends Controller
         if (auth()->attempt($credentials)) {
 
             // user log record
-            $log_message = 'Vendor logged into the profile.';
+            if($userType == '0'){                
+                $log_message = 'Super Admin logged into the profile.';
+            }elseif($userType == '1'){
+                $log_message = 'Admin logged into the profile.';
+            }elseif($userType == '2'){
+                $log_message = 'Vendor logged into the profile.';
+            }else{
+                $log_message = 'Annonymus logged into the profile.';
+            }
             $userlog_data = [
                 'pbu_id' => $userID,
                 'pbul_description' => $log_message,
