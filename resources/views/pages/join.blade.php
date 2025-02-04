@@ -43,7 +43,7 @@
                                         <option value="1">Men</option>
                                         <option value="2">Women</option>
                                         <option value="3">Unisex</option>
-                                        <option value="4">Home Visit</option>
+                                        <!--option value="4">Home Visit</option-->
                                     </select>
                                 </div>
                             </div>
@@ -197,6 +197,17 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="row">
+                            <div class="col-lg-12 col-md-12 col-xl-12">
+                                <fiv class="form-check">
+                                    <input type="checkbox" class="form-check-input" name="userreg_terms" id="userreg_terms" required>        
+                                    <label for="userreg_terms" class="form-check-label">
+                                        I agree to the <a href="/terms-and-conditions" target="_blank">Terms and Conditions</a>.
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
                         <div class="row">
                             <div class="col-lg-12 col-md-12 col-xl-12">
                                 <a href="/" class="btn back-to-home">Back to Home</a>

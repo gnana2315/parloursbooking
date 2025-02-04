@@ -229,7 +229,8 @@
 .work_hours
 {
 	height: 64px;
-	background: #e1ecf4;
+	background:#d2b6aa;
+	/* background: #e1ecf4; */
 	padding-left: 30px;
 	padding-right: 49px;
 }
@@ -237,15 +238,16 @@
 {
 	font-size: 14px;
 	font-weight: 500;
-	color: #8fe12e;
+	color:#000;
+	/* color: #8fe12e; */
 }
 .closed
 {
-	color: #ff014f !important;
+	color: #ff014f;
 }
 .opened
 {
-	color: #8fe12e !important;
+	color: #8fe12e;
 }
 .work_hours > div:last-child
 {
@@ -259,7 +261,8 @@
 	padding-right: 25px;
 	padding-top: 41px;
 	padding-bottom: 39px;
-	background: #e1ecf4;
+	/* background: #e1ecf4; */
+	background: #d2b6aa;
 	margin-top: 19px;
 }
 .sidebar_info ul li:not(:last-of-type)

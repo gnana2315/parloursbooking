@@ -78,6 +78,7 @@ Route::group(['middleware' => 'auth.check'], function () {
             Route::get('/vendor', [vendorsController::class, 'index']);
             Route::get('/vendorlist', [vendorsController::class, 'getAllVendorsList']);
             Route::get('/viewVendor/{id}', [vendorsController::class, 'viewVendor']);
+            Route::post('/vendor/activate', [vendorsController::class, 'activate_vendor']);
 
             Route::get('/reports', [reportsController::class, 'index']);
         });
@@ -88,6 +89,7 @@ Route::group(['middleware' => 'auth.check'], function () {
 
             Route::get('/vendors', [vendorsController::class, 'index']);
             Route::get('/vendorlist', [vendorsController::class, 'getAllVendorsList']);
+            Route::get('/viewVendor/{id}', [vendorsController::class, 'viewVendor']);
 
             Route::get('/reports', [reportsController::class, 'index']);
         });

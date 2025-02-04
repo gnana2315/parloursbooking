@@ -50,20 +50,25 @@
                                             @else
                                                 <td> {{ $vendor->pbv_contactno }} </td>
                                             @endif
-                                            @if( $vendor->pbp_status == 1)
+                                            @if( $vendor->pbu_status == 1)
                                                 <td><label class="ribbon bg-success">Active</label></td>
                                             @else
                                                 <td><label class="ribbon bg-danger">Admin need to Verify</label></td>
                                             @endif
                                             <td>
-                                                <a href="/viewVendor/{{ $vendor->pbv_id }}" class="btn btn-info" type="button" title="View Vendor Details" name="viewVendor" id="viewVendor"><i class="fa fa-eye"></i></a>
+                                                <a href="/viewVendor/{{ $vendor->pbv_id }}" class="btn btn-info" type="button" title="View Vendor Details" name="viewVendor" id="viewVendor" target="_blank"><i class="fa fa-eye"></i></a>
                                                 |
                                                 <button class="btn btn-success" type="button" title="Print Vendor Details" name="printVendor" id="printVendor" value="{{ $vendor->pbv_id }}"><i class="fa fa-print"></i></button>
                                                 |
-                                                @if( $vendor->pbp_status == 1)
-                                                    <button class="btn btn-danger" type="button" title="Disable Vendor" name="disableVendor" id="disableVendor" value="{{ $vendor->pbv_id }}"><i class="fa fa-power-off"></i></button>
+                                                @if( $vendor->pbu_status == 1)
+                                                    <button class="btn btn-danger" type="button" title="Disable Vendor" name="disableVendor" id="disableVendor" value="{{ $vendor->pbu_id }}"><i class="fa fa-power-off"></i></button>
                                                 @else
-                                                    <button class="btn btn-success" type="button" title="Approve Vendor" name="enableVendor" id="enableVendor" value="{{ $vendor->pbv_id }}"><i class="fa fa-power-off"></i></button>
+                                                    <!--button class="btn btn-success" type="button" title="Approve Vendor" name="enableVendor" id="enableVendor" value="{{ $vendor->pbu_id }}"><i class="fa fa-power-off"></i></button-->
+                                                    <form action="/vendor/activate" method="POST">
+                                                        @csrf
+                                                        <input type="hidden" name="id" value="{{ $vendor->pbu_id }}" />
+                                                        <button class="btn btn-success" type="submit" title="Approve Vendor"><i class="fa fa-power-off"></i></button>
+                                                    </form>
                                                 @endif
                                             </td>
                                         </tr>
@@ -77,4 +82,27 @@
 		</div>
 	</section>
 </div>
+<script>
+    $('#enableVendor').on('click', function(e){
+        e.preventDefault();
+        var vendorID = $(this).val();
+        alert(vendorID);
+        $.ajax({
+            url: '/vendor/activate',
+            type: 'POST',
+            data: {
+                id: vendorID,
+                _token: '{{ csrf_token() }}'
+            },
+            success: function(response) {
+                console.log(response);
+            },
+            error: function(xhr, status, error) {
+                console.log('xhr: '+xhr);
+                console.log('status: '+status);
+                console.log('error: '+error);
+            }
+        });
+    });
+</script>
 @stop
