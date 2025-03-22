@@ -30,7 +30,9 @@ class User extends Authenticatable
         'pbu_personid',
         'pbu_name',
         'pbu_email',
+        'pbu_mobileno',
         'pbu_verification_token',
+        'pbu_verification_code_generated_time',
         'password',
         'pbu_status',
         'created_at',
@@ -54,6 +56,7 @@ class User extends Authenticatable
      */
     protected $casts = [
         'pbu_email_verified_at' => 'datetime',
+        'pbu_mobileno_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
 
@@ -65,5 +68,9 @@ class User extends Authenticatable
     public function hasStatus($status)
     {
         return $this->getAttribute('pbu_status') == $status;
+    }
+
+    public function vendors(){
+        return $this->hasOne(vendors::class, 'pbv_id', 'pbu_vid');
     }
 }

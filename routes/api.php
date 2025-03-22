@@ -3,6 +3,9 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\API\CustomersController;
+use App\Http\Controllers\API\VendorController;
+use App\Http\Controllers\API\AuthController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -13,7 +16,20 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
+// Route::controller(CustomersController::class)->group(function(){
+//     Route::post('customerregister','register');
+//     Route::post('customerlogin','login');
+// });
+Route::post('/vendorRegister',[AuthController::class,'vendorRegisteration']);
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+// Route::controller(VendorController::class)->group(function(){
+//     Route::post('vendorRegister','register');
+//     Route::post('vendorlogin','login');
+// });
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::apiResource('posts', PostController::class);
 });
+// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
