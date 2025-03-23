@@ -1,0 +1,189 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Parlours Booking API",
+        "description": "Swagger API Documentation in Parlours Booking",
+        "contact": {
+            "email": "admin@example.com"
+        },
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/vendorRegister": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Registeration Vendor",
+                "description": "Returns user OTP",
+                "operationId": "vendorRegisteration",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "usertype",
+                                    "phone_no",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "usertype": {
+                                        "type": "number",
+                                        "example": "2"
+                                    },
+                                    "phone_no": {
+                                        "type": "number",
+                                        "example": "0711234567"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Vendor Registered Successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "token": {
+                                            "type": "string",
+                                            "example": "generated_token_here"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
+        "/api/vendorMobileVerification": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Vendor mobile no Verification",
+                "description": "Returns user token",
+                "operationId": "vendorMobileNoVerification",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "customer_id",
+                                    "verification_code"
+                                ],
+                                "properties": {
+                                    "customer_id": {
+                                        "type": "number",
+                                        "example": "2"
+                                    },
+                                    "verification_code": {
+                                        "type": "number",
+                                        "example": "OTG478"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Vendor Verified Successfully!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "token": {
+                                            "type": "string",
+                                            "example": "generated_token_here"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
+        "/api/vendorlogin": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Login Vendor",
+                "description": "Returns user token",
+                "operationId": "loginVendor",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "phone_no",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "phone_no": {
+                                        "type": "number",
+                                        "example": "0711234567"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful login",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "token": {
+                                            "type": "string",
+                                            "example": "generated_token_here"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Authentication",
+            "description": "Authentication"
+        }
+    ]
+}

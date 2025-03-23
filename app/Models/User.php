@@ -32,7 +32,8 @@ class User extends Authenticatable
         'pbu_email',
         'pbu_mobileno',
         'pbu_verification_token',
-        'pbu_verification_code_generated_time',
+        'pbu_verification_token_expires_at',
+        'pbu_mobileno_verified_at',
         'password',
         'pbu_status',
         'created_at',
@@ -56,7 +57,6 @@ class User extends Authenticatable
      */
     protected $casts = [
         'pbu_email_verified_at' => 'datetime',
-        'pbu_mobileno_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
 

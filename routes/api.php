@@ -21,6 +21,8 @@ use App\Http\Controllers\API\AuthController;
 //     Route::post('customerlogin','login');
 // });
 Route::post('/vendorRegister',[AuthController::class,'vendorRegisteration']);
+Route::post('/vendorMobileVerification',[AuthController::class,'verifyVendorVerificationCode']);
+Route::post('/vendorLogin',[AuthController::class,'vendorLogin']);
 
 // Route::controller(VendorController::class)->group(function(){
 //     Route::post('vendorRegister','register');
@@ -29,6 +31,7 @@ Route::post('/vendorRegister',[AuthController::class,'vendorRegisteration']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('posts', PostController::class);
+    Route::post('/vendorLogout',[AuthController::class,'vendorLogout']);
 });
 // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 //     return $request->user();

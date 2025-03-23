@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->timestamp('pbu_verification_code_generated_time')->nullable()->after('pbu_verification_token');
+            $table->timestamp('pbu_verification_token_expires_at')->nullable()->after('pbu_verification_token');
         });
     }
 
@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('pbu_verification_code_generated_time');
+            $table->dropColumn('pbu_verification_token_expires_at');
         });
     }
 };
