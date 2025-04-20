@@ -13,6 +13,7 @@ use App\Http\Controllers\admin\servicesController;
 
 use App\Http\Controllers\userAdminController;
 //use App\Http\Controllers\SendMailController;
+use App\Http\Controllers\MigrationController;
 
 /*
 |--------------------------------------------------------------------------
