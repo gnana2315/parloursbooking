@@ -14,6 +14,7 @@ use App\Http\Controllers\admin\servicesController;
 use App\Http\Controllers\userAdminController;
 //use App\Http\Controllers\SendMailController;
 use App\Http\Controllers\MigrationController;
+use App\Http\Controllers\SweggerController;
 
 /*
 |--------------------------------------------------------------------------
@@ -58,6 +59,8 @@ Route::get('/vendorRegistration', function () {
 
 
 Route::get('/migrate', [MigrationController::class, 'runMigrations']);
+Route::get('/generate-swagger', [\App\Http\Controllers\SwaggerController::class, 'generate']);
+
 Route::group(['middleware' => 'auth.check'], function () {
     Route::group(['middleware' => 'isActive'], function () {
         Route::group(['middleware' => 'isAdmin'], function () {
