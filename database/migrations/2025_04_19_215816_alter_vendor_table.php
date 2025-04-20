@@ -14,12 +14,6 @@ return new class extends Migration
         Schema::table('vendor', function (Blueprint $table) {
             $table->integer('pbv_service_type')->after('pbv_servicefor')->nullable();
             $table->integer('pbv_business_type')->after('pbv_service_type')->nullable();
-            $table->string('pbv_display_name', 255)->after('pbv_business_name')->nullable();
-            $table->string('pbv_longatitude')->after('pbv_city')->nullable();
-            $table->string('pbv_latitude')->after('pbv_longatitude')->nullable();
-            $table->integer('pbv_bankinfo_id')->after('pbv_latitude')->nullable();
-            $table->integer('pbv_service_capacity')->after('pbv_bankinfo_id')->nullable();
-            $table->string('pbv_short_description')->after('pbv_accept_terms')->nullable();
         });
     }
 
