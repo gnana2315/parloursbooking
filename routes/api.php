@@ -7,6 +7,7 @@ use App\Http\Controllers\API\CustomersController;
 use App\Http\Controllers\API\VendorController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\CommonController;
+use App\Http\Controllers\MigrationController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -52,3 +53,5 @@ Route::middleware(['auth:sanctum', 'validate.token'])->group(function () {
     Route::get('/serviceFor', [CommonController::class, 'getServiceFor' ]);
     Route::get('/getServices/{vendor_id}', [CommonController::class, 'getServicesByVendor' ]);
 });
+
+Route::get('/migrate', [MigrationController::class, 'runMigrations']);
