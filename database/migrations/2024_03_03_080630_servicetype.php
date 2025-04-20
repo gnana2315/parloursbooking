@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('servicetype', function (Blueprint $table) {
             $table->id('pbst_id');
             $table->string('pbst_name');
+            $table->string('pbst_icon')->nullable();
+            $table->string('pbst_description')->nullable();
             $table->integer('pbst_status');
             $table->timestamps();
             $table->softDeletes($column = 'deleted_at', $precision = 0);
@@ -25,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::drop('servicetype');
+        Schema::dropIfExists('servicetype');
     }
 };

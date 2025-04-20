@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::drop('seo_key_words');
+        Schema::dropIfExists('seo_key_words');
     }
 };

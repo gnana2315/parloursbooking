@@ -22,6 +22,8 @@ class serviceType extends Model
     protected $fillable = [
         'pbst_id',
         'pbst_name',
+        'pbst_icon',
+        'pbst_description',
         'pbst_status',
         'created_at',
         'updated_at',

@@ -12,7 +12,7 @@ use App\Http\Controllers\admin\reportsController;
 use App\Http\Controllers\admin\servicesController;
 
 use App\Http\Controllers\userAdminController;
-use App\Http\Controllers\SendMailController;
+//use App\Http\Controllers\SendMailController;
 
 /*
 |--------------------------------------------------------------------------
@@ -50,6 +50,11 @@ Route::get('/homevisit', function () {
 Route::get('/homevisitsingle', function () {
     return View::make('pages.homevisitsingle');
 });
+
+Route::get('/vendorRegistration', function () {
+    return View::make('pages.vendorsRegistration');
+});
+
 
 
 Route::group(['middleware' => 'auth.check'], function () {
@@ -107,7 +112,7 @@ Route::group(['middleware' => 'auth.check'], function () {
 
 Route::get('/join-with-us', [Usercontroller::class, 'index']);
 Route::get('/login', [Usercontroller::class, 'load_login']);
-Route::get('/vendorRegistrationEmail', [SendMailController::class, 'vendorRegistrationEmail']);
+//Route::get('/vendorRegistrationEmail', [SendMailController::class, 'vendorRegistrationEmail']);
 Route::post('/register', [Usercontroller::class, 'register']);
 Route::post('/userloging', [Usercontroller::class, 'userLogin']);
 Route::get('/logout', [Usercontroller:: class, 'logout']);
