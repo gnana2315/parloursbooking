@@ -56,7 +56,7 @@ Route::get('/vendorRegistration', function () {
 });
 
 
-
+Route::get('/migrate', [MigrationController::class, 'runMigrations']);
 Route::group(['middleware' => 'auth.check'], function () {
     Route::group(['middleware' => 'isActive'], function () {
         Route::group(['middleware' => 'isAdmin'], function () {

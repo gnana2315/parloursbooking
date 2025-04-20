@@ -53,5 +53,3 @@ Route::middleware(['auth:sanctum', 'validate.token'])->group(function () {
     Route::get('/serviceFor', [CommonController::class, 'getServiceFor' ]);
     Route::get('/getServices/{vendor_id}', [CommonController::class, 'getServicesByVendor' ]);
 });
-
-Route::get('/migrate', [MigrationController::class, 'runMigrations']);
