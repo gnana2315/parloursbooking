@@ -59,7 +59,7 @@ Route::get('/vendorRegistration', function () {
 
 
 Route::get('/migrate', [MigrationController::class, 'runMigrations']);
-Route::get('/generate-swagger', [\App\Http\Controllers\SwaggerController::class, 'generate']);
+Route::get('/generate-swagger', [SweggerController::class, 'generate']);
 
 Route::group(['middleware' => 'auth.check'], function () {
     Route::group(['middleware' => 'isActive'], function () {
