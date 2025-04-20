@@ -11,13 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pricelist', function (Blueprint $table) {
-            $table->id('pbpl_id');
-            $table->integer('pbpl_vendorid');
-            $table->integer('pbpl_serviceid');
-            $table->string('pbpl_duration');
-            $table->string('pbpl_price');
-            $table->integer('pbsl_status');
+        Schema::create('service_for', function (Blueprint $table) {
+            $table->id('pbsf_id');
+            $table->string('pbsf_name');
+            $table->string('pbsf_icon')->nullable();
+            $table->string('pbsf_description')->nullable();
+            $table->integer('pbsf_status');
             $table->timestamps();
             $table->softDeletes($column = 'deleted_at', $precision = 0);
         });
@@ -28,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('pricelist');
+        Schema::dropIfExists('service_for');
     }
 };

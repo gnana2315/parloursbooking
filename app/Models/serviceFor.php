@@ -5,26 +5,27 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class serviceType extends Model
+class serviceFor extends Model
 {
     use HasFactory;
-     /**
+
+    /**
     * @var string $table
     */
-    protected $table = 'servicetype';
+    protected $table = 'service_for';
 
     /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
      */
-	protected $primaryKey = 'pbst_id';
+	protected $primaryKey = 'pbsf_id';
     protected $fillable = [
-        'pbst_id',
-        'pbst_name',
-        'pbst_icon',
-        'pbst_description',
-        'pbst_status',
+        'pbsf_id',
+        'pbsf_name',
+        'pbsf_icon',
+        'pbsf_description',
+        'pbsf_status',
         'created_at',
         'updated_at',
         'deleted_at',

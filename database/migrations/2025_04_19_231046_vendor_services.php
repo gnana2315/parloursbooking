@@ -11,12 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('servicecategory', function (Blueprint $table) {
-            $table->id('pbsc_id');
-            $table->string('pbsc_name');
-            $table->integer('pbsc_status');
+        Schema::create('vendor_services', function (Blueprint $table) {
+            $table->id('pbvs_id');
+            $table->integer('pbvs_vendor_id');
+            $table->string('pbvs_service_type');
+            $table->string('pbvs_service_id');
+            $table->string('pbvs_frequency')->nullable();
+            $table->integer('pbs_status');
             $table->timestamps();
-            $table->softDeletes($column = 'deleted_at', $precision = 0);
         });
     }
 
@@ -25,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::drop('servicecategory');
+        Schema::dropIfExists('vendor_services');
     }
 };

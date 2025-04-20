@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\CustomersController;
 use App\Http\Controllers\API\VendorController;
 use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\CommonController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -16,23 +17,38 @@ use App\Http\Controllers\API\AuthController;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
-// Route::controller(CustomersController::class)->group(function(){
-//     Route::post('customerregister','register');
-//     Route::post('customerlogin','login');
-// });
-Route::post('/vendorRegister',[AuthController::class,'vendorRegisteration']);
-Route::post('/vendorMobileVerification',[AuthController::class,'verifyVendorVerificationCode']);
-Route::post('/vendorLogin',[AuthController::class,'vendorLogin']);
+
+//User Auth APIs
+Route::post('/userRegister',[AuthController::class,'userRegisteration']);
+Route::post('/userMobileVerification',[AuthController::class,'verifyVerificationCode']);
+Route::post('/userLogin',[AuthController::class,'userLogin']);
+Route::post('/userForgotPassword',[AuthController::class,'userForgotPassword']);
+Route::post('/userResetPassword',[AuthController::class,'userResetPassword']);
 
 // Route::controller(VendorController::class)->group(function(){
 //     Route::post('vendorRegister','register');
 //     Route::post('vendorlogin','login');
 // });
 
-Route::middleware('auth:sanctum')->group(function () {
-    Route::apiResource('posts', PostController::class);
-    Route::post('/vendorLogout',[AuthController::class,'vendorLogout']);
+Route::middleware(['auth:sanctum', 'validate.token'])->group(function () {
+    Route::post('/userLogout',[AuthController::class,'userLogout']);
+
+    //customer
+    Route::post('/customerRegister/{id}', [ CustomersController::class,'register' ]);
+
+    //vendor
+    Route::post('/vendorRegister/{id}', [VendorController::class, 'vendorRegister' ]);
+    Route::post('/vendorDocumentUpdate/{id}', [VendorController::class, 'vendorDocumentUpdate' ]);
+    Route::post('/vendorConfig/{id}', [VendorController::class, 'vendorConfig' ]);
+    Route::post('/vendorAvailability/{id}', [VendorController::class, 'vendorAvailability' ]);
+    Route::post('/vendorSpecialCloses/{id}', [VendorController::class, 'vendorSpecialCloses' ]);
+    Route::post('/addVendorServices/{id}', [VendorController::class, 'addVendorServices' ]);
+
+    //common
+    Route::get('/vendors/{business_type_id}', [CommonController::class, 'getVendors' ]);
+    Route::post('/searchVendors', [CommonController::class, 'searchVendors' ]);
+    Route::get('/serviceTypes', [CommonController::class, 'getServiceTypes' ]);
+    Route::get('/businessTypes', [CommonController::class, 'getBusinessTypes' ]);
+    Route::get('/serviceFor', [CommonController::class, 'getServiceFor' ]);
+    Route::get('/getServices/{vendor_id}', [CommonController::class, 'getServicesByVendor' ]);
 });
-// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-//     return $request->user();
-// });

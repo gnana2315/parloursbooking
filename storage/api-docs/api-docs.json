@@ -9,14 +9,14 @@
         "version": "1.0.0"
     },
     "paths": {
-        "/api/vendorRegister": {
+        "/api/userRegister": {
             "post": {
                 "tags": [
                     "Authentication"
                 ],
-                "summary": "Registeration Vendor",
+                "summary": "Registeration User",
                 "description": "Returns user OTP",
-                "operationId": "vendorRegisteration",
+                "operationId": "userRegisteration",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -48,7 +48,7 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Vendor Registered Successfully",
+                        "description": "User Registered Successfully",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -69,25 +69,25 @@
                 }
             }
         },
-        "/api/vendorMobileVerification": {
+        "/api/userMobileVerification": {
             "post": {
                 "tags": [
                     "Authentication"
                 ],
-                "summary": "Vendor mobile no Verification",
+                "summary": "User mobile no Verification",
                 "description": "Returns user token",
-                "operationId": "vendorMobileNoVerification",
+                "operationId": "verifyVerificationCode",
                 "requestBody": {
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
                                 "required": [
-                                    "customer_id",
+                                    "user_id",
                                     "verification_code"
                                 ],
                                 "properties": {
-                                    "customer_id": {
+                                    "user_id": {
                                         "type": "number",
                                         "example": "2"
                                     },
@@ -103,7 +103,7 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Vendor Verified Successfully!",
+                        "description": "User Verified Successfully!",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -124,14 +124,14 @@
                 }
             }
         },
-        "/api/vendorlogin": {
+        "/api/userlogin": {
             "post": {
                 "tags": [
                     "Authentication"
                 ],
-                "summary": "Login Vendor",
+                "summary": "Login User",
                 "description": "Returns user token",
-                "operationId": "loginVendor",
+                "operationId": "loginUser",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -178,12 +178,747 @@
                     }
                 }
             }
+        },
+        "/api/userLogout": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "User logout",
+                "description": "Logs out the authenticated user by revoking the token.",
+                "operationId": "userLogout",
+                "responses": {
+                    "401": {
+                        "description": "Unauthenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Unauthenticated"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/userForgotPassword": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Fogot Password User",
+                "description": "Returns user OTP",
+                "operationId": "userForgetPassword",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "phone_no"
+                                ],
+                                "properties": {
+                                    "phone_no": {
+                                        "type": "number",
+                                        "example": "0711234567"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Password Reset request accepted. Please check the OTP in you phone.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "token": {
+                                            "type": "string",
+                                            "example": "generated_token_here"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
+        "/api/userResetPassword": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Reset Password",
+                "operationId": "3d9f9cda12ce18c127d20433d2ec046a",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "user_id",
+                                    "token",
+                                    "password",
+                                    "password_confirmation"
+                                ],
+                                "properties": {
+                                    "user_id": {
+                                        "type": "string",
+                                        "example": "2"
+                                    },
+                                    "token": {
+                                        "type": "string",
+                                        "example": "random-generated-token"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "newpassword123"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "newpassword123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Password reset successfully"
+                    },
+                    "400": {
+                        "description": "Invalid token or Phone No"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/api/vendors/{business_type_id}": {
+            "get": {
+                "tags": [
+                    "Vendors"
+                ],
+                "summary": "Get vendors by business type",
+                "description": "Returns list of active vendors for the specified business type",
+                "operationId": "getVendors",
+                "parameters": [
+                    {
+                        "name": "business_type_id",
+                        "in": "path",
+                        "description": "ID of business type to filter vendors",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Vendors not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Vendors not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/customerRegister/{id}": {
+            "post": {
+                "tags": [
+                    "Customer"
+                ],
+                "summary": "Customer Detail Registration",
+                "description": "",
+                "operationId": "customerDetailRegister",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "intial",
+                                    "first_name",
+                                    "last_name",
+                                    "email",
+                                    "nic_no",
+                                    "nic_document"
+                                ],
+                                "properties": {
+                                    "intial": {
+                                        "type": "string",
+                                        "example": "Mr/Mrs"
+                                    },
+                                    "first_name": {
+                                        "type": "string",
+                                        "example": "John"
+                                    },
+                                    "last_name": {
+                                        "type": "string",
+                                        "example": "Wick"
+                                    },
+                                    "dob": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "1990-02-12"
+                                    },
+                                    "email": {
+                                        "type": "email",
+                                        "example": "John@gmail.com"
+                                    },
+                                    "nic_no": {
+                                        "type": "string",
+                                        "example": "941234587V"
+                                    },
+                                    "nic_document": {
+                                        "type": "file",
+                                        "example": "nic.jpg"
+                                    },
+                                    "sex": {
+                                        "type": "text",
+                                        "example": "male/female"
+                                    },
+                                    "address": {
+                                        "type": "text",
+                                        "example": "address"
+                                    },
+                                    "city": {
+                                        "type": "text",
+                                        "example": "city"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Customer Details saved Successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "token": {
+                                            "type": "string",
+                                            "example": "generated_token_here"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
+        "/api/vendorRegister/{id}": {
+            "post": {
+                "tags": [
+                    "Vendor"
+                ],
+                "summary": "Vendor Registration",
+                "description": "",
+                "operationId": "vendorRegister",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "servicefor",
+                                    "business_type",
+                                    "business_category",
+                                    "business_name",
+                                    "address",
+                                    "city",
+                                    "longatitude",
+                                    "latitude",
+                                    "email",
+                                    "br_no",
+                                    "br_document",
+                                    "certification"
+                                ],
+                                "properties": {
+                                    "servicefor": {
+                                        "type": "string",
+                                        "example": "Men/Women/Unisex"
+                                    },
+                                    "business_type": {
+                                        "type": "string",
+                                        "example": "Business/Therapist"
+                                    },
+                                    "business_category": {
+                                        "type": "string",
+                                        "example": "saloon/parlour"
+                                    },
+                                    "business_name": {
+                                        "type": "string",
+                                        "example": "Golden Saloon"
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "example": "No.7, Negombo Road, Wattala"
+                                    },
+                                    "city": {
+                                        "type": "string",
+                                        "example": "Wattala"
+                                    },
+                                    "longatitude": {
+                                        "type": "string",
+                                        "example": ""
+                                    },
+                                    "latitude": {
+                                        "type": "string",
+                                        "example": ""
+                                    },
+                                    "email": {
+                                        "type": "email",
+                                        "example": "goldensaloon@gmail.com"
+                                    },
+                                    "br_no/nic_no": {
+                                        "type": "string",
+                                        "example": "br-1847/901234567"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Vendor Details saved Successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "token": {
+                                            "type": "string",
+                                            "example": "generated_token_here"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
+        "/api/vendorDocumentUpdate/{id}": {
+            "post": {
+                "tags": [
+                    "Vendor"
+                ],
+                "summary": "Vendor Document Update",
+                "description": "",
+                "operationId": "vendorDocumentUpdate",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "br_document",
+                                    "certification",
+                                    "nic_document",
+                                    "police_report"
+                                ],
+                                "properties": {
+                                    "br_document": {
+                                        "type": "file",
+                                        "example": ""
+                                    },
+                                    "certification": {
+                                        "type": "file",
+                                        "example": ""
+                                    },
+                                    "nic_document": {
+                                        "type": "file",
+                                        "example": ""
+                                    },
+                                    "police_report": {
+                                        "type": "file",
+                                        "example": ""
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Vendor Document saved Successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "token": {
+                                            "type": "string",
+                                            "example": "generated_token_here"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
+        "/api/vendorConfig/{id}": {
+            "post": {
+                "tags": [
+                    "Vendor"
+                ],
+                "summary": "Vendor Configuration",
+                "description": "",
+                "operationId": "vendorConfig",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "display_name",
+                                    "business_logo",
+                                    "service_at_time"
+                                ],
+                                "properties": {
+                                    "display_name": {
+                                        "type": "text",
+                                        "example": "CJ Saloon"
+                                    },
+                                    "business_logo": {
+                                        "type": "file",
+                                        "example": "logo.png"
+                                    },
+                                    "service_at_time": {
+                                        "type": "file",
+                                        "example": "2"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Vendor Configuration saved Successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "token": {
+                                            "type": "string",
+                                            "example": "generated_token_here"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
+        "/api/vendorAvailability/{id}": {
+            "post": {
+                "tags": [
+                    "Vendor"
+                ],
+                "summary": "Vendor Standard Availability",
+                "description": "",
+                "operationId": "vendorAvailability",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "day",
+                                    "start_time",
+                                    "end_time",
+                                    "is_open"
+                                ],
+                                "properties": {
+                                    "day": {
+                                        "type": "text",
+                                        "example": "Monday"
+                                    },
+                                    "start_time": {
+                                        "type": "text",
+                                        "example": "08:00"
+                                    },
+                                    "end_time": {
+                                        "type": "text",
+                                        "example": "17:00"
+                                    },
+                                    "is_open": {
+                                        "type": "boolean",
+                                        "example": "1"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Vendor Standard availabilities saved Successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "token": {
+                                            "type": "string",
+                                            "example": "generated_token_here"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
+        "/api/vendorSpecialCloses/{id}": {
+            "post": {
+                "tags": [
+                    "Vendor"
+                ],
+                "summary": "Vendor Special Closings",
+                "description": "",
+                "operationId": "vendorSpecialCloses",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "day",
+                                    "start_time",
+                                    "end_time",
+                                    "full_day_closed"
+                                ],
+                                "properties": {
+                                    "day": {
+                                        "type": "text",
+                                        "example": "Monday"
+                                    },
+                                    "start_time": {
+                                        "type": "text",
+                                        "example": "08:00"
+                                    },
+                                    "end_time": {
+                                        "type": "text",
+                                        "example": "17:00"
+                                    },
+                                    "full_day_closed": {
+                                        "type": "boolean",
+                                        "example": "1"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Vendor Standard availabilities saved Successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "token": {
+                                            "type": "string",
+                                            "example": "generated_token_here"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
+        "/api/addVendorServices/{id}": {
+            "post": {
+                "tags": [
+                    "Vendor"
+                ],
+                "summary": "Add Vendor Services",
+                "description": "",
+                "operationId": "addVendorServices",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "service_type",
+                                    "service_for",
+                                    "service_name",
+                                    "service_description",
+                                    "service_duration",
+                                    "service_image",
+                                    "service_price"
+                                ],
+                                "properties": {
+                                    "service_type": {
+                                        "type": "number",
+                                        "example": "1"
+                                    },
+                                    "service_for": {
+                                        "type": "number",
+                                        "example": "2"
+                                    },
+                                    "service_name": {
+                                        "type": "text",
+                                        "example": "Normal Hair Cut"
+                                    },
+                                    "service_description": {
+                                        "type": "text",
+                                        "example": "Description"
+                                    },
+                                    "service_duration": {
+                                        "type": "number",
+                                        "example": "2 (hours)"
+                                    },
+                                    "service_image": {
+                                        "type": "file",
+                                        "example": "service_image.png"
+                                    },
+                                    "service_price": {
+                                        "type": "number",
+                                        "example": "2000"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Vendor Services saved Successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "token": {
+                                            "type": "string",
+                                            "example": "generated_token_here"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
         }
     },
     "tags": [
         {
             "name": "Authentication",
             "description": "Authentication"
+        },
+        {
+            "name": "Vendors",
+            "description": "Vendors"
+        },
+        {
+            "name": "Customer",
+            "description": "Customer"
+        },
+        {
+            "name": "Vendor",
+            "description": "Vendor"
         }
     ]
 }

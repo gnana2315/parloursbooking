@@ -71,4 +71,9 @@ class Kernel extends HttpKernel
         'isAdmin' => \App\Http\Middleware\isAdmin::class,
         'isUser' => \App\Http\Middleware\isUser::class,
     ];
+
+    protected $routeMiddleware = [
+        // ...
+        'validate.token' => \App\Http\Middleware\ValidateSanctumToken::class,
+    ];
 }

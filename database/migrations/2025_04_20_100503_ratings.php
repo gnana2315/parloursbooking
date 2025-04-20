@@ -11,13 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pricelist', function (Blueprint $table) {
-            $table->id('pbpl_id');
-            $table->integer('pbpl_vendorid');
-            $table->integer('pbpl_serviceid');
-            $table->string('pbpl_duration');
-            $table->string('pbpl_price');
-            $table->integer('pbsl_status');
+        Schema::create('ratings', function (Blueprint $table) {
+            $table->id('pbr_id');
+            $table->integer('pbr_vendor_id');
+            $table->integer('pbr_booking_id');
+            $table->integer('pbr_customer_id');
+            $table->integer('rating')->nullable();
+            $table->string('pbr_comments')->nullable();
+            $table->integer('pbr_status');
             $table->timestamps();
             $table->softDeletes($column = 'deleted_at', $precision = 0);
         });
@@ -28,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('pricelist');
+        Schema::dropIfExists('ratings');
     }
 };

@@ -12,17 +12,21 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('vendor', function (Blueprint $table) {
-            $table->id('pbv_id');
-            $table->integer('pbv_servicetype');
-            $table->string('pbv_name');
-            $table->string('pbv_logo');
-            $table->string('pbv_parlourcertificate');
-            $table->string('pbv_brno');
-            $table->string('pbv_brdoc');
+            $table->id('pbv_id');   
+            $table->integer('pbv_servicefor');
+            $table->integer('pbv_businesstype');
+            $table->integer('pbv_business_category')->nullable();
+            $table->string('pbv_business_name');
+            $table->string('pbv_parlourcertificate')->nullable();
+            $table->string('pbv_brno')->nullable();
+            $table->string('pbv_brdoc')->nullable();
+            $table->string('pbv_police_report')->nullable();
             $table->string('pbv_email')->unique();
             $table->string('pbv_contactno');
             $table->string('pbv_address');
             $table->string('pbv_city');
+            $table->string('pbv_longatitude')->nullable();
+            $table->string('pbv_latitude')->nullable();
             $table->integer('pbv_accept_terms');
             $table->integer('pbv_status');
             $table->timestamps();
@@ -35,6 +39,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::drop('vendor');
+        Schema::dropIfExists('vendor');
     }
 };
