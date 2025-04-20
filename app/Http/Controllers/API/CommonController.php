@@ -348,11 +348,6 @@ class CommonController extends Controller
  *                 property="success",
  *                 type="boolean",
  *                 example=true
- *             ),
- *             @OA\Property(
- *                 property="data",
- *                 type="array",
- *                 @OA\Items(ref="#/components/schemas/Service")
  *             )
  *         )
  *     ),
