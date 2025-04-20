@@ -275,7 +275,7 @@ class CommonController extends Controller
  *     path="/api/serviceFor",
  *     summary="Get all active service types",
  *     description="Returns a list of all active service types (where pbst_status = 1)",
- *     operationId="getServiceTypes",
+ *     operationId="getServiceFor",
  *     tags={"Service Types"},
  *     @OA\Response(
  *         response=200,
