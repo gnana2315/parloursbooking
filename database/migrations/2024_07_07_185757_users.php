@@ -18,7 +18,7 @@ return new class extends Migration
             $table->integer('pbu_personid')->nullable();
             $table->string('pbu_name');
             $table->string('pbu_email')->unique()->nullable();
-            $table->string('pbu_verification_token');
+            $table->string('pbu_verification_token')->nullable();
             $table->timestamp('pbu_email_verified_at')->nullable();
             $table->string('password');
             $table->integer('pbu_status');
