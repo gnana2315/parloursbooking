@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {            
             $table->integer('pbu_mobileno')->after('pbu_email')->nullable();
-            $table->integer('pbu_verification_token_expires_at')->after('pbu_email_verified_at')->nullable();
             $table->integer('pbu_mobileno_verified_at')->after('pbu_email_verified_at')->nullable();
         });
     }
@@ -25,7 +24,6 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {            
             $table->dropColumn('pbu_mobileno');
-            $table->dropColumn('pbu_verification_token_expires_at');
             $table->dropColumn('pbu_mobileno_verified_at');
         });
     }
