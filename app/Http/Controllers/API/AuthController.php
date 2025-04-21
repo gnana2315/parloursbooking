@@ -84,12 +84,12 @@ class AuthController extends Controller
             'pbu_status' => 0
         ]);
         //dd($user);
-        $this->generateVerificationCode($user);
-        
+        $verfivation_code = $this->generateVerificationCode($user);        
 
         return response()->json([
             'message' => 'User registered successfully. Please check the OTP in you phone.',
-            'user_id' => $user->pbu_id
+            'user_id' => $user->pbu_id,
+            'verification_code' => $verfivation_code,
         ], 201);
     }
 
@@ -102,6 +102,8 @@ class AuthController extends Controller
             'pbu_verification_token' => $verificationCode,
             'pbu_verification_token_expires_at' => $expiresAt,
         ]);
+
+        return $verificationCode;
     }
     /**
      * @OA\Post(
