@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('vendor', function (Blueprint $table) {
             $table->id('pbv_id');   
             $table->integer('pbv_servicefor');
+            $table->integer('pbv_service_type')->nullable();
             $table->integer('pbv_businesstype');
             $table->integer('pbv_business_category')->nullable();
             $table->string('pbv_business_name');
