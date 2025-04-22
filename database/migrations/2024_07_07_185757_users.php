@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('pbu_email')->unique()->nullable();
             $table->integer('pbu_mobileno')->nullable();
             $table->string('pbu_verification_token')->nullable();
+            $table->timestamp('pbu_verification_token_expires_at')->nullable();
             $table->timestamp('pbu_email_verified_at')->nullable();
             $table->integer('pbu_mobileno_verified_at')->nullable();
             $table->string('password');            
