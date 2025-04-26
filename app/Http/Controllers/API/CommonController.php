@@ -410,7 +410,7 @@ class CommonController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/getBankList",
+     *     path="/api/getBankList",
      *     summary="Get Bank name list to add Vendor's Bank Details",
      *     description="Returns a list of Banks Name",
      *     operationId="getBankList",
@@ -466,7 +466,7 @@ class CommonController extends Controller
     
     /**
      * @OA\Get(
-     *     path="/getBusinessCategory",
+     *     path="/api/getBusinessCategory",
      *     summary="Get Business category Details",
      *     description="Returns a list of Business Category (Saloon/Beauty Parlour)",
      *     operationId="getBusinessCategory",
