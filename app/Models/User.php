@@ -83,6 +83,6 @@ class User extends Authenticatable
     }
 
     public function vendors(){
-        return $this->hasOne(vendors::class, 'pbv_id', 'pbu_vid');
+        return $this->hasMany(vendors::class, 'pbv_id', 'pbu_vid');
     }
 }

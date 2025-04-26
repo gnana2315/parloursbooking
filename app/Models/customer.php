@@ -12,7 +12,7 @@ class customer extends Model
     /**
     * @var string $table
     */
-    protected $table = 'persons';
+    protected $table = 'customer';
 
     /**
     * @var array $fillable

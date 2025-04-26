@@ -10,16 +10,14 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-    {        
-        Schema::create('business_type', function (Blueprint $table) {
-            $table->id('pbbt_id');
-            $table->string('pbbt_name')->nullable();
-            $table->string('pbbt_icon')->nullable();
-            $table->string('pbbt_description')->nullable();
-            $table->integer('pbbt_status');
+    {
+        Schema::create('banks', function (Blueprint $table) {
+            $table->id('pbb_id');
+            $table->string('pbb_name');
+            $table->boolean('pbb_status')->default(1);
             $table->timestamps();
             $table->softDeletes($column = 'deleted_at', $precision = 0);
-        });   
+        });
     }
 
     /**
@@ -27,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('business_type');
+        Schema::dropIfExists('banks');
     }
 };

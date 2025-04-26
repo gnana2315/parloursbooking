@@ -19,14 +19,13 @@ class vendors extends Model
     */
     protected $fillable = [
         'pbv_id',
+        'pbv_tenentid',
         'pbv_servicefor',
-        'pbv_businesstype',
+        'pbv_vendortype',
         'pbv_business_category',
         'pbv_business_name',    
-        'pbv_parlourcertificate',
+        'pbv_documents',
         'pbv_brno',
-        'pbv_brdoc',
-        'pbv_police_report',
         'pbv_email',
         'pbv_contactno',
         'pbv_address',

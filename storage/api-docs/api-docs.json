@@ -9,14 +9,14 @@
         "version": "1.0.0"
     },
     "paths": {
-        "/api/userRegister": {
+        "/api/userMobileRegister": {
             "post": {
                 "tags": [
                     "Authentication"
                 ],
-                "summary": "Registeration User",
+                "summary": "Registeration User Mobile No",
                 "description": "Returns user OTP",
-                "operationId": "userRegisteration",
+                "operationId": "userRegisterMobileNo",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -24,21 +24,16 @@
                             "schema": {
                                 "required": [
                                     "usertype",
-                                    "phone_no",
-                                    "password"
+                                    "phone_no"
                                 ],
                                 "properties": {
                                     "usertype": {
                                         "type": "number",
-                                        "example": "2"
+                                        "example": "2(Customer)/1(Vendor)"
                                     },
                                     "phone_no": {
                                         "type": "number",
                                         "example": "0711234567"
-                                    },
-                                    "password": {
-                                        "type": "string",
-                                        "example": "password123"
                                     }
                                 },
                                 "type": "object"
@@ -48,14 +43,14 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "User Registered Successfully",
+                        "description": "User Mobile No Registered Successfully",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "token": {
+                                        "OTP": {
                                             "type": "string",
-                                            "example": "generated_token_here"
+                                            "example": "Send to mobile"
                                         }
                                     },
                                     "type": "object"
@@ -124,14 +119,157 @@
                 }
             }
         },
-        "/api/userlogin": {
+        "/api/userRegistration": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "User Registration",
+                "description": "Register the user(Vendor/Customer) basic details",
+                "operationId": "userRegistration",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "usertype",
+                                    "first_name",
+                                    "last_name",
+                                    "address",
+                                    "city",
+                                    "dob",
+                                    "gender",
+                                    "phone_no",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "first_name": {
+                                        "type": "string",
+                                        "example": "John"
+                                    },
+                                    "last_name": {
+                                        "type": "string",
+                                        "example": "Doe"
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "example": "123 Main St"
+                                    },
+                                    "city": {
+                                        "type": "string",
+                                        "example": "New York"
+                                    },
+                                    "dob": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "1995-08-15"
+                                    },
+                                    "gender": {
+                                        "type": "string",
+                                        "example": "male"
+                                    },
+                                    "phone_no": {
+                                        "type": "string",
+                                        "example": "0711234567"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "password123"
+                                    },
+                                    "vendor_type": {
+                                        "description": "Required only if usertype is 1 (Vendor)",
+                                        "type": "string",
+                                        "example": "Grocery Store",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "User Registered Successfully!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "token": {
+                                            "type": "string",
+                                            "example": "generated_token_here"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
+        "/api/userSetNewPassword": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "User New Password Setup",
+                "description": "Setup New password for registered user",
+                "operationId": "userSetNewPassword",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "password"
+                                ],
+                                "properties": {
+                                    "password": {
+                                        "type": "string",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "User New Password Set Successfully!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "token": {
+                                            "type": "string",
+                                            "example": "generated_token_here"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
+        "/api/userLogin": {
             "post": {
                 "tags": [
                     "Authentication"
                 ],
                 "summary": "Login User",
                 "description": "Returns user token",
-                "operationId": "loginUser",
+                "operationId": "userLogin",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -321,7 +459,7 @@
         "/api/vendors/{business_type_id}": {
             "get": {
                 "tags": [
-                    "Vendors"
+                    "Common"
                 ],
                 "summary": "Get vendors by business type",
                 "description": "Returns list of active vendors for the specified business type",
@@ -368,6 +506,283 @@
                                         "message": {
                                             "type": "string",
                                             "example": "Vendors not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/vendors/search": {
+            "get": {
+                "tags": [
+                    "Common"
+                ],
+                "summary": "Search vendors with filters",
+                "description": "Search vendors by name and/or city",
+                "operationId": "searchVendors",
+                "parameters": [
+                    {
+                        "name": "name",
+                        "in": "query",
+                        "description": "Vendor name to search for",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "city",
+                        "in": "query",
+                        "description": "City to filter vendors by",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Invalid parameters"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/businessTypes": {
+            "get": {
+                "tags": [
+                    "Common"
+                ],
+                "summary": "Get Business types for Radio",
+                "description": "Returns list of business types",
+                "operationId": "getBusinessTypes",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Business Types not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Business Types not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/serviceTypes": {
+            "get": {
+                "tags": [
+                    "Service Types"
+                ],
+                "summary": "Get all active service types",
+                "description": "Returns a list of all active service types (where pbst_status = 1)",
+                "operationId": "getServiceTypes",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No service types found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No service types found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/serviceFor": {
+            "get": {
+                "tags": [
+                    "Service Types"
+                ],
+                "summary": "Get all active service types",
+                "description": "Returns a list of all active service types (where pbst_status = 1)",
+                "operationId": "getServiceFor",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No service types found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No service types found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/getServices/{vendor_id}": {
+            "get": {
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Get active services by vendor ID",
+                "description": "Returns a list of active services (pbsv_status = 1) for a specific vendor",
+                "operationId": "getServicesByVendor",
+                "parameters": [
+                    {
+                        "name": "vendor_id",
+                        "in": "path",
+                        "description": "ID of the vendor",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No services found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No services found"
                                         }
                                     },
                                     "type": "object"
@@ -470,12 +885,12 @@
                 }
             }
         },
-        "/api/vendorRegister/{id}": {
+        "/api/vendorRegister": {
             "post": {
                 "tags": [
                     "Vendor"
                 ],
-                "summary": "Vendor Registration",
+                "summary": "Vendor Info Registration",
                 "description": "",
                 "operationId": "vendorRegister",
                 "requestBody": {
@@ -485,34 +900,47 @@
                             "schema": {
                                 "required": [
                                     "servicefor",
-                                    "business_type",
                                     "business_category",
+                                    "business_name",
                                     "business_name",
                                     "address",
                                     "city",
                                     "longatitude",
                                     "latitude",
                                     "email",
-                                    "br_no",
-                                    "br_document",
-                                    "certification"
+                                    "br_no/nic_no",
+                                    "short_description"
                                 ],
                                 "properties": {
                                     "servicefor": {
                                         "type": "string",
                                         "example": "Men/Women/Unisex"
                                     },
-                                    "business_type": {
-                                        "type": "string",
-                                        "example": "Business/Therapist"
-                                    },
                                     "business_category": {
                                         "type": "string",
-                                        "example": "saloon/parlour"
+                                        "example": "Saloon/Parlour/Nail Art"
                                     },
                                     "business_name": {
                                         "type": "string",
                                         "example": "Golden Saloon"
+                                    },
+                                    "person_initial": {
+                                        "description": "Required only if vendortype is 2 (Therapist)",
+                                        "type": "string",
+                                        "example": "Mr/Mrs/Ms",
+                                        "nullable": true
+                                    },
+                                    "person_firstname": {
+                                        "description": "Required only if vendortype is 2 (Therapist)",
+                                        "type": "string",
+                                        "example": "John",
+                                        "nullable": true
+                                    },
+                                    "person_lastname": {
+                                        "description": "Required only if vendortype is 2 (Therapist)",
+                                        "type": "string",
+                                        "example": "Peter",
+                                        "nullable": true
                                     },
                                     "address": {
                                         "type": "string",
@@ -523,20 +951,36 @@
                                         "example": "Wattala"
                                     },
                                     "longatitude": {
+                                        "description": "Required only if vendortype is 1 (Parlour)",
                                         "type": "string",
-                                        "example": ""
+                                        "example": "",
+                                        "nullable": true
                                     },
                                     "latitude": {
+                                        "description": "Required only if vendortype is 1 (Parlour)",
                                         "type": "string",
-                                        "example": ""
+                                        "example": "",
+                                        "nullable": true
                                     },
                                     "email": {
                                         "type": "email",
                                         "example": "goldensaloon@gmail.com"
                                     },
-                                    "br_no/nic_no": {
+                                    "br_no": {
+                                        "description": "Required only if vendortype is 1 (Parlour)",
                                         "type": "string",
-                                        "example": "br-1847/901234567"
+                                        "example": "",
+                                        "nullable": true
+                                    },
+                                    "nic_no": {
+                                        "description": "Required only if vendortype is 2 (Therapist)",
+                                        "type": "string",
+                                        "example": "",
+                                        "nullable": true
+                                    },
+                                    "short_description": {
+                                        "type": "string",
+                                        "example": ""
                                     }
                                 },
                                 "type": "object"
@@ -546,7 +990,7 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Vendor Details saved Successfully",
+                        "description": "Vendor Info Details saved Successfully",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -567,7 +1011,7 @@
                 }
             }
         },
-        "/api/vendorDocumentUpdate/{id}": {
+        "/api/vendorDocumentUpdate": {
             "post": {
                 "tags": [
                     "Vendor"
@@ -583,8 +1027,11 @@
                                 "required": [
                                     "br_document",
                                     "certification",
+                                    "address_proof",
                                     "nic_document",
-                                    "police_report"
+                                    "police_report",
+                                    "experience_letter",
+                                    "other"
                                 ],
                                 "properties": {
                                     "br_document": {
@@ -595,6 +1042,10 @@
                                         "type": "file",
                                         "example": ""
                                     },
+                                    "address_proof": {
+                                        "type": "file",
+                                        "example": ""
+                                    },
                                     "nic_document": {
                                         "type": "file",
                                         "example": ""
@@ -602,6 +1053,14 @@
                                     "police_report": {
                                         "type": "file",
                                         "example": ""
+                                    },
+                                    "experience_letter": {
+                                        "type": "file",
+                                        "example": ""
+                                    },
+                                    "other": {
+                                        "description": "If upload any other document user need to add a name for the each document",
+                                        "type": "file"
                                     }
                                 },
                                 "type": "object"
@@ -612,6 +1071,66 @@
                 "responses": {
                     "200": {
                         "description": "Vendor Document saved Successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "token": {
+                                            "type": "string",
+                                            "example": "generated_token_here"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
+        "/api/vendorBankUpdate": {
+            "post": {
+                "tags": [
+                    "Vendor"
+                ],
+                "summary": "Vendor Bank Details",
+                "description": "",
+                "operationId": "vendorBankUpdate",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "display_name",
+                                    "business_logo",
+                                    "service_at_time"
+                                ],
+                                "properties": {
+                                    "display_name": {
+                                        "type": "text",
+                                        "example": "CJ Saloon"
+                                    },
+                                    "business_logo": {
+                                        "type": "file",
+                                        "example": "logo.png"
+                                    },
+                                    "service_at_time": {
+                                        "type": "file",
+                                        "example": "2"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Vendor Configuration saved Successfully",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -909,8 +1428,16 @@
             "description": "Authentication"
         },
         {
-            "name": "Vendors",
-            "description": "Vendors"
+            "name": "Common",
+            "description": "Common"
+        },
+        {
+            "name": "Service Types",
+            "description": "Service Types"
+        },
+        {
+            "name": "Services",
+            "description": "Services"
         },
         {
             "name": "Customer",

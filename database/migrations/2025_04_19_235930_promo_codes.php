@@ -13,17 +13,20 @@ return new class extends Migration
     {
         Schema::create('promo_codes', function (Blueprint $table) {
             $table->id('pbpc_id');
+            $table->integer('pbpc_vid')->nullable();
             $table->string('pbpc_name')->nullable();
             $table->string('pbpc_code')->nullable();
             $table->string('pbpc_discount_type')->nullable();
             $table->float('pbpc_value', 5, 2)->default(0.00);
             $table->decimal('pbpc_discount', 5, 2)->default(0.00);
             $table->float('pbpc_max_discount', 5, 2)->default(0.00);
-            $table->date('pbpc_max_start_date')->nullable();
-            $table->date('pbpc_max_end_date')->nullable();
+            $table->date('pbpc_start_date')->nullable();
+            $table->integer('pbpc_days')->nullable();
+            $table->date('pbpc_end_date')->nullable();
             $table->float('pbpc_min_booking_amount')->default(0.00);
             $table->integer('pbpc_uses_count')->default(0);
             $table->string('pbpc_description')->nulable();
+            $table->string('pbpc_image')->nulable();
             $table->integer('pbpc_status');
             $table->timestamps();
             $table->softDeletes($column = 'deleted_at', $precision = 0);

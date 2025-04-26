@@ -5,27 +5,28 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class businessType extends Model
+class vendorBankInfo extends Model
 {
     use HasFactory;
     
     /**
     * @var string $table
     */
-    protected $table = 'business_type';
+    protected $table = 'vendor_bank_info';
 
     /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
      */
-	protected $primaryKey = 'pbbt_id';
+	protected $primaryKey = 'pbvb_id';
     protected $fillable = [
-        'pbbt_id',
-        'pbbt_name',
-        'pbbt_icon',
-        'pbbt_description',
-        'pbbt_status',
+        'pbvb_id',
+        'pbvb_vendorid',
+        'pbvb_bankname',
+        'pbvb_branch',
+        'pbvb_accountno',
+        'pbvb_status',
         'created_at',
         'updated_at',
         'deleted_at',

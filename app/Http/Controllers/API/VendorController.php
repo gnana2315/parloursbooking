@@ -10,6 +10,7 @@ use App\Models\userLogs;
 use App\Models\vendorConfig;
 use App\Models\vendorStandardAvailability;
 use App\Models\vendorSpecialCloses;
+use App\Models\vendorbankInfo;
 use App\Models\services;
 use Validator;
 
@@ -21,43 +22,88 @@ class VendorController extends Controller
 {   
     /**
      * @OA\Post(
-     *      path="/api/vendorRegister/{id}",
+     *      path="/api/vendorRegister",
      *      operationId="vendorRegister",
      *      tags={"Vendor"},
-     *      summary="Vendor Registration",
+     *      summary="Vendor Info Registration",
      *      description="",
      *      @OA\RequestBody(
      *          required=true,
      *          @OA\JsonContent(
      *              required={
      *                  "servicefor",
-     *                  "business_type",
      *                  "business_category",
+     *                  "business_name",
      *                  "business_name",
      *                  "address",
      *                  "city",
      *                  "longatitude",
      *                  "latitude",
      *                  "email",
-     *                  "br_no",
-     *                  "br_document",
-     *                  "certification"
+     *                  "br_no/nic_no",
+     *                  "short_description",
      *              },
      *              @OA\Property(property="servicefor", type="string", example="Men/Women/Unisex"),
-     *              @OA\Property(property="business_type", type="string", example="Business/Therapist"),
-     *              @OA\Property(property="business_category", type="string", example="saloon/parlour"),
+     *              @OA\Property(property="business_category", type="string", example="Saloon/Parlour/Nail Art"),
      *              @OA\Property(property="business_name", type="string", example="Golden Saloon"),
+     *              @OA\Property(
+     *                  property="person_initial", 
+     *                  type="string", 
+     *                  nullable=true,
+     *                  description="Required only if vendortype is 2 (Therapist)",
+     *                  example="Mr/Mrs/Ms"
+     *              ),
+     *              @OA\Property(
+     *                  property="person_firstname", 
+     *                  type="string", 
+     *                  nullable=true,
+     *                  description="Required only if vendortype is 2 (Therapist)",
+     *                  example="John"
+     *              ),
+     *              @OA\Property(
+     *                  property="person_lastname", 
+     *                  type="string", 
+     *                  nullable=true,
+     *                  description="Required only if vendortype is 2 (Therapist)",
+     *                  example="Peter"
+     *              ),
      *              @OA\Property(property="address", type="string", example="No.7, Negombo Road, Wattala"),
      *              @OA\Property(property="city", type="string", example="Wattala"),
-     *              @OA\Property(property="longatitude", type="string", example=""),
-     *              @OA\Property(property="latitude", type="string", example=""),
+     *              @OA\Property(
+     *                  property="longatitude", 
+     *                  type="string", 
+     *                  nullable=true,
+     *                  description="Required only if vendortype is 1 (Parlour)",
+     *                  example=""
+     *              ),
+     *              @OA\Property(
+     *                  property="latitude", 
+     *                  type="string", 
+     *                  nullable=true,
+     *                  description="Required only if vendortype is 1 (Parlour)",
+     *                  example=""
+     *              ),
      *              @OA\Property(property="email", type="email", example="goldensaloon@gmail.com"),
-     *              @OA\Property(property="br_no/nic_no", type="string", example="br-1847/901234567"),
+     *              @OA\Property(
+     *                  property="br_no", 
+     *                  type="string", 
+     *                  nullable=true,
+     *                  description="Required only if vendortype is 1 (Parlour)",
+     *                  example=""
+     *              ),
+     *              @OA\Property(
+     *                  property="nic_no", 
+     *                  type="string", 
+     *                  nullable=true,
+     *                  description="Required only if vendortype is 2 (Therapist)",
+     *                  example=""
+     *              ),
+     *              @OA\Property(property="short_description", type="string", example=""),
      *          ),
      *      ),
      *      @OA\Response(
      *          response=200,
-     *          description="Vendor Details saved Successfully",
+     *          description="Vendor Info Details saved Successfully",
      *          @OA\JsonContent(
      *              @OA\Property(property="token", type="string", example="generated_token_here")
      *          ),
@@ -65,72 +111,71 @@ class VendorController extends Controller
      *      @OA\Response(response=401, description="Unauthorized"),
      * )
      */
-    public function vendorRegister(Request $request, $id){
-        $user = User::find($id);
-        if (!$user) {
-            return response()->json(['message' => 'User not found'], 404);
-        }
-        if($request->business_type == '1'){
+    public function vendorRegister(Request $request){
+        $user = auth()->user();
+        
+        if($user->vendor_type == '1'){
             $request->validate(
                 [
                     'service_for' => 'required',
-                    'business_type' => 'required',
                     'business_category' => 'required',
                     'business_name' => 'required|unique:vendor,pbv_business_name',
                     'address' => 'required',
                     'city' => 'required',
                     'longatitude' => 'required',
                     'latitude' => 'required',
-                    'email' => 'email|unique:person,pbv_email',
-                    'br_no' => 'required',
+                    'email' => 'email|unique:vendor,pbv_email',
+                    'br_no' => 'required'
                 ],
                 [
                     'service_for.required' => 'Service for is required',
-                    'business_type.required' => 'Business Type is required',
                     'business_category.required' => 'Business Category is required',
                     'business_name.required' => 'Parlour name is required',
+                    'business_name.unique' => 'The name already in Use',
                     'address.required' => 'Address is required',
                     'city.required' => 'City is required',
                     'longatitude.required' => 'Longatitude is required',
                     'latitude.required' => 'Latitude is required',
                     'email.email' => 'Email must be a valid email address',
                     'email.unique' => 'Email already exists',
-                    'br_no.required' => 'BR number is required'
+                    'br_no.required' => 'BR No is required'
                 ]
             );
         }else{
             $request->validate(
                 [
                     'service_for' => 'required',
-                    'business_type' => 'required',
-                    'person_name' => 'required',
+                    'person_initial' => 'required',
+                    'person_firstname' => 'required',
+                    'person_lastname' => 'required',
                     'address' => 'required',
                     'city' => 'required',
-                    'email' => 'email|unique:person,pbv_email',
-                    'nic_no' => 'required',
+                    'email' => 'email|unique:vendor,pbv_email',
+                    'nic_no' => 'required'
                 ],
                 [
                     'service_for.required' => 'Service for is required',
-                    'business_type.required' => 'Business Type is required',
-                    'person_name.required' => 'Therapist name is required',
+                    'person_initial.required' => 'Therapist Initial is required',
+                    'person_firstname.required' => 'Therapist Firstname is required',
+                    'person_lastname.required' => 'Therapist Lastname is required',
                     'address.required' => 'Address is required',
                     'city.required' => 'City is required',
                     'email.email' => 'Email must be a valid email address',
                     'email.unique' => 'Email already exists',
-                    'nic_no.required' => 'NIC number is required',
+                    'nic_no.required' => 'NIC No is required'
                 ]
             );
         }
 
+        $therapist_name = $request->person_initial . '. ' .$request->person_firstname. ' ' .$request->person_lastname;
         $vendor = vendors::create([ 
             'pbv_servicefor' => $request->service_for,
-            'pbv_businesstype' => $request->business_type,
-            'pbv_business_name' => ($request->business_type == '1') ? $request->business_name : $request->person_name,
+            'pbv_business_name' => ($request->business_type == '1') ? $request->business_name : $therapist_name,
+            'pbv_brno' => ($request->business_type == '1') ? $request->br_no : $request->nic_no,
             'pbv_address' => $request->address,
             'pbv_city' => $request->city,
             'pbv_longatitude' => ($request->business_type == '1') ? $request->longatitude : null,
             'pbv_latitude' => ($request->business_type == '1') ? $request->latitude : null,
-            'pbv_brno' => ($request->business_type == '1') ? $request->br_no : $request->nic_no,
             'pbv_email' => $request->email,
             'pbv_contactno' => $user->pbu_mobileno,
             'pbv_accept_terms' => 1,
@@ -143,32 +188,22 @@ class VendorController extends Controller
                 'pbu_email' => $request->email,
             ]);
             
-            $token_text = $request->business_type.'_vendor_details_registration_session';
-
-            $message = 'Vendor Details saved successfully';
-            $token = $user->createToken($token_text)->plainTextToken;
-            $token_type = 'Bearer';
-            $user_id = $user->pbu_id;
-            $status = 201;
+            $message = 'Vendor Details saved successfully'; 
+            $status = 200;
         }else{
             $message = 'Vendor Details failed to save';
-            $token = null;
-            $token_type = null;
-            $user_id = $id;
             $status = 500;
         }
 
         return response()->json([
             'message' => $message,
-            'access_token' => $token,
-            'token_type' => $token_type,
-            'user_id' => $user_id
+            'user' => $user
         ], $status);
     }
 
     /**
      * @OA\Post(
-     *      path="/api/vendorDocumentUpdate/{id}",
+     *      path="/api/vendorDocumentUpdate",
      *      operationId="vendorDocumentUpdate",
      *      tags={"Vendor"},
      *      summary="Vendor Document Update",
@@ -179,13 +214,19 @@ class VendorController extends Controller
      *              required={
      *                  "br_document",
      *                  "certification",
+     *                  "address_proof",
      *                  "nic_document",
      *                  "police_report",
+     *                  "experience_letter",
+     *                  "other",
      *              },
      *              @OA\Property(property="br_document", type="file", example=""),
      *              @OA\Property(property="certification", type="file", example=""),
+     *              @OA\Property(property="address_proof", type="file", example=""),
      *              @OA\Property(property="nic_document", type="file", example=""),
      *              @OA\Property(property="police_report", type="file", example=""),
+     *              @OA\Property(property="experience_letter", type="file", example=""),
+     *              @OA\Property(property="other", type="file", description="If upload any other document user need to add a name for the each document"),
      *          ),
      *      ),
      *      @OA\Response(
@@ -198,42 +239,57 @@ class VendorController extends Controller
      *      @OA\Response(response=401, description="Unauthorized"),
      * )
      */
-    public function vendorDocumentUpdate(Request $request, $id){
-        $user = User::find($id);
-        if (!$user) {
-            return response()->json(['message' => 'User not found'], 404);
-        }
+    public function vendorDocumentUpdate(Request $request){
+
+        $user = auth()->user();
+
         $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
         if (!$vendor) {
             return response()->json(['message' => 'Vendor not found'], 404);
         }
-        if($vendor->pbv_businesstype == '1'){
+        $document_data = [];
+        if($vendor->pbv_vendortype == '1'){
             $request->validate(
                 [
-                    'br_document' => 'mimes:jpg,jpeg,png,pdf|max:2048',
-                    'certification' => 'mimes:jpg,jpeg,png,pdf|max:2048',
+                    'br_document' => 'required|mimes:jpg,jpeg,png,pdf|max:2048',
+                    'nic_document' => 'required|mimes:jpg,jpeg,png,pdf|max:2048',
+                    'address_proof_document' => 'required|mimes:jpg,jpeg,png,pdf|max:2048',
+                    'other_document' => 'mimes:jpg,jpeg,png,pdf|max:2048',
                 ],
                 [
+                    'br_document.required' => 'BR document is required',
                     'br_document.mimes' => 'BR document must be a file of type: jpg, jpeg, png, pdf',
                     'br_document.max' => 'BR document may not be greater than 2MB',
-                    'certification.mimes' => 'Certification must be a file of type: jpg, jpeg, png, pdf',
-                    'certification.max' => 'Certification may not be greater than 2MB'
+                    'nic_document.required' => 'BR document is required',
+                    'nic_document.mimes' => 'NIC document must be a file of type: jpg, jpeg, png, pdf',
+                    'nic_document.max' => 'NIC document may not be greater than 2MB',
+                    'address_proof_document.required' => 'Address Proof document is required',
+                    'address_proof_document.mimes' => 'Address Proof document must be a file of type: jpg, jpeg, png, pdf',
+                    'address_proof_document.max' => 'Address Proof document may not be greater than 2MB',
+                    'other_document.mimes' => 'Other document must be a file of type: jpg, jpeg, png, pdf',
+                    'other_document.max' => 'Other document may not be greater than 2MB',
                 ]
             );
         }else{
             $request->validate(
                 [
-                    'nic_document' => 'mimes:jpg,jpeg,png,pdf|max:2048',
-                    'certification' => 'mimes:jpg,jpeg,png,pdf|max:2048',
-                    'police_report' => 'mimes:jpg,jpeg,png,pdf|max:2048',
+                    'nic_document' => 'required|mimes:jpg,jpeg,png,pdf|max:2048',
+                    'certification' => 'required|mimes:jpg,jpeg,png,pdf|max:2048',
+                    'profile_image' => 'required|mimes:jpg,jpeg,png,pdf|max:2048',
+                    'other_document' => 'mimes:jpg,jpeg,png,pdf|max:2048',
                 ],
                 [
-                    'nic_document.mimes' => 'BR document must be a file of type: jpg, jpeg, png, pdf',
-                    'nic_document.max' => 'BR document may not be greater than 2MB',
+                    'nic_document.required' => 'NIC document is required',
+                    'nic_document.mimes' => 'NIC document must be a file of type: jpg, jpeg, png, pdf',
+                    'nic_document.max' => 'NIC document may not be greater than 2MB',
+                    'certification.required' => 'Certification is required',                    
                     'certification.mimes' => 'Certification must be a file of type: jpg, jpeg, png, pdf',
                     'certification.max' => 'Certification may not be greater than 2MB',
-                    'police_report.mimes' => 'Police report must be a file of type: jpg, jpeg, png, pdf',
-                    'police_report.max' => 'Polica Report may not be greater than 2MB',
+                    'profile_image.required' => 'Profile image is required',
+                    'profile_image.mimes' => 'Profile image must be a file of type: jpg, jpeg, png, pdf',
+                    'profile_image.max' => 'Profile image may not be greater than 2MB',
+                    'other_document.mimes' => 'Other document must be a file of type: jpg, jpeg, png, pdf',
+                    'other_document.max' => 'Other document may not be greater than 2MB',
                 ]
             );
         }
@@ -243,6 +299,13 @@ class VendorController extends Controller
             $br_document_file->move(public_path('uploads/vendors'), $br_document_filename);
             $request->merge(['br_document' => $br_document_filename]);
             $br_document_path = public_path('uploads/vendors') . '/' . $br_document_filename;
+
+            $document_data[] = [
+                'br_document' => [
+                    'name' => $br_document_filename,
+                    'path' => $br_document_path,
+                ],
+            ];
         }
 
         if ($request->hasFile('certification')) {
@@ -251,30 +314,47 @@ class VendorController extends Controller
             $certification_document_file->move(public_path('uploads/vendors'), $certification_document_filename);
             $request->merge(['certification' => $certification_document_filename]);
             $certification_document_path = public_path('uploads/vendors') . '/' . $certification_document_filename;
+            $document_data[] = [
+                'br_document' => [
+                    'name' => $certification_document_filename,
+                    'path' => $certification_document_path,
+                ],
+            ];
         }
+
         if ($request->hasFile('nic_document')) {
             $nic_document_file = $request->file('nic_document');
             $nic_document_filename = $vendor->pbv_business_name . '_' .time() . '_nic_document.' . $nic_document_file->getClientOriginalExtension();
             $nic_document_file->move(public_path('uploads/vendors'), $nic_document_filename);
             $request->merge(['nic_document' => $nic_document_filename]);
             $nic_document_path = public_path('uploads/vendors') . '/' . $nic_document_filename;
+            $document_data[] = [
+                'br_document' => [
+                    'name' => $nic_document_filename,
+                    'path' => $nic_document_path,
+                ],
+            ];
         }
-        if ($request->hasFile('police_report')) {
-            $police_report_file = $request->file('police_report');
-            $police_report_filename = $vendor->pbv_business_name . '_' .time() . '_police_report.' . $police_report_file->getClientOriginalExtension();
-            $police_report_file->move(public_path('uploads/vendors'), $police_report_filename);
-            $request->merge(['police_report' => $police_report_filename]);
-            $police_report_path = public_path('uploads/vendors') . '/' . $police_report_filename;
+
+        if ($request->hasFile('other_document')) {
+            foreach ($request->file('other_document') as $index => $document) {
+                $other_document_filename = $vendor->pbv_business_name . '_' .time() . '_other_document_' . $index . '.' . $document->getClientOriginalExtension();
+                $document->move(public_path('uploads/vendors'), $other_document_filename);
+                $request->merge(['other_document' => $other_document_filename]);
+                $other_document_path = public_path('uploads/vendors') . '/' . $other_document_filename;
+                $document_data[] = [
+                    'br_document' => [
+                        'name' => $other_document_filename,
+                        'path' => $other_document_path,
+                    ],
+                ];
+            }
         }
         $vendor_document_update = $vendor->update([
-            'pbv_parlourcertificate' => $certification_document_path,
-            'pbv_brdoc' => ($request->pbv_businesstype == '1') ? $br_document_path : $nic_document_path,
-            'pbv_police_report' => ($request->pbv_businesstype == '1') ? null : $police_report_path,
+            'pbv_documents' => json_encode($document_data),
         ]);
 
-        if($vendor_document_update){            
-            $token_text = $vendor->pbv_business_name.'_vendor_document_update_session';
-
+        if($vendor_document_update){
             $message = 'Vendor Document saved successfully';
             $status = 200;
         }else{
@@ -287,6 +367,78 @@ class VendorController extends Controller
         ], $status);
     }
 
+    /**
+     * @OA\Post(
+     *      path="/api/vendorBankUpdate",
+     *      operationId="vendorBankUpdate",
+     *      tags={"Vendor"},
+     *      summary="Vendor Bank Details",
+     *      description="",
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              required={
+     *                  "display_name",
+     *                  "business_logo",
+     *                  "service_at_time",
+     *              },
+     *              @OA\Property(property="display_name", type="text", example="CJ Saloon"),
+     *              @OA\Property(property="business_logo", type="file", example="logo.png"),
+     *              @OA\Property(property="service_at_time", type="file", example="2"),
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Vendor Configuration saved Successfully",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="token", type="string", example="generated_token_here")
+     *          ),
+     *      ),
+     *      @OA\Response(response=401, description="Unauthorized"),
+     * )
+     */
+    public function vendorBankUpdate(Request $request){
+        $user = auth()->user();
+
+        $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
+        if (!$vendor) {
+            return response()->json(['message' => 'Vendor not found'], 404);
+        }
+        $request->validate(
+            [
+                'bankname' => 'required',
+                'branch' => 'required',
+                'accountno' => 'required|numeric',
+                
+            ],
+            [
+                'bankname.required' => 'Please select the Bank',
+                'branch.required' => 'Please enter the Branch name',
+                'accountno.required' => 'Please enter the bank Account No',
+                'accountno.numeric' => 'Bank no must be Numeric',
+            ]
+        );
+
+        $vendorBankInfoUpdate = vendorbankInfo::create([
+            'pbvb_vendorid' => $vendor->pbv_id,
+            'pbvb_bankname' => $request->bankname,
+            'pbvb_branch' => $request->branch,
+            'pbvb_accountno' => $request->accountno,
+            'pbvb_status' => 1
+        ]);
+
+        if($vendorBankInfoUpdate){
+            $status_code = 200;
+            $message = "Vendor Bank Info Updated Successfully";
+        }else{
+            $status_code = 500;
+            $message = "Vendor Bank Info not updated Successfully";
+        }
+
+        return response()->json([
+            'message' => $message,
+        ], $status_code);
+    }
     /**
      * @OA\Post(
      *      path="/api/vendorConfig/{id}",
@@ -317,11 +469,8 @@ class VendorController extends Controller
      *      @OA\Response(response=401, description="Unauthorized"),
      * )
      */
-    public function vendorConfig(Request $request, $id){
-        $user = User::find($id);
-        if (!$user) {
-            return response()->json(['message' => 'User not found'], 404);
-        }
+    public function vendorConfig(Request $request){
+        $user = auth()->user();
         $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
         if (!$vendor) {
             return response()->json(['message' => 'Vendor not found'], 404);
@@ -359,7 +508,7 @@ class VendorController extends Controller
             'pbvc_service_at_time' => $request->service_at_time,
         ]);
 
-        if($vendor){
+        if($vendorConfig){
             $message = 'Vendor Configuration updated successfully';
             $status = 200;
         }else{

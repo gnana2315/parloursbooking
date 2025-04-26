@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Models\User;
+use App\Models\customer;
+use App\Models\vendors;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -28,23 +30,22 @@ class AuthController extends Controller
 {
     /**
      * @OA\Post(
-     *      path="/api/userRegister",
-     *      operationId="userRegisteration",
+     *      path="/api/userMobileRegister",
+     *      operationId="userRegisterMobileNo",
      *      tags={"Authentication"},
-     *      summary="Registeration User",
+     *      summary="Registeration User Mobile No",
      *      description="Returns user OTP",
      *      @OA\RequestBody(
      *          required=true,
      *          @OA\JsonContent(
-     *              required={"usertype","phone_no","password"},
-     *              @OA\Property(property="usertype", type="number", example="2"),
+     *              required={"usertype","phone_no"},
+     *              @OA\Property(property="usertype", type="number", example="2(Customer)/1(Vendor)"),
      *              @OA\Property(property="phone_no", type="number", example="0711234567"),
-     *              @OA\Property(property="password", type="string", example="password123")
      *          ),
      *      ),
      *      @OA\Response(
      *          response=200,
-     *          description="User Registered Successfully",
+     *          description="User Mobile No Registered Successfully",
      *          @OA\JsonContent(
      *              @OA\Property(property="OTP", type="string", example="Send to mobile")
      *          ),
@@ -52,8 +53,8 @@ class AuthController extends Controller
      *      @OA\Response(response=401, description="Unauthorized"),
      * )
      */
-    //user registration
-    public function userRegisteration(Request $request){
+    //user mobile verification
+    public function userRegisterMobileNo(Request $request){
         $request->validate(
             [
                 'usertype' => 'required',
@@ -64,22 +65,18 @@ class AuthController extends Controller
                         $query->where('pbu_usertype', $request->usertype); // Check for user type
                     }),
                 ],
-                'password' => 'required|min:8',
             ],
             [
                 'usertype.required' => 'User Type undefined',
                 'phone_no.required' => 'Invalid Phone Number. Phone Number cannot be empty',
                 'phone_no.min' => 'Invalid Phone Number. Phone Number Must have 10 Digits',
                 'phone_no.unique' => 'Phone Number Already Registered. If you forgot password, please use forgot password, instead of Create new account.',
-                'password.required' => 'Invalid Password. Password cannot be empty',
-                'password.min' => 'Invalid Password. Password Must have 8 characters',
             ]
         );
         
         $user = User::create([
             'pbu_usertype' => $request->usertype,
             'pbu_mobileno' => $request->phone_no,
-            'password' => Hash::make($request->password),
             'pbu_name' => $request->phone_no,
             'pbu_status' => 0
         ]);
@@ -89,8 +86,8 @@ class AuthController extends Controller
         return response()->json([
             'message' => 'User registered successfully. Please check the OTP in you phone.',
             'user_id' => $user->pbu_id,
-            'verification_code' => $verfivation_code,
-        ], 201);
+            'OTP' => $verfivation_code,
+        ], 200);
     }
 
     public function generateVerificationCode($user){
@@ -167,14 +164,205 @@ class AuthController extends Controller
                 'message' => 'Phone Number Validated Successfully',
                 'access_token' => $token,
                 'token_type' => 'Bearer',
+                'user' => $user,
             ]);
         }        
     }
 
     /**
      * @OA\Post(
+     *      path="/api/userRegistration",
+     *      operationId="userRegistration",
+     *      tags={"Authentication"},
+     *      summary="User Registration",
+     *      description="Register the user(Vendor/Customer) basic details",
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              required={"usertype", "first_name", "last_name", "address", "city", "dob", "gender", "phone_no", "password"},
+     *              @OA\Property(property="first_name", type="string", example="John"),
+     *              @OA\Property(property="last_name", type="string", example="Doe"),
+     *              @OA\Property(property="address", type="string", example="123 Main St"),
+     *              @OA\Property(property="city", type="string", example="New York"),
+     *              @OA\Property(property="dob", type="string", format="date", example="1995-08-15"),
+     *              @OA\Property(property="gender", type="string", example="male"),
+     *              @OA\Property(property="phone_no", type="string", example="0711234567"),
+     *              @OA\Property(property="password", type="string", example="password123"),
+     *              @OA\Property(
+     *                  property="vendor_type", 
+     *                  type="string", 
+     *                  nullable=true,
+     *                  description="Required only if usertype is 1 (Vendor)",
+     *                  example="Grocery Store"
+     *              )
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="User Registered Successfully!",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="token", type="string", example="generated_token_here")
+     *          ),
+     *      ),
+     *      @OA\Response(response=401, description="Unauthorized"),
+     * )
+     */
+    public function userRegistration(Request $request){
+        $user = $request->user();
+        $userRegister = null;
+        if($user->pbu_usertype == '1'){
+            $request->validate(
+                [
+                    'first_name' => 'required',
+                    'last_name' => 'required',
+                    'address' => 'required',
+                    'city' => 'required',
+                    'dob' => 'required',
+                    'gender' => 'required',
+                    'vendor_type' => 'required',
+                ],
+                [
+                    'first_name.required' => 'Please enter your First Name',
+                    'last_name.required' => 'Please enter your Last Name',
+                    'address.required' => 'Please enter your Address',
+                    'city.required' => 'Please enter your City',
+                    'dob.required' => 'Please enter your Date of Birth',
+                    'gender.required' => 'Please select your Gender',
+                    'vendor_type.required' => 'Please select your Vendor Type',
+                ]
+            );
+
+            $userRegister = vendors::create([
+                'pbv_vendortype' => $request->vendor_type,
+                'pbv_first_name' => $request->first_name,
+                'pbv_last_name' => $request->last_name,
+                'pbv_address' => $request->address,
+                'pbv_city' => $request->city,
+                'pbv_gender' => $request->gender,
+                'pbv_dob' => $request->dob,
+                'pbv_accept_terms' => $request->accept_terms
+            ]);
+
+            $user->update([
+                'pbu_vid' => $userRegister->id
+            ]);
+        }else{
+            $request->validate(
+                [
+                    'first_name' => 'required',
+                    'last_name' => 'required',
+                    'address' => 'required',
+                    'city' => 'required',
+                    'dob' => 'required',
+                    'gender' => 'required'
+                ],
+                [
+                    'first_name.required' => 'Please enter your First Name',
+                    'last_name.required' => 'Please enter your Last Name',
+                    'address.required' => 'Please enter your Address',
+                    'city.required' => 'Please enter your City',
+                    'dob.required' => 'Please enter your Date of Birth',
+                    'gender.required' => 'Please select your Gender'
+                ]
+            );
+
+            $userRegister = customer::create([
+                'pbc_user_id' => $user->pbu_id,
+                'pbc_first_name' => $request->first_name,
+                'pbc_last_name' => $request->last_name,
+                'pbc_address' => $request->address,
+                'pbc_city' => $request->city,
+                'pbc_sex' => $request->gender,
+                'pbc_dob' => $request->dob,
+                'pbc_accept_terms' => $request->accept_terms,
+                'pbc_status' => 1
+            ]);
+
+            $user->update([
+                'pbu_vid' => $userRegister->id
+            ]);
+        }
+
+        $status_code = null;
+        $message = "";
+
+        if($userRegister){
+            $status_code = 200;
+            $message = ($user->pbu_usertype == '1') ? "Vendor Registered Successfully" : "Customer Registered Successfully";
+        }else{
+            $status_code = 404;
+            $message = ($user->pbu_usertype == '1') ? "Vendor not registered Successfully! Please try again later." : "Customer not registered Successfully! Please try again later.";
+        }
+
+        return response()->json([
+            'message' => $message,
+            'token_type' => 'Bearer',
+            'user' => $user,
+        ], $status_code);
+    }
+
+    /**
+     * @OA\Post(
+     *      path="/api/userSetNewPassword",
+     *      operationId="userSetNewPassword",
+     *      tags={"Authentication"},
+     *      summary="User New Password Setup",
+     *      description="Setup New password for registered user",
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              required={"password"},
+     *              @OA\Property(property="password", type="string", example="password123")
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="User New Password Set Successfully!",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="token", type="string", example="generated_token_here")
+     *          ),
+     *      ),
+     *      @OA\Response(response=401, description="Unauthorized"),
+     * )
+     */
+    public function userSetNewPassword(Request $request){
+        $user = $request->user();
+        $request->validate(
+            [
+                'password' => 'required|min:8',
+            ],
+            [
+                'password.required' => 'Password is required',
+                'password.min' => 'Password length must be 8 characters',
+            ]
+        );
+
+        $updateUserPassword = $user->update([
+            'password' => Hash::make($request->password),
+        ]);
+
+        $status_code = null;
+        $message = "";
+
+        if($updateUserPassword){
+            $status_code = 200;
+            $message = "User New Password Updated Successfully!";
+        }else{
+            $status_code = 404;
+            $message = "User New Password not updated Successfully! Please try again later.";
+        }
+
+        return response()->json([
+            'message' => $message,
+            'token_type' => 'Bearer',
+            'user' => $user,
+        ], $status_code);
+    }
+
+    /**
+     * @OA\Post(
      *      path="/api/userLogin",
-     *      operationId="loginUser",
+     *      operationId="userLogin",
      *      tags={"Authentication"},
      *      summary="Login User",
      *      description="Returns user token",

@@ -13,16 +13,19 @@ return new class extends Migration
     {
         Schema::create('persons', function (Blueprint $table) {
             $table->id('pbp_id');
-            $table->integer('pbv_id');
-            $table->string('pbp_intial');
-            $table->string('pbp_firstname');
-            $table->string('pbp_lastname');
-            $table->string('pbp_nicno');
-            $table->string('pbp_nic');
-            $table->string('pbp_contactno');
+            $table->integer('pbv_id')->nullable();
+            $table->string('pbp_intial')->nullable();
+            $table->string('pbp_firstname')->nullable();
+            $table->string('pbp_lastname')->nullable();
+            $table->string('pbp_nicno')->nullable();
+            $table->string('pbp_nic')->nullable();
+            $table->string('pbp_contactno')->nullable();
             $table->string('pbp_email')->unique();
-            $table->string('pbp_address');
-            $table->integer('pbp_status');
+            $table->string('pbp_address')->nullable();
+            $table->integer('pbp_city')->nullable();
+            $table->integer('pbp_gender')->nullable();
+            $table->integer('pbp_dob')->nullable();
+            $table->integer('pbp_status')->nullable();
             $table->timestamps();
             $table->softDeletes($column = 'deleted_at', $precision = 0);
         });

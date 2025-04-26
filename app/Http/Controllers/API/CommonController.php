@@ -67,10 +67,18 @@ class CommonController extends Controller
                 ['pbv_businesstype', '=', $business_type_id],
             ])->get();
             
-            return response()->json([
-                'success' => true,
-                'data' => $vendors
-            ]);
+            if(!empty($vendor)){
+                return response()->json([
+                    'success' => true,
+                    'data' => $vendors
+                ], 200);
+            }else{
+                return response()->json([
+                    'success' => false,
+                    'data' => null,
+                    'message' => "Business Type lis is empty."
+                ], 404);
+            }
             
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json([
@@ -160,11 +168,19 @@ class CommonController extends Controller
         // Pagination
         // $perPage = $request->get('per_page', 15);
         // $vendors = $query->paginate($perPage);
-    
-        return response()->json([
-            'success' => true,
-            'data' => $vendors
-        ]);
+        
+        if(!empty($vendors)){
+            return response()->json([
+                'success' => true,
+                'data' => $vendors
+            ], 200);
+        }else{
+            return response()->json([
+                'success' => false,
+                'data' => null,
+                'message' => "Business Type lis is empty."
+            ], 404);
+        }
     }
 
     /**
@@ -216,7 +232,7 @@ class CommonController extends Controller
         return response()->json([
             'success' => true,
             'data' => $businessTypes
-        ]);
+        ], 200);
     }
 
     /**
@@ -268,7 +284,7 @@ class CommonController extends Controller
         return response()->json([
             'success' => true,
             'data' => $serviceTypes
-        ]);
+        ], 200);
     }
 /**
  * @OA\Get(
@@ -319,7 +335,7 @@ class CommonController extends Controller
         return response()->json([
             'success' => true,
             'data' => $serviceFor
-        ]);
+        ], 200);
     }
 
     /**
@@ -384,6 +400,6 @@ class CommonController extends Controller
         return response()->json([
             'success' => true,
             'data' => $services
-        ]);
+        ], 200);
     }
 }

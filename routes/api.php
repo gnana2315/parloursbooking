@@ -20,7 +20,7 @@ use App\Http\Controllers\MigrationController;
 */
 
 //User Auth APIs
-Route::post('/userRegister',[AuthController::class,'userRegisteration']);
+Route::post('/userMobileRegister',[AuthController::class,'userRegisterMobileNo']);
 Route::post('/userMobileVerification',[AuthController::class,'verifyVerificationCode']);
 Route::post('/userLogin',[AuthController::class,'userLogin']);
 Route::post('/userForgotPassword',[AuthController::class,'userForgotPassword']);
@@ -34,12 +34,16 @@ Route::post('/userResetPassword',[AuthController::class,'userResetPassword']);
 Route::middleware(['auth:sanctum', 'validate.token'])->group(function () {
     Route::post('/userLogout',[AuthController::class,'userLogout']);
 
+    //user
+    Route::post('/userRegistration', [AuthController::class, 'userRegistration']);
+
     //customer
     Route::post('/customerRegister/{id}', [ CustomersController::class,'register' ]);
 
     //vendor
-    Route::post('/vendorRegister/{id}', [VendorController::class, 'vendorRegister' ]);
-    Route::post('/vendorDocumentUpdate/{id}', [VendorController::class, 'vendorDocumentUpdate' ]);
+    Route::post('/vendorRegister', [VendorController::class, 'vendorRegister' ]);
+    Route::post('/vendorDocumentUpdate', [VendorController::class, 'vendorDocumentUpdate' ]);
+    Route::post('/vendorBankUpdate', [VendorController::class, 'vendorBankUpdate' ]);
     Route::post('/vendorConfig/{id}', [VendorController::class, 'vendorConfig' ]);
     Route::post('/vendorAvailability/{id}', [VendorController::class, 'vendorAvailability' ]);
     Route::post('/vendorSpecialCloses/{id}', [VendorController::class, 'vendorSpecialCloses' ]);

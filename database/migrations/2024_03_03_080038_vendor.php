@@ -13,23 +13,21 @@ return new class extends Migration
     {
         Schema::create('vendor', function (Blueprint $table) {
             $table->id('pbv_id');   
+            $table->integer('pbv_tenentid');
             $table->integer('pbv_servicefor');
-            $table->integer('pbv_service_type')->nullable();
-            $table->integer('pbv_businesstype');
+            $table->integer('pbv_vendortype');
             $table->integer('pbv_business_category')->nullable();
             $table->string('pbv_business_name');
-            $table->string('pbv_parlourcertificate')->nullable();
+            $table->string('pbv_documents')->nullable()->comment('Add NIC,BR, Certificate, Address Proof, Exp letter and etc with document meta data');
             $table->string('pbv_brno')->nullable();
-            $table->string('pbv_brdoc')->nullable();
-            $table->string('pbv_police_report')->nullable();
             $table->string('pbv_email')->unique();
-            $table->string('pbv_contactno');
-            $table->string('pbv_address');
-            $table->string('pbv_city');
+            $table->string('pbv_contactno')->unique();
+            $table->string('pbv_address')->unique();
+            $table->string('pbv_city')->unique();
             $table->string('pbv_longatitude')->nullable();
             $table->string('pbv_latitude')->nullable();
             $table->integer('pbv_accept_terms');
-            $table->integer('pbv_status');
+            $table->integer('pbv_status')->unique();
             $table->timestamps();
             $table->softDeletes($column = 'deleted_at', $precision = 0);
         });

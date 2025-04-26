@@ -30,8 +30,6 @@ return new class extends Migration
             $table->integer('pbu_gender')->nullable();
             $table->string('pbu_address')->nullable();
             $table->string('pbu_city')->nullable();
-            $table->string('pbu_nicno')->nullable();
-            $table->string('pbu_nic_doc')->nullable();
             $table->string('pbu_accept_terms')->nullable();
             $table->integer('pbu_status')->nullable();
             $table->rememberToken();

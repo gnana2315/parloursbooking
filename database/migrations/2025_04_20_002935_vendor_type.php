@@ -10,16 +10,16 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-    {
-        Schema::create('business_category', function (Blueprint $table) {
-            $table->id('pbbc_id');
-            $table->string('pbbc_name')->nullable();
-            $table->string('pbbc_description')->nullable();
-            $table->string('pbbc_image')->nullable();
-            $table->boolean('pbbc_status')->default(1);
+    {        
+        Schema::create('vendor_type', function (Blueprint $table) {
+            $table->id('pbvt_id');
+            $table->string('pbvt_name')->nullable();
+            $table->string('pbvt_icon')->nullable();
+            $table->string('pbvt_description')->nullable();
+            $table->integer('pbvt_status');
             $table->timestamps();
             $table->softDeletes($column = 'deleted_at', $precision = 0);
-        });
+        });   
     }
 
     /**
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('business_category');
+        Schema::dropIfExists('vendor_type');
     }
 };
