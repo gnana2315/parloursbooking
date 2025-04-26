@@ -7,6 +7,8 @@ use App\Models\vendorType;
 use App\Models\serviceType;
 use App\Models\serviceFor;
 use App\Models\promocode;
+use App\Models\banks;
+use App\Models\businessCategory;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -186,10 +188,10 @@ class CommonController extends Controller
 
     /**
  * @OA\Get(
- *     path="/api/businessTypes",
- *     summary="Get Business types for Radio",
- *     description="Returns list of business types",
- *     operationId="getBusinessTypes",
+ *     path="/api/vendorTypes",
+ *     summary="Get Vendor types for Radio",
+ *     description="Returns list of vendor types (Parlour/Therapist)",
+ *     operationId="getVendorTypes",
  *     tags={"Common"},
  *     @OA\Response(
  *         response=200,
@@ -205,7 +207,7 @@ class CommonController extends Controller
  *     ),
  *     @OA\Response(
  *         response=404,
- *         description="Business Types not found",
+ *         description="Vendor Types not found",
  *         @OA\JsonContent(
  *             type="object",
  *             @OA\Property(
@@ -216,23 +218,23 @@ class CommonController extends Controller
  *             @OA\Property(
  *                 property="message",
  *                 type="string",
- *                 example="Business Types not found"
+ *                 example="Vendor Types are not found"
  *             )
  *         )
  *     )
  * )
  */
-    public function getBusinessTypes(){
-        $businessTypes = businessType::where('pb_business_type_status', 1)->get();
-        if ($businessTypes->isEmpty()) {
+    public function getVendorTypes(){
+        $vendorTypes = vendorType::where('pbvt_status', 1)->get();
+        if ($vendorTypes->isEmpty()) {
             return response()->json([
                 'success' => false,
-                'message' => 'No business types found'
+                'message' => 'No vendor types found'
             ], 404);
         }
         return response()->json([
             'success' => true,
-            'data' => $businessTypes
+            'data' => $vendorTypes
         ], 200);
     }
 
@@ -240,7 +242,7 @@ class CommonController extends Controller
  * @OA\Get(
  *     path="/api/serviceTypes",
  *     summary="Get all active service types",
- *     description="Returns a list of all active service types (where pbst_status = 1)",
+ *     description="Returns a list of all active service types (where pbst_status = 1) (Example: Hair cut, facial)",
  *     operationId="getServiceTypes",
  *     tags={"Service Types"},
  *     @OA\Response(
@@ -327,12 +329,14 @@ class CommonController extends Controller
  */
     public function getServiceFor(){
         $serviceFor = serviceFor::where('pbsf_status', 1)->get();
+
         if ($serviceFor->isEmpty()) {
             return response()->json([
                 'success' => false,
                 'message' => 'No service for found'
             ], 404);
         }
+
         return response()->json([
             'success' => true,
             'data' => $serviceFor
@@ -340,53 +344,53 @@ class CommonController extends Controller
     }
 
     /**
- * @OA\Get(
- *     path="/getServices/{vendor_id}",
- *     summary="Get active services by vendor ID",
- *     description="Returns a list of active services (pbsv_status = 1) for a specific vendor",
- *     operationId="getServicesByVendor",
- *     tags={"Services"},
- *     @OA\Parameter(
- *         name="vendor_id",
- *         in="path",
- *         description="ID of the vendor",
- *         required=true,
- *         @OA\Schema(
- *             type="integer",
- *             format="int64"
- *         )
- *     ),
- *     @OA\Response(
- *         response=200,
- *         description="Successful operation",
- *         @OA\JsonContent(
- *             type="object",
- *             @OA\Property(
- *                 property="success",
- *                 type="boolean",
- *                 example=true
- *             )
- *         )
- *     ),
- *     @OA\Response(
- *         response=404,
- *         description="No services found",
- *         @OA\JsonContent(
- *             type="object",
- *             @OA\Property(
- *                 property="success",
- *                 type="boolean",
- *                 example=false
- *             ),
- *             @OA\Property(
- *                 property="message",
- *                 type="string",
- *                 example="No services found"
- *             )
- *         )
- *     )
- * )
- */
+     * @OA\Get(
+     *     path="/getServices/{vendor_id}",
+     *     summary="Get active services by vendor ID",
+     *     description="Returns a list of active services (pbsv_status = 1) for a specific vendor",
+     *     operationId="getServicesByVendor",
+     *     tags={"Services"},
+     *     @OA\Parameter(
+     *         name="vendor_id",
+     *         in="path",
+     *         description="ID of the vendor",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer",
+     *             format="int64"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="success",
+     *                 type="boolean",
+     *                 example=true
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="No services found",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="success",
+     *                 type="boolean",
+     *                 example=false
+     *             ),
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="No services found"
+     *             )
+     *         )
+     *     )
+     * )
+     */
     public function getServicesByVendor($vendor_id){
         $services = services::where([
             ['pbsv_status', '=', 1],
@@ -401,6 +405,117 @@ class CommonController extends Controller
         return response()->json([
             'success' => true,
             'data' => $services
+        ], 200);
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/getBankList",
+     *     summary="Get Bank name list to add Vendor's Bank Details",
+     *     description="Returns a list of Banks Name",
+     *     operationId="getBankList",
+     *     tags={"Common"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="success",
+     *                 type="boolean",
+     *                 example=true
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="No Banks found",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="success",
+     *                 type="boolean",
+     *                 example=false
+     *             ),
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="No Banks found"
+     *             )
+     *         )
+     *     )
+     * )
+     */
+    public function getBankList(){
+        $user= auth()->user();
+
+        $banklists = banks::where('pbb_status', '=', 1)->get();
+
+        if ($banklists->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Banks are not found'
+            ], 404);
+        }
+        return response()->json([
+            'success' => true,
+            'data' => $banklists
+        ], 200);
+    }
+
+    
+    /**
+     * @OA\Get(
+     *     path="/getBusinessCategory",
+     *     summary="Get Business category Details",
+     *     description="Returns a list of Business Category (Saloon/Beauty Parlour)",
+     *     operationId="getBusinessCategory",
+     *     tags={"Common"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="success",
+     *                 type="boolean",
+     *                 example=true
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="No Business Category found",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="success",
+     *                 type="boolean",
+     *                 example=false
+     *             ),
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="No usiness Category found"
+     *             )
+     *         )
+     *     )
+     * )
+     */
+    public function getBusinessCategory(){
+        $user= auth()->user();
+
+        $businesscategorylists = businessCategory::where('pbbc_status', '=', 1)->get();
+
+        if ($businesscategorylists->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Business Categories are not found'
+            ], 404);
+        }
+        return response()->json([
+            'success' => true,
+            'data' => $businesscategorylists
         ], 200);
     }
 }
