@@ -72,7 +72,57 @@ class AdminSeeder extends Seeder
                 'pbu_personid' => '1',
                 'pbu_name' => 'Vendor',
                 'pbu_email' => null,
-                'pbu_mobileno' => '0712345678',
+                'pbu_mobileno' => '0712345676',
+                'pbu_verification_token' => $timestamp,
+                'pbu_verification_token_expires_at' => null,
+                'pbu_email_verified_at' => $timestamp,
+                'pbu_mobileno_verified_at' => null,
+                'password' => 'Vendor',
+                'pbu_first_name' => 'Vendor',
+                'pbu_last_name' => 'Vendor',
+                'pbu_dob' => null,
+                'pbu_gender' => null,
+                'pbu_address' => null,
+                'pbu_city' => null,
+                'pbu_accept_terms' => '1',
+                'pbu_status' => '1',
+                'remember_token' => $timestamp
+            ]
+        );
+
+        User::create(
+            [
+                'pbu_usertype' => '2',
+                'pbu_vid' => '2',
+                'pbu_personid' => '2',
+                'pbu_name' => 'Vendor',
+                'pbu_email' => null,
+                'pbu_mobileno' => '0712345677',
+                'pbu_verification_token' => $timestamp,
+                'pbu_verification_token_expires_at' => null,
+                'pbu_email_verified_at' => $timestamp,
+                'pbu_mobileno_verified_at' => null,
+                'password' => 'Vendor',
+                'pbu_first_name' => 'Vendor',
+                'pbu_last_name' => 'Vendor',
+                'pbu_dob' => null,
+                'pbu_gender' => null,
+                'pbu_address' => null,
+                'pbu_city' => null,
+                'pbu_accept_terms' => '1',
+                'pbu_status' => '1',
+                'remember_token' => $timestamp
+            ]
+        );
+
+        User::create(
+            [
+                'pbu_usertype' => '2',
+                'pbu_vid' => '3',
+                'pbu_personid' => '3',
+                'pbu_name' => 'Vendor',
+                'pbu_email' => null,
+                'pbu_mobileno' => '0712345679',
                 'pbu_verification_token' => $timestamp,
                 'pbu_verification_token_expires_at' => null,
                 'pbu_email_verified_at' => $timestamp,
@@ -97,7 +147,7 @@ class AdminSeeder extends Seeder
                 'pbu_personid' => '1',
                 'pbu_name' => 'Customer',
                 'pbu_email' => null,
-                'pbu_mobileno' => '0712345678',
+                'pbu_mobileno' => '0712345699',
                 'pbu_verification_token' => $timestamp,
                 'pbu_verification_token_expires_at' => null,
                 'pbu_email_verified_at' => $timestamp,

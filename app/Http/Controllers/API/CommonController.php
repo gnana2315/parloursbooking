@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\API;
 use App\Models\vendors;
 use App\Models\services;
-use App\Models\businessType;
+use App\Models\vendorType;
 use App\Models\serviceType;
 use App\Models\serviceFor;
+use App\Models\promocode;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -14,15 +15,15 @@ class CommonController extends Controller
 {
     /**
  * @OA\Get(
- *     path="/api/vendors/{business_type_id}",
- *     summary="Get vendors by business type",
- *     description="Returns list of active vendors for the specified business type",
+ *     path="/api/vendors/{vendor_type_id}",
+ *     summary="Get vendors by vendor type",
+ *     description="Returns list of active vendors for the specified vendor type",
  *     operationId="getVendors",
  *     tags={"Common"},
  *     @OA\Parameter(
- *         name="business_type_id",
+ *         name="vendor_type_id",
  *         in="path",
- *         description="ID of business type to filter vendors",
+ *         description="ID of vendor type to filter vendors",
  *         required=true,
  *         @OA\Schema(
  *             type="integer",
@@ -60,11 +61,11 @@ class CommonController extends Controller
  *     )
  * )
  */
-    public function getVendors($business_type_id, $token = null){
+    public function getVendors($vendor_type_id, $token = null){
         try {
             $vendors = vendors::where([
                 ['pbv_status', '=', 1],
-                ['pbv_businesstype', '=', $business_type_id],
+                ['pbv_vendortype', '=', $vendor_type_id],
             ])->get();
             
             if(!empty($vendor)){
@@ -76,7 +77,7 @@ class CommonController extends Controller
                 return response()->json([
                     'success' => false,
                     'data' => null,
-                    'message' => "Business Type lis is empty."
+                    'message' => "Vendor Type list is empty."
                 ], 404);
             }
             
