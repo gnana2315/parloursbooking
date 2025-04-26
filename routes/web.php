@@ -15,6 +15,7 @@ use App\Http\Controllers\userAdminController;
 //use App\Http\Controllers\SendMailController;
 use App\Http\Controllers\MigrationController;
 use App\Http\Controllers\SweggerController;
+use App\Http\Controllers\seedController;
 
 /*
 |--------------------------------------------------------------------------
@@ -59,6 +60,7 @@ Route::get('/vendorRegistration', function () {
 
 
 Route::get('/migrate', [MigrationController::class, 'runMigrations']);
+Route::get('/run-seeder', [seedController::class, 'seedFromController']);
 Route::get('/generate-swagger', [SweggerController::class, 'generate']);
 
 Route::group(['middleware' => 'auth.check'], function () {
