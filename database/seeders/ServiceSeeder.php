@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\servies;
+use App\Models\services;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -13,7 +13,7 @@ class ServiceSeeder extends Seeder
      */
     public function run(): void
     {
-        servies::create([
+        services::create([
             'pbs_vendor_id' => 1,
             'pbs_service_type' => 1,
             'pbs_service_for' => 1,
@@ -27,7 +27,7 @@ class ServiceSeeder extends Seeder
             'created_at' => now(),
             'updated_at' => now(),
         ]);
-        servies::create([
+        services::create([
             'pbs_vendor_id' => 1,
             'pbs_service_type' => 2,
             'pbs_service_for' => 1,
