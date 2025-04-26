@@ -152,7 +152,7 @@ class AuthController extends Controller
             $user->update([
                 'pbu_status' => 1,
                 'pbu_verification_token' => null,
-                'pbu_verification_token_expires_at' => null,
+                'pbu_verification_token_expires_at' => Carbon::now()->addHours(2),
                 'pbu_mobileno_verified_at' => date('Y-m-d H:i:s'),
             ]);
 
