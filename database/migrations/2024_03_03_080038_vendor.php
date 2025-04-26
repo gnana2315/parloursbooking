@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('pbv_business_name');
             $table->string('pbv_documents')->nullable()->comment('Add NIC,BR, Certificate, Address Proof, Exp letter and etc with document meta data');
             $table->string('pbv_brno')->nullable();
-            $table->string('pbv_email')->unique();
+            $table->string('pbv_email')->nullable()->unique();
             $table->string('pbv_contactno')->unique();
             $table->string('pbv_address')->unique();
             $table->string('pbv_city')->unique();
