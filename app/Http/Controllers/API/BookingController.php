@@ -32,8 +32,8 @@ class BookingController extends Controller
      *          @OA\JsonContent(
      *              required={"vendor_id","customer_id", "booking_date", "service_total_duration"},
      *              @OA\Property(property="vendor_id", type="number", example="1"),
-     *              @OA\Property(property="customer_id", type="number", example="1")
-     *              @OA\Property(property="booking_date", type="date", example="2025-04-29")
+     *              @OA\Property(property="customer_id", type="number", example="1"),
+     *              @OA\Property(property="booking_date", type="date", example="2025-04-29"),
      *              @OA\Property(property="service_total_duration", type="time", example="02:00:00")
      *          ),
      *      ),
