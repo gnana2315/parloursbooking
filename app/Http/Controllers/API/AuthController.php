@@ -354,7 +354,6 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => $message,
-            'token_type' => 'Bearer',
             'user' => $user,
         ], $status_code);
     }
@@ -404,11 +403,11 @@ class AuthController extends Controller
 
         //Check if user verified the mobile no
         if($user->pbu_mobileno_verified_at == null){
-            return response()->json(['error' => 'User Phone No not verfied yet.'], 401);
+            return response()->json(['error' => 'User Phone No not verfied yet.'], 500);
         }
         // Check if user exists and password is correct
         if (!$user || !Hash::check($request->password, $user->password)) {
-            return response()->json(['error' => 'Invalid mobile number or password'], 401);
+            return response()->json(['error' => 'Invalid mobile number or password'], 500);
         }
 
         $token_text = $user->pbu_id.'_user_login_session';
@@ -418,8 +417,8 @@ class AuthController extends Controller
             'message' => 'Login successful',
             'access_token' => $token,
             'token_type' => 'Bearer',
-            'customer_id' => $user->pbu_id
-        ]);
+            'user' => $user
+        ], 200);
     }
 
     /**
@@ -445,7 +444,7 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'Logged out successfully'
-        ]);
+        ], 200);
     }    
 
     /**

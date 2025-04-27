@@ -95,27 +95,16 @@ class CustomersController extends Controller
         ]);
 
         if($customer){
-            
-            $token_text = 'customer_details_registration_session';
-
             $message = 'Customer Details saved successfully';
-            $token = $user->createToken($token_text)->plainTextToken;
-            $token_type = 'Bearer';
-            $user_id = $user->pbu_id;
-            $status = 201;
+            $status = 200;
         }else{
             $message = 'Customer Details failed to save';
-            $token = null;
-            $token_type = null;
-            $user_id = $id;
             $status = 500;
         }
 
         return response()->json([
             'message' => $message,
-            'access_token' => $token,
-            'token_type' => $token_type,
-            'user_id' => $user_id
+            'user' => $user
         ], $status);
     }
 }
