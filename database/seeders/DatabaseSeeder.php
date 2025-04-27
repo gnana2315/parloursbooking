@@ -27,5 +27,8 @@ class DatabaseSeeder extends Seeder
         $this->call(ServiceTypeSeeder::class);
         $this->call(VendorSeeder::class);
         $this->call(VendorTypeSeeder::class);
+        $this->call(CustomerSeeder::class);
+        $this->call(VendorStandardAvailabilitySeeder::class);
+        $this->call(BookingSeeder::class);
     }
 }

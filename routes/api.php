@@ -8,6 +8,7 @@ use App\Http\Controllers\API\VendorController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\CommonController;
 use App\Http\Controllers\MigrationController;
+use App\Http\Controllers\API\BookingController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -25,11 +26,6 @@ Route::post('/userMobileVerification',[AuthController::class,'verifyVerification
 Route::post('/userLogin',[AuthController::class,'userLogin']);
 Route::post('/userForgotPassword',[AuthController::class,'userForgotPassword']);
 Route::post('/userResetPassword',[AuthController::class,'userResetPassword']);
-
-// Route::controller(VendorController::class)->group(function(){
-//     Route::post('vendorRegister','register');
-//     Route::post('vendorlogin','login');
-// });
 
 Route::middleware(['auth:sanctum', 'validate.token'])->group(function () {
     Route::post('/userLogout',[AuthController::class,'userLogout']);
@@ -57,4 +53,7 @@ Route::middleware(['auth:sanctum', 'validate.token'])->group(function () {
     Route::get('/serviceFor', [CommonController::class, 'getServiceFor' ]);
     Route::get('/getServices/{vendor_id}', [CommonController::class, 'getServicesByVendor' ]);
     Route::get('/getBankList', [CommonController::class, 'getBankList']);
+
+    //booking
+    Route::post('/getBookingSlots', [BookingController::class, 'getBookingSlots']);
 });

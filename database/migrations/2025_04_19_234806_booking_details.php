@@ -20,7 +20,6 @@ return new class extends Migration
             $table->float('pbbd_amount')->default(0);
             $table->float('pbbd_discount')->default(0);
             $table->float('pbbd_total_amount')->default(0);
-            $table->string('pbb_promo_id')->nullable();
             $table->integer('pbb_status');
             $table->timestamps();
             $table->softDeletes($column = 'deleted_at', $precision = 0);
