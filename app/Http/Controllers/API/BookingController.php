@@ -266,6 +266,7 @@ class BookingController extends Controller
                 'contact_no' => $request->someone_contact_no,
                 'age' => $request->age,
                 'gender' => $request->gender,
+                'address' => $request->address,
             ];
         }else{
             $booking_details_generated = [
