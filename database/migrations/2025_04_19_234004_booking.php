@@ -21,7 +21,7 @@ return new class extends Migration
             $table->time('pbb_booking_duration')->nullable();
             $table->time('pbb_booking_start_time')->nullable();
             $table->time('pbb_booking_end_time')->nullable();
-            $table->string('pbb_ref_no');
+            $table->string('pbb_ref_no')->nullable();
             $table->string('pbb_type')->nullable();
             $table->string('pbb_service_location')->nullable();
             $table->string('pbb_contact_no')->nullable();
