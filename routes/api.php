@@ -56,4 +56,5 @@ Route::middleware(['auth:sanctum', 'validate.token'])->group(function () {
 
     //booking
     Route::post('/getBookingSlots', [BookingController::class, 'getBookingSlots']);
+    Route::post('/addBooking', [BookingController::class, 'addBooking']);
 });
