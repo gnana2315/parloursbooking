@@ -38,15 +38,15 @@ Route::middleware(['auth:sanctum', 'validate.token'])->group(function () {
     Route::post('/userRegistration', [AuthController::class, 'userRegistration']);
 
     //customer
-    Route::post('/customerRegister/{id}', [ CustomersController::class,'register' ]);
+    Route::post('/customerRegister', [ CustomersController::class,'register' ]);
 
     //vendor
     Route::post('/vendorRegister', [VendorController::class, 'vendorRegister' ]);
     Route::post('/vendorDocumentUpdate', [VendorController::class, 'vendorDocumentUpdate' ]);
     Route::post('/vendorBankUpdate', [VendorController::class, 'vendorBankUpdate' ]);
-    Route::post('/vendorConfig/{id}', [VendorController::class, 'vendorConfig' ]);
-    Route::post('/vendorAvailability/{id}', [VendorController::class, 'vendorAvailability' ]);
-    Route::post('/vendorSpecialCloses/{id}', [VendorController::class, 'vendorSpecialCloses' ]);
+    Route::post('/vendorConfig', [VendorController::class, 'vendorConfig' ]);
+    Route::post('/vendorAvailability', [VendorController::class, 'vendorAvailability' ]);
+    Route::post('/vendorSpecialCloses', [VendorController::class, 'vendorSpecialCloses' ]);
     Route::post('/addVendorServices/{id}', [VendorController::class, 'addVendorServices' ]);
 
     //common

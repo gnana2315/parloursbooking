@@ -441,7 +441,7 @@ class VendorController extends Controller
     }
     /**
      * @OA\Post(
-     *      path="/api/vendorConfig/{id}",
+     *      path="/api/vendorConfig",
      *      operationId="vendorConfig",
      *      tags={"Vendor"},
      *      summary="Vendor Configuration",
@@ -523,7 +523,7 @@ class VendorController extends Controller
 
     /**
      * @OA\Post(
-     *      path="/api/vendorAvailability/{id}",
+     *      path="/api/vendorAvailability",
      *      operationId="vendorAvailability",
      *      tags={"Vendor"},
      *      summary="Vendor Standard Availability",
@@ -553,11 +553,8 @@ class VendorController extends Controller
      *      @OA\Response(response=401, description="Unauthorized"),
      * )
      */
-    public function vendorAvailability(Request $request, $id){
-        $user = User::find($id);
-        if (!$user) {
-            return response()->json(['message' => 'User not found'], 404);
-        }
+    public function vendorAvailability(Request $request){
+        $user = auth()->user();
         $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
         if (!$vendor) {
             return response()->json(['message' => 'Vendor not found'], 404);
@@ -598,7 +595,7 @@ class VendorController extends Controller
 
     /**
      * @OA\Post(
-     *      path="/api/vendorSpecialCloses/{id}",
+     *      path="/api/vendorSpecialCloses",
      *      operationId="vendorSpecialCloses",
      *      tags={"Vendor"},
      *      summary="Vendor Special Closings",
@@ -629,11 +626,8 @@ class VendorController extends Controller
      * )
      */
 
-    public function vendorSpecialCloses(Request $request, $id){
-        $user = User::find($id);
-        if (!$user) {
-            return response()->json(['message' => 'User not found'], 404);
-        }
+    public function vendorSpecialCloses(Request $request){
+        $user = auth()->user();
         $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
         if (!$vendor) {
             return response()->json(['message' => 'Vendor not found'], 404);
@@ -674,7 +668,7 @@ class VendorController extends Controller
 
     /**
      * @OA\Post(
-     *      path="/api/addVendorServices/{id}",
+     *      path="/api/addVendorServices",
      *      operationId="addVendorServices",
      *      tags={"Vendor"},
      *      summary="Add Vendor Services",
@@ -711,11 +705,8 @@ class VendorController extends Controller
      * )
      */
 
-    public function addVendorServices(Request $request, $id){
-        $user = User::find($id);
-        if (!$user) {
-            return response()->json(['message' => 'User not found'], 404);
-        }
+    public function addVendorServices(Request $request){
+        $user = auth()->user();
         $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
         if (!$vendor) {
             return response()->json(['message' => 'Vendor not found'], 404);

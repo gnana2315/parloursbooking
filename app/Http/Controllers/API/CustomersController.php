@@ -47,11 +47,9 @@ class CustomersController extends Controller
      * )
      */
 
-    public function register(Request $request, $id){
-        $user = User::find($id);
-        if (!$user) {
-            return response()->json(['message' => 'User not found'], 404);
-        }
+    public function register(Request $request){
+        $user = auth()->user();
+
         $request->validate(
             [
                 'intial' => 'required',
