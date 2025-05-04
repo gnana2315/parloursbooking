@@ -62,18 +62,24 @@ class AuthController extends Controller
                     'required',
                     'min:10',
                     Rule::unique('users', 'pbu_mobileno')->where(function ($query) use ($request) {
-                        $query->where('pbu_usertype', $request->user_type); // Check for user type
+                        return $query->where('pbu_usertype', $request->user_type)
+                            ->where('pbu_status', 1); 
                     }),
                 ],
             ],
             [
                 'user_type.required' => 'User Type undefined',
-                'phone_no.required' => 'Invalid Phone Number. Phone Number cannot be empty',
+                'phone_no.required' => 'Invalid Phone Number.',
                 'phone_no.min' => 'Invalid Phone Number. Phone Number Must have 10 Digits',
                 'phone_no.unique' => 'Phone Number Already Registered. If you forgot password, please use forgot password, instead of Create new account.',
             ]
         );
         
+        User::where('pbu_mobileno', $request->phone_no)
+            ->where('pbu_usertype', $request->user_type)
+            ->where('pbu_status', 0)
+            ->delete();
+
         $user = User::create([
             'pbu_usertype' => $request->user_type,
             'pbu_mobileno' => $request->phone_no,
@@ -90,8 +96,36 @@ class AuthController extends Controller
         ], 200);
     }
 
-    public function generateVerificationCode($user){
-        $verificationCode = Str::random(6); // Generate a 6-digit code
+    /**
+     * @OA\Post(
+     *      path="/api/userResendOTP",
+     *      operationId="generateVerificationCode",
+     *      tags={"Authentication"},
+     *      summary="Resend OTP to User Mobile No",
+     *      description="Returns user OTP",
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              required={"user_id"},
+     *              @OA\Property(property="user_id", type="number", example=" "),
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Resend OTP to User Mobile No ",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="OTP", type="string", example="Send to mobile")
+     *          ),
+     *      ),
+     *      @OA\Response(response=401, description="Unauthorized"),
+     * )
+     */
+    public function generateVerificationCode(Request $request){        
+        $user = User::find($request->user_id);
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+        $verificationCode = random_int(100000, 999999); // Generate a 6-digit code
         $expiresAt = Carbon::now()->addMinutes(10); // Code expires in 10 minutes
 
         // Save the code and expiration time
@@ -329,11 +363,10 @@ class AuthController extends Controller
         $user = $request->user();
         $request->validate(
             [
-                'password' => 'required|min:8',
+                'password' => 'required',
             ],
             [
                 'password.required' => 'Password is required',
-                'password.min' => 'Password length must be 8 characters',
             ]
         );
 
@@ -388,13 +421,12 @@ class AuthController extends Controller
         $request->validate(
             [
                 'phone_no' => 'required|exists:users,pbu_mobileno',
-                'password' => 'required|min:8',
+                'password' => 'required',
             ],
             [
                 'phone_no.required' => 'Phone No Required',
                 'phone_no.exists' => 'Phone No not in the system',
                 'password.required' => 'Password Required',
-                'password.min' => 'Password minimum length shild be 8 characters',
             ]
         );
 
@@ -403,11 +435,11 @@ class AuthController extends Controller
 
         //Check if user verified the mobile no
         if($user->pbu_mobileno_verified_at == null){
-            return response()->json(['error' => 'User Phone No not verfied yet.'], 500);
+            return response()->json(['message' => 'User Phone No not verfied yet.'], 500);
         }
         // Check if user exists and password is correct
         if (!$user || !Hash::check($request->password, $user->password)) {
-            return response()->json(['error' => 'Invalid mobile number or password'], 500);
+            return response()->json(['message' => 'Invalid mobile number or password'], 500);
         }
 
         $token_text = $user->pbu_id.'_user_login_session';
@@ -525,13 +557,12 @@ class AuthController extends Controller
             [
                 'reset_token' => 'required',
                 'user_id' => 'required',
-                'password' => 'required|min:8|confirmed',
+                'password' => 'required|confirmed',
             ],
             [
                 'reset_token.required' => 'Invalid Reset Token',
                 'user_id.required' => 'Invalid User ID',
                 'password.required' => 'Password Required',
-                'password.min' => 'Password minimum length shild be 8 characters',
                 'password.confirmed' => 'The password confirmation does not match.',
             ]
         );
