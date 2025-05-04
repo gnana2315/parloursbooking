@@ -121,7 +121,8 @@ class AuthController extends Controller
      * )
      */
     public function resendOtp(Request $request) {
-        $user = User::find($request->user_id);
+        $user = User::where('pbu_id', $request->user_id)
+                    ->first();
     
         if (!$user) {
             return response()->json(['message' => 'User not found'], 404);
