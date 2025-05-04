@@ -10,7 +10,7 @@ use App\Models\userLogs;
 use App\Models\vendorConfig;
 use App\Models\vendorStandardAvailability;
 use App\Models\vendorSpecialCloses;
-use App\Models\vendorbankInfo;
+use App\Models\vendorBankInfo;
 use App\Models\services;
 use Validator;
 
@@ -440,7 +440,7 @@ class VendorController extends Controller
             ]
         );
 
-        $vendorBankInfoUpdate = vendorbankInfo::create([
+        $vendorBankInfoUpdate = vendorBankInfo::create([
             'pbvb_vendorid' => $vendor->pbv_id,
             'pbvb_bankname' => $request->bankname,
             'pbvb_branch' => $request->branch,
