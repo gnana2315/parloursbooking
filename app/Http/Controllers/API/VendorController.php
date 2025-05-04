@@ -117,8 +117,8 @@ class VendorController extends Controller
     public function vendorRegister(Request $request){
         $user = auth()->user();
         
+        dd($user->pbu_vid);
         $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
-        dd($vendor->pbv_vendortype);
         if($vendor->pbv_vendortype == '1'){
             $request->validate(
                 [
