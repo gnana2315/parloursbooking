@@ -134,8 +134,8 @@ class VendorController extends Controller
                     'business_name.unique' => 'The name already in Use',
                     'address.required' => 'Address is required',
                     'city.required' => 'City is required',
-                    'longatitude.required' => 'Longatitude is required',
-                    'latitude.required' => 'Latitude is required',
+                    'longatitude.required' => 'Location is required',
+                    'latitude.required' => 'Location is required',
                     'email.email' => 'Email must be a valid email address',
                     'email.unique' => 'Email already exists',
                     'br_no.required' => 'BR No is required'
