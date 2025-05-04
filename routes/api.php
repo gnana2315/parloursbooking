@@ -22,7 +22,7 @@ use App\Http\Controllers\API\BookingController;
 
 //User Auth APIs
 Route::post('/userMobileRegister',[AuthController::class,'userRegisterMobileNo']);
-Route::get('/userResendOTP',[AuthController::class,'generateVerificationCode']);
+Route::get('/userResendOTP/{user_id}',[AuthController::class,'generateVerificationCode']);
 Route::post('/userMobileVerification',[AuthController::class,'verifyVerificationCode']);
 Route::post('/userLogin',[AuthController::class,'userLogin']);
 Route::post('/userForgotPassword',[AuthController::class,'userForgotPassword']);

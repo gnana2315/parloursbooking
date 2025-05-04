@@ -97,18 +97,18 @@ class AuthController extends Controller
     }
 
     /**
-     * @OA\Get(
-     *      path="/api/userResendOTP",
+     * @OA\Post(
+     *      path="/api/userResendOTP/{user_id}",
      *      operationId="generateVerificationCode",
      *      tags={"Authentication"},
      *      summary="Resend OTP to User Mobile No",
      *      description="Returns user OTP",
-     *      @OA\Parameter(
-     *         name="user_id",
-     *         in="query",
-     *         required=true,
-     *         @OA\Schema(type="integer"),
-     *         description="ID of the user"
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              required={"user_id"},
+     *              @OA\Property(property="user_id", type="number", example=" "),
+     *          ),
      *      ),
      *      @OA\Response(
      *          response=200,
@@ -120,7 +120,7 @@ class AuthController extends Controller
      *      @OA\Response(response=401, description="Unauthorized"),
      * )
      */
-
+    
     public function generateVerificationCode($user_id){        
         $user = User::find($user_id);
         if (!$user) {
