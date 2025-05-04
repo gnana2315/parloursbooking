@@ -98,7 +98,7 @@ class AuthController extends Controller
 
     /**
      * @OA\Post(
-     *      path="/api/userResendOTP",
+     *      path="/api/userResendOTP/{user_id}",
      *      operationId="generateVerificationCode",
      *      tags={"Authentication"},
      *      summary="Resend OTP to User Mobile No",
@@ -120,6 +120,7 @@ class AuthController extends Controller
      *      @OA\Response(response=401, description="Unauthorized"),
      * )
      */
+    
     public function generateVerificationCode($user_id){        
         $user = User::find($user_id);
         if (!$user) {
