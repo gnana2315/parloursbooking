@@ -242,7 +242,7 @@ class AuthController extends Controller
      *                  nullable=true,
      *                  description="Required only if user_type is 1 (Vendor)",
      *                  example="Grocery Store"
-     *              )
+     *              ),
      *              @OA\Property(property="accept_terms", type="string", example="1"),
      *          ),
      *      ),
