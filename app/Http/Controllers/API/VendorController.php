@@ -47,7 +47,6 @@ class VendorController extends Controller
      *              },
      *              @OA\Property(property="user_id", type="string", example="From DB"),
      *              @OA\Property(property="service_for", type="numeric", example="Men(1)/Women(2)/Unisex(3)"),
-     *              @OA\Property(property="vendor_type", type="numeric", example="Business(1)/Therapist(2)"),
      *              @OA\Property(property="business_category", type="numeric", example="Saloon(1)/Parlour(2)/Nail Art(3)"),
      *              @OA\Property(property="business_name", type="string", example="Golden Saloon"),
      *              @OA\Property(
@@ -122,7 +121,6 @@ class VendorController extends Controller
             $request->validate(
                 [
                     'service_for' => 'required',
-                    'vendor_type' => 'required',
                     'business_category' => 'required',
                     'business_name' => 'required|unique:vendor,pbv_business_name',
                     'address' => 'required',
@@ -134,7 +132,6 @@ class VendorController extends Controller
                 ],
                 [
                     'service_for.required' => 'Service for is required',
-                    'vendor_type.required' => 'Vendor Type is required',
                     'business_category.required' => 'Business Category is required',
                     'business_name.required' => 'Parlour name is required',
                     'business_name.unique' => 'The name already in Use',
@@ -147,11 +144,10 @@ class VendorController extends Controller
                     'br_no.required' => 'BR No is required'
                 ]
             );
-        }else{
+        }else if ($user->vendor_type == '2'){
             $request->validate(
                 [
                     'service_for' => 'required',
-                    'vendor_type' => 'required',
                     'business_category' => 'required',
                     'person_initial' => 'required',
                     'person_firstname' => 'required',
@@ -163,7 +159,6 @@ class VendorController extends Controller
                 ],
                 [
                     'service_for.required' => 'Service for is required',
-                    'vendor_type.required' => 'Vendor Type is required',
                     'business_category.required' => 'Business Category is required',
                     'person_initial.required' => 'Therapist Initial is required',
                     'person_firstname.required' => 'Therapist Firstname is required',
@@ -175,6 +170,8 @@ class VendorController extends Controller
                     'nic_no.required' => 'NIC No is required'
                 ]
             );
+        }else{
+            return response()->json(['message' => 'Invalid vendor type'], 400);
         }
 
         $therapist_name = $request->person_initial . '. ' .$request->person_firstname. ' ' .$request->person_lastname;

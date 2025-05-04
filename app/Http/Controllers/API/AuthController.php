@@ -236,7 +236,6 @@ class AuthController extends Controller
      *              @OA\Property(property="dob", type="string", format="date", example="1995-08-15"),
      *              @OA\Property(property="gender", type="string", example="male"),
      *              @OA\Property(property="phone_no", type="string", example="0711234567"),
-     *              @OA\Property(property="password", type="string", example="password123"),
      *              @OA\Property(
      *                  property="vendor_type", 
      *                  type="string", 
@@ -244,6 +243,7 @@ class AuthController extends Controller
      *                  description="Required only if user_type is 1 (Vendor)",
      *                  example="Grocery Store"
      *              )
+     *              @OA\Property(property="accept_terms", type="string", example="1"),
      *          ),
      *      ),
      *      @OA\Response(
@@ -259,6 +259,9 @@ class AuthController extends Controller
     public function userRegistration(Request $request){
         $user = $request->user();
         $userRegister = null;
+        if($user->pbu_mobileno_verified_at == null){
+            return response()->json(['message' => 'User Phone No not verfied yet.'], 500);
+        }
         if($user->pbu_usertype == '1'){
             $request->validate(
                 [
@@ -269,6 +272,7 @@ class AuthController extends Controller
                     'dob' => 'required',
                     'gender' => 'required',
                     'vendor_type' => 'required',
+                    'accept_terms' => 'required',
                 ],
                 [
                     'first_name.required' => 'Please enter your First Name',
@@ -278,6 +282,7 @@ class AuthController extends Controller
                     'dob.required' => 'Please enter your Date of Birth',
                     'gender.required' => 'Please select your Gender',
                     'vendor_type.required' => 'Please select your Vendor Type',
+                    'accept_terms.required' => 'Please accept the terms and conditions',
                 ]
             );
 
@@ -303,7 +308,8 @@ class AuthController extends Controller
                     'address' => 'required',
                     'city' => 'required',
                     'dob' => 'required',
-                    'gender' => 'required'
+                    'gender' => 'required',
+                    'accept_terms' => 'required',
                 ],
                 [
                     'first_name.required' => 'Please enter your First Name',
@@ -311,7 +317,8 @@ class AuthController extends Controller
                     'address.required' => 'Please enter your Address',
                     'city.required' => 'Please enter your City',
                     'dob.required' => 'Please enter your Date of Birth',
-                    'gender.required' => 'Please select your Gender'
+                    'gender.required' => 'Please select your Gender',
+                    'accept_terms.required' => 'Please accept the terms and conditions',
                 ]
             );
 
