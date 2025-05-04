@@ -25,7 +25,7 @@ return new class extends Migration
             $table->string('pbc_city')->nullable();
             $table->string('pbc_email')->nullable();
             $table->string('pbc_contact_no')->nullable();
-            $table->integer('pbc_accept_terms');
+            $table->integer('pbc_accept_terms')->nullable();
             $table->integer('pbc_status');
             $table->timestamps();
             $table->softDeletes($column = 'deleted_at', $precision = 0);
