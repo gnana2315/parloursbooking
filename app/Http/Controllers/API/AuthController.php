@@ -121,14 +121,8 @@ class AuthController extends Controller
      * )
      */
     public function resendOtp(Request $request) {
-        $user = User::where('pbu_id', $request->user_id)
-                    ->first();
     
-        if (!$user) {
-            return response()->json(['message' => 'User not found'], 404);
-        }
-    
-        $otp = $this->generateVerificationCode($user->id);
+        $otp = $this->generateVerificationCode($request->user_id);
     
         // optionally send OTP via SMS or email
         return response()->json([
