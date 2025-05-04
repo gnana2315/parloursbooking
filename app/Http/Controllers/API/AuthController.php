@@ -38,8 +38,8 @@ class AuthController extends Controller
      *      @OA\RequestBody(
      *          required=true,
      *          @OA\JsonContent(
-     *              required={"usertype","phone_no"},
-     *              @OA\Property(property="usertype", type="number", example="2(Customer)/1(Vendor)"),
+     *              required={"user_type","phone_no"},
+     *              @OA\Property(property="user_type", type="number", example="2(Customer)/1(Vendor)"),
      *              @OA\Property(property="phone_no", type="number", example="0711234567"),
      *          ),
      *      ),
@@ -57,17 +57,17 @@ class AuthController extends Controller
     public function userRegisterMobileNo(Request $request){
         $request->validate(
             [
-                'usertype' => 'required',
+                'user_type' => 'required',
                 'phone_no' => [
                     'required',
                     'min:10',
                     Rule::unique('users', 'pbu_mobileno')->where(function ($query) use ($request) {
-                        $query->where('pbu_usertype', $request->usertype); // Check for user type
+                        $query->where('pbu_usertype', $request->user_type); // Check for user type
                     }),
                 ],
             ],
             [
-                'usertype.required' => 'User Type undefined',
+                'user_type.required' => 'User Type undefined',
                 'phone_no.required' => 'Invalid Phone Number. Phone Number cannot be empty',
                 'phone_no.min' => 'Invalid Phone Number. Phone Number Must have 10 Digits',
                 'phone_no.unique' => 'Phone Number Already Registered. If you forgot password, please use forgot password, instead of Create new account.',
@@ -75,7 +75,7 @@ class AuthController extends Controller
         );
         
         $user = User::create([
-            'pbu_usertype' => $request->usertype,
+            'pbu_usertype' => $request->user_type,
             'pbu_mobileno' => $request->phone_no,
             'pbu_name' => $request->phone_no,
             'pbu_status' => 0
@@ -179,7 +179,7 @@ class AuthController extends Controller
      *      @OA\RequestBody(
      *          required=true,
      *          @OA\JsonContent(
-     *              required={"usertype", "first_name", "last_name", "address", "city", "dob", "gender", "phone_no", "password"},
+     *              required={"first_name", "last_name", "address", "city", "dob", "gender", "phone_no", "password"},
      *              @OA\Property(property="first_name", type="string", example="John"),
      *              @OA\Property(property="last_name", type="string", example="Doe"),
      *              @OA\Property(property="address", type="string", example="123 Main St"),
@@ -192,7 +192,7 @@ class AuthController extends Controller
      *                  property="vendor_type", 
      *                  type="string", 
      *                  nullable=true,
-     *                  description="Required only if usertype is 1 (Vendor)",
+     *                  description="Required only if user_type is 1 (Vendor)",
      *                  example="Grocery Store"
      *              )
      *          ),
