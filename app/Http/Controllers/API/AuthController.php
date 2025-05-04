@@ -97,7 +97,7 @@ class AuthController extends Controller
     }
 
     /**
-     * @OA\Post(
+     * @OA\Get(
      *      path="/api/userResendOTP",
      *      operationId="generateVerificationCode",
      *      tags={"Authentication"},
