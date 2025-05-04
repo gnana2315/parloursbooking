@@ -98,8 +98,8 @@ class AuthController extends Controller
 
     /**
      * @OA\Post(
-     *      path="/api/userResendOTP/{user_id}",
-     *      operationId="generateVerificationCode",
+     *      path="/api/resendOtp",
+     *      operationId="resendOtp",
      *      tags={"Authentication"},
      *      summary="Resend OTP to User Mobile No",
      *      description="Returns user OTP",
@@ -120,7 +120,22 @@ class AuthController extends Controller
      *      @OA\Response(response=401, description="Unauthorized"),
      * )
      */
+    public function resendOtp(Request $request) {
+        $user = User::find($user_id);
     
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+    
+        $otp = $this->generateVerificationCode($user->id);
+    
+        // optionally send OTP via SMS or email
+        return response()->json([
+            'message' => 'OTP resent successfully.',
+            'otp' => $otp // remove this in production!
+        ]);
+    }
+
     public function generateVerificationCode($user_id){        
         $user = User::find($user_id);
         if (!$user) {
