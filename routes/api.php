@@ -22,7 +22,7 @@ use App\Http\Controllers\API\BookingController;
 
 //User Auth APIs
 Route::post('/userMobileRegister',[AuthController::class,'userRegisterMobileNo']);
-Route::post('/userResendOTP',[AuthController::class,'generateVerificationCode']);
+Route::get('/userResendOTP/{user_id}',[AuthController::class,'generateVerificationCode']);
 Route::post('/userMobileVerification',[AuthController::class,'verifyVerificationCode']);
 Route::post('/userLogin',[AuthController::class,'userLogin']);
 Route::post('/userForgotPassword',[AuthController::class,'userForgotPassword']);
@@ -35,7 +35,7 @@ Route::middleware(['auth:sanctum', 'validate.token'])->group(function () {
     Route::post('/userRegistration', [AuthController::class, 'userRegistration']);
 
     //customer
-    Route::post('/customerRegister', [ CustomersController::class,'register' ]);
+    Route::post('/customerRegister/{id}', [ CustomersController::class,'register' ]);
 
     //vendor
     Route::post('/vendorRegister', [VendorController::class, 'vendorRegister' ]);

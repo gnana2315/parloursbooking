@@ -87,7 +87,7 @@ class AuthController extends Controller
             'pbu_status' => 0
         ]);
         //dd($user);
-        $verfivation_code = $this->generateVerificationCode($user);        
+        $verfivation_code = $this->generateVerificationCode($user->pbu_id);        
 
         return response()->json([
             'message' => 'User registered successfully. Please check the OTP in you phone.',
@@ -120,8 +120,8 @@ class AuthController extends Controller
      *      @OA\Response(response=401, description="Unauthorized"),
      * )
      */
-    public function generateVerificationCode(Request $request){        
-        $user = User::find($request->user_id);
+    public function generateVerificationCode($user_id){        
+        $user = User::find($user_id);
         if (!$user) {
             return response()->json(['message' => 'User not found'], 404);
         }

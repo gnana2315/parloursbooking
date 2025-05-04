@@ -47,12 +47,11 @@ class CustomersController extends Controller
      * )
      */
 
-    public function register(Request $request){
+    public function register($id, Request $request){
         $user = auth()->user();
 
         $request->validate(
             [
-                'user_id' => 'required',
                 'intial' => 'required',
                 'first_name' => 'required',
                 'last_name' => 'required',
@@ -62,7 +61,6 @@ class CustomersController extends Controller
                 'email' => 'email|unique:customer,pbc_email',
             ],
             [
-                'user_id.required' => 'User ID Required',
                 'intial.required' => 'Customer Initial Required',
                 'first_name.required' => 'Customer First Name Required',
                 'last_name.required' => 'Customer Last Name Required',
@@ -81,7 +79,7 @@ class CustomersController extends Controller
             $nic_doc_path = public_path('uploads/customer_nic') . '/' . $filename;
         }
         $customer = customer::create([
-            'pbc_user_id' => $request->user_id,
+            'pbc_user_id' => $id,
             'pbc_intial' => $request->intial,
             'pbc_first_name' => $request->first_name,
             'pbc_last_name' => $request->last_name,
