@@ -234,7 +234,7 @@ class AuthController extends Controller
      *              @OA\Property(property="address", type="string", example="123 Main St"),
      *              @OA\Property(property="city", type="string", example="New York"),
      *              @OA\Property(property="dob", type="string", format="date", example="1995-08-15"),
-     *              @OA\Property(property="gender", type="string", example="male"),
+     *              @OA\Property(property="gender", type="string", example="male(1)/female(2)"),
      *              @OA\Property(property="phone_no", type="string", example="0711234567"),
      *              @OA\Property(
      *                  property="vendor_type", 
