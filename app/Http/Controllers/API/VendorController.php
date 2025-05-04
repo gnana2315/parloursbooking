@@ -33,6 +33,7 @@ class VendorController extends Controller
      *              required={
      *                  "user_id",
      *                  "service_for",
+     *                  "vendor_for",
      *                  "business_category",
      *                  "business_name",
      *                  "business_name",
@@ -45,8 +46,9 @@ class VendorController extends Controller
      *                  "short_description",
      *              },
      *              @OA\Property(property="user_id", type="string", example="From DB"),
-     *              @OA\Property(property="service_for", type="string", example="Men/Women/Unisex"),
-     *              @OA\Property(property="business_category", type="string", example="Saloon/Parlour/Nail Art"),
+     *              @OA\Property(property="service_for", type="numeric", example="Men(1)/Women(2)/Unisex(3)"),
+     *              @OA\Property(property="vendor_type", type="numeric", example="Business(1)/Therapist(2)"),
+     *              @OA\Property(property="business_category", type="numeric", example="Saloon(1)/Parlour(2)/Nail Art(3)"),
      *              @OA\Property(property="business_name", type="string", example="Golden Saloon"),
      *              @OA\Property(
      *                  property="person_initial", 
@@ -120,6 +122,7 @@ class VendorController extends Controller
             $request->validate(
                 [
                     'service_for' => 'required',
+                    'vendor_type' => 'required',
                     'business_category' => 'required',
                     'business_name' => 'required|unique:vendor,pbv_business_name',
                     'address' => 'required',
@@ -131,6 +134,7 @@ class VendorController extends Controller
                 ],
                 [
                     'service_for.required' => 'Service for is required',
+                    'vendor_type.required' => 'Vendor Type is required',
                     'business_category.required' => 'Business Category is required',
                     'business_name.required' => 'Parlour name is required',
                     'business_name.unique' => 'The name already in Use',
@@ -147,6 +151,8 @@ class VendorController extends Controller
             $request->validate(
                 [
                     'service_for' => 'required',
+                    'vendor_type' => 'required',
+                    'business_category' => 'required',
                     'person_initial' => 'required',
                     'person_firstname' => 'required',
                     'person_lastname' => 'required',
@@ -157,6 +163,8 @@ class VendorController extends Controller
                 ],
                 [
                     'service_for.required' => 'Service for is required',
+                    'vendor_type.required' => 'Vendor Type is required',
+                    'business_category.required' => 'Business Category is required',
                     'person_initial.required' => 'Therapist Initial is required',
                     'person_firstname.required' => 'Therapist Firstname is required',
                     'person_lastname.required' => 'Therapist Lastname is required',
@@ -172,6 +180,8 @@ class VendorController extends Controller
         $therapist_name = $request->person_initial . '. ' .$request->person_firstname. ' ' .$request->person_lastname;
         $vendor = vendors::create([ 
             'pbv_servicefor' => $request->service_for,
+            'pbv_vendortype' => $user->vendor_type,
+            'pbv_business_category' => $request->business_category,
             'pbv_business_name' => ($request->business_type == '1') ? $request->business_name : $therapist_name,
             'pbv_brno' => ($request->business_type == '1') ? $request->br_no : $request->nic_no,
             'pbv_address' => $request->address,
