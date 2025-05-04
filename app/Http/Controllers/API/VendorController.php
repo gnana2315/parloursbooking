@@ -742,7 +742,7 @@ class VendorController extends Controller
                 'service_description' => 'required',
                 'service_duration' => 'required',
                 'service_image' => 'mimes:jpg,jpeg,png|max:2048',
-                'service_price' => 'required|float',
+                'service_price' => 'required|numeric',
             ],
             [
                 'service_type.required' => 'Service type is required',
@@ -753,7 +753,7 @@ class VendorController extends Controller
                 'service_image.mimes' => 'Service image must be a file of type: jpg, jpeg, png',
                 'service_image.max' => 'Service image may not be greater than 2MB',
                 'service_price.required' => 'Service price is required',
-                'service_price.float' => 'Service price must be a number',
+                'service_price.numeric' => 'Service price must be a number',
             ]
         );        
         
