@@ -57,7 +57,6 @@ class CustomersController extends Controller
                 'last_name' => 'required',
                 'dob' => 'required',
                 'nic_no' => 'required',
-                'nic_document' => 'mimes:jpg,jpeg,png,pdf|max:2048',
                 'email' => 'email|unique:customer,pbc_email',
             ],
             [
@@ -67,17 +66,9 @@ class CustomersController extends Controller
                 'email.email' => 'Customer Email Not Valid',
                 'email.unique' => 'Customer Email already in use',
                 'nic_no.required' => 'Customer NIC No Required',
-                'nic_document.mimes' => 'Customer NIC Document must be a file of type: jpg, jpeg, png, pdf',
-                'nic_document.max' => 'Customer NIC Document may not be greater than 2MB',
             ]
         );
-        if ($request->hasFile('nic_document')) {
-            $file = $request->file('nic_document');
-            $filename = time() . '.' . $file->getClientOriginalExtension();
-            $file->move(public_path('uploads/customer_nic'), $filename);
-            $request->merge(['nic_document' => $filename]);
-            $nic_doc_path = public_path('uploads/customer_nic') . '/' . $filename;
-        }
+
         $customer = customer::create([
             'pbc_user_id' => $id,
             'pbc_intial' => $request->intial,
@@ -85,7 +76,6 @@ class CustomersController extends Controller
             'pbc_last_name' => $request->last_name,
             'pbc_dob' => $request->last_name,
             'pbc_nic_no' => $request->nic_no,
-            'pbc_nic_document' => $nic_doc_path,
             'pbc_sex' => $request->sex,
             'pbc_address' => $request->address,
             'pbc_city' => $request->city,
