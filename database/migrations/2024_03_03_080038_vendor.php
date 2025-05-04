@@ -18,7 +18,7 @@ return new class extends Migration
             $table->integer('pbv_vendortype')->nullable();
             $table->integer('pbv_business_category')->nullable();
             $table->string('pbv_business_name')->nullable();
-            $table->string('pbv_documents')->nullable()->comment('Add NIC,BR, Certificate, Address Proof, Exp letter and etc with document meta data');
+            $table->text('pbv_documents')->nullable()->comment('Add NIC,BR, Certificate, Address Proof, Exp letter and etc with document meta data');
             $table->string('pbv_brno')->nullable();
             $table->string('pbv_email')->nullable()->unique();
             $table->string('pbv_contactno')->nullable();
