@@ -759,7 +759,7 @@ class VendorController extends Controller
         
         if ($request->hasFile('service_image')) {
             $service_image_file = $request->file('service_image');
-            $service_image_filename = $vendor->pbv_business_name . '_' .time() . '_service.' . $service_image_file->getClientOriginalExtension();
+            $service_image_filename = $vendor->pbv_business_name . '_' .time() . '_service_' . $service_image_file->getClientOriginalExtension();
             $service_image_file->move(public_path('uploads/services/'.$vendor->pbv_business_name), $service_image_filename);
             $request->merge(['service_image' => $service_image_filename]);
             $service_image_path = public_path('uploads/services/'.$vendor->pbv_business_name) . '/' . $service_image_filename;
