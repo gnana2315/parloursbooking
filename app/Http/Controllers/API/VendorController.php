@@ -32,7 +32,7 @@ class VendorController extends Controller
      *          @OA\JsonContent(
      *              required={
      *                  "user_id",
-     *                  "servicefor",
+     *                  "service_for",
      *                  "business_category",
      *                  "business_name",
      *                  "business_name",
@@ -45,7 +45,7 @@ class VendorController extends Controller
      *                  "short_description",
      *              },
      *              @OA\Property(property="user_id", type="string", example="From DB"),
-     *              @OA\Property(property="servicefor", type="string", example="Men/Women/Unisex"),
+     *              @OA\Property(property="service_for", type="string", example="Men/Women/Unisex"),
      *              @OA\Property(property="business_category", type="string", example="Saloon/Parlour/Nail Art"),
      *              @OA\Property(property="business_name", type="string", example="Golden Saloon"),
      *              @OA\Property(
