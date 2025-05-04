@@ -209,7 +209,7 @@ class AuthController extends Controller
                 'message' => 'Phone Number Validated Successfully',
                 'access_token' => $token,
                 'token_type' => 'Bearer',
-                'user' => $user,
+                'user_id' => $user->pbu_id,
             ]);
         }else{
             return response()->json([
@@ -228,7 +228,8 @@ class AuthController extends Controller
      *      @OA\RequestBody(
      *          required=true,
      *          @OA\JsonContent(
-     *              required={"first_name", "last_name", "address", "city", "dob", "gender", "phone_no", "password"},
+     *              required={"first_name", "last_name", "address", "city", "dob", "gender", "phone_no", "vendor_type", "accept_terms"},
+     *              @OA\Property(property="user_id", type="number", example="2"),
      *              @OA\Property(property="first_name", type="string", example="John"),
      *              @OA\Property(property="last_name", type="string", example="Doe"),
      *              @OA\Property(property="address", type="string", example="123 Main St"),
@@ -257,11 +258,14 @@ class AuthController extends Controller
      * )
      */
     public function userRegistration(Request $request){
-        $user = $request->user();
-        $userRegister = null;
+        $user = User::find($request->user_id);
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
         if($user->pbu_mobileno_verified_at == null){
             return response()->json(['message' => 'User Phone No not verfied yet.'], 500);
         }
+        $userRegister = null;
         if($user->pbu_usertype == '1'){
             $request->validate(
                 [
