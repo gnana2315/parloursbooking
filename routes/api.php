@@ -44,7 +44,7 @@ Route::middleware(['auth:sanctum', 'validate.token'])->group(function () {
     Route::post('/vendorConfig', [VendorController::class, 'vendorConfig' ]);
     Route::post('/vendorAvailability', [VendorController::class, 'vendorAvailability' ]);
     Route::post('/vendorSpecialCloses', [VendorController::class, 'vendorSpecialCloses' ]);
-    Route::post('/addVendorServices/{id}', [VendorController::class, 'addVendorServices' ]);
+    Route::post('/addVendorServices', [VendorController::class, 'addVendorServices' ]);
 
     //common
     Route::get('/vendors/{business_type_id}', [CommonController::class, 'getVendors' ]);
