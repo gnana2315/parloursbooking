@@ -117,7 +117,8 @@ class VendorController extends Controller
     public function vendorRegister(Request $request){
         $user = auth()->user();
         
-        $vendor = vendors::where('pbv_id', $user->pbu_vid)->first(); 
+        $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
+        dd($vendor->pbv_vendortype);
         if($vendor->pbv_vendortype == '1'){
             $request->validate(
                 [
@@ -176,7 +177,7 @@ class VendorController extends Controller
         }
 
         $therapist_name = $request->person_initial . '. ' .$request->person_firstname. ' ' .$request->person_lastname;
-        $vendor = vendors::create([ 
+        $vendorsUpdate = $vendor->update([ 
             'pbv_servicefor' => $request->service_for,
             'pbv_business_category' => $request->business_category,
             'pbv_business_name' => ($request->business_type == '1') ? $request->business_name : $therapist_name,
@@ -191,9 +192,8 @@ class VendorController extends Controller
             'pbv_status' => 0,
         ]);
 
-        if($vendor){
+        if($vendorsUpdate){
             $user->update([
-                'pbu_vid' => $vendor->pbv_id,
                 'pbu_email' => $request->email,
             ]);
             
