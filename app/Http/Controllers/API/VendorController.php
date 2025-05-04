@@ -116,7 +116,7 @@ class VendorController extends Controller
      */
     public function vendorRegister(Request $request){
         $user = auth()->user();
-        
+        dd($user);
         if($user->vendor_type == '1'){
             $request->validate(
                 [
