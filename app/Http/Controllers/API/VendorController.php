@@ -710,9 +710,9 @@ class VendorController extends Controller
      *              @OA\Property(property="service_for", type="number", example="2"),
      *              @OA\Property(property="service_name", type="text", example="Normal Hair Cut"),
      *              @OA\Property(property="service_description", type="text", example="Description"),
-     *              @OA\Property(property="service_duration", type="number", example="2 (hours)"),
+     *              @OA\Property(property="service_duration", type="number", example="90 (in minutes)"),
      *              @OA\Property(property="service_image", type="file", example="service_image.png"),    
-     *              @OA\Property(property="service_price", type="number", example="2000"),
+     *              @OA\Property(property="service_price", type="number", example="2000.00"),
      *          ),
      *      ),
      *      @OA\Response(
