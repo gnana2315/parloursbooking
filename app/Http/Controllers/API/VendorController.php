@@ -178,6 +178,7 @@ class VendorController extends Controller
         $therapist_name = $request->person_initial . '. ' .$request->person_firstname. ' ' .$request->person_lastname;
         $vendorsUpdate = $vendor->update([ 
             'pbv_servicefor' => $request->service_for,
+            'pbv_tenentid' => 1,
             'pbv_business_category' => $request->business_category,
             'pbv_business_name' => ($request->business_type == '1') ? $request->business_name : $therapist_name,
             'pbv_brno' => ($request->business_type == '1') ? $request->br_no : $request->nic_no,
