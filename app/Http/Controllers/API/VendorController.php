@@ -324,9 +324,23 @@ class VendorController extends Controller
             $request->merge(['certification' => $certification_document_filename]);
             $certification_document_path = public_path('uploads/vendors') . '/' . $certification_document_filename;
             $document_data[] = [
-                'br_document' => [
+                'certification_document' => [
                     'name' => $certification_document_filename,
                     'path' => $certification_document_path,
+                ],
+            ];
+        }
+
+        if ($request->hasFile('address_proof_document')) {
+            $address_proof_document_file = $request->file('address_proof_document');
+            $address_proof_document_filename = $vendor->pbv_business_name . '_' .time() . '_address_proof_document_document.' . $address_proof_document_file->getClientOriginalExtension();
+            $address_proof_document_file->move(public_path('uploads/vendors'), $address_proof_document_filename);
+            $request->merge(['address_proof_document' => $address_proof_document_filename]);
+            $address_proof_document_path = public_path('uploads/vendors') . '/' . $address_proof_document_filename;
+            $document_data[] = [
+                'address_proof_document' => [
+                    'name' => $address_proof_document_filename,
+                    'path' => $address_proof_document_path,
                 ],
             ];
         }
@@ -338,7 +352,7 @@ class VendorController extends Controller
             $request->merge(['nic_document' => $nic_document_filename]);
             $nic_document_path = public_path('uploads/vendors') . '/' . $nic_document_filename;
             $document_data[] = [
-                'br_document' => [
+                'nic_document' => [
                     'name' => $nic_document_filename,
                     'path' => $nic_document_path,
                 ],
@@ -352,7 +366,7 @@ class VendorController extends Controller
                 $request->merge(['other_document' => $other_document_filename]);
                 $other_document_path = public_path('uploads/vendors') . '/' . $other_document_filename;
                 $document_data[] = [
-                    'br_document' => [
+                    'other_document' => [
                         'name' => $other_document_filename,
                         'path' => $other_document_path,
                     ],
