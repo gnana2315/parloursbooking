@@ -116,8 +116,9 @@ class VendorController extends Controller
      */
     public function vendorRegister(Request $request){
         $user = auth()->user();
-        dd($user);
-        if($user->vendor_type == '1'){
+        
+        $vendor = vendors::where('pbv_id', $user->pbu_vid)->first(); 
+        if($vendor->pbv_vendortype == '1'){
             $request->validate(
                 [
                     'service_for' => 'required',
@@ -144,7 +145,7 @@ class VendorController extends Controller
                     'br_no.required' => 'BR No is required'
                 ]
             );
-        }else if ($user->vendor_type == '2'){
+        }else if ($vendor->pbv_vendortype == '2'){
             $request->validate(
                 [
                     'service_for' => 'required',
@@ -177,7 +178,6 @@ class VendorController extends Controller
         $therapist_name = $request->person_initial . '. ' .$request->person_firstname. ' ' .$request->person_lastname;
         $vendor = vendors::create([ 
             'pbv_servicefor' => $request->service_for,
-            'pbv_vendortype' => $user->vendor_type,
             'pbv_business_category' => $request->business_category,
             'pbv_business_name' => ($request->business_type == '1') ? $request->business_name : $therapist_name,
             'pbv_brno' => ($request->business_type == '1') ? $request->br_no : $request->nic_no,

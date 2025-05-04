@@ -302,7 +302,7 @@ class AuthController extends Controller
             ]);
 
             $user->update([
-                'pbu_vid' => $userRegister->id
+                'pbu_vid' => $userRegister->pbv_id
             ]);
         }else{
             $request->validate(
