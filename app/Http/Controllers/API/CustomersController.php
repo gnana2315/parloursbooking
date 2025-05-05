@@ -23,14 +23,13 @@ class CustomersController extends Controller
      *      @OA\RequestBody(
      *          required=true,
      *          @OA\JsonContent(
-     *              required={"intial","first_name","last_name","email","nic_no","nic_document"},
+     *              required={"intial","first_name","last_name","email","nic_no","dob","sex","address","city"},
      *              @OA\Property(property="intial", type="string", example="Mr/Mrs"),
      *              @OA\Property(property="first_name", type="string", example="John"),
      *              @OA\Property(property="last_name", type="string", example="Wick"),
      *              @OA\Property(property="dob", type="date", example="1990-02-12"),
      *              @OA\Property(property="email", type="email", example="John@gmail.com"),
      *              @OA\Property(property="nic_no", type="string", example="941234587V"),
-     *              @OA\Property(property="nic_document", type="file", example="nic.jpg"),
      *              @OA\Property(property="sex", type="text", example="male/female"),
      *              @OA\Property(property="address", type="text", example="address"),
      *              @OA\Property(property="city", type="text", example="city")
