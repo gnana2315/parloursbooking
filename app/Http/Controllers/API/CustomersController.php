@@ -13,39 +13,6 @@ use Illuminate\Support\Facades\Auth;
 
 class CustomersController extends Controller
 {
-    /**
-     * @OA\Post(
-     *      path="/api/customerRegister/{id}",
-     *      operationId="customerDetailRegister",
-     *      tags={"Customer"},
-     *      summary="Customer Detail Registration",
-     *      description="",
-     *      @OA\RequestBody(
-     *          required=true,
-     *          @OA\JsonContent(
-     *              required={"intial","first_name","last_name","email","nic_no","dob","sex","address","city"},
-     *              @OA\Property(property="intial", type="string", example="Mr/Mrs"),
-     *              @OA\Property(property="first_name", type="string", example="John"),
-     *              @OA\Property(property="last_name", type="string", example="Wick"),
-     *              @OA\Property(property="dob", type="date", example="1990-02-12"),
-     *              @OA\Property(property="email", type="email", example="John@gmail.com"),
-     *              @OA\Property(property="nic_no", type="string", example="941234587V"),
-     *              @OA\Property(property="sex", type="text", example="male/female"),
-     *              @OA\Property(property="address", type="text", example="address"),
-     *              @OA\Property(property="city", type="text", example="city")
-     *          ),
-     *      ),
-     *      @OA\Response(
-     *          response=200,
-     *          description="Customer Details saved Successfully",
-     *          @OA\JsonContent(
-     *              @OA\Property(property="token", type="string", example="generated_token_here")
-     *          ),
-     *      ),
-     *      @OA\Response(response=401, description="Unauthorized"),
-     * )
-     */
-
     public function register($id, Request $request){
         $user = auth()->user();
 
@@ -81,6 +48,7 @@ class CustomersController extends Controller
             'pbc_email' => $request->city,
             'pbc_contact_no' => $user->pbu_mobileno,
             'pbc_status' => 1,
+            'pbc_accept_terms' => $request->accept_terms,
         ]);
 
         if($customer){

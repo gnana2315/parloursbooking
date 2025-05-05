@@ -35,7 +35,7 @@ Route::middleware(['auth:sanctum', 'validate.token'])->group(function () {
     Route::post('/userRegistration', [AuthController::class, 'userRegistration']);
 
     //customer
-    Route::post('/customerRegister/{id}', [ CustomersController::class,'register' ]);
+    //Route::post('/customerRegister/{id}', [ CustomersController::class,'register' ]);
 
     //vendor
     Route::post('/vendorRegister', [VendorController::class, 'vendorRegister' ]);
