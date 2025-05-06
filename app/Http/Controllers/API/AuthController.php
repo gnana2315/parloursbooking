@@ -460,7 +460,7 @@ class AuthController extends Controller
 
         //Check if user verified the mobile no
         if($user->pbu_mobileno_verified_at == null){
-            return response()->json(['message' => 'User Phone No not verfied yet.'], 500);
+            return response()->json(['message' => 'User not verfied yet.'], 500);
         }
         // Check if user exists and password is correct
         if (!$user || !Hash::check($request->password, $user->password)) {
