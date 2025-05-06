@@ -33,6 +33,7 @@ Route::middleware(['auth:sanctum', 'validate.token'])->group(function () {
 
     //user
     Route::post('/userRegistration', [AuthController::class, 'userRegistration']);
+    Route::post('/userSetNewPassword',[AuthController::class,'userSetNewPassword']);
 
     //customer
     //Route::post('/customerRegister/{id}', [ CustomersController::class,'register' ]);
