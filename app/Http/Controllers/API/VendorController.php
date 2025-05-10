@@ -246,7 +246,7 @@ class VendorController extends Controller
      *      @OA\Response(response=401, description="Unauthorized"),
      * )
      */
-    
+
     public function vendorDocumentUpdate(Request $request){
 
         $user = auth()->user();
@@ -358,6 +358,20 @@ class VendorController extends Controller
             ];
         }
 
+        if ($request->hasFile('profile_image')) {
+            $profile_image = $request->file('profile_image');
+            $profile_imagename = $vendor->pbv_business_name . '_' .time() . '_profile_image.' . $profile_image->getClientOriginalExtension();
+            $profile_image->move(public_path('uploads/vendors'), $profile_imagename);
+            $request->merge(['nic_document' => $profile_imagename]);
+            $profile_image_path = public_path('uploads/vendors') . '/' . $profile_imagename;
+            $document_data[] = [
+                'profile_image' => [
+                    'name' => $profile_imagename,
+                    'path' => $profile_image_path,
+                ],
+            ];
+        }
+
         if ($request->hasFile('other_document')) {
             foreach ($request->file('other_document') as $index => $document) {
                 $other_document_filename = $vendor->pbv_business_name . '_' .time() . '_other_document_' . $index . '.' . $document->getClientOriginalExtension();
@@ -400,13 +414,13 @@ class VendorController extends Controller
      *          required=true,
      *          @OA\JsonContent(
      *              required={
-     *                  "display_name",
-     *                  "business_logo",
-     *                  "service_at_time",
+     *                  "bankname",
+     *                  "branch",
+     *                  "accountno",
      *              },
-     *              @OA\Property(property="display_name", type="text", example="CJ Saloon"),
-     *              @OA\Property(property="business_logo", type="file", example="logo.png"),
-     *              @OA\Property(property="service_at_time", type="file", example="2"),
+     *              @OA\Property(property="bankname", type="text", example="HNB"),
+     *              @OA\Property(property="branch", type="text", example="logo.png"),
+     *              @OA\Property(property="accountno", type="text", example="2"),
      *          ),
      *      ),
      *      @OA\Response(
