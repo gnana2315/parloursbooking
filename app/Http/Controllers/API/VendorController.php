@@ -246,6 +246,7 @@ class VendorController extends Controller
      *      @OA\Response(response=401, description="Unauthorized"),
      * )
      */
+    
     public function vendorDocumentUpdate(Request $request){
 
         $user = auth()->user();
