@@ -12,6 +12,7 @@ use App\Models\businessCategory;
 use App\Models\vendorSpecialCloses;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
 class CommonController extends Controller
@@ -66,12 +67,26 @@ class CommonController extends Controller
  */
     public function getVendors($vendor_type_id, $token = null){
         try {
-            $vendors = vendors::where([
+            $vendors = vendors::join('vendor_config', 'vendor_config.pbvc_vendorid', '=', 'vendor.pbv_id')
+            ->join('vendor_standard_availability', 'vendor_standard_availability.pbvsa_vendor_id', '=', 'vendor.pbv_id')
+            //->join('ratings', 'ratings.pbr_vendor_id', '=', 'vendor.pbv_id')
+            ->select(
+                'vendor.*',
+                'vendor_config.pbvc_display_name',
+                'vendor_standard_availability.pbvsa_start_time',
+                'vendor_standard_availability.pbvsa_end_time',
+                'vendor_standard_availability.pbvsa_day',
+                'vendor_standard_availability.pbvsa_is_open'
+                //DB::raw('AVG(pb_ratings.pbr_rating) as average_rating')
+            )
+            ->where([
                 ['pbv_status', '=', 1],
                 ['pbv_vendortype', '=', $vendor_type_id],
-            ])->get();
+            ])
+            //->groupBy('vendor.pbv_id')
+            ->get();
             
-            if(!empty($vendor)){
+            if(!empty($vendors)){
                 return response()->json([
                     'success' => true,
                     'data' => $vendors
@@ -93,70 +108,70 @@ class CommonController extends Controller
     }
 
     /**
- * @OA\Get(
- *     path="/api/vendors/search",
- *     summary="Search vendors with filters",
- *     description="Search vendors by name and/or city",
- *     operationId="searchVendors",
- *     tags={"Common"},
- *     @OA\Parameter(
- *         name="name",
- *         in="query",
- *         description="Vendor name to search for",
- *         required=false,
- *         @OA\Schema(type="string")
- *     ),
- *     @OA\Parameter(
- *         name="city",
- *         in="query",
- *         description="City to filter vendors by",
- *         required=false,
- *         @OA\Schema(type="string")
- *     ),
- *     @OA\Response(
- *         response=200,
- *         description="Successful operation",
- *         @OA\JsonContent(
- *             type="object",
- *             @OA\Property(
- *                 property="success",
- *                 type="boolean",
- *                 example=true
- *             )
- *         )
- *     ),
- *     @OA\Response(
- *         response=400,
- *         description="Invalid input",
- *         @OA\JsonContent(
- *             type="object",
- *             @OA\Property(
- *                 property="success",
- *                 type="boolean",
- *                 example=false
- *             ),
- *             @OA\Property(
- *                 property="message",
- *                 type="string",
- *                 example="Invalid parameters"
- *             )
- *         )
- *     ),
- *     security={{"bearerAuth": {}}}
- * )
- */
+     * @OA\POST(
+     *     path="/api/searchVendors",
+     *     summary="Search vendors with filters",
+     *     description="Search vendors by name and/or city",
+     *     operationId="searchVendors",
+     *     tags={"Common"},
+     *     @OA\Parameter(
+     *         name="name",
+     *         in="query",
+     *         description="Vendor name to search for",
+     *         required=false,
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Parameter(
+     *         name="city",
+     *         in="query",
+     *         description="City to filter vendors by",
+     *         required=false,
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="success",
+     *                 type="boolean",
+     *                 example=true
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Invalid input",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="success",
+     *                 type="boolean",
+     *                 example=false
+     *             ),
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="Invalid parameters"
+     *             )
+     *         )
+     *     ),
+     *     security={{"bearerAuth": {}}}
+     * )
+     */
     public function searchVendors(Request $request){        
         
         $query = vendors::query();
     
         // Basic filters
         if ($request->has('name')) {
-            $query->join('pb_vendor_config', 'pb_vendor_config.pbvc_vendorid', '=', 'pb_vendor.pbv_id')->where('pbvc_display_name', 'like', '%' . $request->name . '%');
+            $query->join('pb_vendor_config', 'pb_vendor_config.pbvc_vendorid', '=', 'pb_vendor.pbv_id')->where('pb_vendor_config.pbvc_display_name', 'like', '%' . $request->name . '%');
         }
         
         // Location filters
         if ($request->has('city')) {
-            $query->where('pbv_city', $request->city);
+            $query->join('pb_vendor_config', 'pb_vendor_config.pbvc_vendorid', '=', 'pb_vendor.pbv_id')->where('pbv_city', $request->city);
         }
         
         // Rating filter
@@ -170,8 +185,8 @@ class CommonController extends Controller
         // $query->orderBy($sortBy, $sortOrder);
         
         // Pagination
-        // $perPage = $request->get('per_page', 15);
-        // $vendors = $query->paginate($perPage);
+        $perPage = $request->get('per_page', 15);
+        $vendors = $query->paginate($perPage);
         
         if(!empty($vendors)){
             return response()->json([
@@ -346,7 +361,7 @@ class CommonController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/getServices/{vendor_id}",
+     *     path="/api/getServices/{vendor_id}",
      *     summary="Get active services by vendor ID",
      *     description="Returns a list of active services (pbsv_status = 1) for a specific vendor",
      *     operationId="getServicesByVendor",
@@ -394,8 +409,8 @@ class CommonController extends Controller
      */
     public function getServicesByVendor($vendor_id){
         $services = services::where([
-            ['pbsv_status', '=', 1],
-            ['pbsv_vendorid', '=', $vendor_id],
+            ['pbs_status', '=', 1],
+            ['pbs_vendor_id', '=', $vendor_id],
         ])->get();
         if ($services->isEmpty()) {
             return response()->json([

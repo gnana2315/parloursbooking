@@ -18,6 +18,7 @@ return new class extends Migration
             $table->integer('pbs_service_for');
             $table->string('pbs_name');
             $table->text('pbs_description')->nullable();
+            $table->integer('pbs_duration_cetegory')->nullable();
             $table->integer('pbs_duration')->default(0);
             $table->string('pbs_image')->nullable();
             $table->float('pbs_price', 6, 2)->default(0.00);

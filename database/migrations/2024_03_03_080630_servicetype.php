@@ -13,10 +13,11 @@ return new class extends Migration
     {
         Schema::create('servicetype', function (Blueprint $table) {
             $table->id('pbst_id');
+            $table->int('pbst_service_for')->nullable();
             $table->string('pbst_name');
             $table->string('pbst_icon')->nullable();
             $table->string('pbst_description')->nullable();
-            $table->integer('pbst_status');
+            $table->integer('pbst_status')->nullable()->default(1);
             $table->timestamps();
             $table->softDeletes($column = 'deleted_at', $precision = 0);
         });

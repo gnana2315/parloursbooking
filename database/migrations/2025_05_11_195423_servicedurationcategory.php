@@ -11,14 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ratings', function (Blueprint $table) {
-            $table->id('pbr_id');
-            $table->integer('pbr_vendor_id');
-            $table->integer('pbr_booking_id');
-            $table->integer('pbr_customer_id');
-            $table->integer('pbr_rating')->nullable();
-            $table->string('pbr_comments')->nullable();
-            $table->integer('pbr_status');
+        Schema::create('servicedurationcategory', function (Blueprint $table) {
+            $table->id('pbsdc_id');
+            $table->string('pbsdc_name');
+            $table->string('pbsdc_duration');
+            $table->boolean('pbsdc_status')->default(1);
             $table->timestamps();
             $table->softDeletes($column = 'deleted_at', $precision = 0);
         });
@@ -29,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('ratings');
+        Schema::dropIfExists('servicedurationcategory');
     }
 };
