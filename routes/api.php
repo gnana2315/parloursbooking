@@ -27,6 +27,7 @@ Route::post('/userMobileVerification',[AuthController::class,'verifyVerification
 Route::post('/userLogin',[AuthController::class,'userLogin']);
 Route::post('/userForgotPassword',[AuthController::class,'userForgotPassword']);
 Route::post('/userResetPassword',[AuthController::class,'userResetPassword']);
+Route::get('/getUser', [AuthController::class,'getUser']);
 
 Route::middleware(['auth:sanctum', 'validate.token'])->group(function () {
     Route::post('/userLogout',[AuthController::class,'userLogout']);
