@@ -605,4 +605,47 @@ class AuthController extends Controller
             'message' => 'Password resetted Successfully!. Please login with new password!'
         ]);
     }
+
+    /**
+        * @OA\Get(
+        *     path="/api/getUser",
+        *     summary="Get authenticated user and their details",
+        *     tags={"User"},
+        *     security={{"bearerAuth":{}}},
+        *     @OA\Response(
+        *         response=200,
+        *         description="User details retrieved successfully",
+        *         @OA\JsonContent(
+        *             @OA\Property(property="message", type="string", example="User Details"),
+        *             @OA\Property(property="user", type="object",
+        *                 @OA\Property(property="id", type="integer", example=1),
+        *                 @OA\Property(property="pbu_usertype", type="string", example="1"),
+        *                 @OA\Property(property="pbu_vid", type="integer", example=10)
+        *             ),
+        *             @OA\Property(property="userDetails", type="object",
+        *                 @OA\Property(property="name", type="string", example="Vendor Name or Customer Name"),
+        *                 @OA\Property(property="email", type="string", example="vendor@example.com")
+        *             )
+        *         )
+        *     ),
+        *     @OA\Response(
+        *         response=401,
+        *         description="Unauthenticated"
+        *     )
+        * )
+    */
+
+    public function getUser(){
+        $user = auth()->user();   
+        if($user->pbu_usertype == '1'){
+            $userDetails = vendors::where('pbv_id', $user->pbu_vid)->first();
+        }else{
+            $userDetails = customer::where('pbc_user_id', $user->pbu_vid)->first();
+        }
+        return response()->json([
+            'message' => 'User Details',
+            'user' => $user,
+            'userDetails' => $userDetails
+        ], 200);
+    }   
 }
