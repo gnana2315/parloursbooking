@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('vendor_config', function (Blueprint $table) {
-            $table->id('pbvc_id')->nullable();
+            $table->id('pbvc_id');
             $table->integer('pbvc_vendorid')->nullable();
             $table->string('pbvc_display_name')->nullable();
             $table->string('pbvc_logo')->nullable();

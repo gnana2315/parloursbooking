@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('service_category', function (Blueprint $table) {
-            $table->id('pbsc_id')->nullable();
+            $table->id('pbsc_id');
             $table->string('pbsc_name')->nullable();
             $table->string('pbsc_short_code')->nullable();
             $table->string('pbsc_img')->nullable();

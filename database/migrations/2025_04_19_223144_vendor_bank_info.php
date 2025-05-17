@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('vendor_bank_info', function (Blueprint $table) {
-            $table->id('pbvb_id')->nullable();
+            $table->id('pbvb_id');
             $table->integer('pbvb_vendorid')->nullable();
             $table->string('pbvb_bankname')->nullable();
             $table->string('pbvb_branch')->nullable();
