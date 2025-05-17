@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('servicetype', function (Blueprint $table) {
             $table->id('pbst_id');
-            $table->int('pbst_service_for')->nullable();
+            $table->integer('pbst_service_for')->nullable();
             $table->string('pbst_name');
             $table->string('pbst_icon')->nullable();
             $table->string('pbst_description')->nullable();

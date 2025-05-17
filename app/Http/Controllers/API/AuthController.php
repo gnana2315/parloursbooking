@@ -636,16 +636,11 @@ class AuthController extends Controller
     */
 
     public function getUser(){
-        $user = auth()->user();   
-        if($user->pbu_usertype == '1'){
-            $userDetails = vendors::where('pbv_id', $user->pbu_vid)->first();
-        }else{
-            $userDetails = customer::where('pbc_user_id', $user->pbu_vid)->first();
-        }
+        $user = auth()->user();
+
         return response()->json([
             'message' => 'User Details',
-            'user' => $user,
-            'userDetails' => $userDetails
+            'data' => $user
         ], 200);
     }   
 }
