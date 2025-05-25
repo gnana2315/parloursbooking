@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\API;
 
 use App\Models\User;
-use App\Models\Customer;
-use App\Models\Vendor;
+use App\Models\customer;
+use App\Models\vendors;
 use App\Models\Booking;
-use App\Models\BookingDetails;
+use App\Models\bookingDetail;
 use App\Models\vendorStandardAvailability;
 use App\Models\vendorSpecialCloses;
 use App\Models\vendorServices;
@@ -202,9 +202,9 @@ class BookingController extends Controller
      *      @OA\RequestBody(
      *          required=true,
      *          @OA\JsonContent(
-     *              required={"vendor_id","customer_id", "promocode_id", "booking_details", "booking_date", "booking_duration", "booking_start_time", "booking_end_time", "service_location"},
+     *              required={"vendor_id", "promocode_id", "booking_details", "booking_date", "booking_duration", "booking_start_time", "booking_end_time", "service_location"},
      *              @OA\Property(property="vendor_id", type="number", example="1"),
-     *              @OA\Property(property="customer_id", type="number", example="1"),
+     *              @OA\Property(property="booking_for_someone", type="number", example="0(myself)/1(someoneelse)"),
      *              @OA\Property(property="booking_details", type="string", example="name,contactno,remarks"),
      *              @OA\Property(property="booking_date", type="date", example="2025-04-29"),
      *              @OA\Property(property="service_total_duration", type="time", example="02:00:00"),
@@ -230,7 +230,6 @@ class BookingController extends Controller
         $request->validate(
             [
                 'vendor_id' => 'required',
-                'customer_id' => 'required',
                 'promocode_id' => 'nullable',
                 'booking_details' => 'required',
                 'booking_date' => 'required',
@@ -242,7 +241,6 @@ class BookingController extends Controller
             ],
             [
                 'vendor_id.required' => 'Vendor ID is required',
-                'customer_id.required' => 'Customer ID is required',
                 'promocode_id.required' => 'Promo code ID is required',
                 'booking_details.required' => 'Booking details are required',
                 'booking_date.required' => 'Booking date is required',
@@ -255,14 +253,14 @@ class BookingController extends Controller
             ]
         );
 
-        $vendor = Vendor::find($request->vendor_id);
+        $vendor = vendors::find($request->vendor_id);
         if (!$vendor) {
             return response()->json([
                 'status' => false,
                 'message' => 'Vendor not found',
             ], 404);
         }
-        $customer = Customer::find($request->customer_id);
+        $customer = customer::where('pbc_user_id', $user->pbu_id)->first();
         if (!$customer) {
             return response()->json([
                 'status' => false,
@@ -287,7 +285,7 @@ class BookingController extends Controller
 
         $addbooking = Booking::create([
             'pbb_vendor_id' => $request->vendor_id,
-            'pbb_customer_id' => $request->customer_id,
+            'pbb_customer_id' => $customer->pbc_id,
             'pbb_promo_id' => $request->promocode_id,
             'pbb_booking_details' => json_encode($booking_details_generated),
             'pbb_booking_date' => $request->booking_date,
@@ -308,7 +306,7 @@ class BookingController extends Controller
                 $service = vendorServices::where('pbvs_id', $value['service_id'])->first();
                 if($service){
                     $total_amount += $service->pbvs_price;
-                    BookingDetails::create([
+                    bookingDetail::create([
                         'pbbd_booking_id' => $addbooking->pbb_id,
                         'pbbd_service_id' => $value['service_id'],
                         'pbbd_employee_id' => null,

@@ -165,24 +165,47 @@ class CommonController extends Controller
         $query = vendors::query();
     
         // Basic filters
-        if ($request->has('name')) {
+        if ($request->filled('name')) {
             $query->join('pb_vendor_config', 'pb_vendor_config.pbvc_vendorid', '=', 'pb_vendor.pbv_id')->where('pb_vendor_config.pbvc_display_name', 'like', '%' . $request->name . '%');
         }
         
         // Location filters
-        if ($request->has('city')) {
+        if ($request->filled('city')) {
             $query->join('pb_vendor_config', 'pb_vendor_config.pbvc_vendorid', '=', 'pb_vendor.pbv_id')->where('pbv_city', $request->city);
         }
-        
-        // Rating filter
-        // if ($request->has('min_rating')) {
-        //     $query->join('pb_ratings', 'pb_ratings.pbr_vendor_id', '=', 'pb_vendor.pbv_id')->where('rating', '>=', $request->min_rating);
-        // }
-    
-        // Sorting
-        // $sortBy = $request->get('sort_by', 'name');
-        // $sortOrder = $request->get('sort_order', 'asc');
-        // $query->orderBy($sortBy, $sortOrder);
+
+        // Filter by vendorType
+        if ($request->filled('vendorType')) {
+            $query->where('pbv_vendortype', $request->vendorType);
+        }
+
+        // Filter by businessCategory
+        if ($request->filled('businessCategory')) {
+            $query->where('pbv_business_category', $request->businessCategory);
+        }
+
+        // Filter by serviceFor
+        if ($request->filled('serviceFor')) {
+            $query->where('pbv_servicefor', $request->serviceFor);
+        }
+        // Sort
+        if ($request->filled('sort')) {
+            switch ($request->sort) {
+                case 'price_asc':
+                    $query->orderBy('pbs_price', 'asc');
+                    break;
+                case 'price_desc':
+                    $query->orderBy('pbs_price', 'desc');
+                    break;
+                // case 'rating_asc':
+                //     $query->orderBy('rating', 'asc');
+                //     break;
+                // case 'rating_desc':
+                //     $query->orderBy('rating', 'desc');
+                //     break;
+            }
+        }
+
         
         // Pagination
         $perPage = $request->get('per_page', 15);
