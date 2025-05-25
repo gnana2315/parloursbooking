@@ -163,16 +163,27 @@ class CommonController extends Controller
     public function searchVendors(Request $request){        
         
         $query = vendors::query();
+        $query = vendors::query()
+        ->with(['pb_services', 'pb_vendor']) // eager load if needed
+        ->where(function ($q) use ($request) {
+            if ($request->filled('search')) {
+                $q->where('pbv_business_name', 'like', '%' . $request->search . '%')
+                  ->orWhere('pbv_city', 'like', '%' . $request->search . '%')
+                  ->orWhereHas('pb_services', function ($q2) use ($request) {
+                      $q2->where('pbs_name', 'like', '%' . $request->search . '%');
+                  });
+            }
+        });
     
         // Basic filters
-        if ($request->filled('name')) {
-            $query->join('pb_vendor_config', 'pb_vendor_config.pbvc_vendorid', '=', 'pb_vendor.pbv_id')->where('pb_vendor_config.pbvc_display_name', 'like', '%' . $request->name . '%');
-        }
+        // if ($request->filled('name')) {
+        //     $query->join('pb_vendor_config', 'pb_vendor_config.pbvc_vendorid', '=', 'pb_vendor.pbv_id')->where('pb_vendor_config.pbvc_display_name', 'like', '%' . $request->name . '%');
+        // }
         
         // Location filters
-        if ($request->filled('city')) {
-            $query->join('pb_vendor_config', 'pb_vendor_config.pbvc_vendorid', '=', 'pb_vendor.pbv_id')->where('pbv_city', $request->city);
-        }
+        // if ($request->filled('city')) {
+        //     $query->join('pb_vendor_config', 'pb_vendor_config.pbvc_vendorid', '=', 'pb_vendor.pbv_id')->where('pbv_city', $request->city);
+        // }
 
         // Filter by vendorType
         if ($request->filled('vendorType')) {
