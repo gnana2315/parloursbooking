@@ -642,5 +642,67 @@ class AuthController extends Controller
             'message' => 'User Details',
             'data' => $user
         ], 200);
-    }   
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/api/getVendor",
+     *     summary="Get vendor details for the authenticated user",
+     *     description="Returns the vendor details if the authenticated user is a vendor (pbu_usertype = 1)",
+     *     operationId="getVendor",
+     *     tags={"Vendor"},
+     *     security={{"bearerAuth":{}}},
+     * 
+     *     @OA\Response(
+     *         response=200,
+     *         description="Vendor Details",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Vendor Details"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 example={
+     *                     "pbv_id": 1,
+     *                     "pbv_name": "Glamour Salon",
+     *                     "pbv_city": "Mumbai",
+     *                     "pbv_type": "Salon",
+     *                 }
+     *             )
+     *         )
+     *     ),
+     * 
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Unauthorized")
+     *         )
+     *     ),
+     * 
+     *     @OA\Response(
+     *         response=404,
+     *         description="Vendor not found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Vendor not found")
+     *         )
+     *     )
+     * )
+    */
+    public function getVendor(){
+
+        $user = auth()->user();
+        if($user->pbu_usertype != '1'){
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
+        if(!$vendor){
+            return response()->json(['message' => 'Vendor not found'], 404);
+        }
+
+        return response()->json([
+            'message' => 'Vendor Details',
+            'data' => $vendor
+        ], 200);
+    }
 }
