@@ -543,7 +543,7 @@ class AuthController extends Controller
         // Find user by mobile number
         $user = User::where('pbu_mobileno', $request->phone_no)->first();
 
-        $this->generateUserVerificationCode($user); 
+        $this->generateVerificationCode($user); 
         
         $token_text = $user->pbu_id.'_user_password_reset_session';
         $token = $user->createToken($token_text)->plainTextToken;
