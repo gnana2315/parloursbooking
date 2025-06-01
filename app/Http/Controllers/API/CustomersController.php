@@ -64,4 +64,20 @@ class CustomersController extends Controller
             'user' => $user
         ], $status);
     }
+
+    public function getBookingsByCustomerID(){
+        $user = auth()->user();
+        $customer = customer::where('pbc_user_id', $user->id)->first();
+        if(!$customer){
+            return response()->json([
+                'message' => 'Customer not found',
+            ], 404);
+        }
+        $bookings = $customer->bookings()->with('bookingDetails')->get();
+        dd($bookings);
+        return response()->json([
+            'message' => 'Bookings retrieved successfully',
+            'bookings' => $bookings
+        ], 200);
+    }
 }
