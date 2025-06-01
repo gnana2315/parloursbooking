@@ -529,7 +529,8 @@ class AuthController extends Controller
      * )
      */
 
-    public function userForgotPassword(Request $request){
+    public function userForgotPassword (Request $request){
+
         $request->validate(
             [
                 'phone_no' => 'required|exists:users,pbu_mobileno',
