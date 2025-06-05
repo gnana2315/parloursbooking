@@ -17,6 +17,7 @@ class customer extends Model
     /**
     * @var array $fillable
     */
+	protected $primaryKey = 'pbc_id';
     protected $fillable = [
         'pbc_id',
         'pbc_user_id',
