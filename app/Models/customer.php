@@ -34,6 +34,10 @@ class customer extends Model
         'pbc_status',
         'created_at',
         'updated_at',
-        'deleted_at'
+        'deleted_at',
+    ];
+
+    protected $casts = [
+        'pbc_fav' => 'array',
     ];
 }
