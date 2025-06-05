@@ -25,7 +25,7 @@ return [
                 //     base_path('app/Http/Controllers'), // Adjust path if needed
                 // ],
                 'use_absolute_path' => false, // ✅ important
-                'swagger_ui_assets_path' => env('L5_SWAGGER_UI_ASSETS_PATH', 'vendor/swagger-api/swagger-ui/'),
+                'swagger_ui_assets_path' => env('L5_SWAGGER_UI_ASSETS_PATH', 'vendor/swagger-ui/'),
                 'docs_json' => 'api-docs.json',
                 'docs_yaml' => 'api-docs.yaml',
                 'format_to_use_for_docs' => env('L5_FORMAT_TO_USE_FOR_DOCS', 'json'),
