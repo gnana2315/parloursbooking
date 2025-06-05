@@ -5,7 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Models\User;
 use App\Models\customer;
 use App\Models\vendors;
-use App\Models\Booking;
+use App\Models\booking;
 use App\Models\bookingDetail;
 use App\Models\vendorStandardAvailability;
 use App\Models\vendorSpecialCloses;

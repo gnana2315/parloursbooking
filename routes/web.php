@@ -57,9 +57,6 @@ Route::get('/homevisitsingle', function () {
 Route::get('/vendorRegistration', function () {
     return View::make('pages.vendorsRegistration');
 });
-// Route::get('/api/documentation', function () {
-//     return view('swagger.index');
-// });
 
 Route::get('/migrate', [MigrationController::class, 'runMigrations']);
 Route::get('/run-seeder', [seedController::class, 'seedFromController']);
