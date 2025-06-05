@@ -457,14 +457,13 @@ class AuthController extends Controller
 
         // Find user by mobile number
         $user = User::where('pbu_mobileno', $request->phone_no)->first();
-
+        dd(Hash::check($request->password, $user->password));
         //Check if user verified the mobile no
         if($user->pbu_mobileno_verified_at == null){
             return response()->json(['message' => 'User not verfied yet.'], 500);
         }
         // Check if user exists and password is correct
-        if (!Auth::attempt(['pbu_mobileno' => $request->phone_no, 'password' => $request->password])) {
-        // if (!$user || !Hash::check($request->password, $user->password)) {
+        if (!$user || !Hash::check($request->password, $user->password)) {
             return response()->json(['message' => 'Invalid mobile number or password'], 500);
         }
 
