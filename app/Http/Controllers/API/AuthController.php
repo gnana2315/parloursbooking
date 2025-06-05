@@ -456,8 +456,8 @@ class AuthController extends Controller
         );
 
         // Find user by mobile number
-        $user = User::where('pbu_mobileno', $request->phone_no)->first();
-        var_dump($user);
+        $user = User::where('pbu_mobileno', $request->phone_no);
+        dd($user);
         var_dump(Hash::make($request->password));die();
         //Check if user verified the mobile no
         if($user->pbu_mobileno_verified_at == null){
