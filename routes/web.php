@@ -16,6 +16,7 @@ use App\Http\Controllers\userAdminController;
 use App\Http\Controllers\MigrationController;
 use App\Http\Controllers\SweggerController;
 use App\Http\Controllers\seedController;
+use L5Swagger\Http\Controllers\SwaggerAssetController;
 
 /*
 |--------------------------------------------------------------------------
@@ -57,6 +58,9 @@ Route::get('/homevisitsingle', function () {
 Route::get('/vendorRegistration', function () {
     return View::make('pages.vendorsRegistration');
 });
+
+
+Route::get('/api/documentation/asset/{asset}', [SwaggerAssetController::class, 'asset']);
 
 Route::get('/migrate', [MigrationController::class, 'runMigrations']);
 Route::get('/run-seeder', [seedController::class, 'seedFromController']);
