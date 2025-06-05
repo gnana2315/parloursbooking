@@ -443,6 +443,7 @@ class AuthController extends Controller
      */
 
     public function userLogin(Request $request){
+        var_dump('Error!');die();
         $request->validate(
             [
                 'phone_no' => 'required|exists:users,pbu_mobileno',
