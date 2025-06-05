@@ -133,7 +133,7 @@ class CustomersController extends Controller
     public function addCustomerFavourite(Request $request){
         $user = auth()->user();
         $customer = customer::where('pbc_user_id', $user->pbu_id)->first();
-        // dd($customer);
+        dd(auth()->id());
         if(!$customer){
             return response()->json([
                 'message' => 'Customer not found',
