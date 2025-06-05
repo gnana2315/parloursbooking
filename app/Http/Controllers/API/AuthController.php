@@ -418,30 +418,38 @@ class AuthController extends Controller
 
     /**
      * @OA\Post(
-     *      path="/api/userLogin",
-     *      operationId="userLogin",
-     *      tags={"Authentication"},
-     *      summary="Login User",
-     *      description="Returns user token",
-     *      @OA\RequestBody(
-     *          required=true,
-     *          @OA\JsonContent(
-     *              required={"phone_no","password"},
-     *              @OA\Property(property="phone_no", type="number", example="0711234567"),
-     *              @OA\Property(property="password", type="string", example="password123")
-     *          ),
-     *      ),
-     *      @OA\Response(
-     *          response=200,
-     *          description="Successful login",
-     *          @OA\JsonContent(
-     *              @OA\Property(property="token", type="string", example="generated_token_here")
-     *          ),
-     *      ),
-     *      @OA\Response(response=401, description="Unauthorized"),
+     *     path="/api/user-login",
+     *     summary="User login",
+     *     description="Login user by phone number and password. Returns access token and user details.",
+     *     tags={"Auth"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"user_type", "phone_no", "password"},
+     *             @OA\Property(property="user_type", type="string", example="customer"),
+     *             @OA\Property(property="phone_no", type="string", example="1234567890"),
+     *             @OA\Property(property="password", type="string", example="secret123")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Login successful",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Login successful"),
+     *             @OA\Property(property="access_token", type="string", example="1|xyz123token"),
+     *             @OA\Property(property="token_type", type="string", example="Bearer"),
+     *             @OA\Property(property="user", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Invalid credentials or user not verified",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Invalid mobile number or password")
+     *         )
+     *     )
      * )
      */
-
     public function userLogin(Request $request){
         $request->validate(
             [
