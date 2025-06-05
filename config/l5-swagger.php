@@ -17,7 +17,6 @@ return [
                  * Route for accessing api documentation interface
                  */
                 'api' => 'api/documentation',
-                'asset' => 'vendor/swagger-api/swagger-ui',
             ],
             'paths' => [
                 /*
@@ -65,6 +64,7 @@ return [
              * Route for accessing parsed swagger annotations.
              */
             'docs' => 'docs',
+            'asset' => 'vendor/swagger-api/swagger-ui',
 
             /*
              * Route for Oauth2 authentication callback.
