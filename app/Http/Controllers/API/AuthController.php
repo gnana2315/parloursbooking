@@ -443,7 +443,6 @@ class AuthController extends Controller
      */
 
     public function userLogin(Request $request){
-        var_dump('Error!');die();
         $request->validate(
             [
                 'phone_no' => 'required|exists:users,pbu_mobileno',
@@ -458,7 +457,7 @@ class AuthController extends Controller
 
         // Find user by mobile number
         $user = User::where('pbu_mobileno', $request->phone_no)->first();
-        dd(Hash::check($request->password, $user->password));
+        var_dump(Hash::check($request->password, $user->password));die();
         //Check if user verified the mobile no
         if($user->pbu_mobileno_verified_at == null){
             return response()->json(['message' => 'User not verfied yet.'], 500);
