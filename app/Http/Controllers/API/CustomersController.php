@@ -199,12 +199,12 @@ class CustomersController extends Controller
         }        
 
         // Load current favourites or start fresh
-        $favourites = $customer->favourite_vendors ?? [];
+        $favourites = $customer->pbc_fav ?? [];
 
         // Remove the favourite if it exists
         if (($key = array_search($request->favourite_id, $favourites)) !== false) {
             unset($favourites[$key]);
-            $customer->favourite_vendors = array_values($favourites); // Re-index the array
+            $customer->pbc_fav = array_values($favourites); // Re-index the array
             $customer->save();
         }
 
@@ -249,7 +249,7 @@ class CustomersController extends Controller
             ], 404);
         }
 
-        $favourites = $customer->favourite_vendors ?? [];
+        $favourites = $customer->pbc_fav ?? [];
 
         return response()->json([
             'message' => 'Favourites retrieved successfully',
