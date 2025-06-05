@@ -132,7 +132,7 @@ class CustomersController extends Controller
      */
     public function addCustomerFavourite(Request $request){
         $user = auth()->user();
-        $customer = customer::where('pbc_user_id', $user->id)->first();
+        $customer = customer::where('pbc_user_id', $user->pbu_id)->first();
 
         if(!$customer){
             return response()->json([
@@ -190,7 +190,7 @@ class CustomersController extends Controller
     */
     public function removeCustomerFavourite(Request $request){
         $user = auth()->user();
-        $customer = customer::where('pbc_user_id', $user->id)->first();
+        $customer = customer::where('pbc_user_id', $user->pbu_id)->first();
 
         if(!$customer){
             return response()->json([
@@ -241,7 +241,7 @@ class CustomersController extends Controller
     */
     public function getCustomerFavourites(){
         $user = auth()->user();
-        $customer = customer::where('pbc_user_id', $user->id)->first();
+        $customer = customer::where('pbc_user_id', $user->pbu_id)->first();
 
         if(!$customer){
             return response()->json([
