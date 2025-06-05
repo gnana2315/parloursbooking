@@ -64,7 +64,7 @@ return [
              * Route for accessing parsed swagger annotations.
              */
             'docs' => 'docs',
-            'asset' => 'vendor/swagger-api/swagger-ui',
+            'asset' => 'api/documentation/asset',
 
             /*
              * Route for Oauth2 authentication callback.
