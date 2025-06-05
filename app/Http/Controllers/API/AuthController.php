@@ -445,10 +445,12 @@ class AuthController extends Controller
     public function userLogin(Request $request){
         $request->validate(
             [
+                'user_type' => 'required',
                 'phone_no' => 'required|exists:users,pbu_mobileno',
                 'password' => 'required',
             ],
             [
+                'user_type.required' => 'User Type undefined',
                 'phone_no.required' => 'Phone No Required',
                 'phone_no.exists' => 'Phone No not in the system',
                 'password.required' => 'Password Required',
@@ -456,7 +458,9 @@ class AuthController extends Controller
         );
 
         // Find user by mobile number
-        $user = User::where('pbu_mobileno', $request->phone_no)->first();
+        $user = User::where('pbu_mobileno', $request->phone_no)
+                    ->where('pbu_usertype', $request->user_type)
+                    ->first();
         dd($user);
         // var_dump(Hash::make($request->password));die();
         //Check if user verified the mobile no
