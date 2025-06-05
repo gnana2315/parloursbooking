@@ -133,7 +133,7 @@ class CustomersController extends Controller
     public function addCustomerFavourite(Request $request){
         $user = auth()->user();
         $customer = customer::where('pbc_user_id', $user->pbu_id)->first();
-        dd($customer);
+        // dd($customer);
         if(!$customer){
             return response()->json([
                 'message' => 'Customer not found',
@@ -141,12 +141,12 @@ class CustomersController extends Controller
         }        
 
         // Load current favourites or start fresh
-        $favourites = $customer->favourite_vendors ?? [];
+        $favourites = $customer->pbc_fav ?? [];
 
         // Avoid duplicates
         if (!in_array($request->favourite_id, $favourites)) {
             $favourites[] = $request->favourite_id;
-            $customer->favourite_vendors = $favourites;
+            $customer->pbc_fav = $favourites;
             $customer->save();
         }
 
