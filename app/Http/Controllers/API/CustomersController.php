@@ -123,32 +123,49 @@ class CustomersController extends Controller
             ], 404);
         }        
 
+        // // Load current favourites or start fresh
+        // $favourites = $customer->pbc_fav ?? [];
+
+        // if($request->isFav === true){
+        //     // Avoid duplicates
+        //     if (!in_array($request->favourite_id, $favourites)) {
+        //         $favourites[] = $request->favourite_id;
+        //         $customer->pbc_fav = $favourites;
+        //         $customer->save();
+        //     }
+        // }else{
+        //     if (($key = array_search($request->favourite_id, $favourites)) !== false) {
+        //         unset($favourites[$key]);
+        //         $customer->pbc_fav = array_values($favourites); // Re-index the array
+        //         $customer->save();
+        //     }
+        // }
+
         // Load current favourites or start fresh
         $favourites = $customer->pbc_fav ?? [];
+        $message = '';
 
-        if($request->isFav === true){
-            // Avoid duplicates
+        if ($request->isFav === true) {
+            // Add to favourites if not already present
             if (!in_array($request->favourite_id, $favourites)) {
                 $favourites[] = $request->favourite_id;
-                $customer->pbc_fav = $favourites;
-                $customer->save();
             }
-        }else{
+            $message = "Favourite added successfully";
+        } elseif ($request->isFav === false) {
+            // Remove from favourites if it exists
             if (($key = array_search($request->favourite_id, $favourites)) !== false) {
                 unset($favourites[$key]);
-                $customer->pbc_fav = array_values($favourites); // Re-index the array
-                $customer->save();
-            }else{
-                if (!in_array($request->favourite_id, $favourites)) {
-                    $favourites[] = $request->favourite_id;
-                    $customer->pbc_fav = $favourites;
-                    $customer->save();
-                }
+                $favourites = array_values($favourites); // Re-index
             }
+            $message = "Favourite removed successfully";
         }
 
+        // Save updated favourites
+        $customer->pbc_fav = $favourites;
+        $customer->save();
+
         return response()->json([
-            'message' => "Favourite updated successfully",
+            'message' => $message,
         ], 200);
     }
 
