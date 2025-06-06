@@ -127,20 +127,20 @@ class CustomersController extends Controller
         $message = '';
 
         if ($request->isFav) {
-            //dd($request->isFav);
             if (!in_array($request->favourite_id, $favourites)) {
                 $favourites[] = $request->favourite_id;
             }
             $message = "Favourite added successfully";
         } else {
-            //dd($request->isFav);
             if (($key = array_search($request->favourite_id, $favourites)) !== false) {
                 unset($favourites[$key]);
                 $favourites = array_values($favourites); // Re-index
+                $message = "Favourite removed successfully";
+            }else {
+                $message = "Favourite ID not found in favourites";
             }
-            $message = "Favourite removed successfully";
         }
-        //dd($favourites);
+
         // Save updated favourites
         $customer->pbc_fav = $favourites;
         $customer->save();
