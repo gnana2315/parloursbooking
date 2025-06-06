@@ -421,7 +421,7 @@ class AuthController extends Controller
      *     path="/api/user-login",
      *     summary="User login",
      *     description="Login user by phone number and password. Returns access token and user details.",
-     *     tags={"Auth"},
+     *     tags={"Authentication"},
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
