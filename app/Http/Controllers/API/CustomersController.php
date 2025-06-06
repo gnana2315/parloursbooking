@@ -133,15 +133,15 @@ class CustomersController extends Controller
                 $favourites[] = $request->favourite_id;
                 $customer->pbc_fav = $favourites;
                 $customer->save();
-                $message = "Favourite added successfully";
             }
+            $message = "Favourite added successfully";
         }else{
             if (($key = array_search($request->favourite_id, $favourites)) !== false) {
                 unset($favourites[$key]);
                 $customer->pbc_fav = array_values($favourites); // Re-index the array
                 $customer->save();
-                $message = "Favourite removed successfully";
             }
+            $message = "Favourite removed successfully";
         }
 
         return response()->json([
