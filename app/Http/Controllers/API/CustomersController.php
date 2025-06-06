@@ -139,7 +139,8 @@ class CustomersController extends Controller
         //         $customer->save();
         //     }
         // }
-
+        $type = gettype($request->isFav);
+        dd($type);
         // Load current favourites or start fresh
         $favourites = $customer->pbc_fav ?? [];
         if ($request->isFav) {
