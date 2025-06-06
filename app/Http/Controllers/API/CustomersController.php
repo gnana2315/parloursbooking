@@ -138,6 +138,12 @@ class CustomersController extends Controller
                 unset($favourites[$key]);
                 $customer->pbc_fav = array_values($favourites); // Re-index the array
                 $customer->save();
+            }else{
+                if (!in_array($request->favourite_id, $favourites)) {
+                    $favourites[] = $request->favourite_id;
+                    $customer->pbc_fav = $favourites;
+                    $customer->save();
+                }
             }
         }
 
