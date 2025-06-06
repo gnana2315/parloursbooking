@@ -163,7 +163,7 @@ class CustomersController extends Controller
         $customer->save();
 
         return response()->json([
-            'message' => $message,
+            'message' => "Favourite updated successfully",
         ], 200);
     }
 
