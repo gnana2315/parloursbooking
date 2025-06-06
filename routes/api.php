@@ -66,5 +66,4 @@ Route::middleware(['auth:sanctum', 'validate.token'])->group(function () {
     //customer
     Route::post('/customer/favourite', [CustomersController::class, 'addRemoveCustomerFavourite']);
     Route::get('/customer/favourites', [CustomersController::class, 'getCustomerFavourites']);
-    Route::post('/customer/favourite/remove', [CustomersController::class, 'removeCustomerFavourite']);
 });

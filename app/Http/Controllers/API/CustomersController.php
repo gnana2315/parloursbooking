@@ -147,64 +147,6 @@ class CustomersController extends Controller
     }
 
     /**
-     * @OA\Post(
-     *     path="/api/customer/favourite/remove",
-     *     summary="Remove a vendor from customer's favourites",
-     *     description="Removes a vendor ID from the logged-in customer's favourite_vendors column.",
-     *     operationId="removeCustomerFavourite",
-     *     tags={"Customer"},
-     *     security={{"bearerAuth":{}}},
-     *     
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\JsonContent(
-     *             required={"favourite_id"},
-     *             @OA\Property(property="favourite_id", type="integer", example=123)
-     *         )
-     *     ),
-     *     
-     *     @OA\Response(
-     *         response=200,
-     *         description="Favourite removed successfully",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string", example="Favourite removed successfully")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="Customer not found",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string", example="Customer not found")
-     *         )
-     *     )
-     * )
-    */
-    public function removeCustomerFavourite(Request $request){
-        $user = auth()->user();
-        $customer = customer::where('pbc_user_id', $user->pbu_id)->first();
-
-        if(!$customer){
-            return response()->json([
-                'message' => 'Customer not found',
-            ], 404);
-        }        
-
-        // Load current favourites or start fresh
-        $favourites = $customer->pbc_fav ?? [];
-
-        // Remove the favourite if it exists
-        if (($key = array_search($request->favourite_id, $favourites)) !== false) {
-            unset($favourites[$key]);
-            $customer->pbc_fav = array_values($favourites); // Re-index the array
-            $customer->save();
-        }
-
-        return response()->json([
-            'message' => 'Favourite removed successfully',
-        ], 200);
-    }
-
-    /**
      * @OA\Get(
      *     path="/api/customer/favourites",
      *     summary="Get customer's favourites",
