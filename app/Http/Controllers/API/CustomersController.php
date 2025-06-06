@@ -142,14 +142,14 @@ class CustomersController extends Controller
 
         // Load current favourites or start fresh
         $favourites = $customer->pbc_fav ?? [];
-        if ($request->isFav === true) {
-            dd($request->isFav);
+        if ($request->isFav) {
+            //dd($request->isFav);
             if (!in_array($request->favourite_id, $favourites)) {
                 $favourites[] = $request->favourite_id;
             }
             $message = "Favourite added successfully";
-        } elseif ($request->isFav === false) {
-            dd($request->isFav);
+        } else {
+            //dd($request->isFav);
             if (($key = array_search($request->favourite_id, $favourites)) !== false) {
                 unset($favourites[$key]);
                 $favourites = array_values($favourites); // Re-index
