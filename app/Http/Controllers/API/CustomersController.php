@@ -190,7 +190,9 @@ class CustomersController extends Controller
         $favourites = $customer->pbc_fav ?? [];
 
         // Fetch vendor details for the favourites
-        $vendors = vendors::whereIn('pbv_id', $favourites)->get();
+        $vendors = vendors::whereIn('pbv_id', $favourites)
+                    ->select('pbv_id', 'pbv_servicefor', 'pbv_business_name', 'pbv_address', 'pbv_city')
+                    ->get();
 
         return response()->json([
             'message' => 'Favourites retrieved successfully',
