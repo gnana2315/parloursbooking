@@ -86,7 +86,7 @@ class CustomersController extends Controller
          *     path="/api/customer/favourite",
          *     summary="Add a vendor to customer's favourites",
          *     description="Adds a vendor ID to the logged-in customer's favourite_vendors column.",
-         *     operationId="addCustomerFavourite",
+         *     operationId="addRemoveCustomerFavourite",
          *     tags={"Customer"},
          *     security={{"bearerAuth":{}}},
          *     
@@ -95,6 +95,14 @@ class CustomersController extends Controller
          *         @OA\JsonContent(
          *             required={"favourite_id"},
          *             @OA\Property(property="favourite_id", type="integer", example=123)
+         *         )
+         *     ),
+         *     
+         *     @OA\RequestBody(
+         *         required=true,
+         *         @OA\JsonContent(
+         *             required={"isfav"},
+         *             @OA\Property(property="isfav", type="boolean", example=true/false)
          *         )
          *     ),
          *     
@@ -130,7 +138,7 @@ class CustomersController extends Controller
          *     )
          * )
      */
-    public function addCustomerFavourite(Request $request){
+    public function addRemoveCustomerFavourite(Request $request){
         $user = auth()->user();
         $customer = customer::where('pbc_user_id', auth()->id())->first();
         // dd(auth()->id());
@@ -143,11 +151,19 @@ class CustomersController extends Controller
         // Load current favourites or start fresh
         $favourites = $customer->pbc_fav ?? [];
 
-        // Avoid duplicates
-        if (!in_array($request->favourite_id, $favourites)) {
-            $favourites[] = $request->favourite_id;
-            $customer->pbc_fav = $favourites;
-            $customer->save();
+        if($rquest->isfav){
+            // Avoid duplicates
+            if (!in_array($request->favourite_id, $favourites)) {
+                $favourites[] = $request->favourite_id;
+                $customer->pbc_fav = $favourites;
+                $customer->save();
+            }
+        }else{
+            if (($key = array_search($request->favourite_id, $favourites)) !== false) {
+                unset($favourites[$key]);
+                $customer->pbc_fav = array_values($favourites); // Re-index the array
+                $customer->save();
+            }
         }
 
         return response()->json([
