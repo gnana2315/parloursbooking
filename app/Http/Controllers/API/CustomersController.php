@@ -84,31 +84,21 @@ class CustomersController extends Controller
     /**
          * @OA\Post(
          *     path="/api/customer/favourite",
-         *     summary="Add a vendor to customer's favourites",
-         *     description="Adds a vendor ID to the logged-in customer's favourite_vendors column.",
+         *     summary="Add or remove a favourite item for the authenticated customer",
          *     operationId="addRemoveCustomerFavourite",
          *     tags={"Customer"},
          *     security={{"bearerAuth":{}}},
-         *     
          *     @OA\RequestBody(
          *         required=true,
          *         @OA\JsonContent(
-         *             required={"favourite_id"},
-         *             @OA\Property(property="favourite_id", type="integer", example=123)
+         *             required={"favourite_id", "isfav"},
+         *             @OA\Property(property="favourite_id", type="integer", example=123, description="ID of the item to add or remove from favourites"),
+         *             @OA\Property(property="isfav", type="boolean", example=true, description="True to add to favourites, false to remove")
          *         )
          *     ),
-         *     
-         *     @OA\RequestBody(
-         *         required=true,
-         *         @OA\JsonContent(
-         *             required={"isfav"},
-         *             @OA\Property(property="isfav", type="boolean", example="true/false")
-         *         )
-         *     ),
-         *     
          *     @OA\Response(
          *         response=200,
-         *         description="Favourite added successfully",
+         *         description="Favourite updated successfully",
          *         @OA\JsonContent(
          *             @OA\Property(property="message", type="string", example="Favourite added successfully")
          *         )
@@ -119,25 +109,10 @@ class CustomersController extends Controller
          *         @OA\JsonContent(
          *             @OA\Property(property="message", type="string", example="Customer not found")
          *         )
-         *     ),
-         *     @OA\Response(
-         *         response=422,
-         *         description="Validation Error",
-         *         @OA\JsonContent(
-         *             @OA\Property(property="message", type="string", example="The given data was invalid."),
-         *             @OA\Property(
-         *                 property="errors",
-         *                 type="object",
-         *                 @OA\Property(
-         *                     property="favourite_id",
-         *                     type="array",
-         *                     @OA\Items(type="string", example="The favourite id field is required.")
-         *                 )
-         *             )
-         *         )
          *     )
          * )
      */
+
     public function addRemoveCustomerFavourite(Request $request){
         $user = auth()->user();
         $customer = customer::where('pbc_user_id', auth()->id())->first();
@@ -151,7 +126,7 @@ class CustomersController extends Controller
         // Load current favourites or start fresh
         $favourites = $customer->pbc_fav ?? [];
 
-        if($rquest->isfav){
+        if($request->isfav){
             // Avoid duplicates
             if (!in_array($request->favourite_id, $favourites)) {
                 $favourites[] = $request->favourite_id;
