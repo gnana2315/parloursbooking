@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 //use App\ApiResponseTrait;
 use App\Models\User;
 use App\Models\customer;
+use App\Models\vendors;
 use Validator;
 
 use App\Http\Controllers\Controller;
@@ -188,9 +189,12 @@ class CustomersController extends Controller
 
         $favourites = $customer->pbc_fav ?? [];
 
+        // Fetch vendor details for the favourites
+        $vendors = vendors::whereIn('id', $favourites)->get();
+
         return response()->json([
             'message' => 'Favourites retrieved successfully',
-            'data' => $favourites
+            'data' => $vendors
         ], 200);
     }
 }
