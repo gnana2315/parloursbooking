@@ -125,7 +125,6 @@ class CustomersController extends Controller
 
         // Load current favourites or start fresh
         $favourites = $customer->pbc_fav ?? [];
-        $message = "";
 
         if($request->isfav === true){
             // Avoid duplicates
@@ -134,18 +133,16 @@ class CustomersController extends Controller
                 $customer->pbc_fav = $favourites;
                 $customer->save();
             }
-            $message = "Favourite added successfully";
         }else{
             if (($key = array_search($request->favourite_id, $favourites)) !== false) {
                 unset($favourites[$key]);
                 $customer->pbc_fav = array_values($favourites); // Re-index the array
                 $customer->save();
             }
-            $message = "Favourite removed successfully";
         }
 
         return response()->json([
-            'message' => $message,
+            'message' => "Favourite updated successfully",
         ], 200);
     }
 
