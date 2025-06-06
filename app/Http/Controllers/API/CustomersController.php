@@ -102,7 +102,7 @@ class CustomersController extends Controller
          *         required=true,
          *         @OA\JsonContent(
          *             required={"isfav"},
-         *             @OA\Property(property="isfav", type="boolean", example=true/false)
+         *             @OA\Property(property="isfav", type="boolean", example=true or false)
          *         )
          *     ),
          *     
