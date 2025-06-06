@@ -120,29 +120,12 @@ class CustomersController extends Controller
             return response()->json([
                 'message' => 'Customer not found',
             ], 404);
-        }        
+        }  
 
-        // // Load current favourites or start fresh
-        // $favourites = $customer->pbc_fav ?? [];
-
-        // if($request->isFav === true){
-        //     // Avoid duplicates
-        //     if (!in_array($request->favourite_id, $favourites)) {
-        //         $favourites[] = $request->favourite_id;
-        //         $customer->pbc_fav = $favourites;
-        //         $customer->save();
-        //     }
-        // }else{
-        //     if (($key = array_search($request->favourite_id, $favourites)) !== false) {
-        //         unset($favourites[$key]);
-        //         $customer->pbc_fav = array_values($favourites); // Re-index the array
-        //         $customer->save();
-        //     }
-        // }
-        $type = gettype($request->isFav);
-        dd($type);
         // Load current favourites or start fresh
         $favourites = $customer->pbc_fav ?? [];
+        $message = '';
+
         if ($request->isFav) {
             //dd($request->isFav);
             if (!in_array($request->favourite_id, $favourites)) {
@@ -157,13 +140,13 @@ class CustomersController extends Controller
             }
             $message = "Favourite removed successfully";
         }
-        dd($favourites);
+        //dd($favourites);
         // Save updated favourites
         $customer->pbc_fav = $favourites;
         $customer->save();
 
         return response()->json([
-            'message' => "Favourite updated successfully",
+            'message' => $message,
         ], 200);
     }
 
