@@ -143,7 +143,6 @@ class CustomersController extends Controller
 
         // Load current favourites or start fresh
         $favourites = $customer->pbc_fav ?? [];
-        $message = '';
 
         if ($request->isFav === true) {
             // Add to favourites if not already present
