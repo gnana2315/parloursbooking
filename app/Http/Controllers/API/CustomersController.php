@@ -126,7 +126,7 @@ class CustomersController extends Controller
         // Load current favourites or start fresh
         $favourites = $customer->pbc_fav ?? [];
 
-        if($request->isfav === true){
+        if($request->isFav === true){
             // Avoid duplicates
             if (!in_array($request->favourite_id, $favourites)) {
                 $favourites[] = $request->favourite_id;
