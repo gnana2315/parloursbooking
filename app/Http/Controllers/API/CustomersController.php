@@ -127,7 +127,7 @@ class CustomersController extends Controller
         $favourites = $customer->pbc_fav ?? [];
         $message = "";
 
-        if($request->isfav){
+        if($request->isfav === true){
             // Avoid duplicates
             if (!in_array($request->favourite_id, $favourites)) {
                 $favourites[] = $request->favourite_id;
