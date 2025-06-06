@@ -84,23 +84,23 @@ class CustomersController extends Controller
     /**
          * @OA\Post(
          *     path="/api/customer/favourite",
-         *     summary="Add or remove a favourite item for the authenticated customer",
+         *     summary="Add or remove an item from the customer's favourites",
          *     operationId="addRemoveCustomerFavourite",
          *     tags={"Customer"},
          *     security={{"bearerAuth":{}}},
          *     @OA\RequestBody(
          *         required=true,
          *         @OA\JsonContent(
-         *             required={"favourite_id", "isfav"},
-         *             @OA\Property(property="favourite_id", type="integer", example=123, description="ID of the item to add or remove from favourites"),
-         *             @OA\Property(property="isfav", type="boolean", example=true, description="True to add to favourites, false to remove")
+         *             required={"favourite_id", "isFav"},
+         *             @OA\Property(property="favourite_id", type="integer", example=123, description="ID of the item to be added or removed from favourites"),
+         *             @OA\Property(property="isFav", type="boolean", example=true, description="Set to true to add to favourites, false to remove")
          *         )
          *     ),
          *     @OA\Response(
          *         response=200,
          *         description="Favourite updated successfully",
          *         @OA\JsonContent(
-         *             @OA\Property(property="message", type="string", example="Favourite added successfully")
+         *             @OA\Property(property="message", type="string", example="Favourite updated successfully")
          *         )
          *     ),
          *     @OA\Response(
@@ -112,7 +112,6 @@ class CustomersController extends Controller
          *     )
          * )
      */
-
     public function addRemoveCustomerFavourite(Request $request){
         $user = auth()->user();
         $customer = customer::where('pbc_user_id', auth()->id())->first();
@@ -157,7 +156,7 @@ class CustomersController extends Controller
             }
             $message = "Favourite removed successfully";
         }
-
+        dd($favourites);
         // Save updated favourites
         $customer->pbc_fav = $favourites;
         $customer->save();
