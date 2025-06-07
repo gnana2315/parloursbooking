@@ -192,6 +192,7 @@ class CommonController extends Controller
             ->having('distance', '<=', $radius)
             ->orderBy('distance')
             ->get();
+            var_dump($query);die();
         }
         
         // Location filters
