@@ -169,29 +169,30 @@ class CommonController extends Controller
                 $q->where('pbv_business_name', 'like', '%' . $request->search . '%')
                   ->orWhere('pbv_city', 'like', '%' . $request->search . '%')
                   ->orWhereHas('services', function ($q2) use ($request) {
-                      $q2->where('pbs_name', 'like', '%' . $request->search . '%');
+                    //   $q2->where('pbs_name', 'like', '%' . $request->search . '%');
+                    $q2->whereRaw('LOWER(pbs_name) = ?', [strtolower($request->search)]);
                   });
             }
         });
     
         // Basic filters
-        if ($request->filled('radius') && $request->filled('latitude') && $request->filled('longitude')) {
-            $lat = $request->latitude;
-            $lng = $request->longitude;
-            $radius = $request->radius;
-            $query->selectRaw("(
-                6371 * acos(
-                    cos(radians(?)) *
-                    cos(radians(pbv_latitude)) *
-                    cos(radians(pbv_longatitude) - radians(?)) +
-                    sin(radians(?)) *
-                    sin(radians(pbv_latitude))
-                )
-            ) AS distance", [$lat, $lng, $lat])
-            ->having('distance', '<=', $radius)
-            ->orderBy('distance')
-            ->get();
-        }
+        // if ($request->filled('radius') && $request->filled('latitude') && $request->filled('longitude')) {
+        //     $lat = $request->latitude;
+        //     $lng = $request->longitude;
+        //     $radius = $request->radius;
+        //     $query->selectRaw("(
+        //         6371 * acos(
+        //             cos(radians(?)) *
+        //             cos(radians(pbv_latitude)) *
+        //             cos(radians(pbv_longatitude) - radians(?)) +
+        //             sin(radians(?)) *
+        //             sin(radians(pbv_latitude))
+        //         )
+        //     ) AS distance", [$lat, $lng, $lat])
+        //     ->having('distance', '<=', $radius)
+        //     ->orderBy('distance')
+        //     ->get();
+        // }
         
         // Location filters
         // if ($request->filled('city')) {
