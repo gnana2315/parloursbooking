@@ -470,13 +470,15 @@ class AuthController extends Controller
                     ->where('pbu_usertype', $request->user_type)
                     ->first();
         
-        //Check if user verified the mobile no
-        if($user->pbu_mobileno_verified_at == null){
-            return response()->json(['message' => 'User not verfied yet.'], 500);
-        }
+        
         // Check if user exists and password is correct
         if (!$user || !Hash::check($request->password, $user->password)) {
             return response()->json(['message' => 'Invalid mobile number or password'], 500);
+        }
+
+        //Check if user verified the mobile no
+        if($user->pbu_mobileno_verified_at == null){
+            return response()->json(['message' => 'User not verfied yet.'], 500);
         }
 
         $token_text = $user->pbu_id.'_user_login_session';

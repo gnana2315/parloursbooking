@@ -176,9 +176,23 @@ class CommonController extends Controller
         });
     
         // Basic filters
-        // if ($request->filled('name')) {
-        //     $query->join('pb_vendor_config', 'pb_vendor_config.pbvc_vendorid', '=', 'pb_vendor.pbv_id')->where('pb_vendor_config.pbvc_display_name', 'like', '%' . $request->name . '%');
-        // }
+        if ($request->filled('distance')) {
+            $lat = $request->latitude;
+            $lng = $request->longitude;
+            $radius = $request->radius;
+            $query->selectRaw("(
+                6371 * acos(
+                    cos(radians(?)) *
+                    cos(radians(latitude)) *
+                    cos(radians(longitude) - radians(?)) +
+                    sin(radians(?)) *
+                    sin(radians(latitude))
+                )
+            ) AS distance", [$lat, $lng, $lat])
+            ->having('distance', '<=', $radius)
+            ->orderBy('distance')
+            ->get();
+        }
         
         // Location filters
         // if ($request->filled('city')) {
