@@ -51,7 +51,7 @@ Route::middleware(['auth:sanctum', 'validate.token'])->group(function () {
 
     //common
     Route::get('/vendors/{business_type_id}', [CommonController::class, 'getVendors' ]);
-    Route::get('/vendors/search', [CommonController::class, 'searchVendors' ]);
+    Route::get('/searchVendors', [CommonController::class, 'searchVendors' ]);
     Route::get('/serviceTypes', [CommonController::class, 'getServiceTypes' ]);
     Route::get('/vendorTypes', [CommonController::class, 'getVendorTypes' ]);
     Route::get('/serviceFor', [CommonController::class, 'getServiceFor' ]);
