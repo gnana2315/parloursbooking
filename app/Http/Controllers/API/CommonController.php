@@ -160,8 +160,7 @@ class CommonController extends Controller
      *     security={{"bearerAuth": {}}}
      * )
      */
-    public function searchVendors(Request $request){        
-        dd($request);
+    public function searchVendors(Request $request){
         //$query = vendors::query();
         $query = vendors::query()
         ->with(['pb_services', 'pb_vendor']) // eager load if needed
