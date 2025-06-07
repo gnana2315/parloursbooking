@@ -161,18 +161,34 @@ class CommonController extends Controller
      * )
      */
     public function searchVendors(Request $request){
-        //$query = vendors::query();
-        $query = vendors::query()
-        ->with(['services']) // eager load if needed
-        ->where(function ($q) use ($request) {
-            if ($request->filled('search')) {
-                $q->where('pbv_business_name', 'like', '%' . $request->search . '%')
-                  ->orWhere('pbv_city', 'like', '%' . $request->search . '%')
-                  ->orWhereHas('services', function ($q2) use ($request) {
-                      $q2->where('pbs_name', 'like', '%' . $request->search . '%');
-                  });
-            }
-        });
+        $query = vendors::query();
+        // $query = vendors::query()
+        // ->with(['services']) // eager load if needed
+        // ->where(function ($q) use ($request) {
+        //     if ($request->filled('search')) {
+        //         $q->where('pbv_business_name', 'like', '%' . $request->search . '%')
+        //           ->orWhere('pbv_city', 'like', '%' . $request->search . '%')
+        //           ->orWhereHas('services', function ($q2) use ($request) {
+        //               $q2->where('pbs_name', 'like', '%' . $request->search . '%');
+        //           });
+        //     }
+        // });
+        if ($request->filled('search')) {
+            $search = strtolower($request->search);
+
+            $query->where(function ($q) use ($search) {
+                $q->where('pbv_business_name', 'like', "%{$search}%")
+                ->orWhere('pbv_city', 'like', "%{$search}%")
+                ->orWhereHas('services', function ($q2) use ($search) {
+                    $q2->whereRaw('LOWER(pbs_name) = ?', [$search]);
+                });
+            });
+
+            // ✅ Eager-load only matching services
+            $query->with(['services' => function ($q3) use ($search) {
+                $q3->whereRaw('LOWER(pbs_name) = ?', [$search]);
+            }]);
+        }
     
         // Basic filters
         // if ($request->filled('radius') && $request->filled('latitude') && $request->filled('longitude')) {
