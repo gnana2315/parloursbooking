@@ -44,4 +44,9 @@ class vendors extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function services()
+    {
+        return $this->hasMany(services::class, 'pbs_vendor_id', 'pbv_id');
+    }
 }
