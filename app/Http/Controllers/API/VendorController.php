@@ -805,4 +805,53 @@ class VendorController extends Controller
             'message' => $message
         ], $status);
     }
+
+    /**
+        * @OA\Get(
+        *     path="/api/vendor/{vendor_id}",
+        *     summary="Get Vendor Details by ID",
+        *     description="Fetches vendor information along with configuration and services for a given vendor ID.",
+        *     tags={"Vendor"},
+        *     security={{"sanctum":{}}},
+        *     @OA\Parameter(
+        *         name="vendor_id",
+        *         in="path",
+        *         description="ID of the vendor to fetch",
+        *         required=true,
+        *         @OA\Schema(type="integer", example=1)
+        *     ),
+        *     @OA\Response(
+        *         response=200,
+        *         description="Vendor details retrieved successfully",
+        *         @OA\JsonContent(
+        *             @OA\Property(property="success", type="boolean", example=true),
+        *             @OA\Property(property="data", type="object")
+        *         )
+        *     ),
+        *     @OA\Response(
+        *         response=404,
+        *         description="Vendor not found",
+        *         @OA\JsonContent(
+        *             @OA\Property(property="message", type="string", example="Vendor not found")
+        *         )
+        *     )
+        * )
+    */
+
+    public function gentVendorByID($vendor_id){
+        $user = auth()->user();
+        $vendor = vendors::where('pbv_id', $vendor_id)
+                ->join('vendor_config', 'vendor_config.pbvc_vendorid', '=', 'vendors.pbv_id')
+                ->join('services', 'services.pbs_vendor_id', '=', 'vendors.pbv_id')                
+                ->first();
+
+        if (!$vendor) {
+            return response()->json(['message' => 'Vendor not found'], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $vendor
+        ], 200);
+    }
 }

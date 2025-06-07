@@ -40,5 +40,12 @@ class promoCode extends Model
         'created_at',
         'updated_at',
         'deleted_at',
+        'pbpc_promo_types',
+    ];
+
+    protected $casts = [
+        'pbpc_vendor_ids' => 'array',
+        'pbpc_service_ids' => 'array',
+        'pbpc_vendor_service_map' => 'array',
     ];
 }

@@ -108,71 +108,72 @@ class CommonController extends Controller
     }
 
     /**
-     * @OA\POST(
-     *     path="/api/searchVendors",
-     *     summary="Search vendors with filters",
-     *     description="Search vendors by name and/or city",
-     *     operationId="searchVendors",
-     *     tags={"Common"},
-     *     @OA\Parameter(
-     *         name="name",
-     *         in="query",
-     *         description="Vendor name to search for",
-     *         required=false,
-     *         @OA\Schema(type="string")
-     *     ),
-     *     @OA\Parameter(
-     *         name="city",
-     *         in="query",
-     *         description="City to filter vendors by",
-     *         required=false,
-     *         @OA\Schema(type="string")
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Successful operation",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(
-     *                 property="success",
-     *                 type="boolean",
-     *                 example=true
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=400,
-     *         description="Invalid input",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(
-     *                 property="success",
-     *                 type="boolean",
-     *                 example=false
-     *             ),
-     *             @OA\Property(
-     *                 property="message",
-     *                 type="string",
-     *                 example="Invalid parameters"
-     *             )
-     *         )
-     *     ),
-     *     security={{"bearerAuth": {}}}
-     * )
-     */
+         * @OA\Get(
+         *     path="/api/vendors/search",
+         *     summary="Search Vendors",
+         *     description="Search for vendors based on keyword, service, location, category, and other filters.",
+         *     tags={"Vendor"},
+         *     @OA\Parameter(
+         *         name="search",
+         *         in="query",
+         *         description="Search by business name, city, or service name",
+         *         required=false,
+         *         @OA\Schema(type="string", example="Salon")
+         *     ),
+         *     @OA\Parameter(
+         *         name="businessCategory",
+         *         in="query",
+         *         description="Filter by business category ID",
+         *         required=false,
+         *         @OA\Schema(type="integer", example=3)
+         *     ),
+         *     @OA\Parameter(
+         *         name="serviceFor",
+         *         in="query",
+         *         description="Filter by service for (e.g., men/women)",
+         *         required=false,
+         *         @OA\Schema(type="string", example="men")
+         *     ),
+         *     @OA\Parameter(
+         *         name="sort",
+         *         in="query",
+         *         description="Sort by price (price_asc or price_desc)",
+         *         required=false,
+         *         @OA\Schema(type="string", enum={"price_asc", "price_desc"})
+         *     ),
+         *     @OA\Parameter(
+         *         name="per_page",
+         *         in="query",
+         *         description="Number of results per page",
+         *         required=false,
+         *         @OA\Schema(type="integer", example=10)
+         *     ),
+         *     @OA\Response(
+         *         response=200,
+         *         description="Vendors fetched successfully",
+         *         @OA\JsonContent(
+         *             @OA\Property(property="success", type="boolean", example=true),
+         *             @OA\Property(
+         *                 property="data",
+         *                 type="object",
+         *                 description="Paginated vendor data"
+         *             )
+         *         )
+         *     ),
+         *     @OA\Response(
+         *         response=404,
+         *         description="No vendors found",
+         *         @OA\JsonContent(
+         *             @OA\Property(property="success", type="boolean", example=false),
+         *             @OA\Property(property="data", type="string", example=null),
+         *             @OA\Property(property="message", type="string", example="Business Type list is empty.")
+         *         )
+         *     )
+         * )
+    */
+
     public function searchVendors(Request $request){
         $query = vendors::query();
-        // $query = vendors::query()
-        // ->with(['services']) // eager load if needed
-        // ->where(function ($q) use ($request) {
-        //     if ($request->filled('search')) {
-        //         $q->where('pbv_business_name', 'like', '%' . $request->search . '%')
-        //           ->orWhere('pbv_city', 'like', '%' . $request->search . '%')
-        //           ->orWhereHas('services', function ($q2) use ($request) {
-        //               $q2->where('pbs_name', 'like', '%' . $request->search . '%');
-        //           });
-        //     }
-        // });
         $query = vendors::query()
             ->where(function ($q) use ($request) {
                 if ($request->filled('search')) {
@@ -218,9 +219,9 @@ class CommonController extends Controller
         // }
 
         // Filter by vendorType
-        if ($request->filled('vendorType')) {
-            $query->where('pbv_vendortype', $request->vendorType);
-        }
+        // if ($request->filled('vendorType')) {
+        //     $query->where('pbv_vendortype', $request->vendorType);
+        // }
 
         // Filter by businessCategory
         if ($request->filled('businessCategory')) {
