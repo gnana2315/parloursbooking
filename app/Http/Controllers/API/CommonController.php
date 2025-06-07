@@ -169,8 +169,7 @@ class CommonController extends Controller
                 $q->where('pbv_business_name', 'like', '%' . $request->search . '%')
                   ->orWhere('pbv_city', 'like', '%' . $request->search . '%')
                   ->orWhereHas('services', function ($q2) use ($request) {
-                    //   $q2->where('pbs_name', 'like', '%' . $request->search . '%');
-                    $q2->whereRaw('LOWER(pbs_name) = ?', [strtolower($request->search)]);
+                      $q2->where('pbs_name', 'like', '%' . $request->search . '%');
                   });
             }
         });
