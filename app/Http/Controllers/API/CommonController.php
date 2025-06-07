@@ -162,7 +162,7 @@ class CommonController extends Controller
      */
     public function searchVendors(Request $request){        
         
-        $query = vendors::query();
+        //$query = vendors::query();
         $query = vendors::query()
         ->with(['pb_services', 'pb_vendor']) // eager load if needed
         ->where(function ($q) use ($request) {
