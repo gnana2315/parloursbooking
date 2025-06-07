@@ -183,10 +183,10 @@ class CommonController extends Controller
             $query->selectRaw("(
                 6371 * acos(
                     cos(radians(?)) *
-                    cos(radians(latitude)) *
-                    cos(radians(longitude) - radians(?)) +
+                    cos(radians(pbv_latitude)) *
+                    cos(radians(pbv_longatitude) - radians(?)) +
                     sin(radians(?)) *
-                    sin(radians(latitude))
+                    sin(radians(pbv_latitude))
                 )
             ) AS distance", [$lat, $lng, $lat])
             ->having('distance', '<=', $radius)
