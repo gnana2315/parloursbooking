@@ -176,7 +176,7 @@ class CommonController extends Controller
         });
     
         // Basic filters
-        if ($request->filled('distance')) {
+        if ($request->filled('radius') && $request->filled('latitude') && $request->filled('longitude')) {
             $lat = $request->latitude;
             $lng = $request->longitude;
             $radius = $request->radius;
