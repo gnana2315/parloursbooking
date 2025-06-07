@@ -231,7 +231,7 @@ class CommonController extends Controller
         }
 
         
-        var_dump($query);die();
+        //var_dump($query);die();
         // Pagination
         $perPage = $request->get('per_page', 15);
         $vendors = $query->paginate($perPage);
