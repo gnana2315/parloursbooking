@@ -173,21 +173,24 @@ class CommonController extends Controller
         //           });
         //     }
         // });
-        if ($request->filled('search')) {
-            $search = strtolower($request->search);
-
-            $query->where(function ($q) use ($search) {
-                $q->where('pbv_business_name', 'like', "%{$search}%")
-                ->orWhere('pbv_city', 'like', "%{$search}%")
-                ->orWhereHas('services', function ($q2) use ($search) {
-                    $q2->whereRaw('LOWER(pbs_name) = ?', [$search]);
-                });
+        $query = vendors::query()
+            ->where(function ($q) use ($request) {
+                if ($request->filled('search')) {
+                    $q->where('pbv_business_name', 'like', '%' . $request->search . '%')
+                    ->orWhere('pbv_city', 'like', '%' . $request->search . '%')
+                    ->orWhereHas('services', function ($q2) use ($request) {
+                        $q2->where('pbs_name', 'like', '%' . $request->search . '%');
+                    });
+                }
             });
 
-            // ✅ Eager-load only matching services
-            $query->with(['services' => function ($q3) use ($search) {
-                $q3->whereRaw('LOWER(pbs_name) = ?', [$search]);
+        // ✅ Eager load only matching services
+        if ($request->filled('search')) {
+            $query->with(['services' => function ($q) use ($request) {
+                $q->where('pbs_name', 'like', '%' . $request->search . '%');
             }]);
+        } else {
+            $query->with('services');
         }
     
         // Basic filters
