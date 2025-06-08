@@ -659,27 +659,9 @@ class CommonController extends Controller
     }
 
     public function getAllPromoCodes(){
-        $promos = promoCode::where('pbpc_status', 1)->get()->map(function ($promo) {
-            $vendors = collect();
-            $services = collect();
 
-            if ($promo->pbpc_vendor_ids) {
-                $vendors = vendors::whereIn('pbv_id', $promo->pbpc_vendor_ids)->get();
-            }
-
-            if ($promo->pbpc_service_ids) {
-                $services = services::whereIn('pbs_id', $promo->pbpc_service_ids)->get();
-            }
-
-            return [
-                'promo' => $promo,
-                'vendors' => $vendors,
-                'services' => $services,
-            ];
-        });
-
-        // $promoCodes = promoCode::where('pbpc_status', 1)->get();
-
+        $promoCodes = promoCode::where('pbpc_status', 1)->get();
+        dd($promoCodes);
         // $vendors = collect();
         // $services = collect();
 
