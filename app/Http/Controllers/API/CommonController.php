@@ -670,13 +670,13 @@ class CommonController extends Controller
             if ($promo->pbpc_service_ids) {
                 $services = services::whereIn('pbs_id', $promo->pbpc_service_ids)->get();
             }
-        });
 
-        return [
-            'promo' => $promo,
-            'vendors' => $vendors,
-            'services' => $services,
-        ];
+            return [
+                'promo' => $promo,
+                'vendors' => $vendors,
+                'services' => $services,
+            ];
+        });
 
         // $promoCodes = promoCode::where('pbpc_status', 1)->get();
 
