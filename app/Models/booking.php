@@ -41,7 +41,7 @@ class booking extends Model
         'deleted_at',
     ];
 
-    public function bookingDetail(){
+    public function bookingDetails(){
         return $this->hasMany(bookingDetail::class, 'pbb_id', 'pbbd_booking_id');
     }
 }
