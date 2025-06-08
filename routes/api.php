@@ -27,10 +27,9 @@ Route::post('/userMobileVerification',[AuthController::class,'verifyVerification
 Route::post('/userLogin',[AuthController::class,'userLogin']);
 Route::post('/userForgotPassword',[AuthController::class,'userForgetPassword']);
 Route::post('/userResetPassword',[AuthController::class,'userResetPassword']);
-Route::get('/getUser', [AuthController::class,'getUser']);
-Route::get('/getBookingsByCustomerID', [BookingController::class, 'getBookingsByCustomerID']);
 
 Route::middleware(['auth:sanctum', 'validate.token'])->group(function () {
+    Route::get('/getUser', [AuthController::class,'getUser']);
     Route::post('/userLogout',[AuthController::class,'userLogout']);
 
     //user
@@ -69,4 +68,5 @@ Route::middleware(['auth:sanctum', 'validate.token'])->group(function () {
     //customer
     Route::post('/customer/favourite', [CustomersController::class, 'addRemoveCustomerFavourite']);
     Route::get('/customer/favourites', [CustomersController::class, 'getCustomerFavourites']);
+    Route::get('/getBookingsByCustomerID', [BookingController::class, 'getBookingsByCustomerID']);
 });
