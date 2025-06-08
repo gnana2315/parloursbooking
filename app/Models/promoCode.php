@@ -22,7 +22,6 @@ class promoCode extends Model
 	protected $primaryKey = 'pbpc_id';
     protected $fillable = [
         'pbpc_id',
-        'pbpc_vid',
         'pbpc_name',
         'pbpc_code',
         'pbpc_discount_type',

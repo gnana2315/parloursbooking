@@ -658,7 +658,7 @@ class CommonController extends Controller
         ], 200);
     }
 
-    public function getAllPromoCodes(){
-        
-    }
+    // public function getAllPromoCodes(){
+
+    // }
 }
