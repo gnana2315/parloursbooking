@@ -844,7 +844,12 @@ class VendorController extends Controller
         $vendor_results = vendors::where('pbv_id', $vendor_id)
                 ->join('vendor_config', 'vendor_config.pbvc_vendorid', '=', 'vendor.pbv_id')
                 ->join('services', 'services.pbs_vendor_id', '=', 'vendor.pbv_id') 
-                ->get();
+                ->get();        
+        
+        if (!$vendor_results) {
+            return response()->json(['message' => 'Vendor not found'], 404);
+        }
+        
         $vendors = $vendor_results->first();
         
         $final_vendors = [
@@ -872,17 +877,14 @@ class VendorController extends Controller
             })->values()->all()
         ];
 
-                dd($final_vendors);
-        if (!$vendors) {
-            return response()->json(['message' => 'Vendor not found'], 404);
-        }
+                // dd($final_vendors);
 
         $customer = customer::where('pbc_user_id', $user->id)->first();
         $favourites = $customer->pbc_fav ?? [];
 
         $vendors = $vendors->map(function ($vendor) use ($favourites) {
-            $vendor->isFav = in_array($vendor->pbv_id, $favourites);
-            return $vendor;
+            $final_vendors->isFav = in_array($vendor->pbv_id, $favourites);
+            return $final_vendors;
         });
 
         return response()->json([
