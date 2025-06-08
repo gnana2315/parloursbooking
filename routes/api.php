@@ -28,7 +28,6 @@ Route::post('/userLogin',[AuthController::class,'userLogin']);
 Route::post('/userForgotPassword',[AuthController::class,'userForgetPassword']);
 Route::post('/userResetPassword',[AuthController::class,'userResetPassword']);
 Route::get('/getUser', [AuthController::class,'getUser']);
-Route::get('/getAllPromoCodes', [CommonController::class, 'getAllPromoCodes']);
 
 Route::middleware(['auth:sanctum', 'validate.token'])->group(function () {
     Route::post('/userLogout',[AuthController::class,'userLogout']);
@@ -60,6 +59,7 @@ Route::middleware(['auth:sanctum', 'validate.token'])->group(function () {
     Route::get('/getServices/{vendor_id}', [CommonController::class, 'getServicesByVendor' ]);
     Route::get('/getBankList', [CommonController::class, 'getBankList']);
     Route::get('/getBusinessCategory', [CommonController::class, 'getBusinessCategory']);
+    Route::get('/getAllPromoCodes', [CommonController::class, 'getAllPromoCodes']);
 
     //booking
     Route::get('/getBookingSlots', [BookingController::class, 'getBookingSlots']);

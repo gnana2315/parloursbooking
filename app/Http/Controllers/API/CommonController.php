@@ -658,76 +658,105 @@ class CommonController extends Controller
         ], 200);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/promo-codes",
+     *     summary="Get all active promo codes",
+     *     tags={"Promo Codes"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful response",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="pbpc_id", type="integer", example=1),
+     *                     @OA\Property(property="pbpc_name", type="string", example="Test Promo Code"),
+     *                     @OA\Property(property="pbpc_code", type="string", example="TEST1234"),
+     *                     @OA\Property(property="pbpc_discount_type", type="string", example="percentage"),
+     *                     @OA\Property(property="pbpc_value", type="number", format="float", example=10),
+     *                     @OA\Property(property="pbpc_discount", type="string", example="10.00"),
+     *                     @OA\Property(property="pbpc_max_discount", type="number", format="float", example=100),
+     *                     @OA\Property(property="pbpc_start_date", type="string", format="date", example="2025-06-01"),
+     *                     @OA\Property(property="pbpc_days", type="integer", example=30),
+     *                     @OA\Property(property="pbpc_end_date", type="string", format="date", example="2025-06-30"),
+     *                     @OA\Property(property="pbpc_min_booking_amount", type="number", format="float", example=100),
+     *                     @OA\Property(property="pbpc_uses_count", type="integer", example=0),
+     *                     @OA\Property(property="pbpc_description", type="string", example="This is a test promo."),
+     *                     @OA\Property(property="pbpc_image", type="string", example="/promo/image.jpg"),
+     *                     @OA\Property(property="pbpc_status", type="integer", example=1),
+     *                     @OA\Property(property="pbpc_promo_types", type="string", example="global"),
+     *                     @OA\Property(property="pbpc_vendor_ids", type="array", @OA\Items(type="integer")),
+     *                     @OA\Property(property="pbpc_service_ids", type="array", @OA\Items(type="integer")),
+     *                     @OA\Property(property="pbpc_vendor_service_map", type="array", @OA\Items(type="integer")),
+     *                     @OA\Property(property="created_at", type="string", format="date-time"),
+     *                     @OA\Property(property="updated_at", type="string", format="date-time"),
+     *                     @OA\Property(property="deleted_at", type="string", format="date-time", nullable=true)
+     *                 )
+     *             )
+     *         )
+     *     )
+     * )
+     */
+
     public function getAllPromoCodes(){
 
         $promos = promoCode::where('pbpc_status', 1)->get()->toArray();
 
-        $organized = [
-            'global' => [],
-            'vendor' => [],
-            'service' => [],
-            'vendor_service' => [],
-        ];
+        // $organized = [
+        //     'global' => [],
+        //     'vendor' => [],
+        //     'service' => [],
+        //     'vendor_service' => [],
+        // ];
 
-        foreach ($promos as $promo) {
-            switch ($promo['pbpc_promo_types']) {
-                case 'global':
-                    $organized['global'][] = $promo;
-                    break;
+        // foreach ($promos as $promo) {
+        //     switch ($promo['pbpc_promo_types']) {
+        //         case 'global':
+        //             $organized['global'][] = $promo;
+        //             break;
 
-                case 'vendor':
-                    if (!empty($promo['pbpc_vendor_ids'])) {
-                        foreach ($promo['pbpc_vendor_ids'] as $vendorId) {
-                            $organized['vendor'][$vendorId][] = $promo;
-                        }
-                    }
-                    break;
+        //         case 'vendor':
+        //             if (!empty($promo['pbpc_vendor_ids'])) {
+        //                 foreach ($promo['pbpc_vendor_ids'] as $vendorId) {
+        //                     $organized['vendor'][$vendorId][] = $promo;
+        //                 }
+        //             }
+        //             break;
 
-                case 'service':
-                    if (!empty($promo['pbpc_service_ids'])) {
-                        foreach ($promo['pbpc_service_ids'] as $serviceId) {
-                            $organized['service'][$serviceId][] = $promo;
-                        }
-                    }
-                    break;
+        //         case 'service':
+        //             if (!empty($promo['pbpc_service_ids'])) {
+        //                 foreach ($promo['pbpc_service_ids'] as $serviceId) {
+        //                     $organized['service'][$serviceId][] = $promo;
+        //                 }
+        //             }
+        //             break;
 
-                case 'vendor_service':
-                    if (!empty($promo['pbpc_vendor_service_map'])) {
-                        foreach ($promo['pbpc_vendor_service_map'] as $vsId) {
-                            $vendorId = $this->getVendorIdByVendorServiceId($vsId); // You need to implement this
-                            if ($vendorId) {
-                                $organized['vendor_service'][$vendorId]['services'][] = $vsId;
-                                $organized['vendor_service'][$vendorId]['promos'][] = $promo;
-                            }
-                        }
-                    }
-                    break;
-            }
-        }
-
-        // Debug output
-        print_r($organized);
-        die();
-        
-        // $vendors = collect();
-        // $services = collect();
-
-        // // Fetch related vendors
-        // if (in_array($promoCodes->pbpc_promo_types, ['vendor']) && is_array($promoCodes->pbpc_vendor_ids)) {
-        //     $vendors = vendors::whereIn('pbv_id', $promoCodes->pbpc_vendor_ids)->get();
+        //         case 'vendor_service':
+        //             if (!empty($promo['pbpc_vendor_service_map'])) {
+        //                 foreach ($promo['pbpc_vendor_service_map'] as $vsId) {
+        //                     $vendorId = $this->getVendorIdByVendorServiceId($vsId); // You need to implement this
+        //                     if ($vendorId) {
+        //                         $organized['vendor_service'][$vendorId]['services'][] = $vsId;
+        //                         $organized['vendor_service'][$vendorId]['promos'][] = $promo;
+        //                     }
+        //                 }
+        //             }
+        //             break;
+        //     }
         // }
 
-        // // Fetch related services
-        // if (in_array($promoCodes->pbpc_promo_types, ['service']) && is_array($promoCodes->pbpc_service_ids)) {
-        //     $services = services::whereIn('pbs_id', $promoCodes->pbpc_service_ids)->get();
-        // }
-
-        // return response()->json([
-        //     'message' => 'Promo fetched successfully',
-        //     'promo' => $promoCodes,
-        //     'vendors' => $vendors,
-        //     'services' => $services,
-        // ]);
+        // // Debug output
+        // print_r($organized);
+        // die();       
+        return response()->json([
+            'success' => true,
+            'data' => $promos
+        ], 200);
     }
 
     public function getVendorIdByVendorServiceId($vsId)
