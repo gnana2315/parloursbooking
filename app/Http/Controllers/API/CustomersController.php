@@ -186,7 +186,7 @@ class CustomersController extends Controller
 
     public function getBookingsByCustomerID(){
         $user = auth()->user();
-        $customer = customer::where('pbc_user_id', $user->id)->first();
+        $customer = customer::where('pbc_user_id', $user->pbu_id)->first();
         if(!$customer){
             return response()->json([
                 'message' => 'Customer not found',
