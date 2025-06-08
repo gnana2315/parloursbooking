@@ -879,13 +879,11 @@ class VendorController extends Controller
 
                 // dd($final_vendors);
 
+        // Add favorite flag
         $customer = customer::where('pbc_user_id', $user->id)->first();
         $favourites = $customer->pbc_fav ?? [];
 
-        $vendors = $vendors->map(function ($vendor) use ($favourites) {
-            $final_vendors->isFav = in_array($vendor->pbv_id, $favourites);
-            return $final_vendors;
-        });
+        $final_vendor['isFav'] = in_array($vendor->pbv_id, $favourites);
 
         return response()->json([
             'success' => true,
