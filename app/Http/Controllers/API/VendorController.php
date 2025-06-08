@@ -841,10 +841,11 @@ class VendorController extends Controller
 
     public function getVendorByID($vendor_id){
         $user = auth()->user();
-        $vendors = vendors::where('pbv_id', $vendor_id)
+        $vendor_results = vendors::where('pbv_id', $vendor_id)
                 ->join('vendor_config', 'vendor_config.pbvc_vendorid', '=', 'vendor.pbv_id')
                 ->join('services', 'services.pbs_vendor_id', '=', 'vendor.pbv_id') 
-                ->first()->toArray();
+                ->get();
+        $vendors = $vendor_results->first();
         
         $final_vendors = [
             'id' => $vendors->pbv_id,
@@ -855,7 +856,7 @@ class VendorController extends Controller
             'contact_no' => $vendors->pbv_contact_no,
             'logo' => $vendors->pbvc_logo,
             'status' => $vendors->pbv_status,
-            'services' => $vendors->map(function ($vendor) {
+            'services' => $vendor_results->map(function ($vendor) {
                 return [
                     'id' => $vendor->pbs_id,
                     'name' => $vendor->pbs_name,
