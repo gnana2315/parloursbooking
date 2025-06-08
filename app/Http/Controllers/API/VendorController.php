@@ -846,6 +846,7 @@ class VendorController extends Controller
                 ->join('services', 'services.pbs_vendor_id', '=', 'vendor.pbv_id')                
                 ->get();
 
+                dd($vendors);
         if (!$vendors) {
             return response()->json(['message' => 'Vendor not found'], 404);
         }
