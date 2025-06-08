@@ -6,10 +6,10 @@ use App\Models\services;
 use App\Models\vendorType;
 use App\Models\serviceType;
 use App\Models\serviceFor;
-use App\Models\promocode;
 use App\Models\banks;
 use App\Models\businessCategory;
 use App\Models\vendorSpecialCloses;
+use App\Models\promoCode;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
@@ -658,7 +658,27 @@ class CommonController extends Controller
         ], 200);
     }
 
-    // public function getAllPromoCodes(){
+    public function getAllPromoCodes(){
+        $promoCodes = promoCode::where('pbpc_status', 1)->get();
 
-    // }
+        $vendors = collect();
+        $services = collect();
+
+        // Fetch related vendors
+        if (in_array($promo->pbpc_promo_types, ['vendor']) && is_array($promo->pbpc_vendor_ids)) {
+            $vendors = vendors::whereIn('pbv_id', $promo->pbpc_vendor_ids)->get();
+        }
+
+        // Fetch related services
+        if (in_array($promo->pbpc_promo_types, ['service']) && is_array($promo->pbpc_service_ids)) {
+            $services = services::whereIn('pbs_id', $promo->pbpc_service_ids)->get();
+        }
+
+        return response()->json([
+            'message' => 'Promo fetched successfully',
+            'promo' => $promo,
+            'vendors' => $vendors,
+            'services' => $services,
+        ]);
+    }
 }

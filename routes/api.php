@@ -28,6 +28,7 @@ Route::post('/userLogin',[AuthController::class,'userLogin']);
 Route::post('/userForgotPassword',[AuthController::class,'userForgetPassword']);
 Route::post('/userResetPassword',[AuthController::class,'userResetPassword']);
 Route::get('/getUser', [AuthController::class,'getUser']);
+Route::get('/getAllPromoCodes', [CommonController::class, 'getAllPromoCodes']);
 
 Route::middleware(['auth:sanctum', 'validate.token'])->group(function () {
     Route::post('/userLogout',[AuthController::class,'userLogout']);
