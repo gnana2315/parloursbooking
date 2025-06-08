@@ -845,21 +845,18 @@ class VendorController extends Controller
                 ->join('vendor_config', 'vendor_config.pbvc_vendorid', '=', 'vendor.pbv_id')
                 ->join('services', 'services.pbs_vendor_id', '=', 'vendor.pbv_id')                
                 ->get();
-                // ->toArray();
-        dd($vendors);
-        foreach($vendors as $vendor){
-            $vendorID = $vendor->pbc_fav;
-            $userfavorites = customer::where('pbc_user_id', $user->pbu_id)
-                        ->whereJsonContains('pbc_fav', (int)$vendorID)
-                        ->exists();
-            var_dump($userfavorites);
-            $vendors['isFav'] = true;
-        }
-        die();
 
         if (!$vendors) {
             return response()->json(['message' => 'Vendor not found'], 404);
         }
+
+        $customer = customer::where('pbc_user_id', $user->id)->first();
+        $favourites = $customer->pbc_fav ?? [];
+
+        $vendors = $vendors->map(function ($vendor) use ($favourites) {
+            $vendor->isFav = in_array($vendor->pbv_id, $favourites);
+            return $vendor;
+        });
 
         return response()->json([
             'success' => true,
