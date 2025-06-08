@@ -694,7 +694,7 @@ class CommonController extends Controller
                 case 'vendor_service':
                     if (!empty($promo['pbpc_vendor_service_map'])) {
                         foreach ($promo['pbpc_vendor_service_map'] as $vsId) {
-                            $vendorId = getVendorIdByVendorServiceId($vsId); // You need to implement this
+                            $vendorId = $this->getVendorIdByVendorServiceId($vsId); // You need to implement this
                             if ($vendorId) {
                                 $organized['vendor_service'][$vendorId]['services'][] = $vsId;
                                 $organized['vendor_service'][$vendorId]['promos'][] = $promo;
