@@ -661,8 +661,7 @@ class CommonController extends Controller
     public function getAllPromoCodes(){
 
         $promoCodes = promoCode::where('pbpc_status', 1)->get();
-        print_r('<pre>');
-        print_r($promoCodes);
+        var_dump($promoCodes);
         die();
         $promos = [];
         
