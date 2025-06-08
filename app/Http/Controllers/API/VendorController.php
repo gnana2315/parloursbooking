@@ -849,7 +849,7 @@ class VendorController extends Controller
         
         foreach($vendors as $vendor){
             $userfavorites = customer::where('pbc_user_id', $user->pbu_id)
-                        ->whereIn('pbc_fav', $vendor->pbc_fav)
+                        ->whereIn('pbc_fav', [$vendor->pbc_fav])
                         ->get();
             $vendors['isFav'] = true;
         }
