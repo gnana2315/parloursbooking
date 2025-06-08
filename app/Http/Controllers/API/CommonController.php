@@ -660,10 +660,54 @@ class CommonController extends Controller
 
     public function getAllPromoCodes(){
 
-        $promoCodes = promoCode::where('pbpc_status', 1)->get();
-        var_dump($promoCodes->toArray());
+        $promos = promoCode::where('pbpc_status', 1)->get()->toArray();
+
+        $organized = [
+            'global' => [],
+            'vendor' => [],
+            'service' => [],
+            'vendor_service' => [],
+        ];
+
+        foreach ($promos as $promo) {
+            switch ($promo['pbpc_promo_types']) {
+                case 'global':
+                    $organized['global'][] = $promo;
+                    break;
+
+                case 'vendor':
+                    if (!empty($promo['pbpc_vendor_ids'])) {
+                        foreach ($promo['pbpc_vendor_ids'] as $vendorId) {
+                            $organized['vendor'][$vendorId][] = $promo;
+                        }
+                    }
+                    break;
+
+                case 'service':
+                    if (!empty($promo['pbpc_service_ids'])) {
+                        foreach ($promo['pbpc_service_ids'] as $serviceId) {
+                            $organized['service'][$serviceId][] = $promo;
+                        }
+                    }
+                    break;
+
+                case 'vendor_service':
+                    if (!empty($promo['pbpc_vendor_service_map'])) {
+                        foreach ($promo['pbpc_vendor_service_map'] as $vsId) {
+                            $vendorId = getVendorIdByVendorServiceId($vsId); // You need to implement this
+                            if ($vendorId) {
+                                $organized['vendor_service'][$vendorId]['services'][] = $vsId;
+                                $organized['vendor_service'][$vendorId]['promos'][] = $promo;
+                            }
+                        }
+                    }
+                    break;
+            }
+        }
+
+        // Debug output
+        print_r($organized);
         die();
-        $promos = [];
         
         // $vendors = collect();
         // $services = collect();
