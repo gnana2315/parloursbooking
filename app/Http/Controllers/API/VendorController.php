@@ -883,11 +883,11 @@ class VendorController extends Controller
         $customer = customer::where('pbc_user_id', $user->id)->first();
         $favourites = $customer->pbc_fav ?? [];
 
-        $final_vendor['isFav'] = in_array($vendors->pbv_id, $favourites);
+        $final_vendors['isFav'] = in_array($vendors->pbv_id, $favourites);
 
         return response()->json([
             'success' => true,
-            'data' => $final_vendor
+            'data' => $final_vendors
         ], 200);
     }
 }
