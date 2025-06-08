@@ -184,10 +184,60 @@ class CustomersController extends Controller
         ], 200);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/customer/bookings",
+     *     summary="Get bookings by the authenticated customer",
+     *     description="Returns a list of bookings for the authenticated customer, including booking details.",
+     *     operationId="getBookingsByCustomerID",
+     *     tags={"Customer"},
+     *     security={{"bearerAuth":{}}},
+     * 
+     *     @OA\Response(
+     *         response=200,
+     *         description="Bookings retrieved successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Bookings retrieved successfully"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=101),
+     *                     @OA\Property(property="booking_customer_id", type="integer", example=5),
+     *                     @OA\Property(property="booking_date", type="string", format="date", example="2025-06-01"),
+     *                     @OA\Property(property="status", type="string", example="confirmed"),
+     *                     @OA\Property(
+     *                         property="booking_details",
+     *                         type="array",
+     *                         @OA\Items(
+     *                             type="object",
+     *                             @OA\Property(property="id", type="integer", example=201),
+     *                             @OA\Property(property="service_id", type="integer", example=3),
+     *                             @OA\Property(property="employee_id", type="integer", example=12),
+     *                             @OA\Property(property="start_time", type="string", format="date-time", example="2025-06-01T10:00:00Z"),
+     *                             @OA\Property(property="end_time", type="string", format="date-time", example="2025-06-01T10:30:00Z")
+     *                         )
+     *                     )
+     *                 )
+     *             )
+     *         )
+     *     ),
+     * 
+     *     @OA\Response(
+     *         response=404,
+     *         description="Customer not found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Customer not found")
+     *         )
+     *     )
+     * )
+ */
+
     public function getBookingsByCustomerID(){
         $user = auth()->user();
         $customer = customer::where('pbc_user_id', $user->pbu_id)->first();
-        dd($customer);
+        
         if(!$customer){
             return response()->json([
                 'message' => 'Customer not found',
