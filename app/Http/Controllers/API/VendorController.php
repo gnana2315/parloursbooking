@@ -846,7 +846,7 @@ class VendorController extends Controller
                 ->join('services', 'services.pbs_vendor_id', '=', 'vendor.pbv_id')                
                 ->get();
                 // ->toArray();
-        
+        dd($vendors);
         foreach($vendors as $vendor){
             $vendorID = $vendor->pbc_fav;
             $userfavorites = customer::where('pbc_user_id', $user->pbu_id)
