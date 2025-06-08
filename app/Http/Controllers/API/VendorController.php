@@ -852,9 +852,10 @@ class VendorController extends Controller
             $userfavorites = customer::where('pbc_user_id', $user->pbu_id)
                         ->whereJsonContains('pbc_fav', (int)$vendorID)
                         ->exists();
-            dd($userfavorites);
+            var_dump($userfavorites);
             $vendors['isFav'] = true;
         }
+        die();
 
         if (!$vendors) {
             return response()->json(['message' => 'Vendor not found'], 404);
