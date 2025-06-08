@@ -838,7 +838,7 @@ class VendorController extends Controller
         * )
     */
 
-    public function gentVendorByID($vendor_id){
+    public function getVendorByID($vendor_id){
         $user = auth()->user();
         $vendor = vendors::where('pbv_id', $vendor_id)
                 ->join('vendor_config', 'vendor_config.pbvc_vendorid', '=', 'vendors.pbv_id')
