@@ -659,26 +659,45 @@ class CommonController extends Controller
     }
 
     public function getAllPromoCodes(){
-        $promoCodes = promoCode::where('pbpc_status', 1)->get();
+        $promos = promoCode::where('pbpc_status', 1)->get()->map(function ($promo) {
+            $vendors = collect();
+            $services = collect();
 
-        $vendors = collect();
-        $services = collect();
+            if ($promo->pbpc_vendor_ids) {
+                $vendors = vendors::whereIn('pbv_id', $promo->pbpc_vendor_ids)->get();
+            }
 
-        // Fetch related vendors
-        if (in_array($promoCodes->pbpc_promo_types, ['vendor']) && is_array($promoCodes->pbpc_vendor_ids)) {
-            $vendors = vendors::whereIn('pbv_id', $promoCodes->pbpc_vendor_ids)->get();
-        }
+            if ($promo->pbpc_service_ids) {
+                $services = services::whereIn('pbs_id', $promo->pbpc_service_ids)->get();
+            }
 
-        // Fetch related services
-        if (in_array($promoCodes->pbpc_promo_types, ['service']) && is_array($promoCodes->pbpc_service_ids)) {
-            $services = services::whereIn('pbs_id', $promoCodes->pbpc_service_ids)->get();
-        }
+            return [
+                'promo' => $promo,
+                'vendors' => $vendors,
+                'services' => $services,
+            ];
+        });
 
-        return response()->json([
-            'message' => 'Promo fetched successfully',
-            'promo' => $promoCodes,
-            'vendors' => $vendors,
-            'services' => $services,
-        ]);
+        // $promoCodes = promoCode::where('pbpc_status', 1)->get();
+
+        // $vendors = collect();
+        // $services = collect();
+
+        // // Fetch related vendors
+        // if (in_array($promoCodes->pbpc_promo_types, ['vendor']) && is_array($promoCodes->pbpc_vendor_ids)) {
+        //     $vendors = vendors::whereIn('pbv_id', $promoCodes->pbpc_vendor_ids)->get();
+        // }
+
+        // // Fetch related services
+        // if (in_array($promoCodes->pbpc_promo_types, ['service']) && is_array($promoCodes->pbpc_service_ids)) {
+        //     $services = services::whereIn('pbs_id', $promoCodes->pbpc_service_ids)->get();
+        // }
+
+        // return response()->json([
+        //     'message' => 'Promo fetched successfully',
+        //     'promo' => $promoCodes,
+        //     'vendors' => $vendors,
+        //     'services' => $services,
+        // ]);
     }
 }
