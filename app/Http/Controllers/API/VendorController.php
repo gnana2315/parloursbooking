@@ -851,7 +851,8 @@ class VendorController extends Controller
             $vendorID = $vendor->pbc_fav;
             $userfavorites = customer::where('pbc_user_id', $user->pbu_id)
                         ->whereJsonContains('pbc_fav', (int)$vendorID)
-                        ->get();
+                        ->exists();
+            dd($userfavorites);
             $vendors['isFav'] = true;
         }
 
