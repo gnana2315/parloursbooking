@@ -42,6 +42,6 @@ class booking extends Model
     ];
 
     public function bookingDetails(){
-        return $this->hasMany(bookingDetail::class, 'pbb_id', 'pbbd_booking_id');
+        return $this->hasMany(bookingDetail::class, 'pbbd_booking_id', 'pbb_id');
     }
 }
