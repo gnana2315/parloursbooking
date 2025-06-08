@@ -729,4 +729,10 @@ class CommonController extends Controller
         //     'services' => $services,
         // ]);
     }
+
+    function getVendorIdByVendorServiceId($vsId)
+    {
+        $vendorService = service::find($vsId);
+        return $vendorService ? $vendorService->pbs_vendor_id : null;
+    }
 }
