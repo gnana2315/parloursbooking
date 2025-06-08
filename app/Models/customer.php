@@ -41,4 +41,9 @@ class customer extends Model
     protected $casts = [
         'pbc_fav' => 'array',
     ];
+
+    public function bookings()
+    {
+        return $this->hasMany(booking::class, 'pbb_customer_id', 'pbc_id');
+    }
 }
