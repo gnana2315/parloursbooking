@@ -665,18 +665,18 @@ class CommonController extends Controller
         $services = collect();
 
         // Fetch related vendors
-        if (in_array($promo->pbpc_promo_types, ['vendor']) && is_array($promo->pbpc_vendor_ids)) {
-            $vendors = vendors::whereIn('pbv_id', $promo->pbpc_vendor_ids)->get();
+        if (in_array($promoCodes->pbpc_promo_types, ['vendor']) && is_array($promoCodes->pbpc_vendor_ids)) {
+            $vendors = vendors::whereIn('pbv_id', $promoCodes->pbpc_vendor_ids)->get();
         }
 
         // Fetch related services
-        if (in_array($promo->pbpc_promo_types, ['service']) && is_array($promo->pbpc_service_ids)) {
-            $services = services::whereIn('pbs_id', $promo->pbpc_service_ids)->get();
+        if (in_array($promoCodes->pbpc_promo_types, ['service']) && is_array($promoCodes->pbpc_service_ids)) {
+            $services = services::whereIn('pbs_id', $promoCodes->pbpc_service_ids)->get();
         }
 
         return response()->json([
             'message' => 'Promo fetched successfully',
-            'promo' => $promo,
+            'promo' => $promoCodes,
             'vendors' => $vendors,
             'services' => $services,
         ]);
