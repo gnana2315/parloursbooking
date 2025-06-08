@@ -732,7 +732,7 @@ class CommonController extends Controller
 
     public function getVendorIdByVendorServiceId($vsId)
     {
-        $vendorService = service::find($vsId);
+        $vendorService = services::find($vsId);
         return $vendorService ? $vendorService->pbs_vendor_id : null;
     }
 }
