@@ -12,6 +12,7 @@ use App\Models\vendorStandardAvailability;
 use App\Models\vendorSpecialCloses;
 use App\Models\vendorBankInfo;
 use App\Models\services;
+use App\Models\customer;
 use Validator;
 
 use App\Http\Controllers\Controller;
@@ -840,18 +841,26 @@ class VendorController extends Controller
 
     public function getVendorByID($vendor_id){
         $user = auth()->user();
-        $vendor = vendors::where('pbv_id', $vendor_id)
+        $vendors = vendors::where('pbv_id', $vendor_id)
                 ->join('vendor_config', 'vendor_config.pbvc_vendorid', '=', 'vendor.pbv_id')
                 ->join('services', 'services.pbs_vendor_id', '=', 'vendor.pbv_id')                
-                ->get();
+                ->get()
+                ->toArray();
+        
+        foreach($vendors as $vendor){
+            $userfavorites = customer::where('pbc_user_id', $user->pbu_id)
+                        ->whereIn('pbc_fav', $vendor->pbc_fav)
+                        ->get();
+            $vendors['isFav'] = true;
+        }
 
-        if (!$vendor) {
+        if (!$vendors) {
             return response()->json(['message' => 'Vendor not found'], 404);
         }
 
         return response()->json([
             'success' => true,
-            'data' => $vendor
+            'data' => $vendors
         ], 200);
     }
 }
