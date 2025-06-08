@@ -877,8 +877,6 @@ class VendorController extends Controller
             })->values()->all()
         ];
 
-                // dd($final_vendors);
-
         // Add favorite flag
         $customer = customer::where('pbc_user_id', $user->pbu_id)->first();
         $favourites = $customer->pbc_fav ?? [];
