@@ -844,7 +844,7 @@ class VendorController extends Controller
         $vendors = vendors::where('pbv_id', $vendor_id)
                 ->join('vendor_config', 'vendor_config.pbvc_vendorid', '=', 'vendor.pbv_id')
                 ->join('services', 'services.pbs_vendor_id', '=', 'vendor.pbv_id')                
-                ->get();
+                ->get()->toArray();
 
                 dd($vendors);
         if (!$vendors) {
