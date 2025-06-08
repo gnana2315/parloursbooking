@@ -844,9 +844,34 @@ class VendorController extends Controller
         $vendors = vendors::where('pbv_id', $vendor_id)
                 ->join('vendor_config', 'vendor_config.pbvc_vendorid', '=', 'vendor.pbv_id')
                 ->join('services', 'services.pbs_vendor_id', '=', 'vendor.pbv_id') 
-                ->get()->toArray();
+                ->first()->toArray();
+        
+        $final_vendors = [
+            'id' => $vendors->pbv_id,
+            'business_name' => $vendors->pbv_business_name,
+            'city' => $vendors->pbv_city,
+            'lat' => $vendors->pbv_lat,
+            'lon' => $vendors->pbv_lon,
+            'contact_no' => $vendors->pbv_contact_no,
+            'logo' => $vendors->pbvc_logo,
+            'status' => $vendors->pbv_status,
+            'services' => $vendors->map(function ($vendor) {
+                return [
+                    'id' => $vendor->pbs_id,
+                    'name' => $vendor->pbs_name,
+                    'description' => $vendor->pbs_description,
+                    'duration_category' => $vendor->pbs_duration_cetegory,                    
+                    'image' => $vendor->pbs_image,
+                    'emloyee' => $vendor->pbs_employees,
+                    'duration' => $vendor->pbs_duration,
+                    'price' => (float) $vendor->pbs_price,
+                    'type' => $vendor->pbs_service_type,
+                    "status" => $vendor->pbs_status
+                ];
+            })->values()->all()
+        ];
 
-                dd($vendors);
+                dd($final_vendors);
         if (!$vendors) {
             return response()->json(['message' => 'Vendor not found'], 404);
         }
