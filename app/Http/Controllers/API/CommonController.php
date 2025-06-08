@@ -657,4 +657,8 @@ class CommonController extends Controller
             'data' => $closing_data
         ], 200);
     }
+
+    public function getAllPromoCodes(){
+        
+    }
 }
