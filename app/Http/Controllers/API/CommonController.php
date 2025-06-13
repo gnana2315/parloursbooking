@@ -112,7 +112,7 @@ class CommonController extends Controller
 
     /**
          * @OA\Get(
-         *     path="/api/vendors/search",
+         *     path="/api/searchVendors",
          *     summary="Search Vendors",
          *     description="Search for vendors based on keyword, service, location, category, and other filters.",
          *     tags={"Vendor"},
