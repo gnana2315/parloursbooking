@@ -768,7 +768,7 @@ class CommonController extends Controller
          *     summary="Get active cities",
          *     description="Returns a list of active cities where `pbc_cstatus` is 1",
          *     operationId="getCities",
-         *     tags={"Cities"},
+         *     tags={"Common"},
          *     security={{"bearerAuth":{}}},
          * 
          *     @OA\Response(
