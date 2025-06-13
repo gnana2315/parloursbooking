@@ -225,7 +225,7 @@ class CommonController extends Controller
         
         // Location filters
         if ($request->filled('city')) {
-            $query->join('cities', 'cities.pbc_cid', '=', 'pb_vendor.pbv_city')->where('pbv_city', $request->city);
+            $query->join('cities', 'cities.pbc_cid', '=', 'vendor.pbv_city')->where('pbv_city', $request->city);
         }
 
         // Filter by vendorType
