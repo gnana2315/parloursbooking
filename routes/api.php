@@ -60,6 +60,7 @@ Route::middleware(['auth:sanctum', 'validate.token'])->group(function () {
     Route::get('/getBankList', [CommonController::class, 'getBankList']);
     Route::get('/getBusinessCategory', [CommonController::class, 'getBusinessCategory']);
     Route::get('/getAllPromoCodes', [CommonController::class, 'getAllPromoCodes']);
+    Route::get('/cities', [CommonController::class, 'getCities']);
 
     //booking
     Route::get('/getBookingSlots', [BookingController::class, 'getBookingSlots']);

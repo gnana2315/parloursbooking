@@ -10,6 +10,7 @@ use App\Models\banks;
 use App\Models\businessCategory;
 use App\Models\vendorSpecialCloses;
 use App\Models\promoCode;
+use App\Models\cities;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
@@ -756,6 +757,62 @@ class CommonController extends Controller
         return response()->json([
             'success' => true,
             'data' => $promos
+        ], 200);
+    }
+    
+    /**
+         * @OA\Get(
+         *     path="/api/cities",
+         *     summary="Get active cities",
+         *     description="Returns a list of active cities where `pbc_cstatus` is 1",
+         *     operationId="getCities",
+         *     tags={"Cities"},
+         *     security={{"bearerAuth":{}}},
+         * 
+         *     @OA\Response(
+         *         response=200,
+         *         description="Successful retrieval of active cities",
+         *         @OA\JsonContent(
+         *             type="object",
+         *             @OA\Property(property="success", type="boolean", example=true),
+         *             @OA\Property(
+         *                 property="data",
+         *                 type="array",
+         *                 @OA\Items(
+         *                     type="object",
+         *                     @OA\Property(property="id", type="integer", example=1),
+         *                     @OA\Property(property="pbc_cityname", type="string", example="Colombo"),
+         *                     @OA\Property(property="pbc_cstatus", type="integer", example=1)
+         *                 )
+         *             )
+         *         )
+         *     ),
+         * 
+         *     @OA\Response(
+         *         response=404,
+         *         description="Cities not found",
+         *         @OA\JsonContent(
+         *             type="object",
+         *             @OA\Property(property="success", type="boolean", example=false),
+         *             @OA\Property(property="message", type="string", example="Cities are not found")
+         *         )
+         *     )
+         * )
+     */
+    public function getCities(){
+        $user= auth()->user();
+
+        $cities = cities::where('pbc_cstatus', '=', 1)->get();
+        if ($cities->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cities are not found'
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $cities
         ], 200);
     }
 
