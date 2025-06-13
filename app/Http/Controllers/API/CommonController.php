@@ -181,7 +181,7 @@ class CommonController extends Controller
             ->where(function ($q) use ($request) {
                 if ($request->filled('search')) {
                     $q->where('pbv_business_name', 'like', '%' . $request->search . '%')
-                    ->orWhere('pbv_city', 'like', '%' . $request->search . '%')
+                    // ->orWhere('pbv_city', 'like', '%' . $request->search . '%')
                     ->orWhereHas('services', function ($q2) use ($request) {
                         $q2->where('pbs_name', 'like', '%' . $request->search . '%');
                     });
@@ -217,9 +217,9 @@ class CommonController extends Controller
         // }
         
         // Location filters
-        // if ($request->filled('city')) {
-        //     $query->join('pb_vendor_config', 'pb_vendor_config.pbvc_vendorid', '=', 'pb_vendor.pbv_id')->where('pbv_city', $request->city);
-        // }
+        if ($request->filled('city')) {
+            $query->join('cities', 'cities.pbc_cid', '=', 'pb_vendor.pbv_city')->where('pbv_city', $request->city);
+        }
 
         // Filter by vendorType
         // if ($request->filled('vendorType')) {
