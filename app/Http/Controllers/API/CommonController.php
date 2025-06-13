@@ -119,9 +119,16 @@ class CommonController extends Controller
          *     @OA\Parameter(
          *         name="search",
          *         in="query",
-         *         description="Search by business name, city, or service name",
+         *         description="Search by business name or service name",
          *         required=false,
          *         @OA\Schema(type="string", example="Salon")
+         *     ),
+         *     @OA\Parameter(
+         *         name="city",
+         *         in="query",
+         *         description="Filter by City",
+         *         required=false,
+         *         @OA\Schema(type="integer", example=3)
          *     ),
          *     @OA\Parameter(
          *         name="businessCategory",
