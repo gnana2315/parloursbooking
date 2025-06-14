@@ -8,6 +8,8 @@ use Illuminate\Validation\Rule;
 use App\Models\User;
 use App\Models\customer;
 use App\Models\vendors;
+use App\Models\notification;
+use App\Services\FirebaseService;
 
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
@@ -258,7 +260,7 @@ class AuthController extends Controller
      *      @OA\Response(response=401, description="Unauthorized"),
      * )
      */
-    public function userRegistration(Request $request){
+    public function userRegistration(Request $request, FirebaseService $firebase){
         $user = User::find($request->user_id);
         if (!$user) {
             return response()->json(['message' => 'User not found'], 404);
@@ -348,6 +350,13 @@ class AuthController extends Controller
         $message = "";
 
         if($userRegister){
+            $firebase->sendNotification($user->device_token, 'Welcome!', 'Your profile has been created.');
+
+            notification::create([
+                'pbn_user_id' => $user->id,
+                'pbn_title' => 'Welcome!',
+                'pbn_message' => 'Your profile has been created.',
+            ]);
             $status_code = 200;
             $message = ($user->pbu_usertype == '1') ? "Vendor Registered Successfully" : "Customer Registered Successfully";
         }else{
