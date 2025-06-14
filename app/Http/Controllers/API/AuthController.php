@@ -8,13 +8,17 @@ use Illuminate\Validation\Rule;
 use App\Models\User;
 use App\Models\customer;
 use App\Models\vendors;
+use App\Models\deviceToken;
+
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 use Validator;
 
-
+/**
+ * @OA\PathItem(path="/api")
+ */
 /**
  * @OA\Info(
  *      version="1.0.0",
@@ -339,7 +343,7 @@ class AuthController extends Controller
             ]);
 
             $user->update([
-                'pbu_vid' => $userRegister->id
+                'pbu_vid' => $userRegister->pbc_id
             ]);
         }
 
@@ -347,6 +351,10 @@ class AuthController extends Controller
         $message = "";
 
         if($userRegister){
+            deviceToken::create([
+                'pbdt_user_id' => $user->pbu_id,
+                'pbdt_device_token' => $request->device_token,
+            ]);
             $status_code = 200;
             $message = ($user->pbu_usertype == '1') ? "Vendor Registered Successfully" : "Customer Registered Successfully";
         }else{
@@ -479,6 +487,15 @@ class AuthController extends Controller
         //Check if user verified the mobile no
         if($user->pbu_mobileno_verified_at == null){
             return response()->json(['message' => 'User not verfied yet.'], 500);
+        }
+
+        //check user has device token already
+        $checkUserDeviceToken = deviceToken::find($user->pbu_id);
+        if($checkUserDeviceToken == null){
+            deviceToken::create([
+                'pbdt_user_id' => $user->pbu_id,
+                'pbdt_device_token' => $request->device_token,
+            ]);
         }
 
         $token_text = $user->pbu_id.'_user_login_session';

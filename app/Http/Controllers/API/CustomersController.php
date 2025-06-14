@@ -12,6 +12,10 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * @OA\PathItem(path="/api")
+ */
+
 class CustomersController extends Controller
 {
     public function register($id, Request $request){

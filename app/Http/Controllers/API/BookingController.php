@@ -17,6 +17,10 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
+/**
+ * @OA\PathItem(path="/api")
+ */
+
 class BookingController extends Controller
 {
     /**

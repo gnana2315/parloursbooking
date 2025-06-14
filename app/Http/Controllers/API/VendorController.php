@@ -19,6 +19,10 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * @OA\PathItem(path="/api")
+ */
+
 class VendorController extends Controller
 {   
     /**

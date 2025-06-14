@@ -16,6 +16,10 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
+/**
+ * @OA\PathItem(path="/api")
+ */
+
 class CommonController extends Controller
 {
     /**
