@@ -1,1 +1,51 @@
+# Laravel & PHP
+/vendor
+/node_modules
+/public/storage
+/storage/*.key
+.env
+.env.*  # If you use multiple environments
+
+# Laravel specific
+/storage/app/public
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/storage/logs/*
 /storage/app/firebase/firebase_credentials.json
+
+# Ignore Laravel Mix and npm/Yarn build artifacts
+/public/hot
+/public/mix-manifest.json
+/public/css
+/public/js
+
+# IDEs & editors
+.idea
+.vscode
+*.sublime-project
+*.sublime-workspace
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# PHPUnit
+.phpunit.result.cache
+
+# npm debug log
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Laravel Telescope (if installed)
+/storage/telescope
+
+# Laravel Horizon (if installed)
+/horizon
+
+# Laravel Octane cache
+/.octane
+
+# GitHub Codespaces
+.devcontainer
