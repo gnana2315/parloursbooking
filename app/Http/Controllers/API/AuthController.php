@@ -8,7 +8,6 @@ use Illuminate\Validation\Rule;
 use App\Models\User;
 use App\Models\customer;
 use App\Models\vendors;
-use App\Models\deviceToken;
 
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
@@ -230,8 +229,7 @@ class AuthController extends Controller
      *      @OA\RequestBody(
      *          required=true,
      *          @OA\JsonContent(
-     *              required={"device_token","first_name", "last_name", "address", "city", "dob", "gender", "phone_no", "vendor_type", "accept_terms"},
-     *              @OA\Property(property="device_token", type="string", example="device_token_here"),
+     *              required={"first_name", "last_name", "address", "city", "dob", "gender", "phone_no", "vendor_type", "accept_terms"},
      *              @OA\Property(property="user_id", type="number", example="2"),
      *              @OA\Property(property="first_name", type="string", example="John"),
      *              @OA\Property(property="last_name", type="string", example="Doe"),
@@ -350,10 +348,6 @@ class AuthController extends Controller
         $message = "";
 
         if($userRegister){
-            deviceToken::create([
-                'pbdt_user_id' => $user->pbu_id,
-                'pbdt_device_token' => $request->device_token,
-            ]);
             $status_code = 200;
             $message = ($user->pbu_usertype == '1') ? "Vendor Registered Successfully" : "Customer Registered Successfully";
         }else{
@@ -432,7 +426,6 @@ class AuthController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"device_token", "user_type", "phone_no", "password"},
      *             @OA\Property(property="device_token", type="string", example="device_token_here"),
      *             @OA\Property(property="user_type", type="string", example="customer(2)/vendor(1)"),
      *             @OA\Property(property="phone_no", type="string", example="1234567890"),
@@ -487,15 +480,6 @@ class AuthController extends Controller
         //Check if user verified the mobile no
         if($user->pbu_mobileno_verified_at == null){
             return response()->json(['message' => 'User not verfied yet.'], 500);
-        }
-
-        //check user has device token already
-        $checkUserDeviceToken = deviceToken::find($user->pbu_id);
-        if($checkUserDeviceToken == null){
-            deviceToken::create([
-                'pbdt_user_id' => $user->pbu_id,
-                'pbdt_device_token' => $request->device_token,
-            ]);
         }
 
         $token_text = $user->pbu_id.'_user_login_session';

@@ -11,6 +11,7 @@ use App\Models\businessCategory;
 use App\Models\vendorSpecialCloses;
 use App\Models\promoCode;
 use App\Models\cities;
+use App\Models\deviceToken;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
@@ -150,13 +151,6 @@ class CommonController extends Controller
          *         description="Sort by price (price_asc or price_desc)",
          *         required=false,
          *         @OA\Schema(type="string", enum={"price_asc", "price_desc"})
-         *     ),
-         *     @OA\Parameter(
-         *         name="per_page",
-         *         in="query",
-         *         description="Number of results per page",
-         *         required=false,
-         *         @OA\Schema(type="integer", example=10)
          *     ),
          *     @OA\Response(
          *         response=200,
@@ -829,5 +823,64 @@ class CommonController extends Controller
     {
         $vendorService = services::find($vsId);
         return $vendorService ? $vendorService->pbs_vendor_id : null;
+    }
+
+    /**
+ * @OA\Post(
+ *     path="/api/storeDeviceToken",
+ *     summary="Store or update device token",
+ *     description="Stores the device token for the authenticated user to use for push notifications.",
+ *     operationId="storeDeviceToken",
+ *     tags={"Common"},
+ *     security={{"bearerAuth":{}}},
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(
+ *             required={"device_token"},
+ *             @OA\Property(property="device_token", type="string", maxLength=255, example="abcdef123456")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Device token stored successfully",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="success", type="boolean", example=true),
+ *             @OA\Property(property="message", type="string", example="Device token stored successfully")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=422,
+ *         description="Validation error",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="The given data was invalid."),
+ *             @OA\Property(
+ *                 property="errors",
+ *                 type="object",
+ *                 @OA\Property(
+ *                     property="device_token",
+ *                     type="array",
+ *                     @OA\Items(type="string", example="The device token field is required.")
+ *                 )
+ *             )
+ *         )
+ *     )
+ * )
+ */
+    public function storeDeviceToken(Request $request)
+    {
+        $request->validate([
+            'device_token' => 'required|string|max:255',
+        ]);
+
+        $user = auth()->user();
+        $deviceToken = deviceToken::updateOrCreate(
+            ['pbdt_user_id' => $user->pbu_id],
+            ['pbdt_device_token' => $request->device_token]
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Device token stored successfully',
+        ], 200);
     }
 }
