@@ -25,7 +25,7 @@ Route::post('/userMobileRegister',[AuthController::class,'userRegisterMobileNo']
 Route::post('/resendOtp',[AuthController::class,'resendOtp']);
 Route::post('/userMobileVerification',[AuthController::class,'verifyVerificationCode']);
 Route::post('/userLogin',[AuthController::class,'userLogin']);
-Route::post('/userForgotPassword',[AuthController::class,'userForgetPassword']);
+Route::post('/userForgotPassword',[AuthController::class,'userForgotPassword']);
 Route::post('/userResetPassword',[AuthController::class,'userResetPassword']);
 
 Route::middleware(['auth:sanctum', 'validate.token'])->group(function () {
