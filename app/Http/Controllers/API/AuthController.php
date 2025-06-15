@@ -493,7 +493,15 @@ class AuthController extends Controller
             return response()->json(['message' => 'User not verfied yet.'], 500);
         }
         
-        $oneSignalService->sendToUser($user->device_token, 'Welcome!', 'Your profile has been created.');
+        $checkUserDeviceToken = deviceToken::find($user->pbu_id);
+        if($checkUserDeviceToken == null){
+            deviceToken::create([
+                'pbdt_user_id' => $user->pbu_id,
+                'pbdt_device_token' => $request->device_token,
+            ]);
+        }
+
+        $oneSignalService->sendToUser($checkUserDeviceToken->pbdt_device_token, 'Welcome!', 'Your profile has been created.');
 
         notification::create([
             'pbn_user_id' => $user->pbu_id,
