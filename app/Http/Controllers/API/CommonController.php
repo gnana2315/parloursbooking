@@ -887,7 +887,7 @@ class CommonController extends Controller
     public function testNotification()
     {
         $user = auth()->user();
-        $checkUserDeviceToken = deviceToken::where('pbdt_user_id', $user->pbu_id);
+        $checkUserDeviceToken = deviceToken::where('pbdt_user_id', $user->pbu_id)->first();
         dd($checkUserDeviceToken->pbdt_device_token);
 
         $oneSignalService->sendToUser($checkUserDeviceToken->pbdt_device_token, 'Welcome!', 'Your profile has been created.');

@@ -18,7 +18,6 @@ class deviceToken extends Model
     */
 	protected $primaryKey = 'pbdt_id';
     protected $fillable = [
-        'pbdt_id',
         'pbdt_user_id',
         'pbdt_device_token',
         'created_at',
