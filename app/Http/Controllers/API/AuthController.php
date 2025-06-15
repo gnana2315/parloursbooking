@@ -494,22 +494,21 @@ class AuthController extends Controller
             return response()->json(['message' => 'User not verfied yet.'], 500);
         }
         
-        $checkUserDeviceToken = deviceToken::where('pbdt_user_id', $user->pbu_id)->first()?->pbdt_device_token; // ✅
-
-        if($checkUserDeviceToken == null){
+        $checkUserDeviceToken = deviceToken::where('pbdt_user_id', $user->pbu_id);
+        if($checkUserDeviceToken->pbdt_device_token == null){
             deviceToken::create([
                 'pbdt_user_id' => $user->pbu_id,
                 'pbdt_device_token' => $request->device_token,
             ]);
+        }else{
+            $oneSignalService->sendToUser($checkUserDeviceToken->pbdt_device_token, 'Welcome!', 'Your profile has been created.');
+
+            notification::create([
+                'pbn_user_id' => $user->pbu_id,
+                'pbn_title' => 'Welcome!',
+                'pbn_message' => 'Your profile has been created.',
+            ]);
         }
-
-        $oneSignalService->sendToUser($checkUserDeviceToken->pbdt_device_token, 'Welcome!', 'Your profile has been created.');
-
-        notification::create([
-            'pbn_user_id' => $user->pbu_id,
-            'pbn_title' => 'Welcome!',
-            'pbn_message' => 'Your profile has been created.',
-        ]);
 
         $token_text = $user->pbu_id.'_user_login_session';
         $token = $user->createToken($token_text)->plainTextToken;
