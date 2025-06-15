@@ -9,9 +9,9 @@ use App\Models\User;
 use App\Models\customer;
 use App\Models\vendors;
 use App\Models\notification;
-use App\Models\deviceToken;
+// use App\Models\deviceToken;
 // use App\Services\FirebaseService;
-use App\Services\OneSignalService;
+// use App\Services\OneSignalService;
 
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
@@ -438,7 +438,6 @@ class AuthController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             @OA\Property(property="device_token", type="string", example="device_token_here"),
      *             @OA\Property(property="user_type", type="string", example="customer(2)/vendor(1)"),
      *             @OA\Property(property="phone_no", type="string", example="1234567890"),
      *             @OA\Property(property="password", type="string", example="secret123")
@@ -463,7 +462,8 @@ class AuthController extends Controller
      *     )
      * )
      */
-    public function userLogin(Request $request, OneSignalService $oneSignalService){
+    public function userLogin(Request $request){
+        //, OneSignalService $oneSignalService
         $request->validate(
             [
                 'user_type' => 'required',
@@ -494,22 +494,22 @@ class AuthController extends Controller
             return response()->json(['message' => 'User not verfied yet.'], 500);
         }
         
-        $checkUserDeviceToken = deviceToken::where('pbdt_user_id', $user->pbu_id);
-        dd($checkUserDeviceToken->pbdt_device_token);
-        if($checkUserDeviceToken->pbdt_device_token == null){
-            deviceToken::create([
-                'pbdt_user_id' => $user->pbu_id,
-                'pbdt_device_token' => $request->device_token,
-            ]);
-        }else{
-            $oneSignalService->sendToUser($checkUserDeviceToken->pbdt_device_token, 'Welcome!', 'Your profile has been created.');
+        // $checkUserDeviceToken = deviceToken::where('pbdt_user_id', $user->pbu_id);
+        // dd($checkUserDeviceToken->pbdt_device_token);
+        // if($checkUserDeviceToken->pbdt_device_token == null){
+        //     deviceToken::create([
+        //         'pbdt_user_id' => $user->pbu_id,
+        //         'pbdt_device_token' => $request->device_token,
+        //     ]);
+        // }else{
+        //     $oneSignalService->sendToUser($checkUserDeviceToken->pbdt_device_token, 'Welcome!', 'Your profile has been created.');
 
-            notification::create([
-                'pbn_user_id' => $user->pbu_id,
-                'pbn_title' => 'Welcome!',
-                'pbn_message' => 'Your profile has been created.',
-            ]);
-        }
+        //     notification::create([
+        //         'pbn_user_id' => $user->pbu_id,
+        //         'pbn_title' => 'Welcome!',
+        //         'pbn_message' => 'Your profile has been created.',
+        //     ]);
+        // }
 
         $token_text = $user->pbu_id.'_user_login_session';
         $token = $user->createToken($token_text)->plainTextToken;
