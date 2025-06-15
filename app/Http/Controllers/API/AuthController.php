@@ -496,7 +496,7 @@ class AuthController extends Controller
         $oneSignalService->sendToUser($user->device_token, 'Welcome!', 'Your profile has been created.');
 
         notification::create([
-            'pbn_user_id' => $user->id,
+            'pbn_user_id' => $user->pbu_id,
             'pbn_title' => 'Welcome!',
             'pbn_message' => 'Your profile has been created.',
         ]);
