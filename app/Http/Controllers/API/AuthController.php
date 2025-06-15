@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\customer;
 use App\Models\vendors;
 use App\Models\notification;
+use App\Models\deviceToken;
 // use App\Services\FirebaseService;
 use App\Services\OneSignalService;
 
