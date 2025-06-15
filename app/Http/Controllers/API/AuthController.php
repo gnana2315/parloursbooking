@@ -10,6 +10,7 @@ use App\Models\customer;
 use App\Models\vendors;
 use App\Models\notification;
 // use App\Services\FirebaseService;
+use App\Services\OneSignalService;
 
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
@@ -461,7 +462,7 @@ class AuthController extends Controller
      *     )
      * )
      */
-    public function userLogin(Request $request){
+    public function userLogin(Request $request, OneSignalService $oneSignalService){
         $request->validate(
             [
                 'user_type' => 'required',
@@ -491,6 +492,14 @@ class AuthController extends Controller
         if($user->pbu_mobileno_verified_at == null){
             return response()->json(['message' => 'User not verfied yet.'], 500);
         }
+        
+        $oneSignalService->sendToUser($user->device_token, 'Welcome!', 'Your profile has been created.');
+
+        notification::create([
+            'pbn_user_id' => $user->id,
+            'pbn_title' => 'Welcome!',
+            'pbn_message' => 'Your profile has been created.',
+        ]);
 
         $token_text = $user->pbu_id.'_user_login_session';
         $token = $user->createToken($token_text)->plainTextToken;
