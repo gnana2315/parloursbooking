@@ -431,7 +431,7 @@ class AuthController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/api/user-login",
+     *     path="/api/userLogin",
      *     summary="User login",
      *     description="Login user by phone number and password. Returns access token and user details.",
      *     tags={"Authentication"},
