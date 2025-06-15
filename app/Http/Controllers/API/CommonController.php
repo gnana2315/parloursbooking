@@ -888,7 +888,7 @@ class CommonController extends Controller
     {
         $user = auth()->user();
         $checkUserDeviceToken = deviceToken::where('pbdt_user_id', $user->pbu_id);
-        dd($checkUserDeviceToken);
+        dd($checkUserDeviceToken->pbdt_device_token);
 
         $oneSignalService->sendToUser($checkUserDeviceToken->pbdt_device_token, 'Welcome!', 'Your profile has been created.');
 
