@@ -883,4 +883,19 @@ class CommonController extends Controller
             'message' => 'Device token stored successfully',
         ], 200);
     }
+
+    public function testNotification()
+    {
+        $user = auth()->user();
+        $checkUserDeviceToken = deviceToken::where('pbdt_user_id', $user->pbu_id);
+        dd($checkUserDeviceToken);
+
+        $oneSignalService->sendToUser($checkUserDeviceToken->pbdt_device_token, 'Welcome!', 'Your profile has been created.');
+
+        notification::create([
+            'pbn_user_id' => $user->pbu_id,
+            'pbn_title' => 'Welcome!',
+            'pbn_message' => 'Your profile has been created.',
+        ]);
+    }
 }

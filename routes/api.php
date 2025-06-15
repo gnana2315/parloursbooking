@@ -62,6 +62,7 @@ Route::middleware(['auth:sanctum', 'validate.token'])->group(function () {
     Route::get('/getAllPromoCodes', [CommonController::class, 'getAllPromoCodes']);
     Route::get('/cities', [CommonController::class, 'getCities']);
     Route::post('/storeDeviceToken', [CommonController::class, 'storeDeviceToken']);
+    Route::get('/testNotification', [CommonController::class, 'testNotification']);
 
     //booking
     Route::get('/getBookingSlots', [BookingController::class, 'getBookingSlots']);
