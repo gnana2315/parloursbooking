@@ -494,7 +494,7 @@ class AuthController extends Controller
             return response()->json(['message' => 'User not verfied yet.'], 500);
         }
         
-        $checkUserDeviceToken = deviceToken::find($user->pbu_id);
+        $checkUserDeviceToken = deviceToken::find('pbdt_user_id', $user->pbu_id);
         if($checkUserDeviceToken == null){
             deviceToken::create([
                 'pbdt_user_id' => $user->pbu_id,
