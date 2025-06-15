@@ -495,6 +495,7 @@ class AuthController extends Controller
         }
         
         $checkUserDeviceToken = deviceToken::where('pbdt_user_id', $user->pbu_id);
+        dd($checkUserDeviceToken->pbdt_device_token);
         if($checkUserDeviceToken->pbdt_device_token == null){
             deviceToken::create([
                 'pbdt_user_id' => $user->pbu_id,
