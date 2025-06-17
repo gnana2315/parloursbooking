@@ -121,7 +121,7 @@ class BookingController extends Controller
             while ($currentStart->copy()->addMinutes($serviceDuration)->lte($closeTime)) {
                 $finalSlots[] = [
                     'start' => $currentStart->format('H:i:s'),
-                    'end' => clone $currentStart->addMinutes($serviceDuration)->format('H:i:s'),
+                    'end' => (clone $currentStart)->addMinutes($serviceDuration)->format('H:i:s'),
                 ];
                 $currentStart->addMinutes($serviceDuration);
             }
@@ -157,7 +157,7 @@ class BookingController extends Controller
                 while ($startTime->copy()->addMinutes($serviceDuration)->lte($endTime)) {
                     $finalSlots[] = [
                         'start' => $startTime->format('H:i:s'),
-                        'end' => clone $startTime->addMinutes($serviceDuration)->format('H:i:s'),
+                        'end' => (clone $startTime)->addMinutes($serviceDuration)->format('H:i:s'),
                     ];
                     $startTime->addMinutes($serviceDuration);
                 }
