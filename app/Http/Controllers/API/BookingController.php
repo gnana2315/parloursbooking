@@ -82,19 +82,7 @@ class BookingController extends Controller
         * )
     */
     public function getBookingSlots(Request $request){
-        $user = auth()->user();        
-
-        // $request->validate(
-        //     [
-        //         'vendor_id' => 'required',
-        //         'booking_date' => 'required',
-        //         'service_total_duration' => 'required',
-        //     ],
-        //     [
-        //         'vendor_id.required' => 'Vendor ID is required',
-        //         'booking_date.required' => 'Booking date is required',                
-        //     ]
-        // );
+        $user = auth()->user();  
         
         $availableSlots = [];
         $finalSlots = [];
@@ -127,14 +115,12 @@ class BookingController extends Controller
 
         $availableSlots = [];
         $finalSlots = [];
-        // $currentStart = $openTime->copy();
         $currentStart = clone $openTime;
 
         if ($existingBookings->isEmpty()) {
             while ($currentStart->copy()->addMinutes($serviceDuration)->lte($closeTime)) {
                 $finalSlots[] = [
                     'start' => $currentStart->format('H:i:s'),
-                    // 'end' => $currentStart->copy()->addMinutes($serviceDuration)->format('H:i:s'),
                     'end' => clone $currentStart->addMinutes($serviceDuration)->format('H:i:s'),
                 ];
                 $currentStart->addMinutes($serviceDuration);
@@ -146,23 +132,18 @@ class BookingController extends Controller
 
                 if ($currentStart->lt($bookingStart)) {
                     $availableSlots[] = [
-                        // 'start' => $currentStart->copy(),
-                        // 'end' => $bookingStart->copy(),
                         'start' => clone $currentStart,
                         'end' => clone $bookingStart,
                     ];
                 }
 
                 if ($currentStart->lt($bookingEnd)) {
-                    // $currentStart = $bookingEnd->copy();
                     $currentStart = clone $bookingEnd;
                 }
             }
 
             if ($currentStart->lt($closeTime)) {
                 $availableSlots[] = [
-                    // 'start' => $currentStart->copy(),
-                    // 'end' => $closeTime->copy(),
                     'start' => clone $currentStart,
                     'end' => clone $closeTime,
                 ];
@@ -176,7 +157,6 @@ class BookingController extends Controller
                 while ($startTime->copy()->addMinutes($serviceDuration)->lte($endTime)) {
                     $finalSlots[] = [
                         'start' => $startTime->format('H:i:s'),
-                        // 'end' => $startTime->copy()->addMinutes($serviceDuration)->format('H:i:s'),
                         'end' => clone $startTime->addMinutes($serviceDuration)->format('H:i:s'),
                     ];
                     $startTime->addMinutes($serviceDuration);
