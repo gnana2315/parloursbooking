@@ -2,6 +2,7 @@
 
 namespace App\Models;
 use App\Models\bookingDetail;
+use App\Models\vendors;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -41,6 +42,9 @@ class booking extends Model
         'deleted_at',
     ];
 
+    public function vendors(){
+        return $this->belongsTo(vendors::class, 'pbb_vendor_id');
+    }
     public function bookingDetails(){
         return $this->hasMany(bookingDetail::class, 'pbbd_booking_id', 'pbb_id');
     }

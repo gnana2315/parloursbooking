@@ -243,7 +243,7 @@ class CustomersController extends Controller
                 'message' => 'Customer not found',
             ], 404);
         }
-        $bookings = $customer->bookings()->with('bookingDetails')->get();
+        $bookings = $customer->bookings()->with(['vendors','bookingDetails.services'])->get();
         //dd($bookings);
         return response()->json([
             'message' => 'Bookings retrieved successfully',

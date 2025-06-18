@@ -2,6 +2,7 @@
 
 namespace App\Models;
 use App\Models\booking;
+use App\Models\services;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -36,8 +37,11 @@ class bookingDetail extends Model
         'deleted_at',
     ];
 
-    public function booking()
-    {
+    public function booking(){
         return $this->belongsTo(booking::class);
+    }
+
+    public function services(){
+        return $this->belongsTo(services::class, 'pbbd_service_id', 'pbs_id');
     }
 }
