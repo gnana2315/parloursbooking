@@ -9,7 +9,7 @@ use App\Models\booking;
 use App\Models\bookingDetail;
 use App\Models\vendorStandardAvailability;
 use App\Models\vendorSpecialCloses;
-use App\Models\vendorServices;
+use App\Models\services;
 use Validator;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
@@ -283,7 +283,7 @@ class BookingController extends Controller
             $booking_details = json_decode($request->booking_details, true);
             $total_amount = 0;
             foreach($booking_details as $key => $value){
-                $service = vendorServices::where('pbvs_id', $value['service_id'])->first();
+                $service = services::where('pbs_id', $value['service_id'])->first();
                 if($service){
                     $total_amount += $service->pbvs_price;
                     bookingDetail::create([

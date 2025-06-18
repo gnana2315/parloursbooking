@@ -28,6 +28,7 @@ class services extends Model
         'pbs_name',
         'pbs_description',
         'pbs_duration',
+        'pbs_duration_cetegory  ',
         'pbs_image',
         'pbs_price',
         'pbs_employees',
