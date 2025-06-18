@@ -252,7 +252,7 @@ class CustomersController extends Controller
                 $totalAmount += $detail->pbbd_amount; // assuming this is the amount field
             }
         }
-        $bookings->total_amount = $totalAmount;
+        $bookings['total_amount'] = $totalAmount;
         //dd($bookings);
         return response()->json([
             'message' => 'Bookings retrieved successfully',
