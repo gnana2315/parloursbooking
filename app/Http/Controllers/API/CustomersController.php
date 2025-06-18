@@ -251,8 +251,11 @@ class CustomersController extends Controller
             $total = $booking->bookingDetails->sum('pbbd_total_amount');
             return [
                 'booking_id' => $booking->pbb_id,
+                'booking_ref_no' => $booking->pbb_ref_no,
                 'vendor' => $booking->vendor->pbv_business_name ?? null,
                 'booking_date' => $booking->pbb_booking_date,
+                'booking_start_time' => $booking->pbb_booking_start_time,
+                'booking_end_time' => $booking->pbb_booking_end_time,
                 'total_amount' => $total,
                 'services' => $booking->bookingDetails->map(function ($detail) {
                     return [
