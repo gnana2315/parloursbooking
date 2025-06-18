@@ -252,7 +252,7 @@ class CustomersController extends Controller
             return [
                 'booking_id' => $booking->pbb_id,
                 'booking_ref_no' => $booking->pbb_ref_no,
-                'vendor' => $booking->vendor->pbv_business_name ?? null,
+                'vendor' => $booking->vendors->pbv_business_name ?? null,
                 'booking_date' => $booking->pbb_booking_date,
                 'booking_start_time' => $booking->pbb_booking_start_time,
                 'booking_end_time' => $booking->pbb_booking_end_time,
@@ -260,7 +260,7 @@ class CustomersController extends Controller
                 'status' => $booking->pbb_status,
                 'services' => $booking->bookingDetails->map(function ($detail) {
                     return [
-                        'service_name' => $detail->service->pbvs_name ?? null,
+                        'service_name' => $detail->services->pbs_name ?? null,
                         'amount' => $detail->pbbd_total_amount,
                     ];
                 }),
