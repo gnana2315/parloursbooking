@@ -305,6 +305,8 @@ class BookingController extends Controller
                 'message' => 'Booking added successfully',
                 'data' => [
                     'booking_id' => $addbooking->pbb_id,
+                    'booking_ref_no' => $addbooking->pbb_ref_no,
+                    'vendor_id' => $addbooking->pbb_vendor_id,
                     'total_amount' => $total_amount
                 ]
             ], 200);
