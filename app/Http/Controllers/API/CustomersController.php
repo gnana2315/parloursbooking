@@ -245,18 +245,33 @@ class CustomersController extends Controller
         }
         $bookings = $customer->bookings()->with(['vendors','bookingDetails.services'])->get();
 
-        $totalAmount = 0;
+        // $totalAmount = 0;
 
-        foreach ($bookings as $booking) {
-            foreach ($booking->bookingDetails as $detail) {
-                $totalAmount += $detail->pbbd_amount; // assuming this is the amount field
-            }
-        }
-        $bookings['total_amount'] = $totalAmount;
+        $bookingsWithTotal = $bookings->map(function ($booking) {
+            $total = $booking->bookingDetails->sum('pbbd_total_amount');
+            return [
+                'booking_id' => $booking->pbb_id,
+                'vendor' => $booking->vendor->pbv_business_name ?? null,
+                'booking_date' => $booking->pbb_booking_date,
+                'total_amount' => $total,
+                'services' => $booking->bookingDetails->map(function ($detail) {
+                    return [
+                        'service_name' => $detail->service->pbvs_name ?? null,
+                        'amount' => $detail->pbbd_total_amount,
+                    ];
+                }),
+            ];
+        });
+        // foreach ($bookings as $booking) {
+        //     foreach ($booking->bookingDetails as $detail) {
+        //         $totalAmount += $detail->pbbd_amount; // assuming this is the amount field
+        //     }
+        // }
+        // $bookings['total_amount'] = $bookingsWithTotal;
         //dd($bookings);
         return response()->json([
             'message' => 'Bookings retrieved successfully',
-            'data' => $bookings
+            'data' => $bookingsWithTotal
         ], 200);
     }
 }
