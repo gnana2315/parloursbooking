@@ -280,7 +280,8 @@ class BookingController extends Controller
         ]);
 
         if($addbooking){
-            $booking_details = json_decode($request->booking_details, true);
+            // $booking_details = json_decode($request->booking_details, true);
+            $booking_details = $request->booking_details;
             $total_amount = 0;
             foreach($booking_details as $key => $value){
                 $service = services::where('pbs_id', $value['service_id'])->first();
