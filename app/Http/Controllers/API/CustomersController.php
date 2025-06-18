@@ -244,6 +244,15 @@ class CustomersController extends Controller
             ], 404);
         }
         $bookings = $customer->bookings()->with(['vendors','bookingDetails.services'])->get();
+
+        $totalAmount = 0;
+
+        foreach ($bookings as $booking) {
+            foreach ($booking->bookingDetails as $detail) {
+                $totalAmount += $detail->pbbd_amount; // assuming this is the amount field
+            }
+        }
+        $bookings->total_amount = $totalAmount;
         //dd($bookings);
         return response()->json([
             'message' => 'Bookings retrieved successfully',
