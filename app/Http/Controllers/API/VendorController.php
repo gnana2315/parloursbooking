@@ -844,10 +844,10 @@ class VendorController extends Controller
         $vendor_results = vendors::where('pbv_id', $vendor_id)
                 ->join('vendor_config', 'vendor_config.pbvc_vendorid', '=', 'vendor.pbv_id')
                 ->join('services', 'services.pbs_vendor_id', '=', 'vendor.pbv_id') 
-                // ->where('vendor.pbv_status', 1)
+                ->where('vendor.pbv_status', 1)
                 ->get();        
         
-        if (!$vendor_results) {
+        if (!$vendor_results || $vendor_results->isNull()) {
             return response()->json(['message' => 'Vendor not found'], 404);
         }
         
