@@ -860,7 +860,7 @@ class VendorController extends Controller
             return response()->json(['message' => 'Vendor not found'], 404);
         }
         
-        $vendors = $vendor_results->first();
+        // $vendors = $vendor_results->first();
         
         // $final_vendors = [
         //     'id' => $vendors->pbv_id,
@@ -891,11 +891,11 @@ class VendorController extends Controller
         $customer = customer::where('pbc_user_id', $user->pbu_id)->first();
         $favourites = $customer->pbc_fav ?? [];
         
-        $vendors['isFav'] = in_array($vendors->pbv_id, $favourites);
+        $vendor_results['isFav'] = in_array($vendor_results->pbv_id, $favourites);
 
         return response()->json([
             'success' => true,
-            'data' => $vendors
+            'data' => $vendor_results
         ], 200);
     }
 }
