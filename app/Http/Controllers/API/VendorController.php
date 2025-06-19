@@ -859,7 +859,8 @@ class VendorController extends Controller
         if (!$vendor_results || $vendor_results->isEmpty()) {
             return response()->json(['message' => 'Vendor not found'], 404);
         }
-        dd($vendor_results);
+        print_r('<pre>');
+        print_r($vendor_results);die();
         // $vendors = $vendor_results->first();
         
         // $final_vendors = [
