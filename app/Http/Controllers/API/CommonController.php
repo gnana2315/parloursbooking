@@ -903,7 +903,7 @@ class CommonController extends Controller
     {
         $user = auth()->user();
         // $notifications = notification::where('pbn_user_id', $user->pbu_id)->orderBy('created_at', 'desc')->get();
-       $notifications = [
+        $notifications = [
             [
                 "id" => 1,
                 "title" => "Booking Confirmed",
