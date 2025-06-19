@@ -848,12 +848,9 @@ class VendorController extends Controller
                 ->join('services', 'services.pbs_vendor_id', '=', 'vendor.pbv_id')
                 ->select(
                     'vendor.*',
-                    'vendor_config.pbvc_display_name',
-                    'vendor_standard_availability.pbvsa_start_time',
-                    'vendor_standard_availability.pbvsa_end_time',
-                    'vendor_standard_availability.pbvsa_day',
-                    'vendor_standard_availability.pbvsa_is_open',
-                    'cities.pbc_cityname'
+                    'vendor_config.*',
+                    'vendor_standard_availability.*',
+                    'cities.*'
                 )
                 ->where('vendor.pbv_status', 1)
                 ->get();        
