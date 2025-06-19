@@ -929,7 +929,8 @@ class CommonController extends Controller
                 "created_at" => "2025-06-15 14:20:00"
             ]
         ];
-        if ($notifications->isEmpty()) {
+        $notificationlist = collect($notifications);
+        if ($notificationlist->isEmpty()) {
             return response()->json([
                 'success' => false,
                 'message' => 'No notifications found'
@@ -938,7 +939,7 @@ class CommonController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $notifications
+            'data' => $notificationlist
         ], 200);
     }
 }
