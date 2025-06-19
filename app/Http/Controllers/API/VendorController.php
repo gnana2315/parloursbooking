@@ -843,9 +843,8 @@ class VendorController extends Controller
         $user = auth()->user();
         $vendor_results = vendors::where('pbv_id', $vendor_id)
                 ->join('vendor_config', 'vendor_config.pbvc_vendorid', '=', 'vendor.pbv_id')
-                ->leftJoin('services', 'services.pbs_vendor_id', '=', 'vendor.pbv_id') 
+                ->join('services', 'services.pbs_vendor_id', '=', 'vendor.pbv_id') 
                 ->where('vendor.pbv_status', 1)
-                ->distinct()
                 ->get();        
         
         if (!$vendor_results) {
@@ -853,7 +852,7 @@ class VendorController extends Controller
         }
         
         $vendors = $vendor_results->first();
-        
+        dd($vendors);
         $final_vendors = [
             'id' => $vendors->pbv_id,
             'business_name' => $vendors->pbv_business_name,
