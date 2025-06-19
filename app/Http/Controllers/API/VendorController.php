@@ -852,7 +852,7 @@ class VendorController extends Controller
         }
         
         $vendors = $vendor_results->first();
-        dd($vendors);
+        
         $final_vendors = [
             'id' => $vendors->pbv_id,
             'business_name' => $vendors->pbv_business_name,
