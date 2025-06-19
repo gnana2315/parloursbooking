@@ -861,40 +861,40 @@ class VendorController extends Controller
         
         $vendors = $vendor_results->first();
         
-        $final_vendors = [
-            'id' => $vendors->pbv_id,
-            'business_name' => $vendors->pbv_business_name,
-            'city' => $vendors->pbv_city,
-            'lat' => $vendors->pbv_lat,
-            'lon' => $vendors->pbv_lon,
-            'contact_no' => $vendors->pbv_contact_no,
-            'logo' => $vendors->pbvc_logo,
-            'status' => $vendors->pbv_status,
-            'services' => $vendor_results->map(function ($vendor) {
-                return [
-                    'id' => $vendor->pbs_id,
-                    'name' => $vendor->pbs_name,
-                    'description' => $vendor->pbs_description,
-                    'duration_category' => $vendor->pbs_duration_cetegory,                    
-                    'image' => $vendor->pbs_image,
-                    'emloyee' => $vendor->pbs_employees,
-                    'duration' => $vendor->pbs_duration,
-                    'price' => (float) $vendor->pbs_price,
-                    'type' => $vendor->pbs_service_type,
-                    "status" => $vendor->pbs_status
-                ];
-            })->values()->all()
-        ];
+        // $final_vendors = [
+        //     'id' => $vendors->pbv_id,
+        //     'business_name' => $vendors->pbv_business_name,
+        //     'city' => $vendors->pbv_city,
+        //     'lat' => $vendors->pbv_lat,
+        //     'lon' => $vendors->pbv_lon,
+        //     'contact_no' => $vendors->pbv_contact_no,
+        //     'logo' => $vendors->pbvc_logo,
+        //     'status' => $vendors->pbv_status,
+        //     'services' => $vendor_results->map(function ($vendor) {
+        //         return [
+        //             'id' => $vendor->pbs_id,
+        //             'name' => $vendor->pbs_name,
+        //             'description' => $vendor->pbs_description,
+        //             'duration_category' => $vendor->pbs_duration_cetegory,                    
+        //             'image' => $vendor->pbs_image,
+        //             'emloyee' => $vendor->pbs_employees,
+        //             'duration' => $vendor->pbs_duration,
+        //             'price' => (float) $vendor->pbs_price,
+        //             'type' => $vendor->pbs_service_type,
+        //             "status" => $vendor->pbs_status
+        //         ];
+        //     })->values()->all()
+        // ];
 
         // Add favorite flag
         $customer = customer::where('pbc_user_id', $user->pbu_id)->first();
         $favourites = $customer->pbc_fav ?? [];
         
-        $final_vendors['isFav'] = in_array($vendors->pbv_id, $favourites);
+        $vendors['isFav'] = in_array($vendors->pbv_id, $favourites);
 
         return response()->json([
             'success' => true,
-            'data' => $final_vendors
+            'data' => $vendors
         ], 200);
     }
 }
