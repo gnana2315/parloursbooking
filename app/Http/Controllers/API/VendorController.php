@@ -847,8 +847,7 @@ class VendorController extends Controller
                 ->where('vendor.pbv_status', 1)
                 ->get();        
         
-        dd($vendor_results);
-        if (!$vendor_results || $vendor_results == null) {
+        if (!$vendor_results || $vendor_results->isEmpty()) {
             return response()->json(['message' => 'Vendor not found'], 404);
         }
         
