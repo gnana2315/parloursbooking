@@ -849,7 +849,8 @@ class VendorController extends Controller
                     'vendor.*',
                     'vendor_config.*',
                     'vendor_standard_availability.*',
-                    'cities.*'
+                    'cities.*',
+                    'services.*'
                 )
                 ->where('pbv_id', $vendor_id)
                 ->where('vendor.pbv_status', 1)
