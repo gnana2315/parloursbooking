@@ -845,6 +845,7 @@ class VendorController extends Controller
                 ->join('vendor_config', 'vendor_config.pbvc_vendorid', '=', 'vendor.pbv_id')
                 ->leftJoin('services', 'services.pbs_vendor_id', '=', 'vendor.pbv_id') 
                 ->where('vendor.pbv_status', 1)
+                ->distinct()
                 ->get();        
         
         if (!$vendor_results) {
