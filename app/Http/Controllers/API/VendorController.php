@@ -843,9 +843,17 @@ class VendorController extends Controller
         $user = auth()->user();
         $vendor_results = vendors::where('pbv_id', $vendor_id)
                 ->join('vendor_config', 'vendor_config.pbvc_vendorid', '=', 'vendor.pbv_id')
-                ->join('vendor_standard_availability', 'vendor_standard_availability.pbvsa_vendor_id', '=', 'vendor.pbv_id')
                 ->join('cities', 'cities.pbc_cid', '=', 'vendor.pbv_city')
-                ->join('services', 'services.pbs_vendor_id', '=', 'vendor.pbv_id') 
+                ->join('services', 'services.pbs_vendor_id', '=', 'vendor.pbv_id')
+                ->select(
+                    'vendor.*',
+                    'vendor_config.pbvc_display_name',
+                    'vendor_standard_availability.pbvsa_start_time',
+                    'vendor_standard_availability.pbvsa_end_time',
+                    'vendor_standard_availability.pbvsa_day',
+                    'vendor_standard_availability.pbvsa_is_open',
+                    'cities.pbc_cityname'
+                )
                 ->where('vendor.pbv_status', 1)
                 ->get();        
         
