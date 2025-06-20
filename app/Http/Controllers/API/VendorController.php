@@ -861,42 +861,49 @@ class VendorController extends Controller
         }
         // print_r('<pre>');
         // print_r($vendor_results);die();
-        // $vendors = $vendor_results->first();
-        
-        // $final_vendors = [
-        //     'id' => $vendors->pbv_id,
-        //     'business_name' => $vendors->pbv_business_name,
-        //     'city' => $vendors->pbv_city,
-        //     'lat' => $vendors->pbv_lat,
-        //     'lon' => $vendors->pbv_lon,
-        //     'contact_no' => $vendors->pbv_contact_no,
-        //     'logo' => $vendors->pbvc_logo,
-        //     'status' => $vendors->pbv_status,
-        //     'services' => $vendor_results->map(function ($vendor) {
-        //         return [
-        //             'id' => $vendor->pbs_id,
-        //             'name' => $vendor->pbs_name,
-        //             'description' => $vendor->pbs_description,
-        //             'duration_category' => $vendor->pbs_duration_cetegory,                    
-        //             'image' => $vendor->pbs_image,
-        //             'emloyee' => $vendor->pbs_employees,
-        //             'duration' => $vendor->pbs_duration,
-        //             'price' => (float) $vendor->pbs_price,
-        //             'type' => $vendor->pbs_service_type,
-        //             "status" => $vendor->pbs_status
-        //         ];
-        //     })->values()->all()
-        // ];
+        $vendors = $vendor_results->first();
 
+        $availability = $vendor_raw_data->map(function ($item) {
+            return [
+                'day' => $item->pbvsa_day,
+                'start_time' => $item->pbvsa_start_time,
+                'end_time' => $item->pbvsa_end_time,
+                'is_open' => $item->pbvsa_is_open,
+            ];
+        })->toArray();        
+        
         // Add favorite flag
         $customer = customer::where('pbc_user_id', $user->pbu_id)->first();
         $favourites = $customer->pbc_fav ?? [];
-        
-        $vendor_results['isFav'] = in_array($vendor_results->first()->pbv_id, $favourites);
+
+        $isFav = in_array($vendor_results->first()->pbv_id, $favourites);
+
+        $final_vendors = [
+            'id' => $vendor->pbv_id,
+            'tenentid' => $vendor->pbv_tenentid,
+            'servicefor' => $vendor->pbv_servicefor,
+            'vendortype' => $vendor->pbv_vendortype,
+            'business_name' => $vendor->pbv_business_name,
+            'documents' => $vendor->pbv_documents,
+            'brno' => $vendor->pbv_brno,
+            'email' => $vendor->pbv_email,
+            'contact_no' => $vendor->pbv_contactno,
+            'address' => $vendor->pbv_address,
+            'city' => $vendor->pbc_cityname,
+            'longatitude' => $vendor->pbv_longatitude,
+            'latitude' => $vendor->pbv_latitude,
+            'status' => $vendor->pbv_status,
+            'created_at' => $vendor->pbv_created_at,
+            'display_name' => $vendor->pbvc_display_name,
+            'logo' => $vendor->pbvc_logo,
+            'service_at_time' => $vendor->pbvc_service_at_time,
+            'availability' => $availability,
+            'isFav' => $isFav
+        ];
 
         return response()->json([
             'success' => true,
-            'data' => $vendor_results
+            'data' => $final_vendors
         ], 200);
     }
 }
