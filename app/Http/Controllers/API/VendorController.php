@@ -863,7 +863,7 @@ class VendorController extends Controller
         // print_r($vendor_results);die();
         $vendors = $vendor_results->first();
 
-        $availability = $vendor_raw_data->map(function ($item) {
+        $availability = $vendor_results->map(function ($item) {
             return [
                 'day' => $item->pbvsa_day,
                 'start_time' => $item->pbvsa_start_time,
