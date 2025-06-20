@@ -861,7 +861,7 @@ class VendorController extends Controller
         }
         // print_r('<pre>');
         // print_r($vendor_results);die();
-        $vendors = $vendor_results->first();
+        $vendor = $vendor_results->first();
 
         $availability = $vendor_results->map(function ($item) {
             return [
