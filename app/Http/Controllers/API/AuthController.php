@@ -106,7 +106,6 @@ class AuthController extends Controller
         $message = "Your OTP code is {$verfivation_code}. It is valid for 10 minutes. Please do not share this code with anyone.";
 
         // Store OTP to DB/Cache if needed here
-
         $result = $this->smsService->sendMessage($apiKey, [$request->phone_no], $message, $sender);       
 
         return response()->json([
@@ -142,8 +141,8 @@ class AuthController extends Controller
      */
     public function resendOtp(Request $request) {
     
-        $otp = $this->generateVerificationCode($request->user_id);
-    
+        $otp = $this->generateVerificationCode($request->user_id);    
+        
         // optionally send OTP via SMS or email
         return response()->json([
             'message' => 'OTP resent successfully.',
@@ -605,7 +604,14 @@ class AuthController extends Controller
         // Find user by mobile number
         $user = User::where('pbu_mobileno', $request->phone_no)->first();
 
-        $this->generateVerificationCode($user->pbu_id); 
+        $verfivation_code = $this->generateVerificationCode($user->pbu_id); 
+
+        $apiKey = config('dialogesms.api_key');
+        $sender = config('dialogesms.sender');
+        $message = "Your OTP code is {$verfivation_code}. It is valid for 10 minutes. Please do not share this code with anyone.";
+
+        // Store OTP to DB/Cache if needed here
+        $result = $this->smsService->sendMessage($apiKey, [$request->phone_no], $message, $sender);
         
         $token_text = $user->pbu_id.'_user_password_reset_session';
         $token = $user->createToken($token_text)->plainTextToken;
