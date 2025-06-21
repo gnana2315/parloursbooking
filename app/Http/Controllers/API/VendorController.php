@@ -404,9 +404,9 @@ class VendorController extends Controller
         ], $status);
     }
 
-    public function getVendorDocumentsByID(){
+    public function getVendorDocuments(){
         $user = auth()->user();
-        dd($user);
+        var_dump($user);die();
         $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
         if (!$vendor) {
             return response()->json(['message' => 'Vendor not found'], 404);
