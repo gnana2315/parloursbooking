@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 
 use App\Http\Controllers\API\CustomersController;
 use App\Http\Controllers\API\VendorController;
@@ -28,7 +29,20 @@ Route::post('/userLogin',[AuthController::class,'userLogin']);
 Route::post('/userForgotPassword',[AuthController::class,'userForgotPassword']);
 Route::post('/userResetPassword',[AuthController::class,'userResetPassword']);
 
-use Illuminate\Support\Facades\Storage;
+Route::get('/test-s3-config', function () {
+    try {
+        $disk = Storage::disk('s3');
+        $exists = $disk->exists(''); // just testing access
+
+        return response()->json([
+            'connected' => true,
+            'bucket' => env('AWS_BUCKET'),
+            'region' => env('AWS_DEFAULT_REGION'),
+        ]);
+    } catch (\Exception $e) {
+        return response()->json(['connected' => false, 'error' => $e->getMessage()], 500);
+    }
+});
 
 Route::post('/test-s3-upload', function (Request $request) {
     try {
