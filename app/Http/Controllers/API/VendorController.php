@@ -416,11 +416,10 @@ class VendorController extends Controller
         if (!$documents) {
             return response()->json(['message' => 'No documents found'], 404);
         }
-        dd($documents);
         $document_paths = [];
         foreach ($documents as $document) {
             foreach ($document as $key => $value) {
-                $document_paths[] = [
+                $document_paths[$key] = [
                     'name' => $value['name'],
                     'path' => asset('uploads/vendors/' . $value['name']),
                 ];
