@@ -34,6 +34,12 @@ use Validator;
 
 class AuthController extends Controller
 {
+    protected $smsService;
+
+    public function __construct(DialogESMSService $smsService)
+    {
+        $this->smsService = $smsService;
+    }
     /**
      * @OA\Post(
      *      path="/api/userMobileRegister",
@@ -93,7 +99,15 @@ class AuthController extends Controller
             'pbu_status' => 0
         ]);
         //dd($user);
-        $verfivation_code = $this->generateVerificationCode($user->pbu_id);        
+        $verfivation_code = $this->generateVerificationCode($user->pbu_id);
+
+        $apiKey = config('dialogesms.api_key');
+        $sender = config('dialogesms.sender');
+        $message = "Your OTP code is {$verfivation_code}. It is valid for 10 minutes. Please do not share this code with anyone.";
+
+        // Store OTP to DB/Cache if needed here
+
+        $result = $this->smsService->sendMessage($apiKey, [$request->phone_no], $message, $sender);       
 
         return response()->json([
             'message' => 'User registered successfully. Please check the OTP in you phone.',
@@ -137,7 +151,7 @@ class AuthController extends Controller
         ]);
     }
 
-    public function generateVerificationCode($user_id, DialogESMSService $smsService){        
+    public function generateVerificationCode($user_id){        
         $user = User::find($user_id);
         if (!$user) {
             return response()->json(['message' => 'User not found'], 404);
@@ -149,15 +163,7 @@ class AuthController extends Controller
         $user->update([
             'pbu_verification_token' => $verificationCode,
             'pbu_verification_token_expires_at' => $expiresAt,
-        ]);
-
-        $apiKey = config('dialogesms.api_key');
-        $sender = config('dialogesms.sender');
-        $message = "Your OTP code is {$verificationCode}. It is valid for 10 minutes. Please do not share this code with anyone.";
-
-        // Store OTP to DB/Cache if needed here
-
-        $result = $smsService->sendMessage($apiKey, [$request->phone], $message, $sender);
+        ]);        
 
         return $verificationCode;
     }
