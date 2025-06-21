@@ -309,7 +309,7 @@ class VendorController extends Controller
             // $br_document_file->move(public_path('uploads/vendors'), $br_document_filename);
             $path = $br_document_file->storeAs('vendors', $br_document_filename, 's3');
             $url = Storage::disk('s3')->url($path);
-
+            dd($url);
             $request->merge(['br_document' => $br_document_filename]);
             // $br_document_path = public_path('uploads/vendors') . '/' . $br_document_filename;
 
