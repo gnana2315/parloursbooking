@@ -222,7 +222,7 @@ class VendorController extends Controller
      *              required={
      *                  "br_document",
      *                  "certification",
-     *                  "address_proof",
+     *                  "address_proof_document",
      *                  "nic_document",
      *                  "police_report",
      *                  "experience_letter",
@@ -230,7 +230,7 @@ class VendorController extends Controller
      *              },
      *              @OA\Property(property="br_document", type="file", example=""),
      *              @OA\Property(property="certification", type="file", example=""),
-     *              @OA\Property(property="address_proof", type="file", example=""),
+     *              @OA\Property(property="address_proof_document", type="file", example=""),
      *              @OA\Property(property="nic_document", type="file", example=""),
      *              @OA\Property(property="police_report", type="file", example=""),
      *              @OA\Property(property="experience_letter", type="file", example=""),
@@ -402,6 +402,34 @@ class VendorController extends Controller
         return response()->json([
             'message' => $message
         ], $status);
+    }
+
+    public function getVendorDocumentsByID(){
+        $user = auth()->user();
+
+        $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
+        if (!$vendor) {
+            return response()->json(['message' => 'Vendor not found'], 404);
+        }
+
+        $documents = json_decode($vendor->pbv_documents, true);
+        if (!$documents) {
+            return response()->json(['message' => 'No documents found'], 404);
+        }
+        $document_paths = [];
+        foreach ($documents as $document) {
+            foreach ($document as $key => $value) {
+                $document_paths[] = [
+                    'name' => $value['name'],
+                    'path' => asset('uploads/vendors/' . $value['name']),
+                ];
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $document_paths,
+        ], 200);
     }
 
     /**
@@ -884,7 +912,6 @@ class VendorController extends Controller
             'servicefor' => $vendor->pbv_servicefor,
             'vendortype' => $vendor->pbv_vendortype,
             'business_name' => $vendor->pbv_business_name,
-            'documents' => $vendor->pbv_documents,
             'brno' => $vendor->pbv_brno,
             'email' => $vendor->pbv_email,
             'contact_no' => $vendor->pbv_contactno,
