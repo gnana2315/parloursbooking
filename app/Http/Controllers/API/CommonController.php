@@ -12,6 +12,7 @@ use App\Models\vendorSpecialCloses;
 use App\Models\promoCode;
 use App\Models\cities;
 use App\Models\deviceToken;
+use App\Services\DialogESMSService;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
@@ -941,5 +942,26 @@ class CommonController extends Controller
             'success' => true,
             'data' => $notificationlist
         ], 200);
+    }
+
+    public function sendOTP(Request $request, DialogESMSService $smsService)
+    {
+        $request->validate([
+            'phone' => 'required|string',
+        ]);
+
+        $apiKey = config('dialogesms.api_key');
+        $sender = "Test";
+        $otp = rand(100000, 999999);
+        $message = "Your OTP code is {$otp}";
+
+        // Store OTP to DB/Cache if needed here
+
+        $result = $smsService->sendMessage($apiKey, [$request->phone], $message, $sender);
+
+        return response()->json([
+            'status' => $result === "Success",
+            'message' => $result
+        ]);
     }
 }
