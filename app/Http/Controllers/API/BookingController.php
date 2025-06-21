@@ -91,12 +91,11 @@ class BookingController extends Controller
         $bookingDate = $request->query('booking_date');
         $serviceDuration = $request->query('service_total_duration');
 
-        dd($request->query());
         // Get vendor's standard availability for that day
         $availability = vendorStandardAvailability::where('pbvsa_vendor_id', $vendorId)
             ->where('pbvsa_day', date('l', strtotime($bookingDate)))
             ->first();
-        dd($availability);
+            
         if (!$availability || !$availability->pbvsa_is_open) {
             return response()->json([
                 'status' => false,
