@@ -208,6 +208,14 @@ class BookingController extends Controller
             }
         }
 
+        if ($openTime->copy()->addMinutes($serviceDuration)->gt($closeTime)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'No available time slot: The remaining time before closing is shorter than the service duration.',
+                'data' => []
+            ], 200);
+        }
+
         $existingBookings = booking::where('pbb_vendor_id', $vendorId)
             ->where('pbb_booking_date', $bookingDate)
             ->where('pbb_status', '=', 1)
