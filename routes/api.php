@@ -28,6 +28,35 @@ Route::post('/userLogin',[AuthController::class,'userLogin']);
 Route::post('/userForgotPassword',[AuthController::class,'userForgotPassword']);
 Route::post('/userResetPassword',[AuthController::class,'userResetPassword']);
 
+use Illuminate\Support\Facades\Storage;
+
+Route::post('/test-s3-upload', function (Request $request) {
+    try {
+        if (!$request->hasFile('file')) {
+            return response()->json(['error' => 'No file uploaded'], 400);
+        }
+
+        $file = $request->file('file');
+        $filename = 'test_' . time() . '.' . $file->getClientOriginalExtension();
+        $path = $file->storeAs('vendors', $filename, 's3');
+
+        if (!$path) {
+            return response()->json(['error' => 'Upload failed: storeAs returned false'], 500);
+        }
+
+        $url = Storage::disk('s3')->url($path);
+
+        return response()->json([
+            'message' => 'Upload successful',
+            'filename' => $filename,
+            'path' => $path,
+            'url' => $url,
+        ]);
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
+});
+
 Route::middleware(['auth:sanctum', 'validate.token'])->group(function () {
     Route::get('/getUser', [AuthController::class,'getUser']);
     Route::post('/userLogout',[AuthController::class,'userLogout']);
