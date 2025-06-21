@@ -81,95 +81,194 @@ class BookingController extends Controller
         *     )
         * )
     */
-    public function getBookingSlots(Request $request){
-        $user = auth()->user();  
+    // public function getBookingSlots(Request $request){
+    //     $user = auth()->user();  
         
-        $availableSlots = [];
-        $finalSlots = [];
+    //     $availableSlots = [];
+    //     $finalSlots = [];
         
-        $vendorId = $request->query('vendor_id');
-        $bookingDate = $request->query('booking_date');
-        $serviceDuration = $request->query('service_total_duration');
+    //     $vendorId = $request->query('vendor_id');
+    //     $bookingDate = $request->query('booking_date');
+    //     $serviceDuration = $request->query('service_total_duration');
 
-        // Get vendor's standard availability for that day
-        $availability = vendorStandardAvailability::where('pbvsa_vendor_id', $vendorId)
-            ->where('pbvsa_day', date('l', strtotime($bookingDate)))
-            ->first();
+    //     // Get vendor's standard availability for that day
+    //     $availability = vendorStandardAvailability::where('pbvsa_vendor_id', $vendorId)
+    //         ->where('pbvsa_day', date('l', strtotime($bookingDate)))
+    //         ->first();
             
-        if (!$availability || !$availability->pbvsa_is_open) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Vendor is closed on selected date',
-                'data' => []
-            ], 200);
-        }
+    //     if (!$availability || !$availability->pbvsa_is_open) {
+    //         return response()->json([
+    //             'status' => false,
+    //             'message' => 'Vendor is closed on selected date',
+    //             'data' => []
+    //         ], 200);
+    //     }
 
-        $openTime = Carbon::createFromTimeString($availability->pbvsa_start_time);
-        $closeTime = Carbon::createFromTimeString($availability->pbvsa_end_time);
+    //     $openTime = Carbon::createFromTimeString($availability->pbvsa_start_time);
+    //     $closeTime = Carbon::createFromTimeString($availability->pbvsa_end_time);
 
-        $existingBookings = booking::where('pbb_vendor_id', $vendorId)
-            ->where('pbb_booking_date', $bookingDate)
-            ->where('pbb_status', '=', 1)
-            ->orderBy('pbb_booking_start_time')
-            ->get();
+    //     $existingBookings = booking::where('pbb_vendor_id', $vendorId)
+    //         ->where('pbb_booking_date', $bookingDate)
+    //         ->where('pbb_status', '=', 1)
+    //         ->orderBy('pbb_booking_start_time')
+    //         ->get();
 
-        $availableSlots = [];
-        $finalSlots = [];
-        $currentStart = clone $openTime;
+    //     $availableSlots = [];
+    //     $finalSlots = [];
+    //     $currentStart = clone $openTime;
 
-        if ($existingBookings->isEmpty()) {
-            while ($currentStart->copy()->addMinutes($serviceDuration)->lte($closeTime)) {
-                $finalSlots[] = [
-                    'start' => $currentStart->format('H:i:s'),
-                    'end' => (clone $currentStart)->addMinutes($serviceDuration)->format('H:i:s'),
-                ];
-                $currentStart->addMinutes($serviceDuration);
-            }
-        } else {
-            foreach ($existingBookings as $booking) {
-                $bookingStart = Carbon::createFromTimeString($booking->pbb_booking_start_time);
-                $bookingEnd = Carbon::createFromTimeString($booking->pbb_booking_end_time);
+    //     if ($existingBookings->isEmpty()) {
+    //         while ($currentStart->copy()->addMinutes($serviceDuration)->lte($closeTime)) {
+    //             $finalSlots[] = [
+    //                 'start' => $currentStart->format('H:i:s'),
+    //                 'end' => (clone $currentStart)->addMinutes($serviceDuration)->format('H:i:s'),
+    //             ];
+    //             $currentStart->addMinutes($serviceDuration);
+    //         }
+    //     } else {
+    //         foreach ($existingBookings as $booking) {
+    //             $bookingStart = Carbon::createFromTimeString($booking->pbb_booking_start_time);
+    //             $bookingEnd = Carbon::createFromTimeString($booking->pbb_booking_end_time);
 
-                if ($currentStart->lt($bookingStart)) {
-                    $availableSlots[] = [
-                        'start' => clone $currentStart,
-                        'end' => clone $bookingStart,
-                    ];
-                }
+    //             if ($currentStart->lt($bookingStart)) {
+    //                 $availableSlots[] = [
+    //                     'start' => clone $currentStart,
+    //                     'end' => clone $bookingStart,
+    //                 ];
+    //             }
 
-                if ($currentStart->lt($bookingEnd)) {
-                    $currentStart = clone $bookingEnd;
-                }
-            }
+    //             if ($currentStart->lt($bookingEnd)) {
+    //                 $currentStart = clone $bookingEnd;
+    //             }
+    //         }
 
-            if ($currentStart->lt($closeTime)) {
-                $availableSlots[] = [
-                    'start' => clone $currentStart,
-                    'end' => clone $closeTime,
-                ];
-            }
+    //         if ($currentStart->lt($closeTime)) {
+    //             $availableSlots[] = [
+    //                 'start' => clone $currentStart,
+    //                 'end' => clone $closeTime,
+    //             ];
+    //         }
 
-            // Slice each available gap into proper service duration slots
-            foreach ($availableSlots as $slot) {
-                $startTime = $slot['start'];
-                $endTime = $slot['end'];
+    //         // Slice each available gap into proper service duration slots
+    //         foreach ($availableSlots as $slot) {
+    //             $startTime = $slot['start'];
+    //             $endTime = $slot['end'];
 
-                while ($startTime->copy()->addMinutes($serviceDuration)->lte($endTime)) {
-                    $finalSlots[] = [
-                        'start' => $startTime->format('H:i:s'),
-                        'end' => (clone $startTime)->addMinutes($serviceDuration)->format('H:i:s'),
-                    ];
-                    $startTime->addMinutes($serviceDuration);
-                }
-            }
-        }
+    //             while ($startTime->copy()->addMinutes($serviceDuration)->lte($endTime)) {
+    //                 $finalSlots[] = [
+    //                     'start' => $startTime->format('H:i:s'),
+    //                     'end' => (clone $startTime)->addMinutes($serviceDuration)->format('H:i:s'),
+    //                 ];
+    //                 $startTime->addMinutes($serviceDuration);
+    //             }
+    //         }
+    //     }
 
+    //     return response()->json([
+    //         'status' => true,
+    //         'message' => 'Available slots',
+    //         'data' => $finalSlots,
+    //     ], 200);
+    // }
+    public function getBookingSlots(Request $request){
+    $user = auth()->user();  
+    
+    $availableSlots = [];
+    $finalSlots = [];
+    
+    $vendorId = $request->query('vendor_id');
+    $bookingDate = $request->query('booking_date');
+    $serviceDuration = $request->query('service_total_duration');
+
+    $today = Carbon::today()->format('Y-m-d');
+    $now = Carbon::now();
+
+    // Get vendor's standard availability
+    $availability = vendorStandardAvailability::where('pbvsa_vendor_id', $vendorId)
+        ->where('pbvsa_day', date('l', strtotime($bookingDate)))
+        ->first();
+        
+    if (!$availability || !$availability->pbvsa_is_open) {
         return response()->json([
-            'status' => true,
-            'message' => 'Available slots',
-            'data' => $finalSlots,
+            'status' => false,
+            'message' => 'Vendor is closed on selected date',
+            'data' => []
         ], 200);
     }
+
+    $openTime = Carbon::createFromTimeString($availability->pbvsa_start_time)->setDateFrom(Carbon::parse($bookingDate));
+    $closeTime = Carbon::createFromTimeString($availability->pbvsa_end_time)->setDateFrom(Carbon::parse($bookingDate));
+
+    // ✅ Adjust open time if booking date is today
+    if ($bookingDate === $today) {
+        $bufferMinutes = 10;
+        $adjustedNow = $now->copy()->addMinutes($bufferMinutes);
+        if ($adjustedNow->gt($openTime)) {
+            $openTime = $adjustedNow;
+        }
+    }
+
+    $existingBookings = booking::where('pbb_vendor_id', $vendorId)
+        ->where('pbb_booking_date', $bookingDate)
+        ->where('pbb_status', '=', 1)
+        ->orderBy('pbb_booking_start_time')
+        ->get();
+
+    $currentStart = clone $openTime;
+
+    if ($existingBookings->isEmpty()) {
+        while ($currentStart->copy()->addMinutes($serviceDuration)->lte($closeTime)) {
+            $finalSlots[] = [
+                'start' => $currentStart->format('H:i:s'),
+                'end' => (clone $currentStart)->addMinutes($serviceDuration)->format('H:i:s'),
+            ];
+            $currentStart->addMinutes($serviceDuration);
+        }
+    } else {
+        foreach ($existingBookings as $booking) {
+            $bookingStart = Carbon::createFromTimeString($booking->pbb_booking_start_time)->setDateFrom(Carbon::parse($bookingDate));
+            $bookingEnd = Carbon::createFromTimeString($booking->pbb_booking_end_time)->setDateFrom(Carbon::parse($bookingDate));
+
+            if ($currentStart->lt($bookingStart)) {
+                $availableSlots[] = [
+                    'start' => clone $currentStart,
+                    'end' => clone $bookingStart,
+                ];
+            }
+
+            if ($currentStart->lt($bookingEnd)) {
+                $currentStart = clone $bookingEnd;
+            }
+        }
+
+        if ($currentStart->lt($closeTime)) {
+            $availableSlots[] = [
+                'start' => clone $currentStart,
+                'end' => clone $closeTime,
+            ];
+        }
+
+        foreach ($availableSlots as $slot) {
+            $startTime = $slot['start'];
+            $endTime = $slot['end'];
+
+            while ($startTime->copy()->addMinutes($serviceDuration)->lte($endTime)) {
+                $finalSlots[] = [
+                    'start' => $startTime->format('H:i:s'),
+                    'end' => (clone $startTime)->addMinutes($serviceDuration)->format('H:i:s'),
+                ];
+                $startTime->addMinutes($serviceDuration);
+            }
+        }
+    }
+
+    return response()->json([
+        'status' => true,
+        'message' => 'Available slots',
+        'data' => $finalSlots,
+    ], 200);
+}
+
 
     /**
      * @OA\Post(
