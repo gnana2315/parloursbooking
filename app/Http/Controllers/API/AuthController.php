@@ -111,7 +111,6 @@ class AuthController extends Controller
         return response()->json([
             'message' => 'User registered successfully. Please check the OTP in you phone.',
             'user_id' => $user->pbu_id,
-            'OTP' => $verfivation_code,
         ], 200);
     }
 
