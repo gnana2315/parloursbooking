@@ -18,6 +18,7 @@ use Validator;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class VendorController extends Controller
 {   
@@ -261,22 +262,22 @@ class VendorController extends Controller
             $request->validate(
                 [
                     'br_document' => 'required|mimes:jpg,jpeg,png,pdf|max:2048',
-                    'nic_document' => 'required|mimes:jpg,jpeg,png,pdf|max:2048',
-                    'address_proof_document' => 'required|mimes:jpg,jpeg,png,pdf|max:2048',
-                    'other_document' => 'mimes:jpg,jpeg,png,pdf|max:2048',
+                    // 'nic_document' => 'required|mimes:jpg,jpeg,png,pdf|max:2048',
+                    // 'address_proof_document' => 'required|mimes:jpg,jpeg,png,pdf|max:2048',
+                    // 'other_document' => 'mimes:jpg,jpeg,png,pdf|max:2048',
                 ],
                 [
                     'br_document.required' => 'BR document is required',
                     'br_document.mimes' => 'BR document must be a file of type: jpg, jpeg, png, pdf',
                     'br_document.max' => 'BR document may not be greater than 2MB',
-                    'nic_document.required' => 'BR document is required',
-                    'nic_document.mimes' => 'NIC document must be a file of type: jpg, jpeg, png, pdf',
-                    'nic_document.max' => 'NIC document may not be greater than 2MB',
-                    'address_proof_document.required' => 'Address Proof document is required',
-                    'address_proof_document.mimes' => 'Address Proof document must be a file of type: jpg, jpeg, png, pdf',
-                    'address_proof_document.max' => 'Address Proof document may not be greater than 2MB',
-                    'other_document.mimes' => 'Other document must be a file of type: jpg, jpeg, png, pdf',
-                    'other_document.max' => 'Other document may not be greater than 2MB',
+                    // 'nic_document.required' => 'BR document is required',
+                    // 'nic_document.mimes' => 'NIC document must be a file of type: jpg, jpeg, png, pdf',
+                    // 'nic_document.max' => 'NIC document may not be greater than 2MB',
+                    // 'address_proof_document.required' => 'Address Proof document is required',
+                    // 'address_proof_document.mimes' => 'Address Proof document must be a file of type: jpg, jpeg, png, pdf',
+                    // 'address_proof_document.max' => 'Address Proof document may not be greater than 2MB',
+                    // 'other_document.mimes' => 'Other document must be a file of type: jpg, jpeg, png, pdf',
+                    // 'other_document.max' => 'Other document may not be greater than 2MB',
                 ]
             );
         }else{
@@ -305,14 +306,17 @@ class VendorController extends Controller
         if ($request->hasFile('br_document')) {
             $br_document_file = $request->file('br_document');
             $br_document_filename = $vendor->pbv_business_name . '_' .time() . '_br_document.' . $br_document_file->getClientOriginalExtension();
-            $br_document_file->move(public_path('uploads/vendors'), $br_document_filename);
+            // $br_document_file->move(public_path('uploads/vendors'), $br_document_filename);
+            $path = $br_document_file->storeAs('vendors', $br_document_filename, 's3');
+            $url = Storage::disk('s3')->url($path);
+
             $request->merge(['br_document' => $br_document_filename]);
-            $br_document_path = public_path('uploads/vendors') . '/' . $br_document_filename;
+            // $br_document_path = public_path('uploads/vendors') . '/' . $br_document_filename;
 
             $document_data[] = [
                 'br_document' => [
                     'name' => $br_document_filename,
-                    'path' => $br_document_path,
+                    'path' => $url,
                 ],
             ];
         }
