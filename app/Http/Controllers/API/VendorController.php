@@ -407,29 +407,29 @@ class VendorController extends Controller
     public function getVendorDocuments(){
         $user = auth()->user();
         var_dump($user);die();
-        $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
-        if (!$vendor) {
-            return response()->json(['message' => 'Vendor not found'], 404);
-        }
+        // $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
+        // if (!$vendor) {
+        //     return response()->json(['message' => 'Vendor not found'], 404);
+        // }
 
-        $documents = json_decode($vendor->pbv_documents, true);
-        if (!$documents) {
-            return response()->json(['message' => 'No documents found'], 404);
-        }
-        $document_paths = [];
-        foreach ($documents as $document) {
-            foreach ($document as $key => $value) {
-                $document_paths[] = [
-                    'name' => $value['name'],
-                    'path' => asset('uploads/vendors/' . $value['name']),
-                ];
-            }
-        }
+        // $documents = json_decode($vendor->pbv_documents, true);
+        // if (!$documents) {
+        //     return response()->json(['message' => 'No documents found'], 404);
+        // }
+        // $document_paths = [];
+        // foreach ($documents as $document) {
+        //     foreach ($document as $key => $value) {
+        //         $document_paths[] = [
+        //             'name' => $value['name'],
+        //             'path' => asset('uploads/vendors/' . $value['name']),
+        //         ];
+        //     }
+        // }
 
-        return response()->json([
-            'success' => true,
-            'data' => $document_paths,
-        ], 200);
+        // return response()->json([
+        //     'success' => true,
+        //     'data' => $document_paths,
+        // ], 200);
     }
 
     /**
