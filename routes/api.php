@@ -73,8 +73,7 @@ Route::post('/test-s3-upload', function (Request $request) {
     }
 });
 
-Route::post('/send-otp', [CommonController::class, 'sendOTP']);
-
+// Route::post('/send-otp', [CommonController::class, 'sendOTP']);
 
 Route::middleware(['auth:sanctum', 'validate.token'])->group(function () {
     Route::get('/getUser', [AuthController::class,'getUser']);
