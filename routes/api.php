@@ -29,6 +29,14 @@ Route::post('/userLogin',[AuthController::class,'userLogin']);
 Route::post('/userForgotPassword',[AuthController::class,'userForgotPassword']);
 Route::post('/userResetPassword',[AuthController::class,'userResetPassword']);
 
+Route::get('/test-s3', function () {
+    try {
+        $exists = Storage::disk('s3')->exists('/');
+        return response()->json(['connected' => true]);
+    } catch (\Exception $e) {
+        return response()->json(['connected' => false, 'error' => $e->getMessage()]);
+    }
+});
 Route::get('/test-s3-config', function () {
     try {
         $disk = Storage::disk('s3');
