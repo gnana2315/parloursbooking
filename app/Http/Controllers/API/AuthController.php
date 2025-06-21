@@ -682,9 +682,19 @@ class AuthController extends Controller
     public function getUser(){
         $user = auth()->user();
 
+        if (!$user) {
+            return response()->json(['message' => 'Unauthenticated'], 401);
+        }
+        $userDetails = null;
+        if($user->pbu_usertype == '1'){
+            $userDetails = vendors::where('pbv_id', $user->pbu_vid)->first();
+        }else if($user->pbu_usertype == '2'){            
+            $userDetails = customer::where('pbc_user_id', $user->pbu_vid)->first();
+        }
+
         return response()->json([
             'message' => 'User Details',
-            'data' => $user
+            'data' => $userDetails
         ], 200);
     }
 
