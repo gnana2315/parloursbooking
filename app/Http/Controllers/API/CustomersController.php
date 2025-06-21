@@ -278,4 +278,47 @@ class CustomersController extends Controller
             'data' => $bookingsWithTotal
         ], 200);
     }
+
+    /**
+         * @OA\Get(
+         *     path="/api/customer",
+         *     summary="Get logged-in customer details",
+         *     description="Returns the customer record linked to the authenticated user",
+         *     operationId="getCustomer",
+         *     tags={"Customer"},
+         *     security={{"bearerAuth":{}}},
+         *     @OA\Response(
+         *         response=200,
+         *         description="Customer Details",
+         *         @OA\JsonContent(
+         *             type="object",
+         *             @OA\Property(property="message", type="string", example="Customer Details"),
+         *             @OA\Property(
+         *                 property="data",
+         *                 type="object",
+         *                 @OA\Property(property="pbc_id", type="integer", example=1),
+         *                 @OA\Property(property="pbc_user_id", type="integer", example=5),
+         *                 @OA\Property(property="pbc_name", type="string", example="John Doe"),
+         *                 @OA\Property(property="pbc_contact", type="string", example="0771234567"),
+         *                 @OA\Property(property="created_at", type="string", example="2025-06-21T12:00:00.000000Z"),
+         *                 @OA\Property(property="updated_at", type="string", example="2025-06-21T12:00:00.000000Z")
+         *             )
+         *         )
+         *     ),
+         *     @OA\Response(
+         *         response=401,
+         *         description="Unauthenticated"
+         *     )
+         * )
+     */
+    public function getCustomer(){
+        $user = auth()->user();
+
+        $customer = customer::where('pbc_user_id', $user->pbu_id)->first();
+
+        return response()->json([
+            'message' => 'Customer Details',
+            'data' => $customer
+        ], 200);
+    }
 }
