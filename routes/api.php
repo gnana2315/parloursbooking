@@ -31,10 +31,17 @@ Route::post('/userResetPassword',[AuthController::class,'userResetPassword']);
 
 Route::get('/test-s3', function () {
     try {
-        $exists = Storage::disk('s3')->exists('/');
-        return response()->json(['connected' => true]);
+        // Try to upload a test file
+        $path = Storage::disk('s3')->put('test_s3_connection.txt', 'S3 is working!');
+        return response()->json([
+            'connected' => true,
+            'path' => $path
+        ]);
     } catch (\Exception $e) {
-        return response()->json(['connected' => false, 'error' => $e->getMessage()]);
+        return response()->json([
+            'connected' => false,
+            'error' => $e->getMessage()
+        ]);
     }
 });
 Route::get('/test-s3-config', function () {
