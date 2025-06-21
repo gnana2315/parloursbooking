@@ -183,6 +183,14 @@ class BookingController extends Controller
         $today = Carbon::today()->format('Y-m-d');
         $now = Carbon::now();
 
+        if (Carbon::parse($bookingDate)->lt($today)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Booking date cannot be in the past',
+                'data' => [],
+            ], 400);
+        }
+
         // Get vendor's standard availability
         $availability = vendorStandardAvailability::where('pbvsa_vendor_id', $vendorId)
             ->where('pbvsa_day', date('l', strtotime($bookingDate)))
