@@ -137,7 +137,7 @@ class AuthController extends Controller
         ]);
     }
 
-    public function generateVerificationCode($user_id){        
+    public function generateVerificationCode($user_id, DialogESMSService $smsService){        
         $user = User::find($user_id);
         if (!$user) {
             return response()->json(['message' => 'User not found'], 404);
