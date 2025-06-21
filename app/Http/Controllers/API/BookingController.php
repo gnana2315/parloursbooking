@@ -91,7 +91,7 @@ class BookingController extends Controller
         $bookingDate = $request->query('booking_date');
         $serviceDuration = $request->query('service_total_duration');
 
-        dd($vendorId, $bookingDate, $serviceDuration);
+        dd($request->all());
         // Get vendor's standard availability for that day
         $availability = vendorStandardAvailability::where('pbvsa_vendor_id', $vendorId)
             ->where('pbvsa_day', date('l', strtotime($bookingDate)))
