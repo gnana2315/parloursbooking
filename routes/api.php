@@ -29,62 +29,29 @@ Route::post('/userLogin',[AuthController::class,'userLogin']);
 Route::post('/userForgotPassword',[AuthController::class,'userForgotPassword']);
 Route::post('/userResetPassword',[AuthController::class,'userResetPassword']);
 
-Route::get('/test-s3', function () {
+Route::get('api/test-s3', function () {
     try {
-        // Try to upload a test file
-        $path = Storage::disk('s3')->put('test_s3_connection.txt', 'S3 is working!');
+        $filename = 'test-file-' . Str::random(5) . '.txt';
+        $content = 'This is a test file.';
+
+        // Upload file to S3
+        $path = Storage::disk('s3')->put($filename, $content, 'public');
+
+        // Generate URL
+        $url = Storage::disk('s3')->url($filename);
+
         return response()->json([
             'connected' => true,
-            'path' => $path
+            'uploaded' => $path !== false,
+            'filename' => $filename,
+            'url' => $url,
         ]);
+
     } catch (\Exception $e) {
         return response()->json([
             'connected' => false,
-            'error' => $e->getMessage()
+            'error' => $e->getMessage(),
         ]);
-    }
-});
-Route::get('/test-s3-config', function () {
-    try {
-        $disk = Storage::disk('s3');
-        $exists = $disk->exists(''); // just testing access
-
-        return response()->json([
-            'connected' => true,
-            'bucket' => env('AWS_BUCKET'),
-            'region' => env('AWS_DEFAULT_REGION'),
-        ]);
-    } catch (\Exception $e) {
-        return response()->json(['connected' => false, 'error' => $e->getMessage()], 500);
-    }
-});
-
-Route::post('/test-s3-upload', function (Request $request) {
-    try {
-        \Log::info('Current disk:', ['disk' => config('filesystems.default')]);
-
-        if (!$request->hasFile('file')) {
-            return response()->json(['error' => 'No file uploaded'], 400);
-        }
-
-        $file = $request->file('file');
-        $filename = 'test_' . time() . '.' . $file->getClientOriginalExtension();
-        $path = $file   ->storeAs('vendors', $filename, 's3');
-
-        if (!$path) {
-            return response()->json(['error' => 'Upload failed: storeAs returned false'], 500);
-        }
-
-        $url = Storage::disk('s3')->url($path);
-
-        return response()->json([
-            'message' => 'Upload successful',
-            'filename' => $filename,
-            'path' => $path,
-            'url' => $url,
-        ]);
-    } catch (\Exception $e) {
-        return response()->json(['error' => $e->getMessage()], 500);
     }
 });
 
