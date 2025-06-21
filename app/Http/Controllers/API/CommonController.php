@@ -951,7 +951,7 @@ class CommonController extends Controller
         ]);
 
         $apiKey = config('dialogesms.api_key');
-        $sender = "Test";
+        $sender = config('dialogesms.sender');
         $otp = rand(100000, 999999);
         $message = "Your OTP code is {$otp}";
 
