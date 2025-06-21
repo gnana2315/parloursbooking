@@ -29,7 +29,7 @@ Route::post('/userLogin',[AuthController::class,'userLogin']);
 Route::post('/userForgotPassword',[AuthController::class,'userForgotPassword']);
 Route::post('/userResetPassword',[AuthController::class,'userResetPassword']);
 
-Route::get('api/test-s3', function () {
+Route::get('/test-s3', function () {
     try {
         $filename = 'test-file-' . Str::random(5) . '.txt';
         $content = 'This is a test file.';
