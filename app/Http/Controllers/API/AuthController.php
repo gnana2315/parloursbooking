@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\customer;
 use App\Models\vendors;
 use App\Models\notification;
+use App\Services\DialogESMSService;
 // use App\Models\deviceToken;
 // use App\Services\FirebaseService;
 // use App\Services\OneSignalService;
@@ -149,6 +150,14 @@ class AuthController extends Controller
             'pbu_verification_token' => $verificationCode,
             'pbu_verification_token_expires_at' => $expiresAt,
         ]);
+
+        $apiKey = config('dialogesms.api_key');
+        $sender = config('dialogesms.sender');
+        $message = "Your OTP code is {$verificationCode}. It is valid for 10 minutes. Please do not share this code with anyone.";
+
+        // Store OTP to DB/Cache if needed here
+
+        $result = $smsService->sendMessage($apiKey, [$request->phone], $message, $sender);
 
         return $verificationCode;
     }
