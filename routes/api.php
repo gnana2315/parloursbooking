@@ -32,13 +32,15 @@ use Illuminate\Support\Facades\Storage;
 
 Route::post('/test-s3-upload', function (Request $request) {
     try {
+        \Log::info('Current disk:', ['disk' => config('filesystems.default')]);
+
         if (!$request->hasFile('file')) {
             return response()->json(['error' => 'No file uploaded'], 400);
         }
 
         $file = $request->file('file');
         $filename = 'test_' . time() . '.' . $file->getClientOriginalExtension();
-        $path = $file->storeAs('vendors', $filename, 's3');
+        $path = $file   ->storeAs('vendors', $filename, 's3');
 
         if (!$path) {
             return response()->json(['error' => 'Upload failed: storeAs returned false'], 500);
