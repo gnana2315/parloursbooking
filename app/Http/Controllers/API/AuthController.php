@@ -272,6 +272,7 @@ class AuthController extends Controller
             return response()->json(['message' => 'User Phone No not verfied yet.'], 500);
         }
         $userRegister = null;
+        $user_data = null;
         if($user->pbu_usertype == '1'){
             $request->validate(
                 [
@@ -310,6 +311,7 @@ class AuthController extends Controller
             $user->update([
                 'pbu_vid' => $userRegister->pbv_id
             ]);
+            $user_data = $user;
         }else{
             $request->validate(
                 [
@@ -347,6 +349,7 @@ class AuthController extends Controller
             $user->update([
                 'pbu_vid' => $userRegister->pbc_id
             ]);
+            $user_data = $user;
         }
 
         $status_code = null;
@@ -369,7 +372,7 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => $message,
-            'user' => $user,
+            'user' => $user_data,
         ], $status_code);
     }
 
