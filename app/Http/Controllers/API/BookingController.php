@@ -95,7 +95,7 @@ class BookingController extends Controller
         $availability = vendorStandardAvailability::where('pbvsa_vendor_id', $vendorId)
             ->where('pbvsa_day', date('l', strtotime($bookingDate)))
             ->first();
-
+        dd($availability);
         if (!$availability || !$availability->pbvsa_is_open) {
             return response()->json([
                 'status' => false,
