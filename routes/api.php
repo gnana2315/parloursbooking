@@ -35,7 +35,7 @@ Route::get('/test-s3', function () {
         $content = 'This is a test file.';
 
         // Upload file to S3
-        $path = Storage::disk('s3')->put($filename, $content, 'public');
+        $path = Storage::disk('s3')->put($filename, $content);
 
         // Generate URL
         $url = Storage::disk('s3')->url($filename);
