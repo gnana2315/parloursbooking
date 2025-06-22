@@ -110,7 +110,7 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'User registered successfully. Please check the OTP in you phone.',
-            'user_id' => $user->pbu_id,
+            'data' => $user->pbu_id,
         ], 200);
     }
 
@@ -233,8 +233,7 @@ class AuthController extends Controller
             return response()->json([
                 'message' => 'Phone Number Validated Successfully',
                 'access_token' => $token,
-                'token_type' => 'Bearer',
-                'user_id' => $user->pbu_id,
+                'data' => $user->pbu_id,
             ]);
         }else{
             return response()->json([
@@ -392,7 +391,7 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => $message,
-            'user' => $user_data,
+            'data' => $user_data,
         ], $status_code);
     }
 
@@ -448,7 +447,7 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => $message,
-            'user' => $user,
+            'data' => $user,
         ], $status_code);
     }
 
@@ -472,7 +471,6 @@ class AuthController extends Controller
      *         @OA\JsonContent(
      *             @OA\Property(property="message", type="string", example="Login successful"),
      *             @OA\Property(property="access_token", type="string", example="1|xyz123token"),
-     *             @OA\Property(property="token_type", type="string", example="Bearer"),
      *             @OA\Property(property="user", type="object")
      *         )
      *     ),
@@ -540,8 +538,7 @@ class AuthController extends Controller
         return response()->json([
             'message' => 'Login successful',
             'access_token' => $token,
-            'token_type' => 'Bearer',
-            'user' => $user
+            'data' => $user
         ], 200);
     }
 
@@ -625,8 +622,7 @@ class AuthController extends Controller
         return response()->json([
             'message' => 'Password Reset request accepted. Please check the OTP in you phone.',
             'access_token' => $token,
-            'token_type' => 'Bearer',
-            'user_id' => $user->pbu_id
+            'data' => $user->pbu_id
         ], 201);
     }
 
