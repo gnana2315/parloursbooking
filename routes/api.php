@@ -31,7 +31,7 @@ Route::post('/userResetPassword',[AuthController::class,'userResetPassword']);
 
 Route::get('/test-s3', function () {
     try {
-        $filename = 'test-file-' . Str::random(5) . '.txt';
+        $filename = 'test-file.txt';
         $content = 'This is a test file.';
 
         // Upload file to S3
