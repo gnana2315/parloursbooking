@@ -62,7 +62,7 @@ class CustomersController extends Controller
 
         return response()->json([
             'message' => $message,
-            'user' => $user
+            'data' => $user
         ], $status);
     }
 

@@ -27,7 +27,6 @@ Route::post('/resendOtp',[AuthController::class,'resendOtp']);
 Route::post('/userMobileVerification',[AuthController::class,'verifyVerificationCode']);
 Route::post('/userLogin',[AuthController::class,'userLogin']);
 Route::post('/userForgotPassword',[AuthController::class,'userForgotPassword']);
-Route::post('/userResetPassword',[AuthController::class,'userResetPassword']);
 
 Route::get('/test-s3', function () {
     try {
@@ -59,6 +58,7 @@ Route::get('/test-s3', function () {
 
 Route::middleware(['auth:sanctum', 'validate.token'])->group(function () {
     Route::get('/getUser', [AuthController::class,'getUser']);
+    Route::post('/userResetPassword',[AuthController::class,'userResetPassword']);
     Route::post('/userLogout',[AuthController::class,'userLogout']);
 
     //user

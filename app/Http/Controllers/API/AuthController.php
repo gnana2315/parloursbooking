@@ -615,14 +615,11 @@ class AuthController extends Controller
 
         // Store OTP to DB/Cache if needed here
         //$result = $this->smsService->sendMessage($apiKey, [$request->phone_no], $message, $sender);
-        
-        $token_text = $user->pbu_id.'_user_password_reset_session';
-        $token = $user->createToken($token_text)->plainTextToken;
 
         return response()->json([
             'message' => 'Password Reset request accepted. Please check the OTP in you phone.',
-            'access_token' => $token,
-            'data' => $user->pbu_id
+            'data' => $user->pbu_id,
+            'otp' => $verfivation_code,
         ], 201);
     }
 
@@ -649,20 +646,18 @@ class AuthController extends Controller
 
     public function userResetPassword(Request $request){
         $request->validate(
-            [
-                'reset_token' => 'required',
+            [ 
                 'user_id' => 'required',
                 'password' => 'required|confirmed',
             ],
             [
-                'reset_token.required' => 'Invalid Reset Token',
                 'user_id.required' => 'Invalid User ID',
                 'password.required' => 'Password Required',
                 'password.confirmed' => 'The password confirmation does not match.',
             ]
         );
 
-        $user = User::where('pbu_id', $request->customer_id)->first();
+        $user = User::where('pbu_id', $request->user_id)->first();
 
         $user->update([
             'password' => Hash::make($request->password),
