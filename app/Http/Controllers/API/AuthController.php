@@ -710,7 +710,7 @@ class AuthController extends Controller
         if($user->pbu_usertype == '1'){
             $userDetails = vendors::where('pbv_id', $user->pbu_vid)->first();
         }else if($user->pbu_usertype == '2'){            
-            $userDetails = customer::where('pbc_user_id', $user->pbu_vid)->first();
+            $userDetails = customer::where('pbc_user_id', $user->pbu_id)->first();
         }
 
         return response()->json([
