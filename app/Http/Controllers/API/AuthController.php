@@ -106,7 +106,7 @@ class AuthController extends Controller
         $message = "Your OTP code is {$verfivation_code}. It is valid for 10 minutes. Please do not share this code with anyone.";
 
         // Store OTP to DB/Cache if needed here
-        //$result = $this->smsService->sendMessage($apiKey, [$request->phone_no], $message, $sender);       
+        $result = $this->smsService->sendMessage($apiKey, [$request->phone_no], $message, $sender);       
 
         return response()->json([
             'message' => 'User registered successfully. Please check the OTP in you phone.',
@@ -149,7 +149,7 @@ class AuthController extends Controller
         $message = "Your OTP code is {$verfivation_code}. It is valid for 10 minutes. Please do not share this code with anyone.";
 
         // Store OTP to DB/Cache if needed here
-        //$result = $this->smsService->sendMessage($apiKey, [$user->pbu_mobileno], $message, $sender);
+        $result = $this->smsService->sendMessage($apiKey, [$user->pbu_mobileno], $message, $sender);
         // optionally send OTP via SMS or email
         return response()->json([
             'message' => 'OTP resent successfully.',
@@ -614,7 +614,7 @@ class AuthController extends Controller
         $message = "Your OTP code is {$verfivation_code}. It is valid for 10 minutes. Please do not share this code with anyone.";
 
         // Store OTP to DB/Cache if needed here
-        //$result = $this->smsService->sendMessage($apiKey, [$request->phone_no], $message, $sender);
+        $result = $this->smsService->sendMessage($apiKey, [$request->phone_no], $message, $sender);
 
         return response()->json([
             'message' => 'Password Reset request accepted. Please check the OTP in you phone.',
