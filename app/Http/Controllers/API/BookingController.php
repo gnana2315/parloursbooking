@@ -466,12 +466,12 @@ class BookingController extends Controller
         }
 
         // Check if the user is authorized to rate this booking
-        if ($booking->pbb_customer_id !== $user->pbu_id) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Unauthorized to rate this booking',
-            ], 403);
-        }
+        // if ($booking->pbb_customer_id !== $user->pbu_id) {
+        //     return response()->json([
+        //         'status' => false,
+        //         'message' => 'Unauthorized to rate this booking',
+        //     ], 403);
+        // }
 
         $addRating = $booking->ratings()->create([
             'pbr_vendor_id' => $booking->pbb_vendor_id,
