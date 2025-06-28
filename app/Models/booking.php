@@ -3,6 +3,7 @@
 namespace App\Models;
 use App\Models\bookingDetail;
 use App\Models\vendors;
+use App\Models\ratings;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
