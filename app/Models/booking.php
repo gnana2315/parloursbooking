@@ -3,7 +3,6 @@
 namespace App\Models;
 use App\Models\bookingDetail;
 use App\Models\vendors;
-use App\Models\ratings;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -48,8 +47,5 @@ class booking extends Model
     }
     public function bookingDetails(){
         return $this->hasMany(bookingDetail::class, 'pbbd_booking_id', 'pbb_id');
-    }
-    public function ratings(){
-        return $this->hasMany(ratings::class, 'pbr_booking_id');
     }
 }
