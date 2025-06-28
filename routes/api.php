@@ -98,7 +98,7 @@ Route::middleware(['auth:sanctum', 'validate.token'])->group(function () {
     //booking
     Route::get('/getBookingSlots', [BookingController::class, 'getBookingSlots']);
     Route::post('/addOnlineBooking', [BookingController::class, 'addOnlineBooking']);
-    Route::get('/addRating', [BookingController::class, 'addRating']);
+    Route::post('/addRating', [BookingController::class, 'addRating']);
 
     //customer
     Route::get('/customer', [CustomersController::class, 'getCustomer']);
