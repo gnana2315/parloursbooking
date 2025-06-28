@@ -436,4 +436,86 @@ class BookingController extends Controller
             'message' => $message,
         ], $status_code);
     }
+
+    public function addRating(Request $request){
+        $user = auth()->user();
+
+        $request->validate(
+            [
+                'booking_id' => 'required|integer',
+                'vendor_id' => 'required|integer',
+                'rating' => 'required|integer|min:1|max:5',
+                'review' => 'nullable|string|max:500',
+            ],
+            [
+                'booking_id.required' => 'Booking ID is required',
+                'booking_id.integer' => 'Booking ID must be an integer',
+                'vendor_id.required' => 'Vendor ID is required',
+                'vendor_id.integer' => 'Vendor ID must be an integer',
+                'rating.required' => 'Rating is required',
+                'rating.integer' => 'Rating must be an integer',
+                'rating.min' => 'Rating must be at least 1',
+                'rating.max' => 'Rating cannot exceed 5',
+                'review.max' => 'Review cannot exceed 500 characters',
+            ]
+        );
+
+        $booking = booking::find($request->booking_id);
+        if (!$booking) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Booking not found',
+            ], 404);
+        }
+
+        // Check if the user is authorized to rate this booking
+        if ($booking->pbb_customer_id !== $user->pbu_id) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Unauthorized to rate this booking',
+            ], 403);
+        }
+
+        $addRating = $booking->ratings()->create([
+            'pbr_vendor_id' => $$booking->pbb_vendor_id,
+            'pbr_booking_id' => $request->booking_id,
+            'pbr_customer_id' => $booking->pbb_customer_id,
+            'pbr_rating' => $request->rating,
+            'pbr_comments' => $request->review,
+            'pbr_status' => 1,
+        ]);
+
+        if (!$addRating) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Unable to add rating. Please try again later',
+            ], 500);
+        }else {
+            // // Update the booking status to completed if not already done
+            // if ($booking->pbb_status !== 2) { // Assuming 2 is the status for completed bookings
+            //     $booking->update(['pbb_status' => 2]);
+            // }
+        }
+
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Rating added successfully',
+        ], 200);
+    }
+
+    // public function addManualBooking(Request $request){
+    //     $user = auth()->user();
+
+    //     $request->validate(
+    //         [
+    //             'booking_date' => 'required',
+    //             'booking_duration' => 'required|date_format:H:i:s',
+    //             'booking_start_time' => 'required|date_format:H:i:s',
+    //             'booking_end_time' => 'required|date_format:H:i:s',
+    //             'service_location' => 'required',
+    //             'services.*.service_id' => 'required|integer',
+    //         ]
+    //     );
+    // }
 }

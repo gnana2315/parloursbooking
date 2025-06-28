@@ -48,4 +48,7 @@ class booking extends Model
     public function bookingDetails(){
         return $this->hasMany(bookingDetail::class, 'pbbd_booking_id', 'pbb_id');
     }
+    public function ratings(){
+        return $this->hasMany(ratings::class, 'pbr_booking_id');
+    }
 }
