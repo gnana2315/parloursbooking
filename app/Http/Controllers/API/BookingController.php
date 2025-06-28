@@ -443,15 +443,12 @@ class BookingController extends Controller
         $request->validate(
             [
                 'booking_id' => 'required|integer',
-                'vendor_id' => 'required|integer',
                 'rating' => 'required|integer|min:1|max:5',
                 'review' => 'nullable|string|max:500',
             ],
             [
                 'booking_id.required' => 'Booking ID is required',
                 'booking_id.integer' => 'Booking ID must be an integer',
-                'vendor_id.required' => 'Vendor ID is required',
-                'vendor_id.integer' => 'Vendor ID must be an integer',
                 'rating.required' => 'Rating is required',
                 'rating.integer' => 'Rating must be an integer',
                 'rating.min' => 'Rating must be at least 1',
@@ -477,7 +474,7 @@ class BookingController extends Controller
         }
 
         $addRating = $booking->ratings()->create([
-            'pbr_vendor_id' => $$booking->pbb_vendor_id,
+            'pbr_vendor_id' => $booking->pbb_vendor_id,
             'pbr_booking_id' => $request->booking_id,
             'pbr_customer_id' => $booking->pbb_customer_id,
             'pbr_rating' => $request->rating,
