@@ -11,7 +11,7 @@ class ratings extends Model
     /**
     * @var string $table
     */
-    protected $table = 'promo_codes';
+    protected $table = 'ratings';
 
     /**
      * The attributes that are mass assignable.

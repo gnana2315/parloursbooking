@@ -10,7 +10,6 @@ use App\Models\bookingDetail;
 use App\Models\vendorStandardAvailability;
 use App\Models\vendorSpecialCloses;
 use App\Models\services;
-use App\Models\ratings;
 use Validator;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
@@ -474,7 +473,7 @@ class BookingController extends Controller
         //     ], 403);
         // }
 
-        $addRating = ratings::create([
+        $addRating = $booking->ratings()->create([
             'pbr_vendor_id' => $booking->pbb_vendor_id,
             'pbr_booking_id' => $request->booking_id,
             'pbr_customer_id' => $booking->pbb_customer_id,
