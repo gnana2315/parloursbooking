@@ -437,6 +437,39 @@ class BookingController extends Controller
         ], $status_code);
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/addRating",
+     *     summary="Add rating and review for a booking",
+     *     tags={"Booking"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"booking_id", "rating"},
+     *             @OA\Property(property="booking_id", type="integer", example=101),
+     *             @OA\Property(property="rating", type="integer", minimum=1, maximum=5, example=4),
+     *             @OA\Property(property="review", type="string", maxLength=500, example="Great service!")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Rating added successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Rating added successfully")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Booking not found"
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Unable to add rating"
+     *     )
+     * )
+    */
     public function addRating(Request $request){
         $user = auth()->user();
 

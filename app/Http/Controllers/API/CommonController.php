@@ -665,7 +665,7 @@ class CommonController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/promo-codes",
+     *     path="/api/getAllPromoCodes",
      *     summary="Get all active promo codes",
      *     tags={"Promo Codes"},
      *     @OA\Response(
