@@ -891,8 +891,8 @@ class VendorController extends Controller
         if (!$vendor_results || $vendor_results->isEmpty()) {
             return response()->json(['message' => 'Vendor not found'], 404);
         }
-        // print_r('<pre>');
-        // print_r($vendor_results);die();
+        print_r('<pre>');
+        print_r($vendor_results);die();
         $vendor = $vendor_results->first();
 
         $availability = $vendor_results->map(function ($item) {
