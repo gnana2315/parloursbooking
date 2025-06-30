@@ -894,7 +894,7 @@ class VendorController extends Controller
         // print_r('<pre>');
         // print_r($vendor_results);die();
         $vendor = $vendor_results->first();
-        dd($vendor->pbv_images);die();
+        dd($vendor);die();
 
         $availability = $vendor_results->map(function ($item) {
             return [
