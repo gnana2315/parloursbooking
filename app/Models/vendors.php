@@ -37,8 +37,7 @@ class vendors extends Model
         'pbv_status',
         'created_at',
         'updated_at',
-        'deleted_at',
-        'pbv_images'
+        'deleted_at'
     ];
 
     protected $casts = [
