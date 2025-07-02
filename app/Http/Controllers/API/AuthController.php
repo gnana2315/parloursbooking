@@ -502,8 +502,7 @@ class AuthController extends Controller
         // Find user by mobile number
         $user = User::where('pbu_mobileno', $request->phone_no)
                     ->where('pbu_usertype', $request->user_type)
-                    ->first();
-        
+                    ->first();        
         
         // Check if user exists and password is correct
         if (!$user || !Hash::check($request->password, $user->password)) {
@@ -513,6 +512,13 @@ class AuthController extends Controller
         //Check if user verified the mobile no
         if($user->pbu_mobileno_verified_at == null){
             return response()->json(['message' => 'User not verfied yet.'], 500);
+        }
+
+        $finalData = '';
+        if($user->pbu_usertype == 1){
+            $finalData = customer::where('pbc_user_id', $user->pbu_id);
+        }else{
+            $finalData = vendors::where('pbv_id', $user->pbu_vid);
         }
         
         // $checkUserDeviceToken = deviceToken::where('pbdt_user_id', $user->pbu_id);
@@ -538,7 +544,7 @@ class AuthController extends Controller
         return response()->json([
             'message' => 'Login successful',
             'access_token' => $token,
-            'data' => $user
+            'data' => $finalData
         ], 200);
     }
 
