@@ -73,7 +73,7 @@ class CommonController extends Controller
             $vendors = vendors::join('vendor_config', 'vendor_config.pbvc_vendorid', '=', 'vendor.pbv_id')
             ->join('vendor_standard_availability', 'vendor_standard_availability.pbvsa_vendor_id', '=', 'vendor.pbv_id')
             ->join('cities', 'cities.pbc_cid', '=', 'vendor.pbv_city')
-            //->join('ratings', 'ratings.pbr_vendor_id', '=', 'vendor.pbv_id')
+            ->join('ratings', 'ratings.pbr_vendor_id', '=', 'vendor.pbv_id', 'left')
             ->select(
                 'vendor.*',
                 'vendor_config.pbvc_display_name',
@@ -81,14 +81,14 @@ class CommonController extends Controller
                 'vendor_standard_availability.pbvsa_end_time',
                 'vendor_standard_availability.pbvsa_day',
                 'vendor_standard_availability.pbvsa_is_open',
-                'cities.pbc_cityname'
-                //DB::raw('AVG(pb_ratings.pbr_rating) as average_rating')
+                'cities.pbc_cityname',
+                DB::raw('AVG(pb_ratings.pbr_rating) as average_rating')
             )
             ->where([
                 ['pbv_status', '=', 1],
                 ['pbv_vendortype', '=', $vendor_type_id],
             ])
-            //->groupBy('vendor.pbv_id')
+            ->groupBy('vendor.pbv_id')
             ->get();
             
             if(!empty($vendors)){
