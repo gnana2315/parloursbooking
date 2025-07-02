@@ -520,6 +520,7 @@ class AuthController extends Controller
         }else{
             $finalData = customer::where('pbc_user_id', $user->pbu_id);
         }
+        dd($finalData);
         
         // $checkUserDeviceToken = deviceToken::where('pbdt_user_id', $user->pbu_id);
         // dd($checkUserDeviceToken->pbdt_device_token);
