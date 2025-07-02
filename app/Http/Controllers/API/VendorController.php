@@ -883,6 +883,7 @@ class VendorController extends Controller
                     'vendor_config.*',
                     'vendor_standard_availability.*',
                     'cities.*',
+                    'ratings.*',
                     DB::raw('AVG(pb_ratings.pbr_rating) as average_rating')
                 )
                 ->where('pbv_id', $vendor_id)
