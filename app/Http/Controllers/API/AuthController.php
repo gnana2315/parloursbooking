@@ -527,7 +527,7 @@ class AuthController extends Controller
             'pbu_personid' => null,
             'pbu_name' => $user->pbu_name,
             'pbu_email' => $user->pbu_email,
-            'pbu_mobileno' => $user->mobileno,
+            'pbu_mobileno' => $user->pbu_mobileno,
             'pbu_verification_token' => $user->pbu_verification_token,
             'pbu_verification_token_expires_at' => $user->pbu_verification_token_expires_at,
             'pbu_email_verified_at' => $user->pbu_email_verified_at,
