@@ -514,12 +514,35 @@ class AuthController extends Controller
             return response()->json(['message' => 'User not verfied yet.'], 500);
         }
 
-        $finalData = '';
         if($user->pbu_usertype == '1'){
-            $finalData = vendors::where('pbv_id', $user->pbu_vid)->first();
+            $loggedVendors = vendors::where('pbv_id', $user->pbu_vid)->first();
         }else if($user->pbu_usertype == '2'){            
-            $finalData = customer::where('pbc_user_id', $user->pbu_id)->first();
+            $loggedCustomers = customer::where('pbc_user_id', $user->pbu_id)->first();
         }
+
+        $final_users = [
+            'pbu_id' => $user->pbu_id,
+            'pbu_usertype' => $user->pbu_usertype,
+            'pbu_vid' => ($user->pbu_usertype == '1') ? $loggedVendors->pbv_id : $loggedCustomers->pbc_id,
+            'pbu_personid' => null,
+            'pbu_name' => $user->pbu_name,
+            'pbu_email' => $user->pbu_email,
+            'pbu_mobileno' => $user->mobileno,
+            'pbu_verification_token' => $user->pbu_verification_token,
+            'pbu_verification_token_expires_at' => $user->pbu_verification_token_expires_at,
+            'pbu_email_verified_at' => $user->pbu_email_verified_at,
+            'pbu_mobileno_verified_at' => $user->pbu_mobileno_verified_at,
+            'pbu_first_name' => ($user->pbu_usertype == '1') ? $loggedVendors->pbv_first_name : $loggedCustomers->pbc_first_name,
+            'pbu_last_name' => ($user->pbu_usertype == '1') ? $loggedVendors->pbv_last_name : $loggedCustomers->pbc_last_name,
+            'pbu_dob' => ($user->pbu_usertype == '1') ? $loggedVendors->pbv_dob : $loggedCustomers->pbc_dob,
+            'pbu_gender' => ($user->pbu_usertype == '1') ? $loggedVendors->pbv_gender : $loggedCustomers->pbc_sex,
+            'pbu_address' => ($user->pbu_usertype == '1') ? $loggedVendors->pbv_address : $loggedCustomers->pbc_address,
+            'pbu_city' => ($user->pbu_usertype == '1') ? $loggedVendors->pbv_city : $loggedCustomers->pbc_city,
+            'pbu_accept_terms' => ($user->pbu_usertype == '1') ? $loggedVendors->pbv_accept_terms : $loggedCustomers->pbc_accept_terms,
+            'pbu_status' => ($user->pbu_usertype == '1') ? $loggedVendors->pbv_status : $loggedCustomers->pbc_status,
+            'created_at' => ($user->pbu_usertype == '1') ? $loggedVendors->created_at : $loggedCustomers->created_at,
+            'updated_at' => ($user->pbu_usertype == '1') ? $loggedVendors->updated_at : $loggedCustomers->updated_at,
+        ];
         // dd($finalData);
         
         // $checkUserDeviceToken = deviceToken::where('pbdt_user_id', $user->pbu_id);
