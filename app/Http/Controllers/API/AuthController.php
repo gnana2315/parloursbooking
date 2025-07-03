@@ -515,12 +515,12 @@ class AuthController extends Controller
         }
 
         $finalData = '';
-        if($user->pbu_usertype == 1){
-            $finalData = vendors::where('pbv_id', $user->pbu_vid);
-        }else{
-            $finalData = customer::where('pbc_user_id', $user->pbu_id);
+        if($user->pbu_usertype == '1'){
+            $finalData = vendors::where('pbv_id', $user->pbu_vid)->first();
+        }else if($user->pbu_usertype == '2'){            
+            $finalData = customer::where('pbc_user_id', $user->pbu_id)->first();
         }
-        dd($finalData);
+        // dd($finalData);
         
         // $checkUserDeviceToken = deviceToken::where('pbdt_user_id', $user->pbu_id);
         // dd($checkUserDeviceToken->pbdt_device_token);
