@@ -520,7 +520,7 @@ class AuthController extends Controller
             $loggedCustomers = customer::where('pbc_user_id', $user->pbu_id)->first();
         }
 
-        $final_users = [
+        $finalData = [
             'pbu_id' => $user->pbu_id,
             'pbu_usertype' => $user->pbu_usertype,
             'pbu_vid' => ($user->pbu_usertype == '1') ? $loggedVendors->pbv_id : $loggedCustomers->pbc_id,
