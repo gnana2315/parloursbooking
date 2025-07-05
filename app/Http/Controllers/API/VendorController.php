@@ -932,7 +932,7 @@ class VendorController extends Controller
             'display_name' => $vendor->pbvc_display_name,
             'logo' => $vendor->pbvc_logo,
             'service_at_time' => $vendor->pbvc_service_at_time,
-            'availability' => groupAvailability($availability),
+            'availability' => $this->groupAvailability($availability),
             'images' => $vendor->pbv_images,
             'rating' => 3,
             'isFav' => $isFav
