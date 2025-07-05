@@ -877,18 +877,18 @@ class VendorController extends Controller
         $vendor_results = vendors::join('vendor_config', 'vendor_config.pbvc_vendorid', '=', 'vendor.pbv_id')
                 ->join('vendor_standard_availability', 'vendor_standard_availability.pbvsa_vendor_id', '=', 'vendor.pbv_id')
                 ->join('cities', 'cities.pbc_cid', '=', 'vendor.pbv_city')
-                // ->join('ratings', 'ratings.pbr_vendor_id', '=', 'vendor.pbv_id', 'left')
+                ->join('ratings', 'ratings.pbr_vendor_id', '=', 'vendor.pbv_id', 'left')
                 ->select(
                     'vendor.*',
                     'vendor_config.*',
                     'vendor_standard_availability.*',
                     'cities.*',
-                    // 'ratings.*',
-                    // DB::raw('AVG(pb_ratings.pbr_rating) as average_rating')
+                    'ratings.*',
+                    DB::raw('AVG(pb_ratings.pbr_rating) as average_rating')
                 )
                 ->where('pbv_id', $vendor_id)
                 ->where('vendor.pbv_status', 1)
-                // ->groupBy('vendor.pbv_id')
+                ->groupBy('vendor.pbv_id')
                 ->get();        
         
         if (!$vendor_results || $vendor_results->isEmpty()) {
@@ -932,7 +932,7 @@ class VendorController extends Controller
             'display_name' => $vendor->pbvc_display_name,
             'logo' => $vendor->pbvc_logo,
             'service_at_time' => $vendor->pbvc_service_at_time,
-            'availability' => $availability,
+            'availability' => groupAvailability($availability),
             'images' => $vendor->pbv_images,
             'isFav' => $isFav
         ];
@@ -941,5 +941,51 @@ class VendorController extends Controller
             'success' => true,
             'data' => $final_vendors
         ], 200);
+    }
+
+    function groupAvailability(array $availability) {
+        $grouped = [];
+        $tempGroup = null;
+
+        foreach ($availability as $slot) {
+            if ($slot['is_open'] != 1) continue;
+
+            $key = $slot['start_time'] . '-' . $slot['end_time'];
+
+            if (!isset($grouped[$key])) {
+                $grouped[$key] = [];
+            }
+
+            $grouped[$key][] = $slot['day'];
+        }
+
+        $result = [];
+
+        foreach ($grouped as $time => $days) {
+            $dayGroups = [];
+            $startDay = $days[0];
+            $prevDay = $startDay;
+
+            for ($i = 1; $i < count($days); $i++) {
+                if ((strtotime($days[$i]) - strtotime($prevDay)) === 86400) {
+                    $prevDay = $days[$i];
+                } else {
+                    $dayGroups[] = $startDay === $prevDay ? $startDay : "$startDay - $prevDay";
+                    $startDay = $days[$i];
+                    $prevDay = $days[$i];
+                }
+            }
+            $dayGroups[] = $startDay === $prevDay ? $startDay : "$startDay - $prevDay";
+
+            foreach ($dayGroups as $group) {
+                [$start, $end] = explode('-', $time);
+                $result[] = [
+                    'days' => $group,
+                    'time' => "$start to $end"
+                ];
+            }
+        }
+
+        return $result;
     }
 }
