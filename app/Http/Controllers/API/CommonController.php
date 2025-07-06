@@ -77,6 +77,7 @@ class CommonController extends Controller
             ->select(
                 'vendor.*',
                 'vendor_config.pbvc_display_name',
+                'vendor_config.pbvc_logo',
                 'vendor_standard_availability.pbvsa_start_time',
                 'vendor_standard_availability.pbvsa_end_time',
                 'vendor_standard_availability.pbvsa_day',
