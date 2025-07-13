@@ -794,7 +794,6 @@ class AuthController extends Controller
      * )
     */
     public function getVendor(){
-
         $user = auth()->user();
         if($user->pbu_usertype != '1'){
             return response()->json(['message' => 'Unauthorized'], 401);
@@ -809,5 +808,54 @@ class AuthController extends Controller
             'message' => 'Vendor Details',
             'data' => $vendor
         ], 200);
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/api/userDelete",
+     *     summary="Delete authenticated user",
+     *     description="Marks the authenticated user as deleted by updating pbv_status and setting deleted_at.",
+     *     operationId="deleteUserByID",
+     *     tags={"User"},
+     *     security={{"bearerAuth":{}}},
+     * 
+     *     @OA\Response(
+     *         response=200,
+     *         description="User deleted successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="User deleted successfully")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="User not found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="User not found")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Unauthenticated.")
+     *         )
+     *     )
+     * )
+    */
+
+    public function deleteUserByID(){
+        $user = auth()->user();
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        $user->update([
+            'pbv_status' => 0,
+            'deleted_at' => date('Y-m-d H:i:s')
+        ]);
+        
+        auth()->logout();
+
+        return response()->json(['message' => 'User deleted successfully'], 200);
     }
 }
