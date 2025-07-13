@@ -841,7 +841,7 @@ class VendorController extends Controller
             'pbs_name' => $request->service_name,
             'pbs_description' => $request->service_description,
             'pbs_duration' => $request->service_duration,
-            'pbs_duration_cetegory' => 0,
+            'pbs_duration_cetegory' => '0',
             'pbs_image' => $publicPath,
             'pbs_price' => $request->service_price,
             'pbs_employees' => null,
