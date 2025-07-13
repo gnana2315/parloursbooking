@@ -664,6 +664,17 @@ class VendorController extends Controller
         ], 200);
     }
 
+    public function getVendorAvailability(){
+        $user = auth()->user();
+
+        $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
+        if (!$vendor) {
+            return response()->json(['message' => 'Vendor not found'], 404);
+        }
+        $availabilities = vendorStandardAvailability::where('pbvsa_vendor_id', $vendor->pbv_id)->get();
+        return response()->json(['data' => $availabilities], 200);
+    }
+
     /**
      * @OA\Post(
      *      path="/api/vendorSpecialCloses",
