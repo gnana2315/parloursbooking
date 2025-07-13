@@ -20,6 +20,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 
 class VendorController extends Controller
 {   
@@ -808,11 +809,30 @@ class VendorController extends Controller
         
         if ($request->hasFile('service_image')) {
             $service_image_file = $request->file('service_image');
-            $service_image_filename = $vendor->pbv_business_name . '_' .time() . '_service.' . $service_image_file->getClientOriginalExtension();
-            $service_image_file->move(public_path('uploads/services/'.$vendor->pbv_business_name), $service_image_filename);
-            $request->merge(['service_image' => $service_image_filename]);
-            $service_image_path = public_path('uploads/services/'.$vendor->pbv_business_name) . '/' . $service_image_filename;
-        }   
+            $folder = 'uploads/services/' . $vendor->pbv_business_name;
+            $folderPath = public_path($folder);
+
+            // Create the folder if it doesn't exist
+            if (!File::exists($folderPath)) {
+                File::makeDirectory($folderPath, 0755, true);
+            }
+
+            $service_image_filename = $vendor->pbv_business_name . '_' . time() . '_service.' . $service_image_file->getClientOriginalExtension();
+            $service_image_file->move($folderPath, $service_image_filename);
+
+            // Generate public URL path
+            $publicPath = url($folder . '/' . $service_image_filename);
+
+            // Save public URL in DB
+            $request->merge(['service_image' => $publicPath]);
+        }
+        // if ($request->hasFile('service_image')) {
+        //     $service_image_file = $request->file('service_image');
+        //     $service_image_filename = $vendor->pbv_business_name . '_' .time() . '_service.' . $service_image_file->getClientOriginalExtension();
+        //     $service_image_file->move(public_path('uploads/services/'.$vendor->pbv_business_name), $service_image_filename);
+        //     $request->merge(['service_image' => $service_image_filename]);
+        //     $service_image_path = public_path('uploads/services/'.$vendor->pbv_business_name) . '/' . $service_image_filename;
+        // }   
 
         $added_vendor_service = services::create([
             'pbs_vendor_id' => $vendor->pbv_id,
@@ -821,7 +841,7 @@ class VendorController extends Controller
             'pbs_name' => $request->service_name,
             'pbs_description' => $request->service_description,
             'pbs_duration' => $request->service_duration,
-            'pbs_image' => $service_image_path,
+            'pbs_image' => $publicPath,
             'pbs_price' => $request->service_price,
             'pbs_employees' => null,
             'pbs_status' => 1
