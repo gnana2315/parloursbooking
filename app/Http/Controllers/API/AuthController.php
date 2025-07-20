@@ -96,7 +96,7 @@ class AuthController extends Controller
             'pbu_usertype' => $request->user_type,
             'pbu_mobileno' => $request->phone_no,
             'pbu_name' => $request->phone_no,
-            'pbu_status' => 0
+            'pbu_status' => 1
         ]);
         //dd($user);
         $verfivation_code = $this->generateVerificationCode($user->pbu_id);
@@ -502,6 +502,7 @@ class AuthController extends Controller
         // Find user by mobile number
         $user = User::where('pbu_mobileno', $request->phone_no)
                     ->where('pbu_usertype', $request->user_type)
+                    ->where('pbu_status', 1)
                     ->first();        
         
         // Check if user exists and password is correct
@@ -512,6 +513,10 @@ class AuthController extends Controller
         //Check if user verified the mobile no
         if($user->pbu_mobileno_verified_at == null){
             return response()->json(['message' => 'User not verfied yet.'], 500);
+        }
+
+        if($user->pbu_status == 0){
+            return response()->json(['message' => 'Please create the User.'], 500);   
         }
 
         if($user->pbu_usertype == '1'){
@@ -844,18 +849,28 @@ class AuthController extends Controller
     */
 
     public function deleteUserByID(){
-        $user = auth()->user();
-        if (!$user) {
+        // $user = auth()->user();
+        // if (!$user) {
+        //     return response()->json(['message' => 'User not found'], 404);
+        // }
+
+        // $user->update([
+        //     'pbv_status' => 0,
+        //     'deleted_at' => date('Y-m-d H:i:s')
+        // ]);
+        $id = '21';
+        $user = User::find($id);
+
+        if ($user) {
+            $user->pbv_status = 0;
+            $user->deleted_at = date('Y-m-d H:i:s');
+            $user->save();
+            return response()->json(['message' => 'UUser deleted successfully'], 200);
+        } else {
             return response()->json(['message' => 'User not found'], 404);
         }
+        // auth()->logout();
 
-        $user->update([
-            'pbv_status' => 0,
-            'deleted_at' => date('Y-m-d H:i:s')
-        ]);
-        
-        auth()->logout();
-
-        return response()->json(['message' => 'User deleted successfully'], 200);
+        // return response()->json(['message' => 'User deleted successfully'], 200);
     }
 }

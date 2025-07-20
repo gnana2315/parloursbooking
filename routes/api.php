@@ -27,6 +27,7 @@ Route::post('/resendOtp',[AuthController::class,'resendOtp']);
 Route::post('/userMobileVerification',[AuthController::class,'verifyVerificationCode']);
 Route::post('/userLogin',[AuthController::class,'userLogin']);
 Route::post('/userForgotPassword',[AuthController::class,'userForgotPassword']);
+Route::get('/userDelete', [AuthController::class, 'deleteUserByID']);
 
 Route::get('/test-s3', function () {
     try {
@@ -60,7 +61,7 @@ Route::middleware(['auth:sanctum', 'validate.token'])->group(function () {
     Route::get('/getUser', [AuthController::class,'getUser']);
     Route::post('/userResetPassword',[AuthController::class,'userResetPassword']);
     Route::post('/userLogout',[AuthController::class,'userLogout']);
-    Route::get('/userDelete', [AuthController::class, 'deleteUserByID']);
+    // Route::get('/userDelete', [AuthController::class, 'deleteUserByID']);
 
     //user
     Route::post('/userRegistration', [AuthController::class, 'userRegistration']);
