@@ -864,7 +864,7 @@ class AuthController extends Controller
         if ($user) {
             $user->pbu_status = 0;
             $user->save();
-            return response()->json(['message' => 'UUser deleted successfully'], 200);
+            return response()->json(['message' => 'User deleted successfully'], 200);
         } else {
             return response()->json(['message' => 'User not found'], 404);
         }
