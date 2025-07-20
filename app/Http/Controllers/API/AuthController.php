@@ -863,7 +863,6 @@ class AuthController extends Controller
 
         if ($user) {
             $user->pbu_status = 0;
-            $user->deleted_at = date('Y-m-d H:i:s');
             $user->save();
             return response()->json(['message' => 'UUser deleted successfully'], 200);
         } else {
