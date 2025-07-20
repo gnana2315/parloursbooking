@@ -862,7 +862,7 @@ class AuthController extends Controller
         $user = User::find($id);
 
         if ($user) {
-            $user->pbv_status = 0;
+            $user->pbu_status = 0;
             $user->deleted_at = date('Y-m-d H:i:s');
             $user->save();
             return response()->json(['message' => 'UUser deleted successfully'], 200);
