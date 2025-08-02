@@ -36,5 +36,6 @@ class vendorStandardAvailability extends Model
         'pbvsa_start_time' => 'datetime:H:i',
         'pbvsa_end_time' => 'datetime:H:i',
         'pbvsa_is_open' => 'boolean',
+        'pbvsa_isEdit' => 'boolean',
     ];
 }
