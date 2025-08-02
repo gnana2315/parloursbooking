@@ -534,6 +534,73 @@ class BookingController extends Controller
         ], 200);
     }
 
+    /**
+ * @OA\Post(
+ *     path="/addManualBooking",
+ *     summary="Add Manual Booking",
+ *     tags={"Booking"},
+ *     security={{"bearerAuth":{}}},
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(
+ *             required={"vendor_id", "booking_date", "booking_duration", "booking_start_time", "booking_end_time", "service_location", "services"},
+ *             @OA\Property(property="vendor_id", type="integer", example=9),
+ *             @OA\Property(property="booking_date", type="string", format="date", example="2025-08-10"),
+ *             @OA\Property(property="booking_duration", type="string", format="time", example="01:00:00"),
+ *             @OA\Property(property="booking_start_time", type="string", format="time", example="10:00:00"),
+ *             @OA\Property(property="booking_end_time", type="string", format="time", example="11:00:00"),
+ *             @OA\Property(property="service_location", type="string", example="Home"),
+ *             @OA\Property(property="promocode_id", type="integer", example=2),
+ *             @OA\Property(property="booking_for_someone", type="boolean", example=true),
+ *             @OA\Property(property="someone_name", type="string", example="Jane Doe"),
+ *             @OA\Property(property="someone_contact_no", type="string", example="0771234567"),
+ *             @OA\Property(property="age", type="integer", example=28),
+ *             @OA\Property(property="gender", type="string", example="Female"),
+ *             @OA\Property(property="address", type="string", example="123 Street, City"),
+ *             @OA\Property(property="remarks", type="string", example="Please be on time"),
+ *             @OA\Property(
+ *                 property="services",
+ *                 type="array",
+ *                 @OA\Items(
+ *                     @OA\Property(property="service_id", type="integer", example=3)
+ *                 )
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Booking added successfully",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="status", type="boolean", example=true),
+ *             @OA\Property(property="message", type="string", example="Booking added successfully"),
+ *             @OA\Property(
+ *                 property="data",
+ *                 type="object",
+ *                 @OA\Property(property="booking_id", type="integer", example=1),
+ *                 @OA\Property(property="booking_ref_no", type="string", example="BMOAONKUIANLG_65bf2346dfab2"),
+ *                 @OA\Property(property="vendor_id", type="integer", example=9),
+ *                 @OA\Property(property="total_amount", type="number", format="float", example=1500.00)
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=404,
+ *         description="Vendor not found",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="status", type="boolean", example=false),
+ *             @OA\Property(property="message", type="string", example="Vendor not found")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=500,
+ *         description="Unable to add the booking now. Please try again later",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="Unable to add the booking now. Please try again later")
+ *         )
+ *     )
+ * )
+ */
+
     public function addManualBooking(Request $request){
         $user = auth()->user();
         
