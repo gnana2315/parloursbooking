@@ -113,4 +113,7 @@ Route::middleware(['auth:sanctum', 'validate.token'])->group(function () {
 
     //transections
     Route::get('/getThisWeekEarningsByVendor', [VendorController::class, 'getThisWeekEarningsByVendor']);
+    Route::get('/getPayoutHistoryByVendor', [VendorController::class, 'getPayoutHistoryByVendor']);
+    Route::get('/getAllEarningsByVendor', [VendorController::class, 'getAllEarningsByVendor']);
+    Route::get('/getIncentivesByVendor', [VendorController::class, 'getIncentivesByVendor']);
 });

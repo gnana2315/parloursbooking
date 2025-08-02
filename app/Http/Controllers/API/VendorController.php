@@ -1009,6 +1009,41 @@ class VendorController extends Controller
         ], 200);
     }
 
+    /**
+ * @OA\Get(
+ *     path="/getThisWeekEarningsByVendor",
+ *     summary="Get this week's earnings for the authenticated vendor",
+ *     tags={"Transections"},
+ *     security={{"bearerAuth":{}}},
+ *     @OA\Response(
+ *         response=200,
+ *         description="Earnings retrieved successfully",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="success", type="boolean", example=true),
+ *             @OA\Property(
+ *                 property="data",
+ *                 type="array",
+ *                 @OA\Items(
+ *                     type="object",
+ *                     @OA\Property(property="date", type="string", format="date", example="2025-08-02"),
+ *                     @OA\Property(property="booking_ref_no", type="string", example="PBV-123456"),
+ *                     @OA\Property(property="amount", type="number", format="float", example=15000.00),
+ *                     @OA\Property(property="status", type="string", example="Completed")
+ *                 )
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=404,
+ *         description="Vendor not found",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="Vendor not found")
+ *         )
+ *     )
+ * )
+ */
+
     public function getThisWeekEarningsByVendor(){
         $user = auth()->user();
         $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
@@ -1066,6 +1101,284 @@ class VendorController extends Controller
         return response()->json([
             'success' => true,
             'data' => $earnings
+        ], 200);
+    }
+
+
+    /**
+ * @OA\Get(
+ *     path="/getPayoutHistoryByVendor",
+ *     summary="Get payouts for the authenticated vendor",
+ *     tags={"Transections"},
+ *     security={{"bearerAuth":{}}},
+ *     @OA\Response(
+ *         response=200,
+ *         description="Payouts retrieved successfully",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="success", type="boolean", example=true),
+ *             @OA\Property(
+ *                 property="data",
+ *                 type="array",
+ *                 @OA\Items(
+ *                     type="object",
+ *                     @OA\Property(property="date", type="string", format="date", example="2025-08-02"),
+ *                     @OA\Property(property="booking_ref_no", type="string", example="PBV-123456"),
+ *                     @OA\Property(property="amount", type="number", format="float", example=15000.00)
+ *                 )
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=404,
+ *         description="Vendor not found",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="Vendor not found")
+ *         )
+ *     )
+ * )
+ */
+    public function getPayoutHistoryByVendor(){
+        $user = auth()->user();
+        $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
+        if (!$vendor) {
+            return response()->json(['message' => 'Vendor not found'], 404);
+        }
+
+        // $startOfWeek = now()->startOfWeek();
+        // $endOfWeek = now()->endOfWeek();
+
+        // $earnings = bookings::where('pbv_vendor_id', $vendor->pbv_id)
+        //     ->whereBetween('pb_bk_date', [$startOfWeek, $endOfWeek])
+        //     ->sum('pb_bk_total');
+
+        // return response()->json([
+        //     'success' => true,
+        //     'data' => [
+        //         'earnings' => $earnings,
+        //         'week_start' => $startOfWeek->format('Y-m-d'),
+        //         'week_end' => $endOfWeek->format('Y-m-d')
+        //     ]
+        // ], 200);
+        $payouts = [
+            [
+                'date' => now()->format('Y-m-d'),
+                'booking_ref_no' => 'PBV-123456',
+                'amount' => 15000.00
+            ],
+            [
+                'date' => now()->format('Y-m-d'),
+                'booking_ref_no' => 'PBV-4646',
+                'amount' => 7000.00
+            ],
+            [
+                'date' => now()->format('Y-m-d'),
+                'booking_ref_no' => 'PBV-7890',
+                'amount' => 12000.00
+            ],
+            [
+                'date' => now()->format('Y-m-d'),
+                'booking_ref_no' => 'PBV-4567',
+                'amount' => 8000.00
+            ],
+            [
+                'date' => now()->format('Y-m-d'),
+                'booking_ref_no' => 'PBV-8901',
+                'amount' => 5000.00
+            ]
+        ];
+        return response()->json([
+            'success' => true,
+            'data' => $payouts
+        ], 200);
+    }
+/**
+ * @OA\Get(
+ *     path="/getAllEarningsByVendor",
+ *     summary="Get all earnings for the authenticated vendor",
+ *     tags={"Transections"},
+ *     security={{"bearerAuth":{}}},
+ *     @OA\Response(
+ *         response=200,
+ *         description="All Earnings retrieved successfully",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="success", type="boolean", example=true),
+ *             @OA\Property(
+ *                 property="data",
+ *                 type="array",
+ *                 @OA\Items(
+ *                     type="object",
+ *                     @OA\Property(property="date", type="string", format="date", example="2025-08-02"),
+ *                     @OA\Property(property="booking_ref_no", type="string", example="PBV-123456"),
+ *                     @OA\Property(property="amount", type="number", format="float", example=15000.00),
+ *                     @OA\Property(property="status", type="string", example="Completed")
+ *                 )
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=404,
+ *         description="Vendor not found",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="Vendor not found")
+ *         )
+ *     )
+ * )
+ */
+    public function getAllEarningsByVendor(){
+        $user = auth()->user();
+        $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
+        if (!$vendor) {
+            return response()->json(['message' => 'Vendor not found'], 404);
+        }
+
+        // $startOfWeek = now()->startOfWeek();
+        // $endOfWeek = now()->endOfWeek();
+
+        // $earnings = bookings::where('pbv_vendor_id', $vendor->pbv_id)
+        //     ->whereBetween('pb_bk_date', [$startOfWeek, $endOfWeek])
+        //     ->sum('pb_bk_total');
+
+        // return response()->json([
+        //     'success' => true,
+        //     'data' => [
+        //         'earnings' => $earnings,
+        //         'week_start' => $startOfWeek->format('Y-m-d'),
+        //         'week_end' => $endOfWeek->format('Y-m-d')
+        //     ]
+        // ], 200);
+        $allEarnings = [
+            [
+                'date' => now()->format('Y-m-d'),
+                'booking_ref_no' => 'PBV-123456',
+                'amount' => 15000.00,
+                'status' => 'Paid',
+            ],
+            [
+                'date' => now()->format('Y-m-d'),
+                'booking_ref_no' => 'PBV-4646',
+                'amount' => 7000.00,
+                'status' => 'Unpaid',
+            ],
+            [
+                'date' => now()->format('Y-m-d'),
+                'booking_ref_no' => 'PBV-7890',
+                'amount' => 12000.00,
+                'status' => 'Unpaid',
+            ],
+            [
+                'date' => now()->format('Y-m-d'),
+                'booking_ref_no' => 'PBV-4567',
+                'amount' => 8000.00,
+                'status' => 'Paid',
+            ],
+            [
+                'date' => now()->format('Y-m-d'),
+                'booking_ref_no' => 'PBV-8901',
+                'amount' => 5000.00,
+                'status' => 'Paid',
+            ]
+        ];
+        return response()->json([
+            'success' => true,
+            'data' => $allEarnings
+        ], 200);
+    }
+    /**
+ * @OA\Get(
+ *     path="/getIncentivesByVendor",
+ *     summary="Get Incentives for the authenticated vendor",
+ *     tags={"Transections"},
+ *     security={{"bearerAuth":{}}},
+ *     @OA\Response(
+ *         response=200,
+ *         description="All Incentives retrieved successfully",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="success", type="boolean", example=true),
+ *             @OA\Property(
+ *                 property="data",
+ *                 type="array",
+ *                 @OA\Items(
+ *                     type="object",
+ *                     @OA\Property(property="incentive_name", type="string", example="Referral Bonus"),
+ *                     @OA\Property(property="incentive_description", type="string", example="Bonus for referring new customers"),
+ *                     @OA\Property(property="incentive_amount", type="number", format="float", example=5000.00),
+ *                     @OA\Property(property="incentive_target", type="integer", example=10),
+ *                     @OA\Property(property="incentive_start_date", type="string", format="date", example="2025-08-02"),
+ *                     @OA\Property(property="incentive_end_date", type="string", format="date", example="2025-09-01"),
+ *                     @OA\Property(
+ *                         property="incentive_vendor_details",
+ *                         type="object",
+ *                         @OA\Property(property="incentive_achieved", type="integer", example=10),
+ *                         @OA\Property(property="incentive_remaining", type="integer", example=0),
+ *                     ),
+ *                     @OA\Property(
+ *                         property="incentive_transections",
+ *                         type="array",
+ *                         @OA\Items(
+ *                             type="object",
+ *                             @OA\Property(property="date", type="string", format="date", example="2025-08-02"),
+ *                             @OA\Property(property="amount", type="number", format="float", example=5000.00),
+ *                         )
+ *                     )
+ *                 )
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=404,
+ *         description="Vendor not found",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="Vendor not found")
+ *         )
+ *     )
+ * )
+ */
+    public function getIncentivesByVendor(){
+        $user = auth()->user();
+        $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
+        if (!$vendor) {
+            return response()->json(['message' => 'Vendor not found'], 404);
+        }
+
+        $incentives = [
+            [
+                'incentive_name' => 'Referral Bonus',
+                'incentive_description' => 'Bonus for referring new customers',
+                'incentive_amount' => 5000.00,
+                'incentive_target' => 10,
+                'incentive_start_date' => now()->format('Y-m-d'),
+                'incentive_end_date' => now()->addDays(30)->format('Y-m-d'),
+                'incentive_vendor_details' => [
+                    'incentive_achieved' => 10,
+                    'incentive_remaining' => 0,
+                ],
+                'incentive_transections' => [
+                    [
+                        'date' => now()->format('Y-m-d'),
+                        'amount' => 5000.00,
+                    ],
+                ],
+            ],            
+            [
+                'incentive_name' => 'Weekly Booking Target',
+                'incentive_description' => 'Bonus for achieving weekly booking targets',
+                'incentive_amount' => 2000.00,
+                'incentive_target' => 10,
+                'incentive_start_date' => now()->format('Y-m-d'),
+                'incentive_end_date' => now()->addDays(30)->format('Y-m-d'),
+                'incentive_vendor_details' => [
+                    'incentive_achieved' => 3,
+                    'incentive_remaining' => 7,
+                ],
+            ],
+        ];
+
+        return response()->json([
+            'success' => true,
+            'data' => $incentives
         ], 200);
     }
 
