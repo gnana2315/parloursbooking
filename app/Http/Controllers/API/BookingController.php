@@ -290,7 +290,7 @@ class BookingController extends Controller
      * @OA\Post(
      *      path="/api/addOnlineBooking",
      *      operationId="addOnlineBooking",
-     *      tags={"Bookings"},
+     *      tags={"Booking"},
      *      security={{"bearerAuth": {}}},
      *      summary="Add Online Booking",
      *      description="Add Online Bookings",
