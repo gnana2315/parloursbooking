@@ -112,5 +112,5 @@ Route::middleware(['auth:sanctum', 'validate.token'])->group(function () {
     Route::get('/customer/bookings', [CustomersController::class, 'getBookingsByCustomerID']);
 
     //transections
-    Route::get('/getThisWeekEarningsByVendor', [CommonController::class, 'getThisWeekEarningsByVendor']);
+    Route::get('/getThisWeekEarningsByVendor', [VendorController::class, 'getThisWeekEarningsByVendor']);
 });
