@@ -737,6 +737,83 @@ class BookingController extends Controller
         ], $status_code);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/getBookings",
+     *     summary="Get all bookings for the authenticated vendor",
+     *     description="Retrieves bookings including customer and limited service details.",
+     *     tags={"Booking"},
+     *     security={{"bearerAuth":{}}},
+     *     
+     *     @OA\Response(
+     *         response=200,
+     *         description="Bookings retrieved successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Bookings retrieved successfully"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="pbb_id", type="integer", example=1),
+     *                     @OA\Property(property="pbb_vendor_id", type="integer", example=9),
+     *                     @OA\Property(property="pbb_booking_date", type="string", format="date", example="2025-08-02"),
+     *                     @OA\Property(property="pbb_booking_duration", type="string", format="time", example="01:30:00"),
+     *                     @OA\Property(property="pbb_booking_start_time", type="string", format="time", example="10:00:00"),
+     *                     @OA\Property(property="pbb_booking_end_time", type="string", format="time", example="11:30:00"),
+     *                     @OA\Property(property="pbb_service_location", type="string", example="In-Salon"),
+     *                     @OA\Property(
+     *                         property="customer",
+     *                         type="object",
+     *                         @OA\Property(property="pbc_id", type="integer", example=12),
+     *                         @OA\Property(property="pbc_user_id", type="integer", example=21),
+     *                         @OA\Property(property="pbc_name", type="string", example="John Doe"),
+     *                         @OA\Property(property="customer_contact_no", type="string", example="9876543210")
+     *                     ),
+     *                     @OA\Property(
+     *                         property="booking_details",
+     *                         type="array",
+     *                         @OA\Items(
+     *                             type="object",
+     *                             @OA\Property(property="pbbd_id", type="integer", example=100),
+     *                             @OA\Property(
+     *                                 property="services",
+     *                                 type="object",
+     *                                 @OA\Property(property="pbs_id", type="integer", example=55),
+     *                                 @OA\Property(property="pbs_service_type", type="integer", example=1),
+     *                                 @OA\Property(property="pbs_service_for", type="integer", example=2),
+     *                                 @OA\Property(property="pbs_name", type="string", example="Haircut"),
+     *                                 @OA\Property(property="pbs_price", type="number", format="float", example=1200),
+     *                                 @OA\Property(property="pbs_duration", type="string", format="time", example="00:30:00")
+     *                             )
+     *                         )
+     *                     )
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     
+     *     @OA\Response(
+     *         response=404,
+     *         description="No bookings found or vendor not found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="No bookings found")
+     *         )
+     *     ),
+     *     
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Unauthenticated.")
+     *         )
+     *     )
+     * )
+ */
+
     public function getBookings()
     {
         $user = auth()->user();
