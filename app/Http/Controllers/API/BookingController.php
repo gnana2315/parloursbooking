@@ -300,7 +300,6 @@ class BookingController extends Controller
      *              required={"vendor_id", "promocode_id", "booking_details", "booking_date", "booking_duration", "booking_start_time", "booking_end_time", "service_location"},
      *              @OA\Property(property="vendor_id", type="number", example="1"),
      *              @OA\Property(property="booking_for_someone", type="number", example="0(myself)/1(someoneelse)"),
-     *              @OA\Property(property="booking_details", type="string", example="name,contactno,remarks"),
      *              @OA\Property(property="booking_date", type="date", example="2025-04-29"),
      *              @OA\Property(property="service_total_duration", type="time", example="02:00:00"),
      *              @OA\Property(property="booking_start_time", type="time", example="08:00:00"),
