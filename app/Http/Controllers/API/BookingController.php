@@ -387,7 +387,7 @@ class BookingController extends Controller
             'pbb_booking_duration' => $request->booking_duration,
             'pbb_booking_start_time' => $request->booking_start_time,
             'pbb_booking_end_time' => $request->booking_end_time,
-            'pbb_ref_no' => uniqid('BOOKING_'),
+            'pbb_ref_no' => uniqid('BOONOLKIINNEG_'),
             'pbb_type' => 'Online',
             'pbb_service_location' => $request->service_location,
             'pbb_contact_no' => ($request->booking_for_someone == 1) ? $request->someone_contact_no : $customer->customer_contact_no,
@@ -534,18 +534,102 @@ class BookingController extends Controller
         ], 200);
     }
 
-    // public function addManualBooking(Request $request){
-    //     $user = auth()->user();
+    public function addManualBooking(Request $request){
+        $user = auth()->user();
+        
+        $request->validate(
+            [
+                'booking_date' => 'required',
+                'booking_duration' => 'required|date_format:H:i:s',
+                'booking_start_time' => 'required|date_format:H:i:s',
+                'booking_end_time' => 'required|date_format:H:i:s',
+                'service_location' => 'required',
+                'services.*.service_id' => 'required|integer',
+            ],
+            [
+                'booking_date.required' => 'Booking date is required',
+                'booking_duration.required' => 'Booking duration is required',
+                'booking_start_time.required' => 'Booking start time is required',
+                'booking_end_time.required' => 'Booking end time is required',
+                'service_location.required' => 'Service location is required',
+                'services.*.service_id.required' => 'Service ID is required',
+                'services.*.service_id.integer' => 'Service ID must be an integer',
+            ]
+        );
 
-    //     $request->validate(
-    //         [
-    //             'booking_date' => 'required',
-    //             'booking_duration' => 'required|date_format:H:i:s',
-    //             'booking_start_time' => 'required|date_format:H:i:s',
-    //             'booking_end_time' => 'required|date_format:H:i:s',
-    //             'service_location' => 'required',
-    //             'services.*.service_id' => 'required|integer',
-    //         ]
-    //     );
-    // }
+        $vendor = vendors::find($request->vendor_id);
+        if (!$vendor) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Vendor not found',
+            ], 404);
+        }
+
+        $booking_details_generated = [];
+        $booking_details_generated = [
+            'name' => $request->someone_name,
+            'contact_no' => $request->someone_contact_no,
+            'age' => $request->age,
+            'gender' => $request->gender,
+            'address' => $request->address,
+            'remarks' => $request->remarks,
+        ];
+
+        $addbooking = Booking::create([
+            'pbb_vendor_id' => $request->vendor_id,
+            'pbb_customer_id' => null,
+            'pbb_promo_id' => $request->promocode_id,
+            'pbb_booking_details' => json_encode($booking_details_generated),
+            'pbb_booking_date' => $request->booking_date,
+            'pbb_booking_duration' => $request->booking_duration,
+            'pbb_booking_start_time' => $request->booking_start_time,
+            'pbb_booking_end_time' => $request->booking_end_time,
+            'pbb_ref_no' => uniqid('BMOAONKUIANLG_'),
+            'pbb_type' => 'Manual',
+            'pbb_service_location' => $request->service_location,
+            'pbb_contact_no' => ($request->booking_for_someone == 1) ? $request->someone_contact_no : $customer->customer_contact_no,
+            'pbb_status' => 1
+        ]);
+
+        if($addbooking){
+            $booking_details = $request->booking_details;
+            $total_amount = 0;
+            foreach($booking_details as $key => $value){
+                $service = services::where('pbs_id', $value['service_id'])->first();
+                if($service){
+                    $total_amount += $service->pbs_price;
+                    bookingDetail::create([
+                        'pbbd_booking_id' => $addbooking->pbb_id,
+                        'pbbd_service_id' => $value['service_id'],
+                        'pbbd_employee_id' => null,
+                        'pbbd_promo_id' => null,
+                        'pbbd_amount' => $service->pbs_price,
+                        'pbbd_discount' => 0,
+                        'pbbd_total_amount' => $service->pbs_price,
+                        'pbb_status' => 1
+                    ]);
+                }
+            }
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Booking added successfully',
+                'data' => [
+                    'booking_id' => $addbooking->pbb_id,
+                    'booking_ref_no' => $addbooking->pbb_ref_no,
+                    'vendor_id' => $addbooking->pbb_vendor_id,
+                    'total_amount' => $total_amount
+                ]
+            ], 200);
+            $status_code = 200;
+            $message = "Booking Added Successfully";
+        }else{
+            $status_code = 500;
+            $message = "Unable to add the booking now. Please try again later";
+        }
+
+        return response()->json([
+            'message' => $message,
+        ], $status_code);
+    }
 }

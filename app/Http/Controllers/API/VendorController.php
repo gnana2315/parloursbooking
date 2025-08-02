@@ -656,6 +656,7 @@ class VendorController extends Controller
                 'pbvsa_start_time' => $availability['start_time'],
                 'pbvsa_end_time' => $availability['end_time'],
                 'pbvsa_is_open' => $availability['is_open'],
+                'pbvsa_isEdit' => 0
             ]);
         }
 
@@ -663,6 +664,38 @@ class VendorController extends Controller
             'message' => 'Vendor Availability updated successfully'
         ], 200);
     }
+
+    /**
+     * @OA\Get(
+     *     path="/getVendorAvailability",
+     *     summary="Get vendor availability",
+     *     description="Fetches the standard availability details for the authenticated vendor.",
+     *     operationId="getVendorAvailability",
+     *     tags={"Vendor"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Availability fetched successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="data", type="array", @OA\Items(
+     *                 @OA\Property(property="id", type="integer"),
+     *                 @OA\Property(property="pbvsa_vendor_id", type="integer"),
+     *                 @OA\Property(property="day", type="string"),
+     *                 @OA\Property(property="start_time", type="string", format="time"),
+     *                 @OA\Property(property="end_time", type="string", format="time"),
+     *                 @OA\Property(property="is_open", type="integer")
+     *             ))
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Vendor not found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Vendor not found")
+     *         )
+     *     ),
+     * )
+ */
 
     public function getVendorAvailability(){
         $user = auth()->user();
