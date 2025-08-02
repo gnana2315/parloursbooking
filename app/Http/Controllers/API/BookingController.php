@@ -659,7 +659,7 @@ class BookingController extends Controller
         ]);
 
         if($addbooking){
-            $booking_details = $request->booking_details;
+            $booking_details = $request->services;
             $total_amount = 0;
             foreach($booking_details as $key => $value){
                 $service = services::where('pbs_id', $value['service_id'])->first();
