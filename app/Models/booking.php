@@ -43,6 +43,9 @@ class booking extends Model
         'deleted_at',
     ];
 
+    public function customer() {
+        return $this->belongsTo(Customer::class, 'pbb_customer_id', 'pbc_id');
+    }
     public function vendors(){
         return $this->belongsTo(vendors::class, 'pbb_vendor_id');
     }

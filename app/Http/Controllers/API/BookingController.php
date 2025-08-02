@@ -736,4 +736,28 @@ class BookingController extends Controller
             'message' => $message,
         ], $status_code);
     }
+
+    public function getBookings()
+    {
+        $user = auth()->user();
+        $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
+        if (!$vendor) {
+            return response()->json(['message' => 'Vendor not found'], 404);
+        }
+
+        $bookings = booking::where('pbb_vendor_id', $vendor->pbv_id)
+            ->with(['customer', 'bookingDetails.services'])
+            ->orderBy('pbb_booking_date', 'desc')
+            ->get();
+
+        if ($bookings->isEmpty()) {
+            return response()->json(['message' => 'No bookings found'], 404);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Bookings retrieved successfully',
+            'data' => $bookings
+        ], 200);
+    }
 }
