@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('vendor_standard_availability', function (Blueprint $table) {
-            $table->enum('pbvsa_isEdit', ['0', '1']);
+            $table->enum('pbvsa_isEdit', [0, 1])->default(0)->comment('0 = No, 1 = Yes');
         });
     }
 
