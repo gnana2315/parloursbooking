@@ -656,7 +656,8 @@ class VendorController extends Controller
                 'pbvsa_start_time' => $availability['start_time'],
                 'pbvsa_end_time' => $availability['end_time'],
                 'pbvsa_is_open' => $availability['is_open'],
-                'pbvsa_isEdit' => 0
+                'pbvsa_isEdit' => 0,
+                'pbvsa_status' => 1
             ]);
         }
 
