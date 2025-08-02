@@ -326,7 +326,6 @@ class BookingController extends Controller
             [
                 'vendor_id' => 'required',
                 'promocode_id' => 'nullable',
-                'booking_details' => 'required',
                 'booking_date' => 'required',
                 'booking_duration' => 'required|date_format:H:i:s',
                 'booking_start_time' => 'required|date_format:H:i:s',
@@ -337,7 +336,6 @@ class BookingController extends Controller
             [
                 'vendor_id.required' => 'Vendor ID is required',
                 'promocode_id.required' => 'Promo code ID is required',
-                'booking_details.required' => 'Booking details are required',
                 'booking_date.required' => 'Booking date is required',
                 'booking_duration.required' => 'Booking duration is required',
                 'booking_start_time.required' => 'Booking start time is required',
