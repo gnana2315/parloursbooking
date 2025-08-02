@@ -1009,6 +1009,66 @@ class VendorController extends Controller
         ], 200);
     }
 
+    public function getThisWeekEarningsByVendor(){
+        $user = auth()->user();
+        $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
+        if (!$vendor) {
+            return response()->json(['message' => 'Vendor not found'], 404);
+        }
+
+        // $startOfWeek = now()->startOfWeek();
+        // $endOfWeek = now()->endOfWeek();
+
+        // $earnings = bookings::where('pbv_vendor_id', $vendor->pbv_id)
+        //     ->whereBetween('pb_bk_date', [$startOfWeek, $endOfWeek])
+        //     ->sum('pb_bk_total');
+
+        // return response()->json([
+        //     'success' => true,
+        //     'data' => [
+        //         'earnings' => $earnings,
+        //         'week_start' => $startOfWeek->format('Y-m-d'),
+        //         'week_end' => $endOfWeek->format('Y-m-d')
+        //     ]
+        // ], 200);
+        $earnings = [
+            [
+                'date' => now()->format('Y-m-d'),
+                'booking_ref_no' => 'PBV-123456',
+                'amount' => 15000.00,
+                'status' => 'Completed',
+            ],
+            [
+                'date' => now()->format('Y-m-d'),
+                'booking_ref_no' => 'PBV-4646',
+                'amount' => 7000.00,
+                'status' => 'Completed',
+            ],
+            [
+                'date' => now()->format('Y-m-d'),
+                'booking_ref_no' => 'PBV-7890',
+                'amount' => 12000.00,
+                'status' => 'Completed',
+            ],
+            [
+                'date' => now()->format('Y-m-d'),
+                'booking_ref_no' => 'PBV-4567',
+                'amount' => 8000.00,
+                'status' => 'Completed',
+            ],
+            [
+                'date' => now()->format('Y-m-d'),
+                'booking_ref_no' => 'PBV-8901',
+                'amount' => 5000.00,
+                'status' => 'Completed',
+            ]
+        ];
+        return response()->json([
+            'success' => true,
+            'data' => $earnings
+        ], 200);
+    }
+
     function groupAvailability(array $availability) {
         $grouped = [];
         $tempGroup = null;
