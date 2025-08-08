@@ -300,7 +300,7 @@ class BookingController extends Controller
      *             @OA\Property(property="vendor_id", type="integer", example=9),
      *             @OA\Property(property="promocode_id", type="integer", nullable=true, example=null),
      *             @OA\Property(property="booking_details", type="array", @OA\Items(
-     *              @OA\Property(property="service_id", type="integer", example=1) 
+     *              @OA\Property(property="service_id", type="integer", example=1),
      *             @OA\Property(property="booking_date", type="string", format="date", example="2025-08-02"),
      *             @OA\Property(property="booking_duration", type="string", format="time", example="01:30:00"),
      *             @OA\Property(property="booking_start_time", type="string", format="time", example="10:00:00"),
