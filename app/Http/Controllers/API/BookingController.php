@@ -299,6 +299,8 @@ class BookingController extends Controller
      *         @OA\JsonContent(
      *             @OA\Property(property="vendor_id", type="integer", example=9),
      *             @OA\Property(property="promocode_id", type="integer", nullable=true, example=null),
+     *             @OA\Property(property="booking_details", type="array", @OA\Items(
+     *              @OA\Property(property="service_id", type="integer", example=1) 
      *             @OA\Property(property="booking_date", type="string", format="date", example="2025-08-02"),
      *             @OA\Property(property="booking_duration", type="string", format="time", example="01:30:00"),
      *             @OA\Property(property="booking_start_time", type="string", format="time", example="10:00:00"),
@@ -311,13 +313,6 @@ class BookingController extends Controller
      *             @OA\Property(property="gender", type="string", example="Male"),
      *             @OA\Property(property="address", type="string", example="123 Street Name"),
      *             @OA\Property(property="remarks", type="string", example="No special requests."),
-     *             @OA\Property(
-     *                 property="services",
-     *                 type="array",
-     *                 @OA\Items(
-     *                     @OA\Property(property="service_id", type="integer", example=1)
-     *                 )
-     *             )
      *         )
      *     ),
      *
@@ -366,23 +361,25 @@ class BookingController extends Controller
             [
                 'vendor_id' => 'required',
                 'promocode_id' => 'nullable',
+                'booking_details' => 'required',
                 'booking_date' => 'required',
                 'booking_duration' => 'required|date_format:H:i:s',
                 'booking_start_time' => 'required|date_format:H:i:s',
                 'booking_end_time' => 'required|date_format:H:i:s',
                 'service_location' => 'required',
-                'services.*.service_id' => 'required|integer',
+                // 'services.*.service_id' => 'required|integer',
             ],
             [
                 'vendor_id.required' => 'Vendor ID is required',
                 'promocode_id.required' => 'Promo code ID is required',
+                'booking_details.required' => 'Booking details are required',
                 'booking_date.required' => 'Booking date is required',
                 'booking_duration.required' => 'Booking duration is required',
                 'booking_start_time.required' => 'Booking start time is required',
                 'booking_end_time.required' => 'Booking end time is required',
                 'service_location.required' => 'Service location is required',
-                'services.*.service_id.required' => 'Service ID is required',
-                'services.*.service_id.integer' => 'Service ID must be an integer',
+                // 'services.*.service_id.required' => 'Service ID is required',
+                // 'services.*.service_id.integer' => 'Service ID must be an integer',
             ]
         );
 
@@ -433,7 +430,7 @@ class BookingController extends Controller
         ]);
 
         if($addbooking){
-            $booking_details = $request->services;
+            $booking_details = $request->booking_details;
             $total_amount = 0;
             foreach($booking_details as $key => $value){
                 $service = services::where('pbs_id', $value['service_id'])->first();
