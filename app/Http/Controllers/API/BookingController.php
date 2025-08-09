@@ -184,7 +184,7 @@ class BookingController extends Controller
 
         Log::info('Vendor:', ['data' => $vendorId]);
         Log::info('Booking Date:', ['data' => $bookingDate]);
-        Log::info('Services:', ['data' => $services]);
+        Log::info('Services:', ['data' => $service_ids]);
 
         $serviceDuration = 0;
         foreach($service_ids as $service_id){
