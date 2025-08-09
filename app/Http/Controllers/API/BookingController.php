@@ -181,6 +181,7 @@ class BookingController extends Controller
         $bookingDate = $request->query('booking_date');
         // $serviceDuration = $request->query('service_total_duration');
         $services = explode(',', $request->query('services'));
+        dd($services);
 
         Log::info('Vendor:', ['data' => $vendorId]);
         Log::info('Booking Date:', ['data' => $bookingDate]);
