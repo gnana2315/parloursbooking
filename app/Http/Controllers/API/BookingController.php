@@ -180,6 +180,10 @@ class BookingController extends Controller
         $vendorId = $request->query('vendor_id');
         $bookingDate = $request->query('booking_date');
         $serviceDuration = $request->query('service_total_duration');
+        
+        Log::info('Vendor:', $vendorId);
+        Log::info('Booking Date:', $bookingDate);
+        Log::info('Service Duration:', $serviceDuration);
 
         $today = Carbon::today()->format('Y-m-d');
         $now = Carbon::now();
