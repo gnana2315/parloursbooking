@@ -16,6 +16,7 @@ use Carbon\CarbonPeriod;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class BookingController extends Controller
 {
@@ -184,6 +185,7 @@ class BookingController extends Controller
         $now = Carbon::now();
 
         if (Carbon::parse($bookingDate)->lt($today)) {
+            Log::info('Booking date cannot be in the past');
             return response()->json([
                 'status' => false,
                 'message' => 'Booking date cannot be in the past',
@@ -197,6 +199,7 @@ class BookingController extends Controller
             ->first();
             
         if (!$availability || !$availability->pbvsa_is_open) {
+            Log::info('Vendor is closed on selected date');
             return response()->json([
                 'status' => false,
                 'message' => 'Vendor is closed on selected date',
@@ -217,6 +220,7 @@ class BookingController extends Controller
         }
 
         if ($openTime->copy()->addMinutes($serviceDuration)->gt($closeTime)) {
+            Log::info('No available time slot: The remaining time before closing is shorter than the service duration.');
             return response()->json([
                 'status' => false,
                 'message' => 'No available time slot: The remaining time before closing is shorter than the service duration.',
@@ -277,7 +281,7 @@ class BookingController extends Controller
                 }
             }
         }
-
+        Log::info('Available time slots retrieved successfully');
         return response()->json([
             'status' => true,
             'message' => 'Available slots',
