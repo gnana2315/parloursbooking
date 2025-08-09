@@ -324,6 +324,7 @@ class AuthController extends Controller
                 'pbv_city' => $request->city,
                 'pbv_gender' => $request->gender,
                 'pbv_dob' => $request->dob,
+                'pbv_contactno' => $user->pbu_mobileno,
                 'pbv_accept_terms' => $request->accept_terms
             ]);
 
@@ -361,6 +362,7 @@ class AuthController extends Controller
                 'pbc_city' => $request->city,
                 'pbc_sex' => $request->gender,
                 'pbc_dob' => $request->dob,
+                'pbc_contact_no' => $user->pbu_mobileno,
                 'pbc_accept_terms' => $request->accept_terms,
                 'pbc_status' => 1
             ]);
