@@ -281,7 +281,7 @@ class BookingController extends Controller
                 }
             }
         }
-        Log::info('Available time slots retrieved successfully');
+        Log::info('Available time slots:', $finalSlots);
         return response()->json([
             'status' => true,
             'message' => 'Available slots',
