@@ -180,16 +180,15 @@ class BookingController extends Controller
         $vendorId = $request->query('vendor_id');
         $bookingDate = $request->query('booking_date');
         // $serviceDuration = $request->query('service_total_duration');
-        $services = explode(',', $request->query('services'));
-        dd($services);
+        $service_ids = explode(',', $request->query('services'));
 
         Log::info('Vendor:', ['data' => $vendorId]);
         Log::info('Booking Date:', ['data' => $bookingDate]);
         Log::info('Services:', ['data' => $services]);
 
         $serviceDuration = 0;
-        foreach($services as $key => $service){
-            $service_detail = services::where('pbs_id', $service['service_id'])->first();
+        foreach($service_ids as $service_id){
+            $service_detail = services::where('pbs_id', $service_id)->first();
             if($service_detail){
                 $serviceDuration += $service_detail->pbs_duration;
             }
