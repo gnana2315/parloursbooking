@@ -86,11 +86,18 @@ class AuthController extends Controller
                 'phone_no.unique' => 'Phone Number Already Registered. If you forgot password, please use forgot password, instead of Create new account.',
             ]
         );
-        
-        User::where('pbu_mobileno', $request->phone_no)
+
+        $check_user_validation = User::where('pbu_mobileno', $request->phone_no)
             ->where('pbu_usertype', $request->user_type)
             ->where('pbu_status', 0)
-            ->delete();
+            ->first();
+
+        if($check_user_validation->pbu_mobileno_verified_at == null){
+            User::where('pbu_mobileno', $request->phone_no)
+                ->where('pbu_usertype', $request->user_type)
+                ->where('pbu_status', 0)
+                ->delete();
+        }
 
         $user = User::create([
             'pbu_usertype' => $request->user_type,
