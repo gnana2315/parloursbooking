@@ -99,6 +99,18 @@ class CustomersController extends Controller
      */
     public function addRemoveCustomerFavourite(Request $request){
         $user = auth()->user();
+
+        $request->validate(
+            [
+                'favourite_id' => 'required',
+                'isFav' => 'required',
+            ],
+            [
+                'favourite_id.required' => 'Favourite ID Required',
+                'isFav.required' => 'Favourite Status Required',
+            ]
+        );
+
         $customer = customer::where('pbc_user_id', $user->pbu_id)->first();
         // dd(auth()->id());
         if(!$customer){
@@ -175,7 +187,6 @@ class CustomersController extends Controller
 
         // Fetch vendor details for the favourites
         $vendors = vendors::whereIn('pbv_id', $favourites)
-                    ->select('pbv_id', 'pbv_servicefor', 'pbv_business_name', 'pbv_address', 'pbv_city')
                     ->get();
 
         return response()->json([
