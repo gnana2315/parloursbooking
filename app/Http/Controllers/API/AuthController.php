@@ -86,7 +86,7 @@ class AuthController extends Controller
                 'phone_no.unique' => 'Phone Number Already Registered. If you forgot password, please use forgot password, instead of Create new account.',
             ]
         );
-        dd(config('DIALOG_ESMS_API_KEY'));
+        dd(config('dialogesms.api_key'));die();
         $user = User::create([
             'pbu_usertype' => $request->user_type,
             'pbu_mobileno' => $request->phone_no,
@@ -96,10 +96,10 @@ class AuthController extends Controller
         //dd($user);
         $verfivation_code = $this->generateVerificationCode($user->pbu_id);
 
-        $apiKey = config('DIALOG_ESMS_API_KEY');
-        $sender = config('DIALOG_ESMS_SENDER');
+        $apiKey = config('dialogesms.api_key');
+        $sender = config('dialogesms.sender');
         $message = "Your OTP code is {$verfivation_code}. It is valid for 10 minutes. Please do not share this code with anyone.";
-        
+        dd($apiKey);
         // Store OTP to DB/Cache if needed here
         $result = $this->smsService->sendMessage($apiKey, [$request->phone_no], $message, $sender);       
 
