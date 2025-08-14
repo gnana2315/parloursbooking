@@ -99,7 +99,7 @@ class AuthController extends Controller
         $apiKey = config('dialogesms.api_key');
         $sender = config('dialogesms.sender');
         $message = "Your OTP code is {$verfivation_code}. It is valid for 10 minutes. Please do not share this code with anyone.";
-        dd($apiKey);
+        var_dump($apiKey);
         // Store OTP to DB/Cache if needed here
         $result = $this->smsService->sendMessage($apiKey, [$request->phone_no], $message, $sender);       
 
