@@ -83,7 +83,7 @@ class AuthController extends Controller
                 'user_type.required' => 'User Type undefined',
                 'phone_no.required' => 'Invalid Phone Number.',
                 'phone_no.min' => 'Invalid Phone Number. Phone Number Must have 10 Digits',
-                'phone_no.unique' => 'Phone Number Already Registered. If you forgot password, please use forgot password, instead of Create new account.',
+                'phone_no.unique' => 'Phone Number Already Registered. Please use forgot password or contact our hotline.',
             ]
         );
 
