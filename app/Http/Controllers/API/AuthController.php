@@ -92,11 +92,18 @@ class AuthController extends Controller
             ->where('pbu_status', 0)
             ->first();
 
-        if($check_user_validation->pbu_mobileno_verified_at == null){
-            User::where('pbu_mobileno', $request->phone_no)
-                ->where('pbu_usertype', $request->user_type)
-                ->where('pbu_status', 0)
-                ->delete();
+        if(!empty($check_user_validation)){
+            if($check_user_validation->pbu_mobileno_verified_at == null){
+                User::where('pbu_mobileno', $request->phone_no)
+                    ->where('pbu_usertype', $request->user_type)
+                    ->where('pbu_status', 0)
+                    ->delete();
+            }else{
+                return response()->json([
+                    'message' => 'User already registered successfully.',
+                ], 500);
+                
+            }
         }
 
         $user = User::create([
