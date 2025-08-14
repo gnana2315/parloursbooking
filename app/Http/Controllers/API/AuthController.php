@@ -96,8 +96,8 @@ class AuthController extends Controller
         //dd($user);
         $verfivation_code = $this->generateVerificationCode($user->pbu_id);
 
-        $apiKey = config('dialogesms.api_key');
-        $sender = config('dialogesms.sender');
+        $apiKey = config('DIALOG_ESMS_API_KEY');
+        $sender = config('DIALOG_ESMS_SENDER');
         $message = "Your OTP code is {$verfivation_code}. It is valid for 10 minutes. Please do not share this code with anyone.";
         dd($apiKey);
         // Store OTP to DB/Cache if needed here
