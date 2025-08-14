@@ -87,25 +87,6 @@ class AuthController extends Controller
             ]
         );
 
-        $check_user_validation = User::where('pbu_mobileno', $request->phone_no)
-            ->where('pbu_usertype', $request->user_type)
-            ->where('pbu_status', 0)
-            ->first();
-
-        if(!empty($check_user_validation)){
-            if($check_user_validation->pbu_mobileno_verified_at == null){
-                User::where('pbu_mobileno', $request->phone_no)
-                    ->where('pbu_usertype', $request->user_type)
-                    ->where('pbu_status', 0)
-                    ->delete();
-            }else{
-                return response()->json([
-                    'message' => 'User already registered successfully.',
-                ], 500);
-                
-            }
-        }
-
         $user = User::create([
             'pbu_usertype' => $request->user_type,
             'pbu_mobileno' => $request->phone_no,
@@ -118,7 +99,7 @@ class AuthController extends Controller
         $apiKey = config('dialogesms.api_key');
         $sender = config('dialogesms.sender');
         $message = "Your OTP code is {$verfivation_code}. It is valid for 10 minutes. Please do not share this code with anyone.";
-
+        dd($apiKey);
         // Store OTP to DB/Cache if needed here
         $result = $this->smsService->sendMessage($apiKey, [$request->phone_no], $message, $sender);       
 
