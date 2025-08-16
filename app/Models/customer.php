@@ -32,6 +32,7 @@ class customer extends Model
         'pbc_city',
         'pbc_email',
         'pbc_contact_no',
+        'pbc_profile_image',
         'pbc_status',
         'created_at',
         'updated_at',

@@ -28,6 +28,7 @@ class vendors extends Model
         'pbv_documents',
         'pbv_brno',
         'pbv_email',
+        'pbv_profile_image',
         'pbv_contactno',
         'pbv_address',
         'pbv_city',
