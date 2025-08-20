@@ -67,10 +67,10 @@ class AuthController extends Controller
      */
     //user mobile verification
     public function userRegisterMobileNo(Request $request){
-        // User::where('pbu_mobileno', $request->phone_no)
-        //     ->where('pbu_usertype', $request->user_type)
-        //     ->whereNull('pbu_mobileno_verified_at')
-        //     ->delete();
+        User::where('pbu_mobileno', $request->phone_no)
+            ->where('pbu_usertype', $request->user_type)
+            ->whereNull('pbu_mobileno_verified_at')
+            ->delete();
         $request->validate(
             [
                 'user_type' => 'required',
@@ -105,8 +105,11 @@ class AuthController extends Controller
         $message = "Your OTP code is {$verfivation_code}. It is valid for 10 minutes. Please do not share this code with anyone.";
         
         // Store OTP to DB/Cache if needed here
-        $result = $this->smsService->sendMessage($apiKey, [$request->phone_no], $message, $sender);       
-
+        $smsEnable = filter_var($request->header('SMS_ENABLE', true), FILTER_VALIDATE_BOOLEAN);
+        if($smsEnable){
+            $result = $this->smsService->sendMessage($apiKey, [$request->phone_no], $message, $sender);       
+        }
+        
         return response()->json([
             'message' => 'User registered successfully. Please check the OTP in you phone.',
             'data' => $user->pbu_id,

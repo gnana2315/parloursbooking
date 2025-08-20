@@ -125,28 +125,28 @@ class VendorController extends Controller
                 [
                     'service_for' => 'required',
                     'business_category' => 'required',
-                    'business_name' => 'required|unique:vendor,pbv_business_name',
+                    'business_name' => 'required',
                     'address' => 'required',
                     'city' => 'required',
                     'longatitude' => 'required',
                     'latitude' => 'required',
-                    'email' => 'email|unique:vendor,pbv_email',
-                    'br_no' => 'required'
+                    'email' => 'email|unique:vendor,pbv_email'
+                    // 'br_no' => 'required'
                 ],
                 [
                     'service_for.required' => 'Service for is required',
                     'business_category.required' => 'Business Category is required',
                     'business_name.required' => 'Parlour name is required',
-                    'business_name.unique' => 'The name already in Use',
                     'address.required' => 'Address is required',
                     'city.required' => 'City is required',
                     'longatitude.required' => 'Location is required',
                     'latitude.required' => 'Location is required',
                     'email.email' => 'Email must be a valid email address',
-                    'email.unique' => 'Email already exists',
-                    'br_no.required' => 'BR No is required'
+                    'email.unique' => 'Email already exists'
+                    // 'br_no.required' => 'BR No is required'
                 ]
             );
+            $request->br_no = null;
         }else if ($vendor->pbv_vendortype == '2'){
             $request->validate(
                 [
