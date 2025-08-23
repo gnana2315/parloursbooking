@@ -12,7 +12,7 @@ use App\Models\vendorSpecialCloses;
 use App\Models\promoCode;
 use App\Models\cities;
 use App\Models\deviceToken;
-use App\Models\required_document;
+use App\Models\requiredDocument;
 use App\Services\DialogESMSService;
 
 use App\Http\Controllers\Controller;
@@ -1033,7 +1033,7 @@ class CommonController extends Controller
         $user = auth()->user();
 
         if($vendor_type_id){
-            $documents = requiredDocuments::where('pbrd_vendortype', $vendor_type_id)
+            $documents = requiredDocument::where('pbrd_vendortype', $vendor_type_id)
             ->where('pbrd_status', 1)
             ->get();
 
