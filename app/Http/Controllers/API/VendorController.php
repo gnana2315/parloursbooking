@@ -13,6 +13,8 @@ use App\Models\vendorSpecialCloses;
 use App\Models\vendorBankInfo;
 use App\Models\services;
 use App\Models\customer;
+use App\Models\requiredDocument;
+use App\Models\vendorDocuments;
 use Validator;
 
 use App\Http\Controllers\Controller;
@@ -183,32 +185,21 @@ class VendorController extends Controller
      *      path="/api/vendorDocumentUpdate",
      *      operationId="vendorDocumentUpdate",
      *      tags={"Vendor"},
-     *      summary="Vendor Document Update",
+     *      summary="Vendor Document Upload",
      *      description="",
      *      @OA\RequestBody(
-     *          required=true,
-     *          @OA\JsonContent(
-     *              required={
-     *                  "br_document",
-     *                  "certification",
-     *                  "address_proof_document",
-     *                  "nic_document",
-     *                  "police_report",
-     *                  "experience_letter",
-     *                  "other",
-     *              },
-     *              @OA\Property(property="br_document", type="file", example=""),
-     *              @OA\Property(property="certification", type="file", example=""),
-     *              @OA\Property(property="address_proof_document", type="file", example=""),
-     *              @OA\Property(property="nic_document", type="file", example=""),
-     *              @OA\Property(property="police_report", type="file", example=""),
-     *              @OA\Property(property="experience_letter", type="file", example=""),
-     *              @OA\Property(property="other", type="file", description="If upload any other document user need to add a name for the each document"),
-     *          ),
+     *          @OA\MediaType(
+     *              mediaType="multipart/form-data",
+     *              @OA\Schema(
+     *                  @OA\Property(property="document_1", type="file", format="binary", description="Upload document 1"),
+     *                  @OA\Property(property="document_2", type="file", format="binary", description="Upload document 2"),
+     *                  @OA\Property(property="document_3", type="file", format="binary", description="Upload document 3"),
+     *              )
+     *          )
      *      ),
      *      @OA\Response(
      *          response=200,
-     *          description="Vendor Document saved Successfully",
+     *          description="Vendor Documents uploaded Successfully",
      *          @OA\JsonContent(
      *              @OA\Property(property="token", type="string", example="generated_token_here")
      *          ),
@@ -217,164 +208,219 @@ class VendorController extends Controller
      * )
      */
 
-    public function vendorDocumentUpdate(Request $request){
-
+    public function vendorDocumentUpdate(Request $request, $vendor_type_id){
         $user = auth()->user();
 
         $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
-        if (!$vendor) {
-            return response()->json(['message' => 'Vendor not found'], 404);
-        }
-        $document_data = [];
-        if($vendor->pbv_vendortype == '1'){
-            $request->validate(
-                [
-                    'br_document' => 'required|mimes:jpg,jpeg,png,pdf|max:2048',
-                    'nic_document' => 'required|mimes:jpg,jpeg,png,pdf|max:2048',
-                    'address_proof_document' => 'required|mimes:jpg,jpeg,png,pdf|max:2048',
-                    'other_document' => 'mimes:jpg,jpeg,png,pdf|max:2048',
-                ],
-                [
-                    'br_document.required' => 'BR document is required',
-                    'br_document.mimes' => 'BR document must be a file of type: jpg, jpeg, png, pdf',
-                    'br_document.max' => 'BR document may not be greater than 2MB',
-                    'nic_document.required' => 'BR document is required',
-                    'nic_document.mimes' => 'NIC document must be a file of type: jpg, jpeg, png, pdf',
-                    'nic_document.max' => 'NIC document may not be greater than 2MB',
-                    'address_proof_document.required' => 'Address Proof document is required',
-                    'address_proof_document.mimes' => 'Address Proof document must be a file of type: jpg, jpeg, png, pdf',
-                    'address_proof_document.max' => 'Address Proof document may not be greater than 2MB',
-                    'other_document.mimes' => 'Other document must be a file of type: jpg, jpeg, png, pdf',
-                    'other_document.max' => 'Other document may not be greater than 2MB',
-                ]
-            );
-        }else{
-            $request->validate(
-                [
-                    'nic_document' => 'required|mimes:jpg,jpeg,png,pdf|max:2048',
-                    'certification' => 'required|mimes:jpg,jpeg,png,pdf|max:2048',
-                    'profile_image' => 'required|mimes:jpg,jpeg,png,pdf|max:2048',
-                    'other_document' => 'mimes:jpg,jpeg,png,pdf|max:2048',
-                ],
-                [
-                    'nic_document.required' => 'NIC document is required',
-                    'nic_document.mimes' => 'NIC document must be a file of type: jpg, jpeg, png, pdf',
-                    'nic_document.max' => 'NIC document may not be greater than 2MB',
-                    'certification.required' => 'Certification is required',                    
-                    'certification.mimes' => 'Certification must be a file of type: jpg, jpeg, png, pdf',
-                    'certification.max' => 'Certification may not be greater than 2MB',
-                    'profile_image.required' => 'Profile image is required',
-                    'profile_image.mimes' => 'Profile image must be a file of type: jpg, jpeg, png, pdf',
-                    'profile_image.max' => 'Profile image may not be greater than 2MB',
-                    'other_document.mimes' => 'Other document must be a file of type: jpg, jpeg, png, pdf',
-                    'other_document.max' => 'Other document may not be greater than 2MB',
-                ]
-            );
-        }
-        if ($request->hasFile('br_document')) {
-            $br_document_file = $request->file('br_document');
-            $br_document_filename = $vendor->pbv_business_name . '_' .time() . '_br_document.' . $br_document_file->getClientOriginalExtension();
-            $br_document_file->move(public_path('uploads/vendors'), $br_document_filename);
-            // $path = $br_document_file->storeAs('vendors', $br_document_filename, 's3');
-            // $url = Storage::disk('s3')->url($path);
 
-            $request->merge(['br_document' => $br_document_filename]);
-            $br_document_path = public_path('uploads/vendors') . '/' . $br_document_filename;
+        // Fetch required documents for this vendor type
+        $documents = requiredDocument::where('pbrd_vendor_type', $vendor_type_id)
+            ->where('pbrd_status', 1)
+            ->get();
 
-            $document_data[] = [
-                'br_document' => [
-                    'name' => $br_document_filename,
-                    'path' => $br_document_path,
-                ],
-            ];
+        if ($documents->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No required documents found for this vendor type'
+            ], 404);
         }
 
-        if ($request->hasFile('certification')) {
-            $certification_document_file = $request->file('certification');
-            $certification_document_filename = $vendor->pbv_business_name . '_' .time() . '_certification_document.' . $certification_document_file->getClientOriginalExtension();
-            $certification_document_file->move(public_path('uploads/vendors'), $certification_document_filename);
-            $request->merge(['certification' => $certification_document_filename]);
-            $certification_document_path = public_path('uploads/vendors') . '/' . $certification_document_filename;
-            $document_data[] = [
-                'certification_document' => [
-                    'name' => $certification_document_filename,
-                    'path' => $certification_document_path,
-                ],
-            ];
-        }
+        foreach ($documents as $doc) {
 
-        if ($request->hasFile('address_proof_document')) {
-            $address_proof_document_file = $request->file('address_proof_document');
-            $address_proof_document_filename = $vendor->pbv_business_name . '_' .time() . '_address_proof_document_document.' . $address_proof_document_file->getClientOriginalExtension();
-            $address_proof_document_file->move(public_path('uploads/vendors'), $address_proof_document_filename);
-            $request->merge(['address_proof_document' => $address_proof_document_filename]);
-            $address_proof_document_path = public_path('uploads/vendors') . '/' . $address_proof_document_filename;
-            $document_data[] = [
-                'address_proof_document' => [
-                    'name' => $address_proof_document_filename,
-                    'path' => $address_proof_document_path,
-                ],
-            ];
-        }
-
-        if ($request->hasFile('nic_document')) {
-            $nic_document_file = $request->file('nic_document');
-            $nic_document_filename = $vendor->pbv_business_name . '_' .time() . '_nic_document.' . $nic_document_file->getClientOriginalExtension();
-            $nic_document_file->move(public_path('uploads/vendors'), $nic_document_filename);
-            $request->merge(['nic_document' => $nic_document_filename]);
-            $nic_document_path = public_path('uploads/vendors') . '/' . $nic_document_filename;
-            $document_data[] = [
-                'nic_document' => [
-                    'name' => $nic_document_filename,
-                    'path' => $nic_document_path,
-                ],
-            ];
-        }
-
-        if ($request->hasFile('profile_image')) {
-            $profile_image = $request->file('profile_image');
-            $profile_imagename = $vendor->pbv_business_name . '_' .time() . '_profile_image.' . $profile_image->getClientOriginalExtension();
-            $profile_image->move(public_path('uploads/vendors'), $profile_imagename);
-            $request->merge(['nic_document' => $profile_imagename]);
-            $profile_image_path = public_path('uploads/vendors') . '/' . $profile_imagename;
-            $document_data[] = [
-                'profile_image' => [
-                    'name' => $profile_imagename,
-                    'path' => $profile_image_path,
-                ],
-            ];
-        }
-
-        if ($request->hasFile('other_document')) {
-            foreach ($request->file('other_document') as $index => $document) {
-                $other_document_filename = $vendor->pbv_business_name . '_' .time() . '_other_document_' . $index . '.' . $document->getClientOriginalExtension();
-                $document->move(public_path('uploads/vendors'), $other_document_filename);
-                $request->merge(['other_document' => $other_document_filename]);
-                $other_document_path = public_path('uploads/vendors') . '/' . $other_document_filename;
-                $document_data[] = [
-                    'other_document' => [
-                        'name' => $other_document_filename,
-                        'path' => $other_document_path,
-                    ],
-                ];
+            if ($doc->pbrd_required && !$request->hasFile($doc->pbrd_name)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $doc->pbrd_label . ' is required.'
+                ], 422);
             }
-        }
-        $vendor_document_update = $vendor->update([
-            'pbv_documents' => json_encode($document_data),
-        ]);
 
-        if($vendor_document_update){
-            $message = 'Vendor Document saved successfully';
-            $status = 200;
-        }else{
-            $message = 'Vendor Document failed to save';
-            $status = 500;
-        }
+            if ($request->hasFile($doc->pbrd_name)) {
+                $file = $request->file($doc->pbrd_name);
+                $filename = time() . '_' . $doc->pbrd_name . '_' . $vendor->pbv_business_name . '.' . $file->getClientOriginalExtension();
+                $path = $file->storeAs('uploads/vendors/' . $user->pbu_vid, $filename, 'public');
 
-        return response()->json([
-            'message' => $message
-        ], $status);
+                // Save to DB (example table: vendor_documents)
+                $vendor_document_update = vendorDocuments::create([
+                    'pbvd_vendor_id' => $user->pbu_vid,
+                    'pbvd_required_document_id' => $doc->id,
+                    'pbvd_document_name' => $filename,
+                    'pbvd_document_url' => $path,
+                ]);
+
+                if($vendor_document_update){
+                    $message = 'Vendor Document saved successfully';
+                    $status = 200;
+                }else{
+                    $message = 'Vendor Document failed to save';
+                    $status = 500;
+                }
+            }
+
+            return response()->json([
+                'message' => $message
+            ], $status);
+        }
     }
+    // public function vendorDocumentUpdate(Request $request){
+
+    //     $user = auth()->user();
+
+    //     $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
+    //     if (!$vendor) {
+    //         return response()->json(['message' => 'Vendor not found'], 404);
+    //     }
+        
+    //     $document_data = [];
+        
+    //     if($vendor->pbv_vendortype == '1'){
+    //         $request->validate(
+    //             [
+    //                 'br_document' => 'required|mimes:jpg,jpeg,png,pdf|max:2048',
+    //                 'nic_document' => 'required|mimes:jpg,jpeg,png,pdf|max:2048',
+    //                 'address_proof_document' => 'required|mimes:jpg,jpeg,png,pdf|max:2048',
+    //                 'other_document' => 'mimes:jpg,jpeg,png,pdf|max:2048',
+    //             ],
+    //             [
+    //                 'br_document.required' => 'BR document is required',
+    //                 'br_document.mimes' => 'BR document must be a file of type: jpg, jpeg, png, pdf',
+    //                 'br_document.max' => 'BR document may not be greater than 2MB',
+    //                 'nic_document.required' => 'BR document is required',
+    //                 'nic_document.mimes' => 'NIC document must be a file of type: jpg, jpeg, png, pdf',
+    //                 'nic_document.max' => 'NIC document may not be greater than 2MB',
+    //                 'address_proof_document.required' => 'Address Proof document is required',
+    //                 'address_proof_document.mimes' => 'Address Proof document must be a file of type: jpg, jpeg, png, pdf',
+    //                 'address_proof_document.max' => 'Address Proof document may not be greater than 2MB',
+    //                 'other_document.mimes' => 'Other document must be a file of type: jpg, jpeg, png, pdf',
+    //                 'other_document.max' => 'Other document may not be greater than 2MB',
+    //             ]
+    //         );
+    //     }else{
+    //         $request->validate(
+    //             [
+    //                 'nic_document' => 'required|mimes:jpg,jpeg,png,pdf|max:2048',
+    //                 'certification' => 'required|mimes:jpg,jpeg,png,pdf|max:2048',
+    //                 'profile_image' => 'required|mimes:jpg,jpeg,png,pdf|max:2048',
+    //                 'other_document' => 'mimes:jpg,jpeg,png,pdf|max:2048',
+    //             ],
+    //             [
+    //                 'nic_document.required' => 'NIC document is required',
+    //                 'nic_document.mimes' => 'NIC document must be a file of type: jpg, jpeg, png, pdf',
+    //                 'nic_document.max' => 'NIC document may not be greater than 2MB',
+    //                 'certification.required' => 'Certification is required',                    
+    //                 'certification.mimes' => 'Certification must be a file of type: jpg, jpeg, png, pdf',
+    //                 'certification.max' => 'Certification may not be greater than 2MB',
+    //                 'profile_image.required' => 'Profile image is required',
+    //                 'profile_image.mimes' => 'Profile image must be a file of type: jpg, jpeg, png, pdf',
+    //                 'profile_image.max' => 'Profile image may not be greater than 2MB',
+    //                 'other_document.mimes' => 'Other document must be a file of type: jpg, jpeg, png, pdf',
+    //                 'other_document.max' => 'Other document may not be greater than 2MB',
+    //             ]
+    //         );
+    //     }
+    //     if ($request->hasFile('br_document')) {
+    //         $br_document_file = $request->file('br_document');
+    //         $br_document_filename = $vendor->pbv_business_name . '_' .time() . '_br_document.' . $br_document_file->getClientOriginalExtension();
+    //         $br_document_file->move(public_path('uploads/vendors'), $br_document_filename);
+    //         // $path = $br_document_file->storeAs('vendors', $br_document_filename, 's3');
+    //         // $url = Storage::disk('s3')->url($path);
+
+    //         $request->merge(['br_document' => $br_document_filename]);
+    //         $br_document_path = public_path('uploads/vendors') . '/' . $br_document_filename;
+
+    //         $document_data[] = [
+    //             'br_document' => [
+    //                 'name' => $br_document_filename,
+    //                 'path' => $br_document_path,
+    //             ],
+    //         ];
+    //     }
+
+    //     if ($request->hasFile('certification')) {
+    //         $certification_document_file = $request->file('certification');
+    //         $certification_document_filename = $vendor->pbv_business_name . '_' .time() . '_certification_document.' . $certification_document_file->getClientOriginalExtension();
+    //         $certification_document_file->move(public_path('uploads/vendors'), $certification_document_filename);
+    //         $request->merge(['certification' => $certification_document_filename]);
+    //         $certification_document_path = public_path('uploads/vendors') . '/' . $certification_document_filename;
+    //         $document_data[] = [
+    //             'certification_document' => [
+    //                 'name' => $certification_document_filename,
+    //                 'path' => $certification_document_path,
+    //             ],
+    //         ];
+    //     }
+
+    //     if ($request->hasFile('address_proof_document')) {
+    //         $address_proof_document_file = $request->file('address_proof_document');
+    //         $address_proof_document_filename = $vendor->pbv_business_name . '_' .time() . '_address_proof_document_document.' . $address_proof_document_file->getClientOriginalExtension();
+    //         $address_proof_document_file->move(public_path('uploads/vendors'), $address_proof_document_filename);
+    //         $request->merge(['address_proof_document' => $address_proof_document_filename]);
+    //         $address_proof_document_path = public_path('uploads/vendors') . '/' . $address_proof_document_filename;
+    //         $document_data[] = [
+    //             'address_proof_document' => [
+    //                 'name' => $address_proof_document_filename,
+    //                 'path' => $address_proof_document_path,
+    //             ],
+    //         ];
+    //     }
+
+    //     if ($request->hasFile('nic_document')) {
+    //         $nic_document_file = $request->file('nic_document');
+    //         $nic_document_filename = $vendor->pbv_business_name . '_' .time() . '_nic_document.' . $nic_document_file->getClientOriginalExtension();
+    //         $nic_document_file->move(public_path('uploads/vendors'), $nic_document_filename);
+    //         $request->merge(['nic_document' => $nic_document_filename]);
+    //         $nic_document_path = public_path('uploads/vendors') . '/' . $nic_document_filename;
+    //         $document_data[] = [
+    //             'nic_document' => [
+    //                 'name' => $nic_document_filename,
+    //                 'path' => $nic_document_path,
+    //             ],
+    //         ];
+    //     }
+
+    //     if ($request->hasFile('profile_image')) {
+    //         $profile_image = $request->file('profile_image');
+    //         $profile_imagename = $vendor->pbv_business_name . '_' .time() . '_profile_image.' . $profile_image->getClientOriginalExtension();
+    //         $profile_image->move(public_path('uploads/vendors'), $profile_imagename);
+    //         $request->merge(['nic_document' => $profile_imagename]);
+    //         $profile_image_path = public_path('uploads/vendors') . '/' . $profile_imagename;
+    //         $document_data[] = [
+    //             'profile_image' => [
+    //                 'name' => $profile_imagename,
+    //                 'path' => $profile_image_path,
+    //             ],
+    //         ];
+    //     }
+
+    //     if ($request->hasFile('other_document')) {
+    //         foreach ($request->file('other_document') as $index => $document) {
+    //             $other_document_filename = $vendor->pbv_business_name . '_' .time() . '_other_document_' . $index . '.' . $document->getClientOriginalExtension();
+    //             $document->move(public_path('uploads/vendors'), $other_document_filename);
+    //             $request->merge(['other_document' => $other_document_filename]);
+    //             $other_document_path = public_path('uploads/vendors') . '/' . $other_document_filename;
+    //             $document_data[] = [
+    //                 'other_document' => [
+    //                     'name' => $other_document_filename,
+    //                     'path' => $other_document_path,
+    //                 ],
+    //             ];
+    //         }
+    //     }
+    //     $vendor_document_update = $vendor->update([
+    //         'pbv_documents' => json_encode($document_data),
+    //     ]);
+
+    //     if($vendor_document_update){
+    //         $message = 'Vendor Document saved successfully';
+    //         $status = 200;
+    //     }else{
+    //         $message = 'Vendor Document failed to save';
+    //         $status = 500;
+    //     }
+
+    //     return response()->json([
+    //         'message' => $message
+    //     ], $status);
+    // }
 
     public function getVendorDocuments(){
         $user = auth()->user();
