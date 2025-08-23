@@ -975,7 +975,7 @@ class CommonController extends Controller
  *     summary="Get Required Documents by Vendor Type",
  *     description="Fetch all required documents for a given vendor type.",
  *     operationId="getRequiredDocuments",
- *     tags={"Required Documents"},
+ *     tags={"Common"},
  *     security={{"bearerAuth":{}}},
  *
  *     @OA\Parameter(
