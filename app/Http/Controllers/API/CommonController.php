@@ -12,6 +12,7 @@ use App\Models\vendorSpecialCloses;
 use App\Models\promoCode;
 use App\Models\cities;
 use App\Models\deviceToken;
+use App\Models\required_document;
 use App\Services\DialogESMSService;
 
 use App\Http\Controllers\Controller;
@@ -966,5 +967,92 @@ class CommonController extends Controller
             'status' => $result === "Success",
             'message' => $result
         ]);
+    }
+
+    /**
+ * @OA\Get(
+ *     path="/api/required-documents/{vendor_type_id}",
+ *     summary="Get Required Documents by Vendor Type",
+ *     description="Fetch all required documents for a given vendor type.",
+ *     operationId="getRequiredDocuments",
+ *     tags={"Required Documents"},
+ *     security={{"bearerAuth":{}}},
+ *
+ *     @OA\Parameter(
+ *         name="vendor_type_id",
+ *         in="path",
+ *         required=true,
+ *         description="Vendor type ID",
+ *         @OA\Schema(type="integer", example=1)
+ *     ),
+ *
+ *     @OA\Response(
+ *         response=200,
+ *         description="List of required documents",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="success", type="boolean", example=true),
+ *             @OA\Property(
+ *                 property="data",
+ *                 type="array",
+ *                 @OA\Items(
+ *                     @OA\Property(property="id", type="integer", example=1),
+ *                     @OA\Property(property="pbrd_vendortype", type="integer", example=1),
+ *                     @OA\Property(property="pbrd_name", type="string", example="businessregistration"),
+ *                     @OA\Property(property="pbrd_label", type="string", example="Business Registration"),
+ *                     @OA\Property(property="pbrd_is_single", type="integer", example=1),
+ *                     @OA\Property(property="pbrd_required", type="boolean", example=true),
+ *                     @OA\Property(property="pbrd_status", type="integer", example=1),
+ *                 )
+ *             )
+ *         )
+ *     ),
+ *
+ *     @OA\Response(
+ *         response=400,
+ *         description="Vendor type ID is required",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="success", type="boolean", example=false),
+ *             @OA\Property(property="message", type="string", example="Vendor type ID is required")
+ *         )
+ *     ),
+ *
+ *     @OA\Response(
+ *         response=404,
+ *         description="No required documents found",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="success", type="boolean", example=false),
+ *             @OA\Property(property="message", type="string", example="No required documents found for this vendor type")
+ *         )
+ *     )
+ * )
+ */
+    public function getRequiredDocuments($vendor_type_id){
+        $user = auth()->user();
+
+        if($vendor_type_id){
+            $documents = requiredDocuments::where('pbrd_vendortype', $vendor_type_id)
+            ->where('pbrd_status', 1)
+            ->get();
+
+            if ($documents->isEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No required documents found for this vendor type'
+                ], 404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => $documents
+            ], 200);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Vendor type ID is required'
+        ], 400);
     }
 }

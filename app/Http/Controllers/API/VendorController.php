@@ -35,11 +35,9 @@ class VendorController extends Controller
      *          required=true,
      *          @OA\JsonContent(
      *              required={
-     *                  "service_for",
-     *                  "vendor_for",
      *                  "business_category",
      *                  "business_name",
-     *                  "business_name",
+     *                  "display_name",
      *                  "address",
      *                  "city",
      *                  "longatitude",
@@ -47,31 +45,10 @@ class VendorController extends Controller
      *                  "email",
      *                  "br_no/nic_no",
      *                  "short_description",
-     *              },
-     *              @OA\Property(property="service_for", type="numeric", example="Men(1)/Women(2)/Unisex(3)"),
-     *              @OA\Property(property="business_category", type="numeric", example="Saloon(1)/Parlour(2)/Nail Art(3)"),
+     *                  "staff_no"
+     *              }, 
      *              @OA\Property(property="business_name", type="string", example="Golden Saloon"),
-     *              @OA\Property(
-     *                  property="person_initial", 
-     *                  type="string", 
-     *                  nullable=true,
-     *                  description="Required only if vendortype is 2 (Therapist)",
-     *                  example="Mr/Mrs/Ms"
-     *              ),
-     *              @OA\Property(
-     *                  property="person_firstname", 
-     *                  type="string", 
-     *                  nullable=true,
-     *                  description="Required only if vendortype is 2 (Therapist)",
-     *                  example="John"
-     *              ),
-     *              @OA\Property(
-     *                  property="person_lastname", 
-     *                  type="string", 
-     *                  nullable=true,
-     *                  description="Required only if vendortype is 2 (Therapist)",
-     *                  example="Peter"
-     *              ),
+     *              @OA\Property(property="display_name", type="string", example="Golden"),
      *              @OA\Property(property="address", type="string", example="No.7, Negombo Road, Wattala"),
      *              @OA\Property(property="city", type="string", example="Wattala"),
      *              @OA\Property(
@@ -104,6 +81,7 @@ class VendorController extends Controller
      *                  example=""
      *              ),
      *              @OA\Property(property="short_description", type="string", example=""),
+     *              @OA\Property(property="staff_no", type="string", example=""),
      *          ),
      *      ),
      *      @OA\Response(
@@ -123,8 +101,6 @@ class VendorController extends Controller
         if($vendor->pbv_vendortype == '1'){
             $request->validate(
                 [
-                    'service_for' => 'required',
-                    'business_category' => 'required',
                     'business_name' => 'required',
                     'address' => 'required',
                     'city' => 'required',
@@ -134,8 +110,6 @@ class VendorController extends Controller
                     // 'br_no' => 'required'
                 ],
                 [
-                    'service_for.required' => 'Service for is required',
-                    'business_category.required' => 'Business Category is required',
                     'business_name.required' => 'Parlour name is required',
                     'address.required' => 'Address is required',
                     'city.required' => 'City is required',
@@ -150,22 +124,14 @@ class VendorController extends Controller
         }else if ($vendor->pbv_vendortype == '2'){
             $request->validate(
                 [
-                    'service_for' => 'required',
                     'business_category' => 'required',
-                    'person_initial' => 'required',
-                    'person_firstname' => 'required',
-                    'person_lastname' => 'required',
                     'address' => 'required',
                     'city' => 'required',
                     'email' => 'email|unique:vendor,pbv_email',
                     'nic_no' => 'required'
                 ],
                 [
-                    'service_for.required' => 'Service for is required',
                     'business_category.required' => 'Business Category is required',
-                    'person_initial.required' => 'Therapist Initial is required',
-                    'person_firstname.required' => 'Therapist Firstname is required',
-                    'person_lastname.required' => 'Therapist Lastname is required',
                     'address.required' => 'Address is required',
                     'city.required' => 'City is required',
                     'email.email' => 'Email must be a valid email address',
@@ -179,10 +145,9 @@ class VendorController extends Controller
 
         $therapist_name = $request->person_initial . '. ' .$request->person_firstname. ' ' .$request->person_lastname;
         $vendorsUpdate = $vendor->update([ 
-            'pbv_servicefor' => $request->service_for,
             'pbv_tenentid' => 1,
-            'pbv_business_category' => $request->business_category,
             'pbv_business_name' => ($request->business_type == '1') ? $request->business_name : $therapist_name,
+            'pbv_display_name' => ($request->business_type == '1') ? $request->display_name : $therapist_name,
             'pbv_brno' => ($request->business_type == '1') ? $request->br_no : $request->nic_no,
             'pbv_address' => $request->address,
             'pbv_city' => $request->city,
@@ -191,6 +156,7 @@ class VendorController extends Controller
             'pbv_email' => $request->email,
             'pbv_contactno' => $user->pbu_mobileno,
             'pbv_accept_terms' => 1,
+            'pbv_staff_count' => ($request->business_type == '1') ? $request->staff_no : 1,
             'pbv_status' => 0,
         ]);
 
@@ -450,10 +416,12 @@ class VendorController extends Controller
      *          @OA\JsonContent(
      *              required={
      *                  "bankname",
+     *                  "account_holder_name",
      *                  "branch",
      *                  "accountno",
      *              },
      *              @OA\Property(property="bankname", type="text", example="HNB"),
+     *              @OA\Property(property="account_holder_name", type="text", example="John"),
      *              @OA\Property(property="branch", type="text", example="logo.png"),
      *              @OA\Property(property="accountno", type="text", example="2"),
      *          ),
@@ -478,12 +446,14 @@ class VendorController extends Controller
         $request->validate(
             [
                 'bankname' => 'required',
+                'account_holder_name' => 'required',
                 'branch' => 'required',
                 'accountno' => 'required|numeric',
                 
             ],
             [
                 'bankname.required' => 'Please select the Bank',
+                'account_holder_name' => 'Please enter the account holder name',
                 'branch.required' => 'Please enter the Branch name',
                 'accountno.required' => 'Please enter the bank Account No',
                 'accountno.numeric' => 'Bank no must be Numeric',
@@ -493,6 +463,7 @@ class VendorController extends Controller
         $vendorBankInfoUpdate = vendorBankInfo::create([
             'pbvb_vendorid' => $vendor->pbv_id,
             'pbvb_bankname' => $request->bankname,
+            'pbvb_holder_name' => $request->account_holder_name,
             'pbvb_branch' => $request->branch,
             'pbvb_accountno' => $request->accountno,
             'pbvb_status' => 1
