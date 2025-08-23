@@ -1033,7 +1033,7 @@ class CommonController extends Controller
         $user = auth()->user();
 
         if($vendor_type_id){
-            $documents = requiredDocument::where('pbrd_vendortype', $vendor_type_id)
+            $documents = requiredDocument::where('pbrd_vendor_type', $vendor_type_id)
             ->where('pbrd_status', 1)
             ->get();
 
