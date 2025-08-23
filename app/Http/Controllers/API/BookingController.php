@@ -302,74 +302,80 @@ class BookingController extends Controller
         ], 200);
     }
 
-    /**
-     * @OA\Post(
-     *     path="/addOnlineBooking",
-     *     summary="Add Online Booking",
-     *     description="Allows a customer to create a new online booking with one or more services.",
-     *     operationId="addOnlineBooking",
-     *     tags={"Booking"},
-     *     security={{"bearerAuth":{}}},
-     *
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\JsonContent(
-     *             @OA\Property(property="vendor_id", type="integer", example=9),
-     *             @OA\Property(property="promocode_id", type="integer", nullable=true, example=null),
-     *             @OA\Property(property="booking_details", type="array", @OA\Items(
-     *              @OA\Property(property="service_id", type="integer", example=1),
-     *             @OA\Property(property="booking_date", type="string", format="date", example="2025-08-02"),
-     *             @OA\Property(property="booking_duration", type="string", format="time", example="01:30:00"),
-     *             @OA\Property(property="booking_start_time", type="string", format="time", example="10:00:00"),
-     *             @OA\Property(property="booking_end_time", type="string", format="time", example="11:30:00"),
-     *             @OA\Property(property="service_location", type="string", example="Home"),
-     *             @OA\Property(property="booking_for_someone", type="integer", enum={0,1}, example=0),
-     *             @OA\Property(property="someone_name", type="string", example="John Doe"),
-     *             @OA\Property(property="someone_contact_no", type="string", example="0771234567"),
-     *             @OA\Property(property="age", type="integer", example=25),
-     *             @OA\Property(property="gender", type="string", example="Male"),
-     *             @OA\Property(property="address", type="string", example="123 Street Name"),
-     *             @OA\Property(property="remarks", type="string", example="No special requests."),
-     *         )
-     *     ),
-     *
-     *     @OA\Response(
-     *         response=200,
-     *         description="Booking created successfully",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="status", type="boolean", example=true),
-     *             @OA\Property(property="message", type="string", example="Booking added successfully"),
-     *             @OA\Property(
-     *                 property="data",
-     *                 type="object",
-     *                 @OA\Property(property="booking_id", type="integer", example=101),
-     *                 @OA\Property(property="booking_ref_no", type="string", example="BOONOLKIINNEG_64fcd541e0f59"),
-     *                 @OA\Property(property="vendor_id", type="integer", example=9),
-     *                 @OA\Property(property="total_amount", type="number", format="float", example=2000.00)
-     *             )
-     *         )
-     *     ),
-     *
-     *     @OA\Response(
-     *         response=404,
-     *         description="Vendor or Customer not found",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="status", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Vendor not found")
-     *         )
-     *     ),
-     *
-     *     @OA\Response(
-     *         response=422,
-     *         description="Validation error"
-     *     ),
-     *
-     *     @OA\Response(
-     *         response=500,
-     *         description="Server error"
-     *     )
-     * )
+/**
+ * @OA\Post(
+ *     path="/addOnlineBooking",
+ *     summary="Add Online Booking",
+ *     description="Allows a customer to create a new online booking with one or more services.",
+ *     operationId="addOnlineBooking",
+ *     tags={"Booking"},
+ *     security={{"bearerAuth":{}}},
+ *
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(
+ *             @OA\Property(property="vendor_id", type="integer", example=9),
+ *             @OA\Property(property="promocode_id", type="integer", nullable=true, example=null),
+ *             @OA\Property(
+ *                 property="booking_details",
+ *                 type="array",
+ *                 @OA\Items(
+ *                     @OA\Property(property="service_id", type="integer", example=1),
+ *                     @OA\Property(property="booking_date", type="string", format="date", example="2025-08-02"),
+ *                     @OA\Property(property="booking_duration", type="string", format="time", example="01:30:00"),
+ *                     @OA\Property(property="booking_start_time", type="string", format="time", example="10:00:00"),
+ *                     @OA\Property(property="booking_end_time", type="string", format="time", example="11:30:00"),
+ *                     @OA\Property(property="service_location", type="string", example="Home"),
+ *                     @OA\Property(property="booking_for_someone", type="integer", enum={0,1}, example=0),
+ *                     @OA\Property(property="someone_name", type="string", example="John Doe"),
+ *                     @OA\Property(property="someone_contact_no", type="string", example="0771234567"),
+ *                     @OA\Property(property="age", type="integer", example=25),
+ *                     @OA\Property(property="gender", type="string", example="Male"),
+ *                     @OA\Property(property="address", type="string", example="123 Street Name"),
+ *                     @OA\Property(property="remarks", type="string", example="No special requests.")
+ *                 )
+ *             )
+ *         )
+ *     ),
+ *
+ *     @OA\Response(
+ *         response=200,
+ *         description="Booking created successfully",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="status", type="boolean", example=true),
+ *             @OA\Property(property="message", type="string", example="Booking added successfully"),
+ *             @OA\Property(
+ *                 property="data",
+ *                 type="object",
+ *                 @OA\Property(property="booking_id", type="integer", example=101),
+ *                 @OA\Property(property="booking_ref_no", type="string", example="BOONOLKIINNEG_64fcd541e0f59"),
+ *                 @OA\Property(property="vendor_id", type="integer", example=9),
+ *                 @OA\Property(property="total_amount", type="number", format="float", example=2000.00)
+ *             )
+ *         )
+ *     ),
+ *
+ *     @OA\Response(
+ *         response=404,
+ *         description="Vendor or Customer not found",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="status", type="boolean", example=false),
+ *             @OA\Property(property="message", type="string", example="Vendor not found")
+ *         )
+ *     ),
+ *
+ *     @OA\Response(
+ *         response=422,
+ *         description="Validation error"
+ *     ),
+ *
+ *     @OA\Response(
+ *         response=500,
+ *         description="Server error"
+ *     )
+ * )
  */
+
 
     public function addOnlineBooking(Request $request){
         $user = auth()->user();
