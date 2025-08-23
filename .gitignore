@@ -6,6 +6,7 @@
 /storage/*.key
 .env
 .env.*  # If you use multiple environments
+config/l5-swagger.php
 
 # Laravel specific
 /storage/app/public
