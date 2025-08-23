@@ -143,7 +143,7 @@ class VendorController extends Controller
             return response()->json(['message' => 'Invalid vendor type'], 400);
         }
 
-        $therapist_name = $request->person_initial . '. ' .$request->person_firstname. ' ' .$request->person_lastname;
+        $therapist_name = $user->pbu_first_name . ' ' .$user->pbu_last_name;
         $vendorsUpdate = $vendor->update([ 
             'pbv_tenentid' => 1,
             'pbv_business_name' => ($request->business_type == '1') ? $request->business_name : $therapist_name,
