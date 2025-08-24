@@ -455,17 +455,6 @@ class VendorController extends Controller
                         $action = 'uploaded';
                     }
 
-                    $uploadedDocuments[] = [
-                        'document_id' => $doc->pbrd_id,
-                        'document_name' => $doc->pbrd_name,
-                        'label' => $doc->pbrd_label,
-                        'file_name' => $filename,
-                        'file_path' => $path,
-                        'action' => $action,
-                        'status' => 1, // pending
-                        'status_text' => 'pending'
-                    ];
-
                 } catch (\Exception $e) {
                     $errors[] = 'Failed to upload ' . $doc->pbrd_label . ': ' . $e->getMessage();
                 }
@@ -477,7 +466,6 @@ class VendorController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Some documents failed to upload',
-                'data' => $uploadedDocuments
             ], 422);
         }
 
@@ -491,7 +479,6 @@ class VendorController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Documents processed successfully',
-            'data' => $uploadedDocuments
         ], 200);
     }
     // public function vendorDocumentUpdate(Request $request){
