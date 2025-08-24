@@ -1045,8 +1045,6 @@ class CommonController extends Controller
 
         if($vendor_type_id){
             $documents = requiredDocument::where('pbrd_vendor_type', $vendor_type_id)
-                                            ->join('vendor_documents', 'vendor_documents.pbvd_required_document_id', '=', 'required_document.pbrd_id')
-                                            ->where('vendor_documents.pbvd_vendor_id', $user->pbu_vid)
                                             ->where('pbrd_status', 1)
                                             ->get();
 
