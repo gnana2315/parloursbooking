@@ -376,13 +376,13 @@ class VendorController extends Controller
      * )
      */
 
-    public function vendorDocumentUpdate(Request $request, $vendor_type_id){
+    public function vendorDocumentUpdate(Request $request){
         $user = auth()->user();
 
         $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
 
         // Fetch required documents for this vendor type
-        $documents = requiredDocument::where('pbrd_vendor_type', $vendor_type_id)
+        $documents = requiredDocument::where('pbrd_vendor_type', $vendor->pbv_vendortype)
             ->where('pbrd_status', 1)
             ->get();
 
