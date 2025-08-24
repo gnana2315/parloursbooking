@@ -1032,7 +1032,7 @@ class CommonController extends Controller
     public function getRequiredDocuments(){
         $user = auth()->user();
 
-        $vendor = vendor::where('pbv_id', $user->pbu_vid)->first();
+        $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
 
         if(!$vendor){
             return response()->json([
