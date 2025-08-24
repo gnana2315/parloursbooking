@@ -465,7 +465,7 @@ class VendorController extends Controller
         if (!empty($errors)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Some documents failed to upload',
+                'message' => $errors,
             ], 422);
         }
 
