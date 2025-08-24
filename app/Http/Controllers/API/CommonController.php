@@ -1034,8 +1034,10 @@ class CommonController extends Controller
 
         if($vendor_type_id){
             $documents = requiredDocument::where('pbrd_vendor_type', $vendor_type_id)
-            ->where('pbrd_status', 1)
-            ->get();
+                                            ->join('vendor_documents', 'vendor_documents.pbrd_id', '=', 'required_documents.pbrd_id')
+                                            ->where('vendor_documents.pbvd_vendor_id', $user->pbu_vid)
+                                            ->where('pbrd_status', 1)
+                                            ->get();
 
             if ($documents->isEmpty()) {
                 return response()->json([
