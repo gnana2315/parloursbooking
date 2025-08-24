@@ -72,7 +72,9 @@ Route::middleware(['auth:sanctum', 'validate.token'])->group(function () {
     //Route::post('/customerRegister/{id}', [ CustomersController::class,'register' ]);
 
     //vendor
-    Route::post('/vendorRegister', [VendorController::class, 'vendorRegister' ]);
+    // Route::post('/vendorRegister', [VendorController::class, 'vendorRegister' ]);
+    Route::post('/businessVendorRegister', [VendorController::class, 'businessVendorRegister' ]);
+    Route::post('/therapistVendorRegister', [VendorController::class, 'therapistVendorRegister' ]);
     Route::post('/vendorDocumentUpdate', [VendorController::class, 'vendorDocumentUpdate' ]);
     Route::post('/vendorBankUpdate', [VendorController::class, 'vendorBankUpdate' ]);
     Route::post('/vendorConfig', [VendorController::class, 'vendorConfig' ]);
@@ -85,7 +87,7 @@ Route::middleware(['auth:sanctum', 'validate.token'])->group(function () {
 
     //common
     Route::get('/vendors/{business_type_id}', [CommonController::class, 'getVendors' ]);
-    Route::get('/required-documents/{vendor_type_id}', [CommonController::class, 'getRequiredDocuments' ]);
+    Route::get('/required-documents', [CommonController::class, 'getRequiredDocuments' ]);
     Route::get('/searchVendors', [CommonController::class, 'searchVendors' ]);
     Route::get('/serviceTypes', [CommonController::class, 'getServiceTypes' ]);
     Route::get('/vendorTypes', [CommonController::class, 'getVendorTypes' ]);
