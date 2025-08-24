@@ -243,7 +243,9 @@ class VendorController extends Controller
  *             @OA\Property(property="nic_no", type="string", example="901234567V"),
  *             @OA\Property(property="address", type="string", example="45 Park Lane"),
  *             @OA\Property(property="city", type="string", example="Kandy"),
- *             @OA\Property(property="email", type="string", format="email", example="therapist@example.com")
+ *             @OA\Property(property="service_area", type="string", example="Kandy"),
+ *             @OA\Property(property="email", type="string", format="email", example="therapist@example.com"),
+ *             @OA\Property(property="contact_no", type="string", example="0111234567")
  *         )
  *     ),
  *     @OA\Response(
@@ -255,8 +257,7 @@ class VendorController extends Controller
  *                 @OA\Property(property="id", type="integer", example=15),
  *                 @OA\Property(property="pbu_first_name", type="string", example="John"),
  *                 @OA\Property(property="pbu_last_name", type="string", example="Doe"),
- *                 @OA\Property(property="pbu_email", type="string", example="therapist@example.com"),
- *                 @OA\Property(property="pbu_mobileno", type="string", example="+94712345678")
+ *                 @OA\Property(property="pbu_email", type="string", example="therapist@example.com")
  *             )
  *         )
  *     ),
@@ -286,14 +287,18 @@ class VendorController extends Controller
                 [
                     'address' => 'required',
                     'city' => 'required',
+                    'service_area' => 'required',
                     'email' => 'email|unique:vendor,pbv_email',
+                    'contact_no' => 'required',
                     'nic_no' => 'required'
                 ],
                 [
                     'address.required' => 'Address is required',
                     'city.required' => 'City is required',
+                    'service_area.required' => 'Service area is required',
                     'email.email' => 'Email must be a valid email address',
                     'email.unique' => 'Email already exists',
+                    'contact_no.required' => 'Contact No is required',
                     'nic_no.required' => 'NIC No is required'
                 ]
             );
@@ -310,10 +315,11 @@ class VendorController extends Controller
             'pbv_brno' => $request->nic_no,
             'pbv_address' => $request->address,
             'pbv_city' => $request->city,
+            'pbv_therapist_service_area' => $request->service_area ?? null,
             'pbv_longatitude' => null,
             'pbv_latitude' => null,
             'pbv_email' => $request->email,
-            'pbv_contactno' => $user->pbu_mobileno,
+            'pbv_contactno' => $request->contact_no ?? $user->pbu_mobileno,
             'pbv_accept_terms' => 1,
             'pbv_staff_count' => 1,
             'pbv_status' => 0,

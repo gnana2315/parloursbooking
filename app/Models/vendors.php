@@ -39,6 +39,7 @@ class vendors extends Model
         'pbv_staff_count',
         'pbv_status',
         'pbv_short_description',
+        'pbv_therapist_service_area',
         'created_at',
         'updated_at',
         'deleted_at'
@@ -46,6 +47,7 @@ class vendors extends Model
 
     protected $casts = [
         'pbv_images' => 'array',
+        'pbv_therapist_service_area' => 'array'
     ];
 
     public function User()
