@@ -1054,8 +1054,8 @@ class CommonController extends Controller
             foreach($documents as $doc){
                 $check_document = vendorDocuments::where('pbvd_vendor_id', $user->pbu_vid)
                                         ->where('pbvd_required_document_id', $doc->pbrd_id)
-                                        ->get();
-                                        
+                                        ->first();
+
                 // Create document array with uploaded status
                 $documentData = [
                     'id' => $doc->pbrd_id,
