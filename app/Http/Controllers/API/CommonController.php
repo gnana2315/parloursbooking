@@ -1052,6 +1052,7 @@ class CommonController extends Controller
             $requiredDocuments = [];
 
             foreach($documents as $doc){
+                dd($doc);
                 $check_document = vendorDocuments::where('pbvd_vendor_id', $user->pbu_vid)
                                         ->where('pbvd_required_document_id', $doc->pbrd_id)
                                         ->first();
