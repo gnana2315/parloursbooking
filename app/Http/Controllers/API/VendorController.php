@@ -381,8 +381,13 @@ class VendorController extends Controller
 
         $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
 
-        $previous_documents = vendorDocuments::where('pbvd_vendor_id', $user->pbu_vid)->get();
-        dd($previous_documents);
+        if (!$vendor) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Vendor not found'
+            ], 404);
+        }
+
         // Fetch required documents for this vendor type
         $documents = requiredDocument::where('pbrd_vendor_type', $vendor->pbv_vendortype)
             ->where('pbrd_status', 1)
@@ -395,41 +400,99 @@ class VendorController extends Controller
             ], 404);
         }
 
-        foreach ($documents as $doc) {
+        $uploadedDocuments = [];
+        $errors = [];
 
+        foreach ($documents as $doc) {
+            // Check if document is required but not provided
             if ($doc->pbrd_required && !$request->hasFile($doc->pbrd_name)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => $doc->pbrd_label . ' is required.'
-                ], 422);
+                $errors[] = $doc->pbrd_label . ' is required.';
+                continue;
             }
 
+            // Process file if uploaded
             if ($request->hasFile($doc->pbrd_name)) {
                 $file = $request->file($doc->pbrd_name);
-                $filename = time() . '_' . $doc->pbrd_name . '_' . $vendor->pbv_business_name . '.' . $file->getClientOriginalExtension();
-                $path = $file->storeAs('uploads/vendors/' . $user->pbu_vid, $filename, 'public');
-
-                // Save to DB (example table: vendor_documents)
-                $vendor_document_update = vendorDocuments::create([
-                    'pbvd_vendor_id' => $user->pbu_vid,
-                    'pbvd_required_document_id' => $doc->id,
-                    'pbvd_document_name' => $filename,
-                    'pbvd_document_url' => $path,
+                
+                // Validate file
+                $validated = $request->validate([
+                    $doc->pbrd_name => 'file|mimes:pdf,jpg,jpeg,png|max:5120' // 5MB max
                 ]);
 
-                if($vendor_document_update){
-                    $message = 'Vendor Document saved successfully';
-                    $status = 200;
-                }else{
-                    $message = 'Vendor Document failed to save';
-                    $status = 500;
+                if (!$validated) {
+                    $errors[] = 'Invalid file for ' . $doc->pbrd_label;
+                    continue;
+                }
+
+                try {
+                    $filename = time() . '_' . $doc->pbrd_name . '_' . $vendor->pbv_business_name . '.' . $file->getClientOriginalExtension();
+                    $path = $file->storeAs('uploads/vendors/' . $user->pbu_vid, $filename, 'public');
+
+                    // Check if document already exists for this vendor and required document
+                    $existingDocument = vendorDocuments::where('pbvd_vendor_id', $user->pbu_vid)
+                        ->where('pbvd_required_document_id', $doc->pbrd_id) // Use pbrd_id from requiredDocument
+                        ->first();
+
+                    if ($existingDocument) {
+                        // Update existing document
+                        $existingDocument->update([
+                            'pbvd_document_name' => $filename,
+                            'pbvd_document_url' => $path,
+                            'pbvd_document_status' => 1, // Set to pending after update
+                            'pbvd_updated_at' => now()
+                        ]);
+                        $action = 'updated';
+                        $documentRecord = $existingDocument;
+                    } else {
+                        // Create new document record
+                        $documentRecord = vendorDocuments::create([
+                            'pbvd_vendor_id' => $user->pbu_vid,
+                            'pbvd_required_document_id' => $doc->pbrd_id, // Use pbrd_id from requiredDocument
+                            'pbvd_document_name' => $filename,
+                            'pbvd_document_url' => $path,
+                            'pbvd_document_status' => 1, // Set to pending
+                        ]);
+                        $action = 'uploaded';
+                    }
+
+                    $uploadedDocuments[] = [
+                        'document_id' => $doc->pbrd_id,
+                        'document_name' => $doc->pbrd_name,
+                        'label' => $doc->pbrd_label,
+                        'file_name' => $filename,
+                        'file_path' => $path,
+                        'action' => $action,
+                        'status' => 1, // pending
+                        'status_text' => 'pending'
+                    ];
+
+                } catch (\Exception $e) {
+                    $errors[] = 'Failed to upload ' . $doc->pbrd_label . ': ' . $e->getMessage();
                 }
             }
-
-            return response()->json([
-                'message' => $message
-            ], $status);
         }
+
+        // Return response after processing all documents
+        if (!empty($errors)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Some documents failed to upload',
+                'data' => $uploadedDocuments
+            ], 422);
+        }
+
+        if (empty($uploadedDocuments)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No documents were uploaded'
+            ], 400);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Documents processed successfully',
+            'data' => $uploadedDocuments
+        ], 200);
     }
     // public function vendorDocumentUpdate(Request $request){
 
