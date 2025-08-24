@@ -403,7 +403,7 @@ class VendorController extends Controller
         $uploadedDocuments = [];
         $errors = [];
 
-        $previouslyUploaded = vendorDocuments::where('pbvd_vendor_id', $user->pbu_vid)->get();
+        $previouslyUploaded = vendorDocuments::where('pbvd_vendor_id', $vendor->pbv_id)->get();
         dd($previouslyUploaded);
 
         foreach ($documents as $doc) {
