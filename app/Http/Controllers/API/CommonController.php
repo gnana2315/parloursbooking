@@ -1052,7 +1052,6 @@ class CommonController extends Controller
             $requiredDocuments = [];
 
             foreach($documents as $doc){
-                dd($doc);
                 $check_document = vendorDocuments::where('pbvd_vendor_id', $user->pbu_vid)
                                         ->where('pbvd_required_document_id', $doc->pbrd_id)
                                         ->first();
@@ -1070,9 +1069,9 @@ class CommonController extends Controller
 
                 // Add file information if document exists
                 if ($check_document) {
-                    $documentData['file_name'] = $check_document->pbvd_file_name;
-                    $documentData['file_path'] = $check_document->pbvd_file_path;
-                    $documentData['uploaded_at'] = $check_document->pbvd_created_at;
+                    $documentData['file_name'] = $check_document->pbvd_document_name;
+                    $documentData['file_path'] = $check_document->pbvd_document_url;
+                    $documentData['uploaded_at'] = $check_document->created_at;
                 }
 
                 $requiredDocuments[] = $documentData;
