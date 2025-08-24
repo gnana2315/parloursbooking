@@ -1056,6 +1056,8 @@ class CommonController extends Controller
                                         ->where('pbvd_required_document_id', $doc->pbrd_id)
                                         ->first();
 
+                $status = $check_document ? $check_document->pbvd_document_status : null;
+                $status_text = $this->getDocumentStatusText($status);
                 // Create document array with uploaded status
                 $documentData = [
                     'id' => $doc->pbrd_id,
@@ -1063,7 +1065,7 @@ class CommonController extends Controller
                     'label' => $doc->pbrd_label,
                     'is_single' => $doc->pbrd_is_single,
                     'required' => $doc->pbrd_required,
-                    'document_status' => $check_document ? $check_document->pbvd_document_status : null,
+                    'document_status' => $status_text,
                     'uploaded' => (bool) $check_document // This should be inside each document
                 ];
 
@@ -1087,5 +1089,22 @@ class CommonController extends Controller
             'success' => false,
             'message' => 'Vendor type ID is required'
         ], 400);
+    }
+
+    // Helper method to get status text
+    private function getDocumentStatusText($status)
+    {
+        switch ($status) {
+            case 1:
+                return 'pending';
+            case 2:
+                return 'rejected';
+            case 3:
+                return 'confirmed';
+            case null:
+                return 'not_uploaded';
+            default:
+                return 'unknown';
+        }
     }
 }
