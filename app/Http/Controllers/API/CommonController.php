@@ -1048,6 +1048,28 @@ class CommonController extends Controller
                                             ->where('pbrd_status', 1)
                                             ->get();
 
+            $requiredDocuments = [];
+
+            foreach($documents as $doc){
+                $check_document = vendorDocument::where('pbvd_vendor_id', $user->pbu_vid)
+                                        ->where('pbvd_document_id', $doc->pbrd_id)
+                                        ->first();
+
+                if($check_document){
+                    $requiredDocuments[count($requiredDocuments) - 1]['uploaded'] = true;
+                }else{
+                    $requiredDocuments[count($requiredDocuments) - 1]['uploaded'] = false;
+                }
+                $requiredDocuments[] = [
+                    'id' => $doc->pbrd_id,
+                    'name' => $doc->pbrd_name,
+                    'label' => $doc->pbrd_label,
+                    'is_single' => $doc->pbrd_is_single,
+                    'required' => $doc->pbrd_required,
+                    'status' => $doc->pbrd_status,
+                ];
+            }
+
             return response()->json([
                 'success' => true,
                 'data' => $documents
