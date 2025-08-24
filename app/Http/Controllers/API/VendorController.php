@@ -207,7 +207,7 @@ class VendorController extends Controller
         $vendorsUpdate = $vendor->update([ 
             'pbv_tenentid' => 1,
             'pbv_business_name' => $request->business_name,
-            'pbv_display_name' => $request->display_name,
+            'pbv_display_name' => !empty($request->display_name) ? $request->display_name : $request->business_name,
             'pbv_short_description' => $request->short_description,
             'pbv_brno' => $request->br_no,
             'pbv_address' => $request->address,
