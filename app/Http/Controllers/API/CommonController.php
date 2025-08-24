@@ -13,6 +13,7 @@ use App\Models\promoCode;
 use App\Models\cities;
 use App\Models\deviceToken;
 use App\Models\requiredDocument;
+use App\Models\vendorDocuments;
 use App\Services\DialogESMSService;
 
 use App\Http\Controllers\Controller;
@@ -1051,7 +1052,7 @@ class CommonController extends Controller
             $requiredDocuments = [];
 
             foreach($documents as $doc){
-                $check_document = vendorDocument::where('pbvd_vendor_id', $user->pbu_vid)
+                $check_document = vendorDocuments::where('pbvd_vendor_id', $user->pbu_vid)
                                         ->where('pbvd_document_id', $doc->pbrd_id)
                                         ->first();
 
