@@ -1046,8 +1046,8 @@ class CommonController extends Controller
 
         if($vendor_type_id){
             $documents = requiredDocument::where('pbrd_vendor_type', $vendor_type_id)
-                                            ->where('pbrd_status', 1)
-                                            ->get();
+                                        ->where('pbrd_status', 1)
+                                        ->get();
 
             $requiredDocuments = [];
 
@@ -1056,19 +1056,25 @@ class CommonController extends Controller
                                         ->where('pbvd_required_document_id', $doc->pbrd_id)
                                         ->first();
 
-                if($check_document){
-                    $requiredDocuments[count($requiredDocuments) - 1]['uploaded'] = true;
-                }else{
-                    $requiredDocuments[count($requiredDocuments) - 1]['uploaded'] = false;
-                }
-                $requiredDocuments[] = [
+                // Create document array with uploaded status
+                $documentData = [
                     'id' => $doc->pbrd_id,
                     'name' => $doc->pbrd_name,
                     'label' => $doc->pbrd_label,
                     'is_single' => $doc->pbrd_is_single,
                     'required' => $doc->pbrd_required,
-                    'status' => $doc->pbrd_status,
+                    'document_status' => $check_document ? $check_document->pbvd_document_status : null,
+                    'uploaded' => (bool) $check_document // This should be inside each document
                 ];
+
+                // Add file information if document exists
+                if ($check_document) {
+                    $documentData['file_name'] = $check_document->pbvd_file_name;
+                    $documentData['file_path'] = $check_document->pbvd_file_path;
+                    $documentData['uploaded_at'] = $check_document->pbvd_created_at;
+                }
+
+                $requiredDocuments[] = $documentData;
             }
 
             return response()->json([
