@@ -403,6 +403,9 @@ class VendorController extends Controller
         $uploadedDocuments = [];
         $errors = [];
 
+        $previouslyUploaded = vendorDocuments::where('pbvd_vendor_id', $user->pbu_vid)->get()->keyBy('pbvd_required_document_id');
+        dd($previouslyUploaded);
+
         foreach ($documents as $doc) {
             // Check if document is required but not provided
             if ($doc->pbrd_required && !$request->hasFile($doc->pbrd_name)) {
