@@ -230,24 +230,26 @@ class VendorController extends Controller
     /**
  * @OA\Post(
  *     path="/api/therapistVendorRegister",
- *     summary="Register or update a therapist vendor",
- *     description="This API allows an authenticated vendor of type `2` (Therapist) to register/update their details.",
+ *     summary="Register or update therapist vendor",
+ *     description="This endpoint allows an authenticated vendor of type `2` (Therapist) to register or update their vendor profile.",
  *     tags={"Vendor"},
  *     security={{"bearerAuth":{}}},
+ * 
  *     @OA\RequestBody(
  *         required=true,
  *         @OA\JsonContent(
- *             required={"address", "city", "email", "nic_no"},
+ *             required={"address","city","service_area","email","contact_no","nic_no"},
  *             @OA\Property(property="display_name", type="string", example="Therapist John"),
- *             @OA\Property(property="short_bio", type="string", example="Certified massage therapist with 5 years of experience."),
+ *             @OA\Property(property="short_bio", type="string", example="Certified therapist with 5 years of experience."),
  *             @OA\Property(property="nic_no", type="string", example="901234567V"),
  *             @OA\Property(property="address", type="string", example="45 Park Lane"),
  *             @OA\Property(property="city", type="string", example="Kandy"),
- *             @OA\Property(property="service_area", type="string", example="Kandy"),
+ *             @OA\Property(property="service_area", type="string", example="Colombo, Kandy"),
  *             @OA\Property(property="email", type="string", format="email", example="therapist@example.com"),
- *             @OA\Property(property="contact_no", type="string", example="0111234567")
+ *             @OA\Property(property="contact_no", type="string", example="+94712345678")
  *         )
  *     ),
+ * 
  *     @OA\Response(
  *         response=200,
  *         description="Therapist vendor details saved successfully",
@@ -257,10 +259,12 @@ class VendorController extends Controller
  *                 @OA\Property(property="id", type="integer", example=15),
  *                 @OA\Property(property="pbu_first_name", type="string", example="John"),
  *                 @OA\Property(property="pbu_last_name", type="string", example="Doe"),
- *                 @OA\Property(property="pbu_email", type="string", example="therapist@example.com")
+ *                 @OA\Property(property="pbu_email", type="string", example="therapist@example.com"),
+ *                 @OA\Property(property="pbu_mobileno", type="string", example="+94712345678")
  *             )
  *         )
  *     ),
+ * 
  *     @OA\Response(
  *         response=400,
  *         description="Invalid vendor type or validation error",
@@ -268,6 +272,7 @@ class VendorController extends Controller
  *             @OA\Property(property="message", type="string", example="Invalid vendor type")
  *         )
  *     ),
+ * 
  *     @OA\Response(
  *         response=500,
  *         description="Failed to save therapist vendor details",
