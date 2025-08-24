@@ -348,7 +348,7 @@ class AuthController extends Controller
                 'pbv_gender' => $request->gender,
                 'pbv_dob' => $request->dob,
                 'pbv_contactno' => $user->pbu_mobileno,
-                'pbv_profile_image' => $publicPath,
+                'pbv_profile_image' => $publicPath ?? null,
                 'pbv_accept_terms' => $request->accept_terms
             ]);
 
