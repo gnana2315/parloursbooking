@@ -381,6 +381,10 @@ class VendorController extends Controller
 
         $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
 
+        $previous_document_ids = vendorDocuments::where('pbvd_vendor_id', $user->pbu_vid)
+            ->whereIn('pbvd_required_document_id', $documents->pluck('id'))
+            ->get();
+        dd($previous_document_ids);
         // Fetch required documents for this vendor type
         $documents = requiredDocument::where('pbrd_vendor_type', $vendor->pbv_vendortype)
             ->where('pbrd_status', 1)
