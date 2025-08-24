@@ -1029,8 +1029,19 @@ class CommonController extends Controller
  *     )
  * )
  */
-    public function getRequiredDocuments($vendor_type_id){
+    public function getRequiredDocuments(){
         $user = auth()->user();
+
+        $vendor = vendor::where('pbv_id', $user->pbu_vid)->first();
+
+        if(!$vendor){
+            return response()->json([
+                'success' => false,
+                'message' => 'Vendor not found for the user'
+            ], 404);
+        }
+
+        $vendor_type_id = $vendor->pbv_vendortype;
 
         if($vendor_type_id){
             $documents = requiredDocument::where('pbrd_vendor_type', $vendor_type_id)
@@ -1038,13 +1049,6 @@ class CommonController extends Controller
                                             ->where('vendor_documents.pbvd_vendor_id', $user->pbu_vid)
                                             ->where('pbrd_status', 1)
                                             ->get();
-
-            if ($documents->isEmpty()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'No required documents found for this vendor type'
-                ], 404);
-            }
 
             return response()->json([
                 'success' => true,
