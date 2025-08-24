@@ -217,7 +217,7 @@ class VendorController extends Controller
             'pbv_email' => $request->email,
             'pbv_contactno' => $user->pbu_mobileno,
             'pbv_accept_terms' => 1,
-            'pbv_staff_count' => $request->staff_no,
+            'pbv_staff_count' => $request->staff_no ?? 1,
             'pbv_status' => 0,
         ]);
 
