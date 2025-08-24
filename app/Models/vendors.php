@@ -38,6 +38,7 @@ class vendors extends Model
         'pbv_accept_terms',
         'pbv_staff_count',
         'pbv_status',
+        'pbv_short_description',
         'created_at',
         'updated_at',
         'deleted_at'

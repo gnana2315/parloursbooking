@@ -26,76 +26,6 @@ use Illuminate\Support\Facades\File;
 
 class VendorController extends Controller
 {   
-    /**
-     * @OA\Post(
-     *      path="/api/vendorRegister",
-     *      operationId="vendorRegister",
-     *      tags={"Vendor"},
-     *      summary="Vendor Info Registration",
-     *      description="",
-     *      @OA\RequestBody(
-     *          required=true,
-     *          @OA\JsonContent(
-     *              required={
-     *                  "business_category",
-     *                  "business_name",
-     *                  "display_name",
-     *                  "address",
-     *                  "city",
-     *                  "longatitude",
-     *                  "latitude",
-     *                  "email",
-     *                  "br_no/nic_no",
-     *                  "short_description",
-     *                  "staff_no"
-     *              }, 
-     *              @OA\Property(property="business_name", type="string", example="Golden Saloon"),
-     *              @OA\Property(property="display_name", type="string", example="Golden"),
-     *              @OA\Property(property="address", type="string", example="No.7, Negombo Road, Wattala"),
-     *              @OA\Property(property="city", type="string", example="Wattala"),
-     *              @OA\Property(
-     *                  property="longatitude", 
-     *                  type="string", 
-     *                  nullable=true,
-     *                  description="Required only if vendortype is 1 (Parlour)",
-     *                  example=""
-     *              ),
-     *              @OA\Property(
-     *                  property="latitude", 
-     *                  type="string", 
-     *                  nullable=true,
-     *                  description="Required only if vendortype is 1 (Parlour)",
-     *                  example=""
-     *              ),
-     *              @OA\Property(property="email", type="email", example="goldensaloon@gmail.com"),
-     *              @OA\Property(
-     *                  property="br_no", 
-     *                  type="string", 
-     *                  nullable=true,
-     *                  description="Required only if vendortype is 1 (Parlour)",
-     *                  example=""
-     *              ),
-     *              @OA\Property(
-     *                  property="nic_no", 
-     *                  type="string", 
-     *                  nullable=true,
-     *                  description="Required only if vendortype is 2 (Therapist)",
-     *                  example=""
-     *              ),
-     *              @OA\Property(property="short_description", type="string", example=""),
-     *              @OA\Property(property="staff_no", type="string", example=""),
-     *          ),
-     *      ),
-     *      @OA\Response(
-     *          response=200,
-     *          description="Vendor Info Details saved Successfully",
-     *          @OA\JsonContent(
-     *              @OA\Property(property="token", type="string", example="generated_token_here")
-     *          ),
-     *      ),
-     *      @OA\Response(response=401, description="Unauthorized"),
-     * )
-     */
     public function vendorRegister(Request $request){
         $user = auth()->user();        
         
@@ -159,6 +89,236 @@ class VendorController extends Controller
             'pbv_contactno' => $user->pbu_mobileno,
             'pbv_accept_terms' => 1,
             'pbv_staff_count' => ($request->business_type == '1') ? $request->staff_no : 1,
+            'pbv_status' => 0,
+        ]);
+
+        if($vendorsUpdate){
+            $user->update([
+                'pbu_email' => $request->email,
+            ]);
+            
+            $message = 'Vendor Details saved successfully'; 
+            $status = 200;
+        }else{
+            $message = 'Vendor Details failed to save';
+            $status = 500;
+        }
+
+        return response()->json([
+            'message' => $message,
+            'data' => $user
+        ], $status);
+    }
+
+    /**
+     * @OA\Post(
+     *      path="/api/businessVendorRegister",
+     *      operationId="businessVendorRegister",
+     *      tags={"Vendor"},
+     *      summary="Business Vendor Info Registration",
+     *      description="",
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              required={
+     *                  "business_category",
+     *                  "business_name",
+     *                  "display_name",
+     *                  "address",
+     *                  "city",
+     *                  "longatitude",
+     *                  "latitude",
+     *                  "email",
+     *                  "br_no",
+     *                  "short_description",
+     *                  "staff_no"
+     *              }, 
+     *              @OA\Property(property="business_name", type="string", example="Golden Saloon"),
+     *              @OA\Property(property="display_name", type="string", example="Golden"),
+     *              @OA\Property(property="address", type="string", example="No.7, Negombo Road, Wattala"),
+     *              @OA\Property(property="city", type="string", example="Wattala"),
+     *              @OA\Property(
+     *                  property="longatitude", 
+     *                  type="string", 
+     *                  nullable=true,
+     *                  description="Required only if vendortype is 1 (Parlour)",
+     *                  example=""
+     *              ),
+     *              @OA\Property(
+     *                  property="latitude", 
+     *                  type="string", 
+     *                  nullable=true,
+     *                  description="Required only if vendortype is 1 (Parlour)",
+     *                  example=""
+     *              ),
+     *              @OA\Property(property="email", type="email", example="goldensaloon@gmail.com"),
+     *              @OA\Property(
+     *                  property="br_no", 
+     *                  type="string", 
+     *                  nullable=true,
+     *                  description="Required only if vendortype is 1 (Parlour)",
+     *                  example=""
+     *              ),
+     *              @OA\Property(property="short_description", type="string", example=""),
+     *              @OA\Property(property="staff_no", type="string", example=""),
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Vendor Info Details saved Successfully",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="token", type="string", example="generated_token_here")
+     *          ),
+     *      ),
+     *      @OA\Response(response=401, description="Unauthorized"),
+     * )
+     */
+    public function businessVendorRegister(Request $request){
+        $user = auth()->user();        
+        
+        $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
+        if($vendor->pbv_vendortype == '1'){
+            $request->validate(
+                [
+                    'business_name' => 'required',
+                    'address' => 'required',
+                    'city' => 'required',
+                    'longatitude' => 'required',
+                    'latitude' => 'required',
+                    'email' => 'email|unique:vendor,pbv_email'
+                    // 'br_no' => 'required'
+                ],
+                [
+                    'business_name.required' => 'Parlour name is required',
+                    'address.required' => 'Address is required',
+                    'city.required' => 'City is required',
+                    'longatitude.required' => 'Location is required',
+                    'latitude.required' => 'Location is required',
+                    'email.email' => 'Email must be a valid email address',
+                    'email.unique' => 'Email already exists'
+                    // 'br_no.required' => 'BR No is required'
+                ]
+            );
+            $request->br_no = null;
+        }else{
+            return response()->json(['message' => 'Invalid vendor type'], 400);
+        }
+
+        $vendorsUpdate = $vendor->update([ 
+            'pbv_tenentid' => 1,
+            'pbv_business_name' => $request->business_name,
+            'pbv_display_name' => $request->display_name,
+            'pbv_short_description' => $request->short_description,
+            'pbv_brno' => $request->br_no,
+            'pbv_address' => $request->address,
+            'pbv_city' => $request->city,
+            'pbv_longatitude' => $request->longatitude,
+            'pbv_latitude' => $request->latitude,
+            'pbv_email' => $request->email,
+            'pbv_contactno' => $user->pbu_mobileno,
+            'pbv_accept_terms' => 1,
+            'pbv_staff_count' => $request->staff_no,
+            'pbv_status' => 0,
+        ]);
+
+        if($vendorsUpdate){
+            $user->update([
+                'pbu_email' => $request->email,
+            ]);
+            
+            $message = 'Vendor Details saved successfully'; 
+            $status = 200;
+        }else{
+            $message = 'Vendor Details failed to save';
+            $status = 500;
+        }
+
+        return response()->json([
+            'message' => $message,
+            'data' => $user
+        ], $status);
+    }
+
+    /**
+     * @OA\Post(
+     *      path="/api/therapistVendorRegister",
+     *      operationId="therapistVendorRegister",
+     *      tags={"Vendor"},
+     *      summary="Vendor Info Registration",
+     *      description="",
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              required={
+     *                  "address",
+     *                  "city",
+     *                  "email",
+     *                  "nic_no",
+     *                  "short_bio",
+     *              },
+     *              @OA\Property(property="address", type="string", example="No.7, Negombo Road, Wattala"),
+     *              @OA\Property(property="city", type="string", example="Wattala"),
+     *              @OA\Property(property="email", type="email", example="goldensaloon@gmail.com"),
+     *              @OA\Property(
+     *                  property="nic_no", 
+     *                  type="string", 
+     *                  nullable=true,
+     *                  description="Required only if vendortype is 2 (Therapist)",
+     *                  example=""
+     *              ),
+     *              @OA\Property(property="short_bio", type="string", example=""),
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Vendor Info Details saved Successfully",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="token", type="string", example="generated_token_here")
+     *          ),
+     *      ),
+     *      @OA\Response(response=401, description="Unauthorized"),
+     * )
+     */
+    public function therapistVendorRegister(Request $request){
+        $user = auth()->user();        
+        
+        $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
+        
+        if ($vendor->pbv_vendortype == '2'){
+            $request->validate(
+                [
+                    'address' => 'required',
+                    'city' => 'required',
+                    'email' => 'email|unique:vendor,pbv_email',
+                    'nic_no' => 'required'
+                ],
+                [
+                    'address.required' => 'Address is required',
+                    'city.required' => 'City is required',
+                    'email.email' => 'Email must be a valid email address',
+                    'email.unique' => 'Email already exists',
+                    'nic_no.required' => 'NIC No is required'
+                ]
+            );
+        }else{
+            return response()->json(['message' => 'Invalid vendor type'], 400);
+        }
+
+        $therapist_name = $user->pbu_first_name . ' ' .$user->pbu_last_name;
+        $vendorsUpdate = $vendor->update([ 
+            'pbv_tenentid' => 1,
+            'pbv_business_name' => $therapist_name,
+            'pbv_display_name' => $therapist_name,
+            'pbv_short_description' => $request->short_bio,
+            'pbv_brno' => $request->nic_no,
+            'pbv_address' => $request->address,
+            'pbv_city' => $request->city,
+            'pbv_longatitude' => null,
+            'pbv_latitude' => null,
+            'pbv_email' => $request->email,
+            'pbv_contactno' => $user->pbu_mobileno,
+            'pbv_accept_terms' => 1,
+            'pbv_staff_count' => 1,
             'pbv_status' => 0,
         ]);
 
