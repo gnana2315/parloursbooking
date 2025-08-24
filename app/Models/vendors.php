@@ -2,6 +2,8 @@
 
 namespace App\Models;
 use App\Models\User;
+use App\Models\services;
+use App\Models\vendorDocuments;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -58,5 +60,10 @@ class vendors extends Model
     public function services()
     {
         return $this->hasMany(services::class, 'pbs_vendor_id', 'pbv_id');
+    }
+
+    public function vendorDocuments()
+    {
+        return $this->hasMany(vendorDocuments::class, 'pbvd_vendor_id', 'pbv_id');
     }
 }
