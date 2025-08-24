@@ -972,24 +972,15 @@ class CommonController extends Controller
 
     /**
  * @OA\Get(
- *     path="/api/required-documents/{vendor_type_id}",
- *     summary="Get Required Documents by Vendor Type",
- *     description="Fetch all required documents for a given vendor type.",
- *     operationId="getRequiredDocuments",
- *     tags={"Common"},
+ *     path="/api/required-documents",
+ *     summary="Get Required Documents for Vendor",
+ *     description="Fetch required documents for the authenticated vendor based on their vendor type.",
+ *     tags={"Vendor"},
  *     security={{"bearerAuth":{}}},
- *
- *     @OA\Parameter(
- *         name="vendor_type_id",
- *         in="path",
- *         required=true,
- *         description="Vendor type ID",
- *         @OA\Schema(type="integer", example=1)
- *     ),
  *
  *     @OA\Response(
  *         response=200,
- *         description="List of required documents",
+ *         description="List of required documents with upload status",
  *         @OA\JsonContent(
  *             type="object",
  *             @OA\Property(property="success", type="boolean", example=true),
@@ -997,13 +988,17 @@ class CommonController extends Controller
  *                 property="data",
  *                 type="array",
  *                 @OA\Items(
+ *                     type="object",
  *                     @OA\Property(property="id", type="integer", example=1),
- *                     @OA\Property(property="pbrd_vendortype", type="integer", example=1),
- *                     @OA\Property(property="pbrd_name", type="string", example="businessregistration"),
- *                     @OA\Property(property="pbrd_label", type="string", example="Business Registration"),
- *                     @OA\Property(property="pbrd_is_single", type="integer", example=1),
- *                     @OA\Property(property="pbrd_required", type="boolean", example=true),
- *                     @OA\Property(property="pbrd_status", type="integer", example=1),
+ *                     @OA\Property(property="name", type="string", example="Business Registration"),
+ *                     @OA\Property(property="label", type="string", example="BR Document"),
+ *                     @OA\Property(property="is_single", type="boolean", example=true),
+ *                     @OA\Property(property="required", type="boolean", example=true),
+ *                     @OA\Property(property="document_status", type="string", example="Approved"),
+ *                     @OA\Property(property="uploaded", type="boolean", example=true),
+ *                     @OA\Property(property="file_name", type="string", example="br_doc.pdf", nullable=true),
+ *                     @OA\Property(property="file_path", type="string", example="https://domain.com/uploads/vendors/br_doc.pdf", nullable=true),
+ *                     @OA\Property(property="uploaded_at", type="string", format="date-time", example="2025-08-20T12:34:56Z", nullable=true),
  *                 )
  *             )
  *         )
@@ -1021,11 +1016,11 @@ class CommonController extends Controller
  *
  *     @OA\Response(
  *         response=404,
- *         description="No required documents found",
+ *         description="Vendor not found",
  *         @OA\JsonContent(
  *             type="object",
  *             @OA\Property(property="success", type="boolean", example=false),
- *             @OA\Property(property="message", type="string", example="No required documents found for this vendor type")
+ *             @OA\Property(property="message", type="string", example="Vendor not found for the user")
  *         )
  *     )
  * )
