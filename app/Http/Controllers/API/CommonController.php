@@ -1053,7 +1053,7 @@ class CommonController extends Controller
 
             foreach($documents as $doc){
                 $check_document = vendorDocuments::where('pbvd_vendor_id', $user->pbu_vid)
-                                        ->where('pbvd_document_id', $doc->pbrd_id)
+                                        ->where('pbvd_required_document_id', $doc->pbrd_id)
                                         ->first();
 
                 if($check_document){
