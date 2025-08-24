@@ -377,6 +377,7 @@ class VendorController extends Controller
      */
 
     public function vendorDocumentUpdate(Request $request){
+        dd('Under Construction');
         $user = auth()->user();
 
         $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
