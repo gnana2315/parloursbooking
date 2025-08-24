@@ -673,9 +673,13 @@ class AuthController extends Controller
         $apiKey = config('dialogesms.api_key');
         $sender = config('dialogesms.sender');
         $message = "Your OTP code is {$verfivation_code}. It is valid for 10 minutes. Please do not share this code with anyone.";
-
+        
+        $smsEnable = filter_var($request->header('SMS_ENABLE', true), FILTER_VALIDATE_BOOLEAN);
+        
         // Store OTP to DB/Cache if needed here
-        $result = $this->smsService->sendMessage($apiKey, [$request->phone_no], $message, $sender);
+        if($smsEnable){
+            $result = $this->smsService->sendMessage($apiKey, [$request->phone_no], $message, $sender);
+        }
 
         return response()->json([
             'message' => 'Password Reset request accepted. Please check the OTP in you phone.',
