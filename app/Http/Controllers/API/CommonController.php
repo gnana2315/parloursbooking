@@ -1072,7 +1072,7 @@ class CommonController extends Controller
 
             return response()->json([
                 'success' => true,
-                'data' => $documents
+                'data' => $requiredDocuments
             ], 200);
         }
 
