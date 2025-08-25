@@ -349,58 +349,74 @@ class VendorController extends Controller
     }
 
     /**
-     * @OA\Post(
-     *     path="/api/vendorDocumentUpdate",
-     *     summary="Upload or update vendor documents",
-     *     description="Upload multiple required documents for a vendor and store them in storage. Updates existing documents if they already exist.",
-     *     operationId="vendorDocumentUpdate",
-     *     tags={"Vendor"},
-     *     security={{"bearerAuth": {}}},
-     *
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(
-     *                 property="vendor_document",
-     *                 type="array",
-     *                 @OA\Items(
-     *                     type="object",
-     *                     required={"document_id","document"},
-     *                     @OA\Property(property="document_id", type="integer", example=1, description="Required document ID"),
-     *                     @OA\Property(property="document", type="string", format="binary", description="Document file to upload")
-     *                 )
-     *             )
-     *         )
-     *     ),
-     *
-     *     @OA\Response(
-     *         response=200,
-     *         description="Documents uploaded successfully",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="message", type="string", example="Documents uploaded successfully")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="Vendor not found",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="message", type="string", example="Vendor not found")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=422,
-     *         description="Validation error"
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Internal server error"
-     *     )
-     * )
-    */
+ * @OA\Post(
+ *     path="/api/vendor/document/update",
+ *     summary="Upload or update vendor documents",
+ *     description="Allows a vendor to upload/update required documents. Files are stored and document records are updated.",
+ *     operationId="vendorDocumentUpdate",
+ *     tags={"Vendor"},
+ *     security={{"bearerAuth":{}}},
+ *
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\MediaType(
+ *             mediaType="multipart/form-data",
+ *             @OA\Schema(
+ *                 type="object",
+ *                 @OA\Property(
+ *                     property="vendor_document",
+ *                     type="array",
+ *                     @OA\Items(
+ *                         type="object",
+ *                         @OA\Property(
+ *                             property="document_id",
+ *                             type="integer",
+ *                             example=1,
+ *                             description="Required document ID (from required_documents table)"
+ *                         ),
+ *                         @OA\Property(
+ *                             property="document",
+ *                             type="string",
+ *                             format="binary",
+ *                             description="File upload (jpg, jpeg, png, pdf)"
+ *                         )
+ *                     )
+ *                 )
+ *             )
+ *         )
+ *     ),
+ *
+ *     @OA\Response(
+ *         response=200,
+ *         description="Documents uploaded successfully",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="success", type="boolean", example=true),
+ *             @OA\Property(property="message", type="string", example="Documents uploaded successfully")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=400,
+ *         description="Invalid request (validation failed)",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="Validation error")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=404,
+ *         description="Vendor not found",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="Vendor not found")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=500,
+ *         description="Server error",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="Something went wrong")
+ *         )
+ *     )
+ * )
+ */
     public function vendorDocumentUpdate(Request $request){
         $user = auth()->user();
 
@@ -409,11 +425,19 @@ class VendorController extends Controller
             return response()->json(['message' => 'Vendor not found'], 404);
         }
 
-        $request->validate([
-            'vendor_document' => 'required|array',
-            'vendor_document.*.document_id' => 'required|integer|exists:required_documents,pbrd_id',
-            'vendor_document.*.document' => 'required|string'
-        ]);
+        $request->validate(
+            [
+                'vendor_document' => 'required|array',
+                'vendor_document.*.document_id' => 'required|integer|exists:required_documents,pbrd_id',
+                'vendor_document.*.document' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048'
+            ],
+            [
+                'vendor_document.*.document.required' => 'Document is required',
+                'vendor_document.*.document.file' => 'Document must be a file',
+                'vendor_document.*.document.mimes' => 'Document must be a file of type: jpg, jpeg, png, pdf',
+                'vendor_document.*.document.max' => 'Document may not be greater than 2MB',
+            ]
+        );
 
         foreach ($request->vendor_document as $doc) {
 
