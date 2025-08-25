@@ -350,7 +350,7 @@ class VendorController extends Controller
 
     /**
  * @OA\Post(
- *     path="/api/vendor/document/update",
+ *     path="/api/vendorDocumentUpdate",
  *     summary="Upload or update vendor documents",
  *     description="Allows a vendor to upload/update required documents. Files are stored and document records are updated.",
  *     operationId="vendorDocumentUpdate",
