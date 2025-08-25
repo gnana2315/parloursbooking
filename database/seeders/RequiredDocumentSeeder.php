@@ -16,7 +16,7 @@ class RequiredDocumentSeeder extends Seeder
         required_document::create(
             [
                 'pbrd_vendor_type' => '1',
-                'pbrd_name' => 'certificate/licenceofparlour',
+                'pbrd_name' => 'certificatelicenceofparlour',
                 'pbrd_label' => 'Certificate/Licence of Parlour',
                 'pbrd_is_single' => '1',
                 'pbrd_required' => '1',
