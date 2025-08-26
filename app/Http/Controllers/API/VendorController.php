@@ -714,7 +714,7 @@ class VendorController extends Controller
      *                  "account_holder_name",
      *                  "accountno",
      *              },
-     *              @OA\Property(property="bankname", type="text", example="HNB"),
+     *              @OA\Property(property="bankname", type="text", example="1(HNB)/2(BOC)"),
      *              @OA\Property(property="branch", type="text", example="Colombo"),
      *              @OA\Property(property="branch_code", type="text", example="021"),
      *              @OA\Property(property="account_holder_name", type="text", example="John"),
@@ -765,7 +765,7 @@ class VendorController extends Controller
             'pbvb_holder_name' => $request->account_holder_name,
             'pbvb_accountno' => $request->accountno,
             'pbvb_is_active' => 1,
-            'pbvb_status' => 1
+            'pbvb_status' => 0
         ]);
 
         if($vendorBankInfoUpdate){
