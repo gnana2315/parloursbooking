@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('vendor_bank_info', function (Blueprint $table) {
-            $table->string('pbvd_branch_code')->nullable();
+            $table->string('pbvb_branch_code')->nullable();
         });
     }
 
@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('vendor_bank_info', function (Blueprint $table) {
-            $table->dropColumn('pbvd_branch_code');
+            $table->dropColumn('pbvb_branch_code');
         });
     }
 };

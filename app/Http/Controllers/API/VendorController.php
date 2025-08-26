@@ -1701,8 +1701,9 @@ class VendorController extends Controller
         if (!$vendor) {
             return response()->json(['message' => 'Vendor not found'], 404);
         }
-
+dd($vendor);
         $vendor_bank_info = vendorBankInfo::where('pbvb_vendorid', $vendor->pbv_id)->first();
+        
         if (!$vendor_bank_info) {
             return response()->json(['message' => 'Vendor bank information not found'], 404);
         }
