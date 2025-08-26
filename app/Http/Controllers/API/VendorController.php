@@ -764,6 +764,7 @@ class VendorController extends Controller
             'pbvb_branch_code' => $request->branch_code,
             'pbvb_holder_name' => $request->account_holder_name,
             'pbvb_accountno' => $request->accountno,
+            'pbvb_is_active' => 1,
             'pbvb_status' => 1
         ]);
 
