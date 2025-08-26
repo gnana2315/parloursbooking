@@ -1646,6 +1646,69 @@ class VendorController extends Controller
         ], 200);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/vendor/bankDetails",
+     *     summary="Get vendor bank details",
+     *     description="Fetches the authenticated vendor's bank details.",
+     *     operationId="getVendorBankDetails",
+     *     tags={"Vendor"},
+     *     security={{"bearerAuth":{}}},
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Vendor bank details retrieved successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="pbvb_id", type="integer", example=1),
+     *                 @OA\Property(property="pbvb_vendorid", type="integer", example=10),
+     *                 @OA\Property(property="pbvb_bank_name", type="string", example="ABC Bank"),
+     *                 @OA\Property(property="pbvb_account_no", type="string", example="1234567890"),
+     *                 @OA\Property(property="pbvb_ifsc_code", type="string", example="ABC0001234"),
+     *                 @OA\Property(property="pbvb_branch", type="string", example="Colombo Main"),
+     *                 @OA\Property(property="created_at", type="string", format="date-time", example="2025-08-26 10:30:00"),
+     *                 @OA\Property(property="updated_at", type="string", format="date-time", example="2025-08-26 10:30:00")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Vendor or bank details not found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Vendor not found")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Server error",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Something went wrong")
+     *         )
+     *     )
+     * )
+     */
+    public function getVendorBankDetails(){
+        $user = auth()->user();
+        $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
+        if (!$vendor) {
+            return response()->json(['message' => 'Vendor not found'], 404);
+        }
+
+        $vendor_bank_info = vendorBankInfo::join('vendors', 'vendorBankInfo.pbvb_vendorid', '=', 'vendors.pbv_id')
+                                    ->where('pbvb_vendorid', $vendor->pbv_id)->first();
+        if (!$vendor_bank_info) {
+            return response()->json(['message' => 'Vendor bank information not found'], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $vendor_bank_info
+        ], 200);
+    }
+
     function groupAvailability(array $availability) {
         $grouped = [];
         $tempGroup = null;
