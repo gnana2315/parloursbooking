@@ -1696,7 +1696,6 @@ class VendorController extends Controller
      * )
      */
     public function getVendorBankDetails(){
-        dd('test');
         $user = auth()->user();
         $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
         if (!$vendor) {
