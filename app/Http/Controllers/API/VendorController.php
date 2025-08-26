@@ -708,7 +708,7 @@ class VendorController extends Controller
      *          required=true,
      *          @OA\JsonContent(
      *              required={
-     *                  "bankname",
+     *                  "bankid",
      *                  "branch",
      *                  "branch_code",
      *                  "account_holder_name",
@@ -740,7 +740,7 @@ class VendorController extends Controller
         }
         $request->validate(
             [
-                'bankname' => 'required',
+                'bankid' => 'required',
                 'branch' => 'required',
                 'branch_code' => 'required',
                 'account_holder_name' => 'required',
@@ -748,7 +748,7 @@ class VendorController extends Controller
                 
             ],
             [
-                'bankname.required' => 'Please select the Bank',
+                'bankid.required' => 'Please select the Bank',
                 'branch.required' => 'Please enter the Branch name',
                 'branch_code.required' => 'Please enter the Branch Code',
                 'account_holder_name' => 'Please enter the account holder name',
@@ -759,7 +759,7 @@ class VendorController extends Controller
 
         $vendorBankInfoUpdate = vendorBankInfo::create([
             'pbvb_vendorid' => $vendor->pbv_id,
-            'pbvb_bankname' => $request->bankname,
+            'pbvb_bankname' => $request->bankid,
             'pbvb_branch' => $request->branch,
             'pbvb_branch_code' => $request->branch_code,
             'pbvb_holder_name' => $request->account_holder_name,
