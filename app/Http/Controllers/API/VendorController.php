@@ -1653,7 +1653,7 @@ class VendorController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/vendor/bankDetails",
+     *     path="/api/getVendorBankDetails",
      *     summary="Get vendor bank details",
      *     description="Fetches the authenticated vendor's bank details.",
      *     operationId="getVendorBankDetails",
@@ -1716,7 +1716,7 @@ class VendorController extends Controller
 
     /**
  * @OA\Get(
- *     path="/api/vendor/details",
+ *     path="/api/getVendorDetails",
  *     summary="Get vendor details",
  *     description="Fetches the authenticated vendor's details.",
  *     operationId="getVendorDetails",
