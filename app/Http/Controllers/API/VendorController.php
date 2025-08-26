@@ -1697,8 +1697,7 @@ class VendorController extends Controller
             return response()->json(['message' => 'Vendor not found'], 404);
         }
 
-        $vendor_bank_info = vendorBankInfo::join('vendors', 'vendorBankInfo.pbvb_vendorid', '=', 'vendors.pbv_id')
-                                    ->where('pbvb_vendorid', $vendor->pbv_id)->first();
+        $vendor_bank_info = vendorBankInfo::where('pbvb_vendorid', $vendor->pbv_id)->first();
         if (!$vendor_bank_info) {
             return response()->json(['message' => 'Vendor bank information not found'], 404);
         }
@@ -1706,6 +1705,65 @@ class VendorController extends Controller
         return response()->json([
             'success' => true,
             'data' => $vendor_bank_info
+        ], 200);
+    }
+
+    /**
+ * @OA\Get(
+ *     path="/api/vendor/details",
+ *     summary="Get vendor details",
+ *     description="Fetches the authenticated vendor's details.",
+ *     operationId="getVendorDetails",
+ *     tags={"Vendor"},
+ *     security={{"bearerAuth":{}}},
+ *
+ *     @OA\Response(
+ *         response=200,
+ *         description="Vendor details retrieved successfully",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="success", type="boolean", example=true),
+ *             @OA\Property(
+ *                 property="data",
+ *                 type="object",
+ *                 @OA\Property(property="pbv_id", type="integer", example=1),
+ *                 @OA\Property(property="pbv_business_name", type="string", example="TJS Beauty Parlour"),
+ *                 @OA\Property(property="pbv_email", type="string", example="vendor@example.com"),
+ *                 @OA\Property(property="pbv_contactno", type="string", example="+94771234567"),
+ *                 @OA\Property(property="pbv_address", type="string", example="123 Main Street, Colombo"),
+ *                 @OA\Property(property="pbv_business_category", type="integer", example=2),
+ *                 @OA\Property(property="pbv_vendortype", type="integer", example=1),
+ *                 @OA\Property(property="pbv_status", type="integer", example=1),
+ *                 @OA\Property(property="created_at", type="string", format="date-time", example="2025-08-26 10:30:00"),
+ *                 @OA\Property(property="updated_at", type="string", format="date-time", example="2025-08-26 10:30:00")
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=404,
+ *         description="Vendor not found",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="Vendor not found")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=500,
+ *         description="Server error",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="Something went wrong")
+ *         )
+ *     )
+ * )
+ */
+    public function getVendorDetails(){
+        $user = auth()->user();
+        $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
+        if (!$vendor) {
+            return response()->json(['message' => 'Vendor not found'], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $vendor
         ], 200);
     }
 
