@@ -709,13 +709,15 @@ class VendorController extends Controller
      *          @OA\JsonContent(
      *              required={
      *                  "bankname",
-     *                  "account_holder_name",
      *                  "branch",
+     *                  "branch_code",
+     *                  "account_holder_name",
      *                  "accountno",
      *              },
      *              @OA\Property(property="bankname", type="text", example="HNB"),
+     *              @OA\Property(property="branch", type="text", example="Colombo"),
+     *              @OA\Property(property="branch_code", type="text", example="021"),
      *              @OA\Property(property="account_holder_name", type="text", example="John"),
-     *              @OA\Property(property="branch", type="text", example="logo.png"),
      *              @OA\Property(property="accountno", type="text", example="2"),
      *          ),
      *      ),
@@ -739,15 +741,17 @@ class VendorController extends Controller
         $request->validate(
             [
                 'bankname' => 'required',
-                'account_holder_name' => 'required',
                 'branch' => 'required',
+                'branch_code' => 'required',
+                'account_holder_name' => 'required',
                 'accountno' => 'required|numeric',
                 
             ],
             [
                 'bankname.required' => 'Please select the Bank',
-                'account_holder_name' => 'Please enter the account holder name',
                 'branch.required' => 'Please enter the Branch name',
+                'branch_code.required' => 'Please enter the Branch Code',
+                'account_holder_name' => 'Please enter the account holder name',
                 'accountno.required' => 'Please enter the bank Account No',
                 'accountno.numeric' => 'Bank no must be Numeric',
             ]
@@ -756,8 +760,9 @@ class VendorController extends Controller
         $vendorBankInfoUpdate = vendorBankInfo::create([
             'pbvb_vendorid' => $vendor->pbv_id,
             'pbvb_bankname' => $request->bankname,
-            'pbvb_holder_name' => $request->account_holder_name,
             'pbvb_branch' => $request->branch,
+            'pbvb_branch_code' => $request->branch_code,
+            'pbvb_holder_name' => $request->account_holder_name,
             'pbvb_accountno' => $request->accountno,
             'pbvb_status' => 1
         ]);
