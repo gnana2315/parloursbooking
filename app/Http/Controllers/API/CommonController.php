@@ -1088,20 +1088,29 @@ class CommonController extends Controller
 
     /**
  * @OA\Get(
- *     path="/api/getTotalBookingsCountByVendor",
- *     summary="Get total bookings count for authenticated vendor",
- *     description="Returns the total number of bookings for the currently authenticated vendor",
- *     operationId="getTotalBookingsCountByVendor",
+ *     path="/api/getStaticsByVendor",
+ *     summary="Get vendor dashboard statistics",
+ *     description="Retrieves comprehensive financial and booking statistics for the authenticated vendor user",
+ *     operationId="getStaticsByVendor",
  *     tags={"Common"},
  *     security={{"bearerAuth": {}}},
+ *     
  *     @OA\Response(
  *         response=200,
  *         description="Successful operation",
  *         @OA\JsonContent(
  *             @OA\Property(property="success", type="boolean", example=true),
- *             @OA\Property(property="data", type="integer", example=23, description="Total bookings count")
+ *             @OA\Property(
+ *                 property="data",
+ *                 type="object",
+ *                 @OA\Property(property="bookingsCount", type="integer", example=23, description="Total number of bookings"),
+ *                 @OA\Property(property="earnedAmount", type="string", example="1,575.00", description="Total earned amount (formatted currency)"),
+ *                 @OA\Property(property="paidAmount", type="string", example="645.00", description="Total paid amount (formatted currency)"),
+ *                 @OA\Property(property="pendingAmount", type="string", example="930.00", description="Total pending amount (formatted currency)")
+ *             )
  *         )
  *     ),
+ *     
  *     @OA\Response(
  *         response=404,
  *         description="Vendor not found",
@@ -1110,6 +1119,7 @@ class CommonController extends Controller
  *             @OA\Property(property="message", type="string", example="Vendor not found for the user")
  *         )
  *     ),
+ *     
  *     @OA\Response(
  *         response=401,
  *         description="Unauthenticated",
@@ -1119,7 +1129,7 @@ class CommonController extends Controller
  *     )
  * )
  */
-    public function getTotalBookingsCountByVendor()
+    public function getStaticsByVendor()
     {
         $user = auth()->user();
 
@@ -1135,188 +1145,35 @@ class CommonController extends Controller
         // $bookingsCount = bookings::where('pbb_vendor_id', $vendor->pbv_id)->count();
         $bookingsCount = 23;
 
-        return response()->json([
-            'success' => true,
-            'data' => $bookingsCount
-        ], 200);
-    }
-
-    /**
- * @OA\Get(
- *     path="/api/getTotalEarnedAmountByVendor",
- *     summary="Get total earned amount for authenticated vendor",
- *     description="Returns the total amount earned by the currently authenticated vendor from all bookings",
- *     operationId="getTotalEarnedAmountByVendor",
- *     tags={"Common"},
- *     security={{"bearerAuth": {}}},
- *     @OA\Response(
- *         response=200,
- *         description="Successful operation",
- *         @OA\JsonContent(
- *             @OA\Property(property="success", type="boolean", example=true),
- *             @OA\Property(property="data", type="string", example="1,575.00", description="Formatted total earned amount with 2 decimal places")
- *         )
- *     ),
- *     @OA\Response(
- *         response=404,
- *         description="Vendor not found",
- *         @OA\JsonContent(
- *             @OA\Property(property="success", type="boolean", example=false),
- *             @OA\Property(property="message", type="string", example="Vendor not found for the user")
- *         )
- *     ),
- *     @OA\Response(
- *         response=401,
- *         description="Unauthenticated",
- *         @OA\JsonContent(
- *             @OA\Property(property="message", type="string", example="Unauthenticated.")
- *         )
- *     )
- * )
- */
-    public function getTotalEarnedAmountByVendor()
-    {
-        $user = auth()->user();
-
-        $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
-
-        if(!$vendor){
-            return response()->json([
-                'success' => false,
-                'message' => 'Vendor not found for the user'
-            ], 404);
-        }
-
         // $earnedAmount = bookings::join('booking_details', 'bookings.pbb_id', '=', 'booking_details.pbbd_booking_id')
         //     ->where('pbb_vendor_id', $vendor->pbv_id)
         //     ->sum('pbb_amount');
 
-        $amount = 1575;
-        $formatted_currency = number_format($amount, 2, '.', ',');
-
-        return response()->json([
-            'success' => true,
-            'data' => $formatted_currency
-        ], 200);
-    }
-
-    /**
- * @OA\Get(
- *     path="/api/getTotalPaidAmountByVendor",
- *     summary="Get total paid amount for authenticated vendor",
- *     description="Returns the total amount that has been paid to the currently authenticated vendor from all bookings",
- *     operationId="getTotalPaidAmountByVendor",
- *     tags={"Common"},
- *     security={{"bearerAuth": {}}},
- *     @OA\Response(
- *         response=200,
- *         description="Successful operation",
- *         @OA\JsonContent(
- *             @OA\Property(property="success", type="boolean", example=true),
- *             @OA\Property(property="data", type="string", example="645.00", description="Formatted total paid amount with 2 decimal places")
- *         )
- *     ),
- *     @OA\Response(
- *         response=404,
- *         description="Vendor not found",
- *         @OA\JsonContent(
- *             @OA\Property(property="success", type="boolean", example=false),
- *             @OA\Property(property="message", type="string", example="Vendor not found for the user")
- *         )
- *     ),
- *     @OA\Response(
- *         response=401,
- *         description="Unauthenticated",
- *         @OA\JsonContent(
- *             @OA\Property(property="message", type="string", example="Unauthenticated.")
- *         )
- *     )
- * )
- */
-    public function getTotalPaidAmountByVendor()
-    {
-        $user = auth()->user();
-
-        $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
-
-        if(!$vendor){
-            return response()->json([
-                'success' => false,
-                'message' => 'Vendor not found for the user'
-            ], 404);
-        }
+        $earnedAmount = 1575;
+        $earnedAmount_formatted_currency = number_format($earnedAmount, 2, '.', ',');
 
         // $paidAmount = bookings::join('booking_details', 'bookings.pbb_id', '=', 'booking_details.pbbd_booking_id')
         //     ->where('pbb_vendor_id', $vendor->pbv_id)
         //     ->sum('pbb_amount');
+
         $paidAmount = 645;
-        $formatted_currency = number_format($paidAmount, 2, '.', ',');
-
-        return response()->json([
-            'success' => true,
-            'data' => $formatted_currency
-        ], 200);
-    }
-
-    /**
- * @OA\Get(
- *     path="/api/getTotalPendingAmountByVendor",
- *     summary="Get total pending amount for authenticated vendor",
- *     description="Retrieves the total pending amount for the currently authenticated vendor user",
- *     operationId="getTotalPendingAmountByVendor",
- *     tags={"Common"},
- *     security={{"bearerAuth": {}}},
- *     
- *     @OA\Response(
- *         response=200,
- *         description="Successful operation",
- *         @OA\JsonContent(
- *             @OA\Property(property="success", type="boolean", example=true),
- *             @OA\Property(property="data", type="string", example="930.00", description="Formatted currency amount with 2 decimal places")
- *         )
- *     ),
- *     
- *     @OA\Response(
- *         response=404,
- *         description="Vendor not found",
- *         @OA\JsonContent(
- *             @OA\Property(property="success", type="boolean", example=false),
- *             @OA\Property(property="message", type="string", example="Vendor not found for the user")
- *         )
- *     ),
- *     
- *     @OA\Response(
- *         response=401,
- *         description="Unauthenticated",
- *         @OA\JsonContent(
- *             @OA\Property(property="message", type="string", example="Unauthenticated.")
- *         )
- *     )
- * )
- */
-    public function getTotalPendingAmountByVendor()
-    {
-        $user = auth()->user();
-
-        $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
-
-        if(!$vendor){
-            return response()->json([
-                'success' => false,
-                'message' => 'Vendor not found for the user'
-            ], 404);
-        }
+        $paidAmount_formatted_currency = number_format($paidAmount, 2, '.', ',');
 
         // $pendingAmount = bookings::join('booking_details', 'bookings.pbb_id', '=', 'booking_details.pbbd_booking_id')
         //     ->where('pbb_vendor_id', $vendor->pbv_id)
         //     ->sum('pbb_amount');
 
         $pendingAmount = 930;
-        $formatted_currency = number_format($pendingAmount, 2, '.', ',');
+        $pendingAmount_formatted_currency = number_format($pendingAmount, 2, '.', ',');
 
         return response()->json([
             'success' => true,
-            'data' => $formatted_currency
+            'data' => [
+                'bookingsCount' => $bookingsCount,
+                'earnedAmount' => $earnedAmount_formatted_currency,
+                'paidAmount' => $paidAmount_formatted_currency,
+                'pendingAmount' => $pendingAmount_formatted_currency
+            ]
         ], 200);
     }
 
