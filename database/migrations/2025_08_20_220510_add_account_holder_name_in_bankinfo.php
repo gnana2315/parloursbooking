@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('vendor_bank_info', function (Blueprint $table) { 
-            $table->string('pbvb_holder_name')->default(0)->after('pbvb_bankname');
+            $table->string('pbvb_holder_name')->after('pbvb_bankname');
         });
     }
 

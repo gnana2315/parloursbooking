@@ -102,6 +102,10 @@ Route::middleware(['auth:sanctum', 'validate.token'])->group(function () {
     Route::post('/storeDeviceToken', [CommonController::class, 'storeDeviceToken']);
     Route::get('/testNotification', [CommonController::class, 'testNotification']);
     Route::get('/getNotifications', [CommonController::class, 'notificationlist']);
+    Route::get('/getTotalBookingsCountByVendor', [CommonController::class, 'getTotalBookingsCountByVendor']);
+    Route::get('/getTotalEarnedAmountByVendor', [CommonController::class, 'getTotalEarnedAmountByVendor']);
+    Route::get('/getTotalPaidAmountByVendor', [CommonController::class, 'getTotalPaidAmountByVendor']);
+    Route::get('/getTotalPendingAmountByVendor', [CommonController::class, 'getTotalPendingAmountByVendor']);
 
     //booking
     Route::get('/getBookingSlots', [BookingController::class, 'getBookingSlots']);
