@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\required_document;
+use App\Models\requiredDocument;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -13,7 +13,7 @@ class RequiredDocumentSeeder extends Seeder
      */
     public function run(): void
     {
-        required_document::create(
+        requiredDocument::create(
             [
                 'pbrd_vendor_type' => '1',
                 'pbrd_name' => 'certificatelicenceofparlour',
@@ -22,7 +22,7 @@ class RequiredDocumentSeeder extends Seeder
                 'pbrd_required' => '1'
             ],
         );
-        required_document::create(
+        requiredDocument::create(
             [
                 'pbrd_vendor_type' => '1',
                 'pbrd_name' => 'businessregistration',
@@ -31,7 +31,7 @@ class RequiredDocumentSeeder extends Seeder
                 'pbrd_required' => '1'
             ],
         );
-        required_document::create(
+        requiredDocument::create(
             [
                 'pbrd_vendor_type' => '1',
                 'pbrd_name' => 'addressproof',
@@ -40,7 +40,7 @@ class RequiredDocumentSeeder extends Seeder
                 'pbrd_required' => '1'
             ],
         );
-        required_document::create(
+        requiredDocument::create(
             [
                 'pbrd_vendor_type' => '1',
                 'pbrd_name' => 'nicfront',
@@ -49,7 +49,7 @@ class RequiredDocumentSeeder extends Seeder
                 'pbrd_required' => '1'
             ],
         );
-        required_document::create(
+        requiredDocument::create(
             [
                 'pbrd_vendor_type' => '1',
                 'pbrd_name' => 'nicback',
@@ -58,7 +58,7 @@ class RequiredDocumentSeeder extends Seeder
                 'pbrd_required' => '1'
             ],
         );
-        required_document::create(
+        requiredDocument::create(
             [
                 'pbrd_vendor_type' => '1',
                 'pbrd_name' => 'businesslogo',
@@ -67,7 +67,7 @@ class RequiredDocumentSeeder extends Seeder
                 'pbrd_required' => '1'
             ],
         );
-        required_document::create(
+        requiredDocument::create(
             [
                 'pbrd_vendor_type' => '1',
                 'pbrd_name' => 'photoofparlours',
@@ -76,7 +76,7 @@ class RequiredDocumentSeeder extends Seeder
                 'pbrd_required' => '1'
             ],
         );
-        required_document::create(
+        requiredDocument::create(
             [
                 'pbrd_vendor_type' => '2',
                 'pbrd_name' => 'policeclearance',
@@ -85,7 +85,7 @@ class RequiredDocumentSeeder extends Seeder
                 'pbrd_required' => '1'
             ],
         );
-        required_document::create(
+        requiredDocument::create(
             [
                 'pbrd_vendor_type' => '2',
                 'pbrd_name' => 'workexperience',
@@ -94,7 +94,7 @@ class RequiredDocumentSeeder extends Seeder
                 'pbrd_required' => '0'
             ],
         );
-        required_document::create(
+        requiredDocument::create(
             [
                 'pbrd_vendor_type' => '2',
                 'pbrd_name' => 'certificates',
@@ -103,7 +103,7 @@ class RequiredDocumentSeeder extends Seeder
                 'pbrd_required' => '0'
             ],
         );
-        required_document::create(
+        requiredDocument::create(
             [
                 'pbrd_vendor_type' => '2',
                 'pbrd_name' => 'photographofuser',
@@ -112,7 +112,7 @@ class RequiredDocumentSeeder extends Seeder
                 'pbrd_required' => '1'
             ],
         );
-        required_document::create(
+        requiredDocument::create(
             [
                 'pbrd_vendor_type' => '2',
                 'pbrd_name' => 'nicfront',
@@ -121,7 +121,7 @@ class RequiredDocumentSeeder extends Seeder
                 'pbrd_required' => '1'
             ],
         );
-        required_document::create(
+        requiredDocument::create(
             [
                 'pbrd_vendor_type' => '2',
                 'pbrd_name' => 'nicback',
@@ -130,7 +130,7 @@ class RequiredDocumentSeeder extends Seeder
                 'pbrd_required' => '1'
             ],
         );
-        required_document::create(
+        requiredDocument::create(
             [
                 'pbrd_vendor_type' => '2',
                 'pbrd_name' => 'coverphoto',
