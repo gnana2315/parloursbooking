@@ -1053,6 +1053,7 @@ class CommonController extends Controller
 
                 $status = $check_document ? $check_document->pbvd_document_status : null;
                 $status_text = $this->getDocumentStatusText($status);
+
                 // Create document array with uploaded status
                 $documentData = [
                     'id' => $doc->pbrd_id,

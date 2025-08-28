@@ -18,7 +18,6 @@ return new class extends Migration
             $table->string('pbrd_label');
             $table->boolean('pbrd_is_single')->default(false);
             $table->boolean('pbrd_required')->default(false);
-            $table->boolean('pbrd_status')->default(true);
             $table->timestamps();
         });
     }

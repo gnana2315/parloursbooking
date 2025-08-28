@@ -17,7 +17,7 @@ return new class extends Migration
             $table->integer('pbvd_required_document_id');
             $table->string('pbvd_document_name');
             $table->string('pbvd_document_url');
-            $table->integer('pbvd_document_status')->default(0);
+            $table->enum('pbvd_document_status', ['0', '1', '2', '3', '4'])->default(0)->comment('Document Status:NotUploaded|UnderReview|Pending|Accepted|Rejected');
             $table->timestamps();
         });
     }

@@ -26,14 +26,12 @@ class requiredDocument extends Model
         'pbrd_label',
         'pbrd_is_single',
         'pbrd_required',
-        'pbrd_status',
         'created_at',
         'updated_at',
     ];
 
     protected $casts = [
         'pbrd_is_single' => 'boolean',
-        'pbrd_required' => 'boolean',
-        'pbrd_status' => 'boolean',
+        'pbrd_required' => 'boolean'
     ];
 }
