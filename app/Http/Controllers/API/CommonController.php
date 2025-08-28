@@ -1061,7 +1061,6 @@ class CommonController extends Controller
                     'is_single' => $doc->pbrd_is_single,
                     'required' => $doc->pbrd_required,
                     'document_status' => $status_text,
-                    'uploaded' => (bool) $check_document // This should be inside each document
                 ];
 
                 // Add file information if document exists
