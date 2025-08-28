@@ -1050,8 +1050,8 @@ class CommonController extends Controller
                                         ->where('pbvd_required_document_id', $doc->pbrd_id)
                                         ->first();
 
-                $status = $check_document ? $check_document->pbvd_document_status : 0;
-                $status_text = $this->getDocumentStatusText($status);
+                $status_text = $check_document ? $check_document->pbvd_document_status : 0;
+                // $status_text = $this->getDocumentStatusText($status);
 
                 // Create document array with uploaded status
                 $documentData = [
