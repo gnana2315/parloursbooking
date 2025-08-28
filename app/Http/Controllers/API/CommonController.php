@@ -1041,7 +1041,6 @@ class CommonController extends Controller
 
         if($vendor_type_id){
             $documents = requiredDocument::where('pbrd_vendor_type', $vendor_type_id)
-                                        ->where('pbrd_status', 1)
                                         ->get();
 
             $requiredDocuments = [];
@@ -1051,7 +1050,7 @@ class CommonController extends Controller
                                         ->where('pbvd_required_document_id', $doc->pbrd_id)
                                         ->first();
 
-                $status = $check_document ? $check_document->pbvd_document_status : null;
+                $status = $check_document ? $check_document->pbvd_document_status : 0;
                 $status_text = $this->getDocumentStatusText($status);
 
                 // Create document array with uploaded status
