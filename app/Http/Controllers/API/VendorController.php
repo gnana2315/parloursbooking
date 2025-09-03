@@ -1653,6 +1653,95 @@ class VendorController extends Controller
     }
 
     /**
+ * @OA\Get(
+ *     path="/getToBePaidByVendor",
+ *     summary="Get all earnings for the authenticated vendor",
+ *     tags={"Transections"},
+ *     security={{"bearerAuth":{}}},
+ *     @OA\Response(
+ *         response=200,
+ *         description="All To Be Paid retrieved successfully",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="success", type="boolean", example=true),
+ *             @OA\Property(
+ *                 property="data",
+ *                 type="array",
+ *                 @OA\Items(
+ *                     type="object",
+ *                     @OA\Property(property="date", type="string", format="date", example="2025-08-02"),
+ *                     @OA\Property(property="booking_ref_no", type="string", example="PBV-123456"),
+ *                     @OA\Property(property="amount", type="number", format="float", example=15000.00),
+ *                     @OA\Property(property="status", type="string", example="Completed")
+ *                 )
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=404,
+ *         description="Vendor not found",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="Vendor not found")
+ *         )
+ *     )
+ * )
+ */
+    public function getToBePaidByVendor(){
+        $user = auth()->user();
+        $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
+        if (!$vendor) {
+            return response()->json(['message' => 'Vendor not found'], 404);
+        }
+
+        // $startOfWeek = now()->startOfWeek();
+        // $endOfWeek = now()->endOfWeek();
+
+        // $earnings = bookings::where('pbv_vendor_id', $vendor->pbv_id)
+        //     ->whereBetween('pb_bk_date', [$startOfWeek, $endOfWeek])
+        //     ->sum('pb_bk_total');
+
+        // return response()->json([
+        //     'success' => true,
+        //     'data' => [
+        //         'earnings' => $earnings,
+        //         'week_start' => $startOfWeek->format('Y-m-d'),
+        //         'week_end' => $endOfWeek->format('Y-m-d')
+        //     ]
+        // ], 200);
+        $toBePaidList = [
+            [
+                'date' => now()->format('Y-m-d'),
+                'booking_ref_no' => 'PBV-123456',
+                'amount' => 1500.00,
+            ],
+            [
+                'date' => now()->format('Y-m-d'),
+                'booking_ref_no' => 'PBV-4646',
+                'amount' => 700.00,
+            ],
+            [
+                'date' => now()->format('Y-m-d'),
+                'booking_ref_no' => 'PBV-7890',
+                'amount' => 1200.00,
+            ],
+            [
+                'date' => now()->format('Y-m-d'),
+                'booking_ref_no' => 'PBV-4567',
+                'amount' => 800.00,
+            ],
+            [
+                'date' => now()->format('Y-m-d'),
+                'booking_ref_no' => 'PBV-8901',
+                'amount' => 500.00,
+            ]
+        ];
+        return response()->json([
+            'success' => true,
+            'data' => $toBePaidList
+        ], 200);
+    }
+
+    /**
      * @OA\Get(
      *     path="/api/getVendorBankDetails",
      *     summary="Get vendor bank details",
