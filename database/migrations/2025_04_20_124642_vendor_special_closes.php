@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('vendor_special_closes', function (Blueprint $table) {
             $table->id('pbvsc_id');
             $table->integer('pbvsc_vendor_id');
-            $table->enum('pbvsc_day', ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'])->nullable();
+            $table->date('pbvsc_day')->nullable();
             $table->boolean('pbvsc_full_day_closed')->default(false);
             $table->time('pbvsc_from_time')->nullable();
             $table->time('pbvsc_to_time')->nullable();

@@ -1019,14 +1019,13 @@ class VendorController extends Controller
         }
         $request->validate(
             [
-                '*.day' => 'required:in:Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday',
+                '*.day' => 'required',
                 '*.full_day_closed' => 'required|boolean',
                 '*.from_time' => 'required_if:*.full_day_closed,false|date_format:H:i',
                 '*.to_time' => 'required_if:*.full_day_closed,false|date_format:H:i|after:*.from_time',
             ],
             [
                 '*.day.required' => 'Day is required',
-                '*.day.in' => 'Day must be one of the following: Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday',
                 '*.full_day_closed.required' => 'Full day closed is required',
                 '*.full_day_closed.boolean' => 'Full day closed must be true or false',
                 '*.from_time.required_if' => 'From time is required if full day closed is false',
