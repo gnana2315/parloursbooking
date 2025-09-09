@@ -612,61 +612,6 @@ class CommonController extends Controller
             'data' => $businesscategorylists
         ], 200);
     }
-    
-    /**
-     * @OA\Get(
-     *     path="/api/getVendorsSpecificClosings",
-     *     summary="Get Vendor's Special Closing Dates",
-     *     description="Returns the vendor closing dates and when customer booking those dates want to be disable",
-     *     operationId="getVendorsSpecificClosings",
-     *     tags={"Vendor"},
-     *     @OA\Response(
-     *         response=200,
-     *         description="Successful operation",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(
-     *                 property="success",
-     *                 type="boolean",
-     *                 example=true
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="No Data found",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(
-     *                 property="success",
-     *                 type="boolean",
-     *                 example=false
-     *             ),
-     *             @OA\Property(
-     *                 property="message",
-     *                 type="string",
-     *                 example="No Data found"
-     *             )
-     *         )
-     *     )
-     * )
-     */
-    public function getVendorsSpecificClosings(){
-        $user= auth()->user();
-
-        $closing_data = vendorSpecialCloses::where('pbvsc_status', '=', 1)->get();
-
-        if ($closing_data->isEmpty()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Closing dates not not found'
-            ], 404);
-        }
-        return response()->json([
-            'success' => true,
-            'data' => $closing_data
-        ], 200);
-    }
 
     /**
      * @OA\Get(

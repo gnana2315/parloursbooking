@@ -965,7 +965,7 @@ class VendorController extends Controller
      *         )
      *     ),
      * )
- */
+     */
 
     public function getVendorAvailability(){
         $user = auth()->user();
