@@ -937,7 +937,7 @@ class VendorController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/getVendorAvailability",
+     *     path="/api/getVendorAvailability",
      *     summary="Get vendor availability",
      *     description="Fetches the standard availability details for the authenticated vendor.",
      *     operationId="getVendorAvailability",
@@ -1048,6 +1048,67 @@ class VendorController extends Controller
 
         return response()->json([
             'message' => 'Vendor Special Closes requested successfully! We will confirm after validate with your exisiting bookings.'
+        ], 200);
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/api/getVendorsSpecificClosings",
+     *     summary="Get Vendor Specific Closings",
+     *     description="Fetches the specific closing dates for the authenticated vendor.",
+     *     operationId="getVendorsSpecificClosings",
+     *     tags={"Vendor"},
+     *     security={{"bearerAuth":{}}},
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successfully retrieved vendor closings",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     @OA\Property(property="pbvsc_id", type="integer", example=1),
+     *                     @OA\Property(property="pbvsc_vendor_id", type="integer", example=9),
+     *                     @OA\Property(property="pbvsc_date", type="string", format="date", example="2025-09-15"),
+     *                     @OA\Property(property="pbvsc_reason", type="string", example="Holiday"),
+     *                     @OA\Property(property="created_at", type="string", format="date-time", example="2025-09-01T10:00:00Z"),
+     *                     @OA\Property(property="updated_at", type="string", format="date-time", example="2025-09-01T10:00:00Z")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=404,
+     *         description="Vendor not found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Vendor not found")
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=500,
+     *         description="Server error"
+     *     )
+     * )
+ */
+    public function getVendorsSpecificClosings(){
+        $user = auth()->user();
+
+        $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
+
+        if (!$vendor) {
+            return response()->json(['message' => 'Vendor not found'], 404);
+        }
+
+        $availabilities = vendorSpecialCloses::where('pbvsc_vendor_id', $vendor->pbv_id)->get();
+        
+        return response()->json([
+            'success' => true,
+            'data' => $availabilities
         ], 200);
     }
 
