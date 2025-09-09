@@ -994,7 +994,7 @@ class VendorController extends Controller
      *                  "end_time",
      *                  "full_day_closed", 
      *              },
-     *              @OA\Property(property="day", type="text", example="Monday"),
+     *              @OA\Property(property="day", type="date", example="2025-10-22"),
      *              @OA\Property(property="start_time", type="text", example="08:00"),
      *              @OA\Property(property="end_time", type="text", example="17:00"),
      *              @OA\Property(property="full_day_closed", type="boolean", example="1"),
