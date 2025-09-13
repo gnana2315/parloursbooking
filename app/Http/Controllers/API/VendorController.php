@@ -428,7 +428,7 @@ class VendorController extends Controller
         $request->validate(
             [
                 'vendor_document' => 'required|array',
-                'vendor_document.*.document_id' => 'required|integer|exists:required_documents,pbrd_id',
+                'vendor_document.*.document_id' => 'required|integer|exists:required_document,pbrd_id',
                 'vendor_document.*.document' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048'
             ],
             [
