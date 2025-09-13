@@ -1269,9 +1269,9 @@ class VendorController extends Controller
 
     public function getVendorByID($vendor_id){
         $user = auth()->user();
-        $vendor_results = vendors::join('vendor_config', 'vendor_config.pbvc_vendorid', '=', 'vendor.pbv_id')
-                ->join('vendor_standard_availability', 'vendor_standard_availability.pbvsa_vendor_id', '=', 'vendor.pbv_id')
-                ->join('cities', 'cities.pbc_cid', '=', 'vendor.pbv_city')
+        $vendor_results = vendors::join('vendor_config', 'vendor_config.pbvc_vendorid', '=', 'vendor.pbv_id', 'left')
+                ->join('vendor_standard_availability', 'vendor_standard_availability.pbvsa_vendor_id', '=', 'vendor.pbv_id', 'left')
+                ->join('cities', 'cities.pbc_cid', '=', 'vendor.pbv_city', 'left')
                 // ->join('ratings', 'ratings.pbr_vendor_id', '=', 'vendor.pbv_id', 'left')
                 ->select(
                     'vendor.*',
