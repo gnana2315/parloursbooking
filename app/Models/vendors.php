@@ -66,4 +66,19 @@ class vendors extends Model
     {
         return $this->hasMany(vendorDocuments::class, 'pbvd_vendor_id', 'pbv_id');
     }
+
+    public function availability()
+    {
+        return $this->hasMany(VendorStandardAvailability::class, 'pbvsa_vendor_id', 'pbv_id');
+    }
+
+    public function config()
+    {
+        return $this->hasOne(VendorConfig::class, 'pbvc_vendorid', 'pbv_id');
+    }
+
+    public function city()
+    {
+        return $this->belongsTo(City::class, 'pbv_city', 'pbc_cid');
+    }
 }
