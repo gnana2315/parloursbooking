@@ -843,6 +843,115 @@ class BookingController extends Controller
         }
 
         $bookings = booking::where('pbb_vendor_id', $vendor->pbv_id)
+            ->with(['bookingDetails.services' => function ($q) {
+                $q->select('pbs_price', 'pbs_duration');
+            }])
+            ->orderBy('pbb_booking_date', 'desc')
+            ->get();
+
+        if ($bookings->isEmpty()) {
+            return response()->json(['message' => 'No bookings found'], 404);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Bookings retrieved successfully',
+            'data' => $bookings
+        ], 200);
+    }
+
+    /**
+ * @OA\Get(
+ *     path="/api/bookings/{id}",
+ *     summary="Get booking details by ID",
+ *     description="Retrieves detailed information about a specific booking including customer details and services",
+ *     tags={"Bookings"},
+ *     security={{"bearerAuth":{}}},
+ *     @OA\Parameter(
+ *         name="id",
+ *         in="path",
+ *         required=true,
+ *         description="ID of the booking to retrieve",
+ *         @OA\Schema(
+ *             type="integer",
+ *             example=123
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Booking details retrieved successfully",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="status", type="boolean", example=true),
+ *             @OA\Property(property="message", type="string", example="Booking Details retrieved successfully"),
+ *             @OA\Property(
+ *                 property="data",
+ *                 type="array",
+ *                 @OA\Items(
+ *                     type="object",
+ *                     @OA\Property(property="pbb_id", type="integer", example=123),
+ *                     @OA\Property(property="pbb_booking_date", type="string", format="date-time", example="2023-10-25T12:00:00.000000Z"),
+ *                     @OA\Property(property="pbb_status", type="string", example="confirmed"),
+ *                     @OA\Property(property="pbb_total_amount", type="number", format="float", example=150.50),
+ *                     @OA\Property(
+ *                         property="customer",
+ *                         type="object",
+ *                         @OA\Property(property="pbc_id", type="integer", example=456),
+ *                         @OA\Property(property="pbc_name", type="string", example="John Doe"),
+ *                         @OA\Property(property="pbc_email", type="string", example="john@example.com"),
+ *                         @OA\Property(property="pbc_phone", type="string", example="+1234567890")
+ *                     ),
+ *                     @OA\Property(
+ *                         property="booking_details",
+ *                         type="array",
+ *                         @OA\Items(
+ *                             type="object",
+ *                             @OA\Property(property="pbbd_id", type="integer", example=789),
+ *                             @OA\Property(property="pbbd_service_id", type="integer", example=101),
+ *                             @OA\Property(property="pbbd_price", type="number", format="float", example=75.25),
+ *                             @OA\Property(
+ *                                 property="services",
+ *                                 type="object",
+ *                                 @OA\Property(property="pbs_id", type="integer", example=101),
+ *                                 @OA\Property(property="pbs_service_type", type="string", example="hair"),
+ *                                 @OA\Property(property="pbs_service_for", type="string", example="women"),
+ *                                 @OA\Property(property="pbs_name", type="string", example="Hair Cut & Styling"),
+ *                                 @OA\Property(property="pbs_price", type="number", format="float", example=75.25),
+ *                                 @OA\Property(property="pbs_duration", type="integer", example=60)
+ *                             )
+ *                         )
+ *                     ),
+ *                     @OA\Property(property="pbb_created_at", type="string", format="date-time", example="2023-10-25T12:00:00.000000Z"),
+ *                     @OA\Property(property="pbb_updated_at", type="string", format="date-time", example="2023-10-25T12:00:00.000000Z")
+ *                 )
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=404,
+ *         description="Booking not found",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="No bookings found")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=401,
+ *         description="Unauthorized",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="Unauthenticated.")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=500,
+ *         description="Internal server error",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="Server error")
+ *         )
+ *     )
+ * )
+ */
+    public function getBookingDetailsById($id)
+    {
+        $bookings = booking::where('pbb_id', $id)
             ->with(['customer', 'bookingDetails.services' => function ($q) {
                 $q->select('pbs_id', 'pbs_service_type', 'pbs_service_for', 'pbs_name', 'pbs_price', 'pbs_duration');
             }])
@@ -855,7 +964,7 @@ class BookingController extends Controller
 
         return response()->json([
             'status' => true,
-            'message' => 'Bookings retrieved successfully',
+            'message' => 'Booking Details retrieved successfully',
             'data' => $bookings
         ], 200);
     }
