@@ -1345,54 +1345,62 @@ class VendorController extends Controller
         //             ['vendor.pbv_id', $vendor_id], ['vendor.pbv_status', 1]
         //         ])
         //         ->get(); 
-        $vendor_results = vendors::with(['config', 'city', 'availability', 'vendorDocuments']) // Eager load everything
+        $vendor_results = vendors::with(['config', 'city', 'availability', 'vendorDocuments'])
             ->where('pbv_id', $vendor_id)
             ->where('pbv_status', 1)
             ->first();      
-        // dd($vendor_results);die();
+
         if (!$vendor_results) {
             return response()->json(['message' => 'Vendor not found'], 404);
         }
-        // print_r('<pre>');
-        // print_r($vendor_results);die();
-        // $vendor = $vendor_results->first();
-        dd($vendor_results);die();
 
-        $availability = $vendor_results->map(function ($item) {
+        // Process availability - $vendor_results is a single object, not a collection
+        $availability = $vendor_results->availability->map(function ($item) {
             return [
                 'day' => $item->pbvsa_day,
                 'start_time' => $item->pbvsa_start_time,
                 'end_time' => $item->pbvsa_end_time,
                 'is_open' => $item->pbvsa_is_open,
             ];
-        })->toArray();        
-        
+        })->toArray();
+
+        // Get logo from documents where required_document_id = 6
+        $vendorDocuments = $vendor_results->vendorDocuments;
+        $logoDocument = $vendorDocuments->firstWhere('pbvd_required_document_id', 6);
+        $logoUrl = $logoDocument ? $logoDocument->pbvd_document_url : null;
+
+        // Fallback to config logo if document not found
+        if (!$logoUrl && $vendor_results->config) {
+            $logoUrl = $vendor_results->config->pbvc_logo ?? null;
+        }
+
         // Add favorite flag
         $customer = customer::where('pbc_user_id', $user->pbu_id)->first();
         $favourites = $customer->pbc_fav ?? [];
 
-        $isFav = in_array($vendor_results->first()->pbv_id, $favourites);
+        // Check if this vendor's ID is in favorites
+        $isFav = in_array($vendor_results->pbv_id, $favourites);
 
         $final_vendors = [
-            'id' => $vendor->pbv_id,
-            'tenentid' => $vendor->pbv_tenentid,
-            'servicefor' => $vendor->pbv_servicefor,
-            'vendortype' => $vendor->pbv_vendortype,
-            'business_name' => $vendor->pbv_business_name,
-            'brno' => $vendor->pbv_brno,
-            'email' => $vendor->pbv_email,
-            'contact_no' => $vendor->pbv_contactno,
-            'address' => $vendor->pbv_address,
-            'city' => $vendor->pbc_cityname,
-            'longatitude' => $vendor->pbv_longatitude,
-            'latitude' => $vendor->pbv_latitude,
-            'status' => $vendor->pbv_status,
-            'created_at' => $vendor->pbv_created_at,
-            'display_name' => $vendor->pbv_display_name,
-            'logo' => $vendor->pbvc_logo,
-            'service_at_time' => $vendor->pbv_staff_count,
+            'id' => $vendor_results->pbv_id,
+            'tenentid' => $vendor_results->pbv_tenentid,
+            'servicefor' => $vendor_results->pbv_servicefor,
+            'vendortype' => $vendor_results->pbv_vendortype,
+            'business_name' => $vendor_results->pbv_business_name,
+            'brno' => $vendor_results->pbv_brno,
+            'email' => $vendor_results->pbv_email,
+            'contact_no' => $vendor_results->pbv_contactno,
+            'address' => $vendor_results->pbv_address,
+            'city' => $vendor_results->city->pbc_cityname ?? null, // Access through city relationship
+            'longatitude' => $vendor_results->pbv_longatitude,
+            'latitude' => $vendor_results->pbv_latitude,
+            'status' => $vendor_results->pbv_status,
+            'created_at' => $vendor_results->pbv_created_at,
+            'display_name' => $vendor_results->pbv_display_name,
+            'logo' => $logoUrl, // Use the document URL or fallback
+            'service_at_time' => $vendor_results->pbv_staff_count,
             'availability' => $this->groupAvailability($availability),
-            'images' => $vendor->pbv_images,
+            'images' => $vendor_results->pbv_images,
             'rating' => 3,
             'isFav' => $isFav
         ];
