@@ -520,7 +520,7 @@ class VendorController extends Controller
             [
                 'pbvd_document_name' => $fileName,
                 'pbvd_document_url' => $fileUrl,
-                'pbvd_document_status' => 1
+                'pbvd_document_status' => '1'
             ]
         );
 
