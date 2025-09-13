@@ -1354,9 +1354,9 @@ class VendorController extends Controller
             return response()->json(['message' => 'Vendor not found'], 404);
         }
         // print_r('<pre>');
-        print_r($vendor_results);die();
+        // print_r($vendor_results);die();
         $vendor = $vendor_results->first();
-        // dd($vendor->pbv_images);die();
+        dd($vendor);die();
 
         $availability = $vendor_results->map(function ($item) {
             return [
