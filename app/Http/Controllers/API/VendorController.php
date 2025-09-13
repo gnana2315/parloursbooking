@@ -1354,7 +1354,7 @@ class VendorController extends Controller
             return response()->json(['message' => 'Vendor not found'], 404);
         }
         // print_r('<pre>');
-        // print_r($vendor_results);die();
+        print_r($vendor_results);die();
         $vendor = $vendor_results->first();
         // dd($vendor->pbv_images);die();
 
@@ -1388,9 +1388,9 @@ class VendorController extends Controller
             'latitude' => $vendor->pbv_latitude,
             'status' => $vendor->pbv_status,
             'created_at' => $vendor->pbv_created_at,
-            'display_name' => $vendor->pbvc_display_name,
+            'display_name' => $vendor->pbv_display_name,
             'logo' => $vendor->pbvc_logo,
-            'service_at_time' => $vendor->pbvc_service_at_time,
+            'service_at_time' => $vendor->pbv_staff_count,
             'availability' => $this->groupAvailability($availability),
             'images' => $vendor->pbv_images,
             'rating' => 3,
