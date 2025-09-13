@@ -1332,12 +1332,14 @@ class VendorController extends Controller
         $vendor_results = vendors::join('vendor_config', 'vendor_config.pbvc_vendorid', '=', 'vendor.pbv_id', 'left')
                 ->join('vendor_standard_availability', 'vendor_standard_availability.pbvsa_vendor_id', '=', 'vendor.pbv_id', 'left')
                 ->join('cities', 'cities.pbc_cid', '=', 'vendor.pbv_city', 'left')
+                ->join('vendor_documents', 'vendor_documents.pbvd_vendor_id', '=', 'vendor.pbv_id', 'left')
                 // ->join('ratings', 'ratings.pbr_vendor_id', '=', 'vendor.pbv_id', 'left')
                 ->select(
                     'vendor.*',
                     'vendor_config.*',
                     'vendor_standard_availability.*',
                     'cities.*',
+                    'vendor_documents.*'
                     // 'ratings.*',
                     // DB::raw('AVG(pb_ratings.pbr_rating) as average_rating')
                 )
