@@ -1296,38 +1296,93 @@ class VendorController extends Controller
     }
 
     /**
-        * @OA\Get(
-        *     path="/api/vendor/{vendor_id}",
-        *     summary="Get Vendor Details by ID",
-        *     description="Fetches vendor information along with configuration and services for a given vendor ID.",
-        *     tags={"Vendor"},
-        *     security={{"sanctum":{}}},
-        *     @OA\Parameter(
-        *         name="vendor_id",
-        *         in="path",
-        *         description="ID of the vendor to fetch",
-        *         required=true,
-        *         @OA\Schema(type="integer", example=1)
-        *     ),
-        *     @OA\Response(
-        *         response=200,
-        *         description="Vendor details retrieved successfully",
-        *         @OA\JsonContent(
-        *             @OA\Property(property="success", type="boolean", example=true),
-        *             @OA\Property(property="data", type="object")
-        *         )
-        *     ),
-        *     @OA\Response(
-        *         response=404,
-        *         description="Vendor not found",
-        *         @OA\JsonContent(
-        *             @OA\Property(property="message", type="string", example="Vendor not found")
-        *         )
-        *     )
-        * )
-    */
-
-    public function getVendorByID($vendor_id){
+ * @OA\Get(
+ *     path="/api/getVendor",
+ *     summary="Get authenticated vendor's profile",
+ *     description="Retrieves detailed information about the currently authenticated vendor including availability, documents, and configuration",
+ *     tags={"Vendors"},
+ *     security={{"bearerAuth":{}}},
+ *     @OA\Response(
+ *         response=200,
+ *         description="Successful operation",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="success", type="boolean", example=true),
+ *             @OA\Property(
+ *                 property="data",
+ *                 type="object",
+ *                 @OA\Property(property="id", type="integer", example=123),
+ *                 @OA\Property(property="tenentid", type="integer", example=1),
+ *                 @OA\Property(property="servicefor", type="string", example="salon"),
+ *                 @OA\Property(property="vendortype", type="string", example="premium"),
+ *                 @OA\Property(property="business_name", type="string", example="Luxury Salon"),
+ *                 @OA\Property(property="brno", type="string", example="BR123456"),
+ *                 @OA\Property(property="email", type="string", example="info@luxurysalon.com"),
+ *                 @OA\Property(property="contact_no", type="string", example="+1234567890"),
+ *                 @OA\Property(property="address", type="string", example="123 Main Street"),
+ *                 @OA\Property(property="city", type="string", example="New York"),
+ *                 @OA\Property(property="longatitude", type="string", example="-73.935242"),
+ *                 @OA\Property(property="latitude", type="string", example="40.730610"),
+ *                 @OA\Property(property="status", type="integer", example=1),
+ *                 @OA\Property(property="created_at", type="string", format="date-time", example="2023-10-25T12:00:00.000000Z"),
+ *                 @OA\Property(property="display_name", type="string", example="Luxury Beauty Salon"),
+ *                 @OA\Property(property="logo", type="string", format="uri", example="https://api.example.com/storage/logo.png"),
+ *                 @OA\Property(property="service_at_time", type="integer", example=5),
+ *                 @OA\Property(
+ *                     property="availability",
+ *                     type="array",
+ *                     description="Grouped availability information",
+ *                     @OA\Items(
+ *                         type="object",
+ *                         @OA\Property(property="day", type="string", example="Monday"),
+ *                         @OA\Property(property="time_slots", type="array", @OA\Items(type="string", example="09:00-18:00")),
+ *                         @OA\Property(property="is_open", type="boolean", example=true)
+ *                     )
+ *                 ),
+ *                 @OA\Property(
+ *                     property="images",
+ *                     type="array",
+ *                     @OA\Items(
+ *                         type="string",
+ *                         format="uri",
+ *                         example="https://api.example.com/storage/image1.jpg"
+ *                     )
+ *                 ),
+ *                 @OA\Property(property="rating", type="number", format="float", example=4.5),
+ *                 @OA\Property(property="isFav", type="boolean", example=false)
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=404,
+ *         description="Vendor not found",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="Vendor not found")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=401,
+ *         description="Unauthorized - User not authenticated or not a vendor",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="Unauthenticated.")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=403,
+ *         description="Forbidden - User doesn't have vendor access",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="Access denied")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=500,
+ *         description="Internal server error",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="Server error")
+ *         )
+ *     )
+ * )
+ */
+    public function getVendor(){
         $user = auth()->user();
         // $vendor_results = vendors::join('vendor_standard_availability', 'vendor_standard_availability.pbvsa_vendor_id', '=', 'vendor.pbv_id', 'left')
         //         ->join('cities', 'cities.pbc_cid', '=', 'vendor.pbv_city', 'left')
@@ -1346,7 +1401,7 @@ class VendorController extends Controller
         //         ])
         //         ->get(); 
         $vendor_results = vendors::with(['config', 'city', 'availability', 'vendorDocuments'])
-            ->where('pbv_id', $vendor_id)
+            ->where('pbv_id', $user->pbu_vid)
             ->where('pbv_status', 1)
             ->first();      
 

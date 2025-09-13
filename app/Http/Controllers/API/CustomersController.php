@@ -332,4 +332,175 @@ class CustomersController extends Controller
             'data' => $customer
         ], 200);
     }
+
+    /**
+ * @OA\Get(
+ *     path="/api/vendors/{vendor_id}",
+ *     summary="Get vendor details by ID",
+ *     description="Retrieves detailed information about a specific vendor including availability, documents, and favorite status",
+ *     tags={"Customer"},
+ *     security={{"bearerAuth":{}}},
+ *     @OA\Parameter(
+ *         name="vendor_id",
+ *         in="path",
+ *         required=true,
+ *         description="ID of the vendor to retrieve",
+ *         @OA\Schema(
+ *             type="integer",
+ *             example=123
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Successful operation",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="success", type="boolean", example=true),
+ *             @OA\Property(
+ *                 property="data",
+ *                 type="object",
+ *                 @OA\Property(property="id", type="integer", example=123),
+ *                 @OA\Property(property="tenentid", type="integer", example=1),
+ *                 @OA\Property(property="servicefor", type="string", example="salon"),
+ *                 @OA\Property(property="vendortype", type="string", example="premium"),
+ *                 @OA\Property(property="business_name", type="string", example="Luxury Salon"),
+ *                 @OA\Property(property="brno", type="string", example="BR123456"),
+ *                 @OA\Property(property="email", type="string", example="info@luxurysalon.com"),
+ *                 @OA\Property(property="contact_no", type="string", example="+1234567890"),
+ *                 @OA\Property(property="address", type="string", example="123 Main Street"),
+ *                 @OA\Property(property="city", type="string", example="New York"),
+ *                 @OA\Property(property="longatitude", type="string", example="-73.935242"),
+ *                 @OA\Property(property="latitude", type="string", example="40.730610"),
+ *                 @OA\Property(property="status", type="integer", example=1),
+ *                 @OA\Property(property="created_at", type="string", format="date-time", example="2023-10-25T12:00:00.000000Z"),
+ *                 @OA\Property(property="display_name", type="string", example="Luxury Beauty Salon"),
+ *                 @OA\Property(property="logo", type="string", format="uri", example="https://api.example.com/storage/logo.png"),
+ *                 @OA\Property(property="service_at_time", type="integer", example=5),
+ *                 @OA\Property(
+ *                     property="availability",
+ *                     type="array",
+ *                     @OA\Items(
+ *                         type="object",
+ *                         @OA\Property(property="day", type="string", example="Monday"),
+ *                         @OA\Property(property="start_time", type="string", example="09:00:00"),
+ *                         @OA\Property(property="end_time", type="string", example="18:00:00"),
+ *                         @OA\Property(property="is_open", type="boolean", example=true)
+ *                     )
+ *                 ),
+ *                 @OA\Property(
+ *                     property="images",
+ *                     type="array",
+ *                     @OA\Items(type="string", format="uri")
+ *                 ),
+ *                 @OA\Property(property="rating", type="number", format="float", example=4.5),
+ *                 @OA\Property(property="isFav", type="boolean", example=true)
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=404,
+ *         description="Vendor not found",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="Vendor not found")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=401,
+ *         description="Unauthorized",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="Unauthenticated.")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=500,
+ *         description="Internal server error",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="Server error")
+ *         )
+ *     )
+ * )
+ */
+    public function getVendorByID($vendor_id)
+    {
+        $user = auth()->user();
+        // $vendor_results = vendors::join('vendor_standard_availability', 'vendor_standard_availability.pbvsa_vendor_id', '=', 'vendor.pbv_id', 'left')
+        //         ->join('cities', 'cities.pbc_cid', '=', 'vendor.pbv_city', 'left')
+        //         ->join('vendor_documents', 'vendor_documents.pbvd_vendor_id', '=', 'vendor.pbv_id', 'left')
+        //         // ->join('ratings', 'ratings.pbr_vendor_id', '=', 'vendor.pbv_id', 'left')
+        //         ->select(
+        //             'vendor.*',
+        //             'vendor_standard_availability.*',
+        //             'cities.*',
+        //             'vendor_documents.*'
+        //             // 'ratings.*',
+        //             // DB::raw('AVG(pb_ratings.pbr_rating) as average_rating')
+        //         )
+        //         ->where([
+        //             ['vendor.pbv_id', $vendor_id], ['vendor.pbv_status', 1]
+        //         ])
+        //         ->get(); 
+        $vendor_results = vendors::with(['config', 'city', 'availability', 'vendorDocuments'])
+            ->where('pbv_id', $vendor_id)
+            ->where('pbv_status', 1)
+            ->first();      
+
+        if (!$vendor_results) {
+            return response()->json(['message' => 'Vendor not found'], 404);
+        }
+
+        // Process availability - $vendor_results is a single object, not a collection
+        $availability = $vendor_results->availability->map(function ($item) {
+            return [
+                'day' => $item->pbvsa_day,
+                'start_time' => $item->pbvsa_start_time,
+                'end_time' => $item->pbvsa_end_time,
+                'is_open' => $item->pbvsa_is_open,
+            ];
+        })->toArray();
+
+        // Get logo from documents where required_document_id = 6
+        $vendorDocuments = $vendor_results->vendorDocuments;
+        $logoDocument = $vendorDocuments->firstWhere('pbvd_required_document_id', 6);
+        $logoUrl = $logoDocument ? $logoDocument->pbvd_document_url : null;
+
+        // Fallback to config logo if document not found
+        if (!$logoUrl && $vendor_results->config) {
+            $logoUrl = $vendor_results->config->pbvc_logo ?? null;
+        }
+
+        // Add favorite flag
+        $customer = customer::where('pbc_user_id', $user->pbu_id)->first();
+        $favourites = $customer->pbc_fav ?? [];
+
+        // Check if this vendor's ID is in favorites
+        $isFav = in_array($vendor_results->pbv_id, $favourites);
+
+        $final_vendors = [
+            'id' => $vendor_results->pbv_id,
+            'tenentid' => $vendor_results->pbv_tenentid,
+            'servicefor' => $vendor_results->pbv_servicefor,
+            'vendortype' => $vendor_results->pbv_vendortype,
+            'business_name' => $vendor_results->pbv_business_name,
+            'brno' => $vendor_results->pbv_brno,
+            'email' => $vendor_results->pbv_email,
+            'contact_no' => $vendor_results->pbv_contactno,
+            'address' => $vendor_results->pbv_address,
+            'city' => $vendor_results->city->pbc_cityname ?? null, // Access through city relationship
+            'longatitude' => $vendor_results->pbv_longatitude,
+            'latitude' => $vendor_results->pbv_latitude,
+            'status' => $vendor_results->pbv_status,
+            'created_at' => $vendor_results->pbv_created_at,
+            'display_name' => $vendor_results->pbv_display_name,
+            'logo' => $logoUrl, // Use the document URL or fallback
+            'service_at_time' => $vendor_results->pbv_staff_count,
+            'availability' => $this->groupAvailability($availability),
+            'images' => $vendor_results->pbv_images,
+            'rating' => 3,
+            'isFav' => $isFav
+        ];
+
+        return response()->json([
+            'success' => true,
+            'data' => $final_vendors
+        ], 200);
+    }
 }

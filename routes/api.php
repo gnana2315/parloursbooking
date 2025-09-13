@@ -82,7 +82,7 @@ Route::middleware(['auth:sanctum', 'validate.token'])->group(function () {
     Route::post('/vendorAvailability', [VendorController::class, 'vendorAvailability' ]);
     Route::post('/vendorSpecialCloses', [VendorController::class, 'vendorSpecialCloses' ]);
     Route::post('/addVendorServices', [VendorController::class, 'addVendorServices' ]);
-    Route::get('/vendor/{vendor_id}', [VendorController::class, 'getVendorById' ]);
+    Route::get('/getVendor', [VendorController::class, 'getVendor' ]);
     Route::get('/getVendorDocuments',[VendorController::class,'getVendorDocuments']);
     Route::get('/getVendorAvailability', [VendorController::class, 'getVendorAvailability']);
     Route::get('/getVendorsSpecificClosings', [VendorController::class, 'getVendorsSpecificClosings']);
@@ -118,6 +118,7 @@ Route::middleware(['auth:sanctum', 'validate.token'])->group(function () {
     Route::post('/customer/favourite', [CustomersController::class, 'addRemoveCustomerFavourite']);
     Route::get('/customer/favourites', [CustomersController::class, 'getCustomerFavourites']);
     Route::get('/customer/bookings', [CustomersController::class, 'getBookingsByCustomerID']);
+    Route::get('/vendor/{vendor_id}', [CustomersController::class, 'getVendorById' ]);
 
     //transections
     Route::get('/getThisWeekEarningsByVendor', [VendorController::class, 'getThisWeekEarningsByVendor']);
