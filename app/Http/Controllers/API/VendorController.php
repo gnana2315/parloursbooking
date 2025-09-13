@@ -1297,7 +1297,7 @@ class VendorController extends Controller
 
     /**
  * @OA\Get(
- *     path="/api/getVendor",
+ *     path="/api/vendor/profile",
  *     summary="Get authenticated vendor's profile",
  *     description="Retrieves detailed information about the currently authenticated vendor including availability, documents, and configuration",
  *     tags={"Vendors"},
