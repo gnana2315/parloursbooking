@@ -4,6 +4,9 @@ namespace App\Models;
 use App\Models\User;
 use App\Models\services;
 use App\Models\vendorDocuments;
+use App\Models\vendorStandardAvailability;
+use App\Models\vendorConfig;
+use App\Models\cities;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -69,16 +72,16 @@ class vendors extends Model
 
     public function availability()
     {
-        return $this->hasMany(VendorStandardAvailability::class, 'pbvsa_vendor_id', 'pbv_id');
+        return $this->hasMany(vendorStandardAvailability::class, 'pbvsa_vendor_id', 'pbv_id');
     }
 
     public function config()
     {
-        return $this->hasOne(VendorConfig::class, 'pbvc_vendorid', 'pbv_id');
+        return $this->hasOne(vendorConfig::class, 'pbvc_vendorid', 'pbv_id');
     }
 
     public function city()
     {
-        return $this->belongsTo(City::class, 'pbv_city', 'pbc_cid');
+        return $this->belongsTo(cities::class, 'pbv_city', 'pbc_cid');
     }
 }
