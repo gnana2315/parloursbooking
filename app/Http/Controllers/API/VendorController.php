@@ -1269,78 +1269,78 @@ class VendorController extends Controller
 
     public function getVendorByID($vendor_id){
         $user = auth()->user();
-        // $vendor_results = vendors::join('vendor_config', 'vendor_config.pbvc_vendorid', '=', 'vendor.pbv_id', 'left')
-        //         ->join('vendor_standard_availability', 'vendor_standard_availability.pbvsa_vendor_id', '=', 'vendor.pbv_id', 'left')
-        //         ->join('cities', 'cities.pbc_cid', '=', 'vendor.pbv_city', 'left')
-        //         // ->join('ratings', 'ratings.pbr_vendor_id', '=', 'vendor.pbv_id', 'left')
-        //         ->select(
-        //             'vendor.*',
-        //             'vendor_config.*',
-        //             'vendor_standard_availability.*',
-        //             'cities.*',
-        //             // 'ratings.*',
-        //             // DB::raw('AVG(pb_ratings.pbr_rating) as average_rating')
-        //         )
-        //         ->where([
-        //             ['vendor.pbv_id', $vendor_id], ['vendor.pbv_status', 1]
-        //         ])
-        //         // ->groupBy('vendor.pbv_id')
-        //         ->get(); 
-        $vendor_results = vendors::with(['config', 'city', 'availability']) // Eager load everything
-            ->where('pbv_id', $vendor_id)
-            ->where('pbv_status', 1)
-            ->first();      
+        $vendor_results = vendors::join('vendor_config', 'vendor_config.pbvc_vendorid', '=', 'vendor.pbv_id', 'left')
+                ->join('vendor_standard_availability', 'vendor_standard_availability.pbvsa_vendor_id', '=', 'vendor.pbv_id', 'left')
+                ->join('cities', 'cities.pbc_cid', '=', 'vendor.pbv_city', 'left')
+                // ->join('ratings', 'ratings.pbr_vendor_id', '=', 'vendor.pbv_id', 'left')
+                ->select(
+                    'vendor.*',
+                    'vendor_config.*',
+                    'vendor_standard_availability.*',
+                    'cities.*',
+                    // 'ratings.*',
+                    // DB::raw('AVG(pb_ratings.pbr_rating) as average_rating')
+                )
+                ->where([
+                    ['vendor.pbv_id', $vendor_id], ['vendor.pbv_status', 1]
+                ])
+                // ->groupBy('vendor.pbv_id')
+                ->get(); 
+        // $vendor_results = vendors::with(['config', 'city', 'availability']) // Eager load everything
+        //     ->where('pbv_id', $vendor_id)
+        //     ->where('pbv_status', 1)
+        //     ->first();      
         // dd($vendor_results);die();
-        // if (!$vendor_results || $vendor_results->isEmpty()) {
-        //     return response()->json(['message' => 'Vendor not found'], 404);
-        // }
-        // // print_r('<pre>');
-        // // print_r($vendor_results);die();
-        // $vendor = $vendor_results->first();
-        // // dd($vendor->pbv_images);die();
+        if (!$vendor_results || $vendor_results->isEmpty()) {
+            return response()->json(['message' => 'Vendor not found'], 404);
+        }
+        // print_r('<pre>');
+        // print_r($vendor_results);die();
+        $vendor = $vendor_results->first();
+        // dd($vendor->pbv_images);die();
 
-        // $availability = $vendor_results->map(function ($item) {
-        //     return [
-        //         'day' => $item->pbvsa_day,
-        //         'start_time' => $item->pbvsa_start_time,
-        //         'end_time' => $item->pbvsa_end_time,
-        //         'is_open' => $item->pbvsa_is_open,
-        //     ];
-        // })->toArray();        
+        $availability = $vendor_results->map(function ($item) {
+            return [
+                'day' => $item->pbvsa_day,
+                'start_time' => $item->pbvsa_start_time,
+                'end_time' => $item->pbvsa_end_time,
+                'is_open' => $item->pbvsa_is_open,
+            ];
+        })->toArray();        
         
-        // // Add favorite flag
-        // $customer = customer::where('pbc_user_id', $user->pbu_id)->first();
-        // $favourites = $customer->pbc_fav ?? [];
+        // Add favorite flag
+        $customer = customer::where('pbc_user_id', $user->pbu_id)->first();
+        $favourites = $customer->pbc_fav ?? [];
 
-        // $isFav = in_array($vendor_results->first()->pbv_id, $favourites);
+        $isFav = in_array($vendor_results->first()->pbv_id, $favourites);
 
-        // $final_vendors = [
-        //     'id' => $vendor->pbv_id,
-        //     'tenentid' => $vendor->pbv_tenentid,
-        //     'servicefor' => $vendor->pbv_servicefor,
-        //     'vendortype' => $vendor->pbv_vendortype,
-        //     'business_name' => $vendor->pbv_business_name,
-        //     'brno' => $vendor->pbv_brno,
-        //     'email' => $vendor->pbv_email,
-        //     'contact_no' => $vendor->pbv_contactno,
-        //     'address' => $vendor->pbv_address,
-        //     'city' => $vendor->pbc_cityname,
-        //     'longatitude' => $vendor->pbv_longatitude,
-        //     'latitude' => $vendor->pbv_latitude,
-        //     'status' => $vendor->pbv_status,
-        //     'created_at' => $vendor->pbv_created_at,
-        //     'display_name' => $vendor->pbvc_display_name,
-        //     'logo' => $vendor->pbvc_logo,
-        //     'service_at_time' => $vendor->pbvc_service_at_time,
-        //     'availability' => $this->groupAvailability($availability),
-        //     'images' => $vendor->pbv_images,
-        //     'rating' => 3,
-        //     'isFav' => $isFav
-        // ];
+        $final_vendors = [
+            'id' => $vendor->pbv_id,
+            'tenentid' => $vendor->pbv_tenentid,
+            'servicefor' => $vendor->pbv_servicefor,
+            'vendortype' => $vendor->pbv_vendortype,
+            'business_name' => $vendor->pbv_business_name,
+            'brno' => $vendor->pbv_brno,
+            'email' => $vendor->pbv_email,
+            'contact_no' => $vendor->pbv_contactno,
+            'address' => $vendor->pbv_address,
+            'city' => $vendor->pbc_cityname,
+            'longatitude' => $vendor->pbv_longatitude,
+            'latitude' => $vendor->pbv_latitude,
+            'status' => $vendor->pbv_status,
+            'created_at' => $vendor->pbv_created_at,
+            'display_name' => $vendor->pbvc_display_name,
+            'logo' => $vendor->pbvc_logo,
+            'service_at_time' => $vendor->pbvc_service_at_time,
+            'availability' => $this->groupAvailability($availability),
+            'images' => $vendor->pbv_images,
+            'rating' => 3,
+            'isFav' => $isFav
+        ];
 
         return response()->json([
             'success' => true,
-            'data' => $vendor_results
+            'data' => $final_vendors
         ], 200);
     }
 
