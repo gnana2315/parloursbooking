@@ -510,8 +510,8 @@ class VendorController extends Controller
         $filePath = $file->storeAs('uploads/vendors/'.$vendor->pbv_id, $fileName, 'public');
 
         // full url for access (public disk: storage/app/public/uploads/...)
-        // $fileUrl = Storage::disk('public')->url($filePath);
-        $fileUrl = asset('storage/' . $filePath);
+        $fileUrl = Storage::disk('public')->url($filePath);
+        // $fileUrl = asset('storage/' . $filePath);
         // $file->move(public_path('uploads/vendors'), $fileName);
         // $filePath = public_path('uploads/vendors') . '/' . $vendor->pbv_id . '/' . $fileName;
 
