@@ -1281,11 +1281,10 @@ class VendorController extends Controller
                     // 'ratings.*',
                     // DB::raw('AVG(pb_ratings.pbr_rating) as average_rating')
                 )
-                ->where('pbv_id', $vendor_id)
-                ->where('vendor.pbv_status', 1)
+                ->where(['vendor.pbv_id', $vendor_id], ['vendor.pbv_status', 1])
                 // ->groupBy('vendor.pbv_id')
                 ->get();        
-        
+        dd($vendor_results);
         if (!$vendor_results || $vendor_results->isEmpty()) {
             return response()->json(['message' => 'Vendor not found'], 404);
         }
