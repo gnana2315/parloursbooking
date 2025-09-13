@@ -1350,7 +1350,7 @@ class VendorController extends Controller
             ->where('pbv_status', 1)
             ->first();      
         // dd($vendor_results);die();
-        if (!$vendor_results || $vendor_results->isEmpty()) {
+        if (!$vendor_results) {
             return response()->json(['message' => 'Vendor not found'], 404);
         }
         // print_r('<pre>');
