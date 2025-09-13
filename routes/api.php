@@ -76,6 +76,7 @@ Route::middleware(['auth:sanctum', 'validate.token'])->group(function () {
     Route::post('/businessVendorRegister', [VendorController::class, 'businessVendorRegister' ]);
     Route::post('/therapistVendorRegister', [VendorController::class, 'therapistVendorRegister' ]);
     Route::post('/vendorDocumentUpdate', [VendorController::class, 'vendorDocumentUpdate' ]);
+    Route::post('/vendorDocumentUpdate_v1', [VendorController::class, 'vendorDocumentUpdate_v1' ]);
     Route::post('/vendorBankUpdate', [VendorController::class, 'vendorBankUpdate' ]);
     Route::post('/vendorConfig', [VendorController::class, 'vendorConfig' ]);
     Route::post('/vendorAvailability', [VendorController::class, 'vendorAvailability' ]);

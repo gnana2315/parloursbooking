@@ -470,6 +470,59 @@ class VendorController extends Controller
             'message' => 'Documents uploaded successfully'
         ], 200);
     }
+
+    public function vendorDocumentUpdate_v1(Request $request){
+        $user = auth()->user();
+
+        $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
+        if (!$vendor) {
+            return response()->json(['message' => 'Vendor not found'], 404);
+        }
+
+        $request->validate(
+            [
+                'document_id' => 'required|integer|exists:required_document,pbrd_id',
+                'document' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048'
+            ],
+            [
+                'document_id.required' => 'Document ID is required',
+                'document_id.integer' => 'Document ID must be an integer',
+                'document_id.exists' => 'Document ID does not exist',
+                'document.required' => 'Document is required',
+                'document.file' => 'Document must be a file',
+                'document.mimes' => 'Document must be a file of type: jpg, jpeg, png, pdf',
+                'document.max' => 'Document may not be greater than 2MB',
+            ]
+        );
+
+        $file = $request->file('document');
+
+        // generate unique filename
+        $fileName = time().'_'.$file->getClientOriginalName();
+
+        // store file (change 'public' to 's3' if using AWS S3)
+        $filePath = $file->storeAs('uploads/vendors/'.$vendor->pbv_id, $fileName, 'public');
+
+        // full url for access (public disk: storage/app/public/uploads/...)
+        $fileUrl = Storage::disk('public')->url($filePath);
+
+        vendorDocuments::updateOrCreate(
+            [
+                'pbvd_vendor_id' => $vendor->pbv_id,
+                'pbvd_required_document_id' => $request->document_id,
+            ],
+            [
+                'pbvd_document_name' => $fileName,
+                'pbvd_document_url' => $fileUrl,
+                'pbvd_document_status' => 1
+            ]
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Documents uploaded successfully'
+        ], 200);
+    }
     // public function vendorDocumentUpdate(Request $request){
 
     //     $user = auth()->user();
