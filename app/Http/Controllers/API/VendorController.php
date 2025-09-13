@@ -1289,9 +1289,8 @@ class VendorController extends Controller
         $vendor_results = vendors::with(['config', 'city', 'availability']) // Eager load everything
             ->where('pbv_id', $vendor_id)
             ->where('pbv_status', 1)
-            ->first(); 
-        print_r('<pre>');      
-        print_r($vendor_results->availability);die();
+            ->first();      
+        dd($vendor_results);die();
         if (!$vendor_results || $vendor_results->isEmpty()) {
             return response()->json(['message' => 'Vendor not found'], 404);
         }
