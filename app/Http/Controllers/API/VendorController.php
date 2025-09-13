@@ -1329,34 +1329,34 @@ class VendorController extends Controller
 
     public function getVendorByID($vendor_id){
         $user = auth()->user();
-        $vendor_results = vendors::join('vendor_standard_availability', 'vendor_standard_availability.pbvsa_vendor_id', '=', 'vendor.pbv_id', 'left')
-                ->join('cities', 'cities.pbc_cid', '=', 'vendor.pbv_city', 'left')
-                ->join('vendor_documents', 'vendor_documents.pbvd_vendor_id', '=', 'vendor.pbv_id', 'left')
-                // ->join('ratings', 'ratings.pbr_vendor_id', '=', 'vendor.pbv_id', 'left')
-                ->select(
-                    'vendor.*',
-                    'vendor_standard_availability.*',
-                    'cities.*',
-                    'vendor_documents.*'
-                    // 'ratings.*',
-                    // DB::raw('AVG(pb_ratings.pbr_rating) as average_rating')
-                )
-                ->where([
-                    ['vendor.pbv_id', $vendor_id], ['vendor.pbv_status', 1]
-                ])
-                ->get(); 
-        // $vendor_results = vendors::with(['config', 'city', 'availability']) // Eager load everything
-        //     ->where('pbv_id', $vendor_id)
-        //     ->where('pbv_status', 1)
-        //     ->first();      
+        // $vendor_results = vendors::join('vendor_standard_availability', 'vendor_standard_availability.pbvsa_vendor_id', '=', 'vendor.pbv_id', 'left')
+        //         ->join('cities', 'cities.pbc_cid', '=', 'vendor.pbv_city', 'left')
+        //         ->join('vendor_documents', 'vendor_documents.pbvd_vendor_id', '=', 'vendor.pbv_id', 'left')
+        //         // ->join('ratings', 'ratings.pbr_vendor_id', '=', 'vendor.pbv_id', 'left')
+        //         ->select(
+        //             'vendor.*',
+        //             'vendor_standard_availability.*',
+        //             'cities.*',
+        //             'vendor_documents.*'
+        //             // 'ratings.*',
+        //             // DB::raw('AVG(pb_ratings.pbr_rating) as average_rating')
+        //         )
+        //         ->where([
+        //             ['vendor.pbv_id', $vendor_id], ['vendor.pbv_status', 1]
+        //         ])
+        //         ->get(); 
+        $vendor_results = vendors::with(['config', 'city', 'availability', 'vendorDocuments']) // Eager load everything
+            ->where('pbv_id', $vendor_id)
+            ->where('pbv_status', 1)
+            ->first();      
         // dd($vendor_results);die();
         if (!$vendor_results || $vendor_results->isEmpty()) {
             return response()->json(['message' => 'Vendor not found'], 404);
         }
         // print_r('<pre>');
         // print_r($vendor_results);die();
-        $vendor = $vendor_results->first();
-        dd($vendor);die();
+        // $vendor = $vendor_results->first();
+        dd($vendor_results);die();
 
         $availability = $vendor_results->map(function ($item) {
             return [
