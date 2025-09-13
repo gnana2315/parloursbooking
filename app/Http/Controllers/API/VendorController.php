@@ -1335,7 +1335,7 @@ class VendorController extends Controller
                 // ->join('ratings', 'ratings.pbr_vendor_id', '=', 'vendor.pbv_id', 'left')
                 ->select(
                     'vendor.*',
-                    // 'vendor_standard_availability.*',
+                    'vendor_standard_availability.*',
                     'cities.*',
                     'vendor_documents.*'
                     // 'ratings.*',
