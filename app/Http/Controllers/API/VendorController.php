@@ -1329,8 +1329,9 @@ class VendorController extends Controller
 
     public function getVendorByID($vendor_id){
         $user = auth()->user();
-        $vendor_results = vendors::join('vendor_standard_availability', 'vendor_standard_availability.pbvsa_vendor_id', '=', 'vendor.pbv_id', 'left')
-                ->join('cities', 'cities.pbc_cid', '=', 'vendor.pbv_city', 'left')
+        $vendor_results = vendors::
+                // join('vendor_standard_availability', 'vendor_standard_availability.pbvsa_vendor_id', '=', 'vendor.pbv_id', 'left')
+                join('cities', 'cities.pbc_cid', '=', 'vendor.pbv_city', 'left')
                 ->join('vendor_documents', 'vendor_documents.pbvd_vendor_id', '=', 'vendor.pbv_id', 'left')
                 // ->join('ratings', 'ratings.pbr_vendor_id', '=', 'vendor.pbv_id', 'left')
                 ->select(
@@ -1344,7 +1345,6 @@ class VendorController extends Controller
                 ->where([
                     ['vendor.pbv_id', $vendor_id], ['vendor.pbv_status', 1]
                 ])
-                // ->groupBy('vendor.pbv_id')
                 ->get(); 
         // $vendor_results = vendors::with(['config', 'city', 'availability']) // Eager load everything
         //     ->where('pbv_id', $vendor_id)
