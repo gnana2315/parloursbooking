@@ -479,6 +479,12 @@ class VendorController extends Controller
             return response()->json(['message' => 'Vendor not found'], 404);
         }
 
+        $check_document_upload = vendorDocuments::where([['pbvd_vendor_id', '=', $user->pbu_vid], ['pbvd_required_document_id', '=', $request->document_id]])->first();
+
+        if(!$check_document_upload){
+            return response()->json(['message' => 'This document already uploaded'], 404);
+        }
+        
         $request->validate(
             [
                 'document_id' => 'required|integer|exists:required_document,pbrd_id',
