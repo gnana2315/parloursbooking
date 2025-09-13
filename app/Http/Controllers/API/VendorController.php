@@ -1286,7 +1286,7 @@ class VendorController extends Controller
         //         ])
         //         // ->groupBy('vendor.pbv_id')
         //         ->get(); 
-        $vendor = vendors::with(['config', 'city', 'availability']) // Eager load everything
+        $vendor_results = vendors::with(['config', 'city', 'availability']) // Eager load everything
             ->where('pbv_id', $vendor_id)
             ->where('pbv_status', 1)
             ->first();       
