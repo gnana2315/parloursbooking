@@ -454,7 +454,7 @@ class VendorController extends Controller
 
             vendorDocuments::updateOrCreate(
                 [
-                    'pbvd_vendor_id' => $request->vendor_id,
+                    'pbvd_vendor_id' => $vendor->pbv_id,
                     'pbvd_required_document_id' => $doc['document_id'],
                 ],
                 [
