@@ -507,12 +507,13 @@ class VendorController extends Controller
         $fileName = time().'_'.$file->getClientOriginalName();
 
         // store file (change 'public' to 's3' if using AWS S3)
-        // $filePath = $file->storeAs('uploads/vendors/'.$vendor->pbv_id, $fileName, 'public');
+        $filePath = $file->storeAs('uploads/vendors/'.$vendor->pbv_id, $fileName, 'public');
 
         // full url for access (public disk: storage/app/public/uploads/...)
         // $fileUrl = Storage::disk('public')->url($filePath);
-        $file->move(public_path('uploads/vendors'), $fileName);
-        $filePath = public_path('uploads/vendors') . '/' . $vendor->pbv_id . '/' . $fileName;
+        $fileUrl = asset('storage/' . $filePath);
+        // $file->move(public_path('uploads/vendors'), $fileName);
+        // $filePath = public_path('uploads/vendors') . '/' . $vendor->pbv_id . '/' . $fileName;
 
         vendorDocuments::updateOrCreate(
             [
