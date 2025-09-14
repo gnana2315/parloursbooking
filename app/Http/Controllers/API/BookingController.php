@@ -390,7 +390,6 @@ class BookingController extends Controller
                 'booking_start_time' => 'required|date_format:H:i:s',
                 'booking_end_time' => 'required|date_format:H:i:s',
                 'service_location' => 'required',
-                // 'services.*.service_id' => 'required|integer',
             ],
             [
                 'vendor_id.required' => 'Vendor ID is required',
@@ -401,8 +400,6 @@ class BookingController extends Controller
                 'booking_start_time.required' => 'Booking start time is required',
                 'booking_end_time.required' => 'Booking end time is required',
                 'service_location.required' => 'Service location is required',
-                // 'services.*.service_id.required' => 'Service ID is required',
-                // 'services.*.service_id.integer' => 'Service ID must be an integer',
             ]
         );
 
@@ -957,6 +954,8 @@ class BookingController extends Controller
             }])
             ->orderBy('pbb_booking_date', 'desc')
             ->first();
+
+        dd($bookings);
 
         if (!$bookings) {
             return response()->json(['message' => 'No bookings found'], 404);
