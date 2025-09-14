@@ -1269,7 +1269,7 @@ class VendorController extends Controller
         
         if ($request->hasFile('service_image')) {
             $service_image_file = $request->file('service_image');
-            $folder = 'uploads/services/' . $vendor->pbv_business_name;
+            $folder = 'uploads/services/' . $vendor->pbv_id;
             $folderPath = public_path($folder);
 
             // Create the folder if it doesn't exist
