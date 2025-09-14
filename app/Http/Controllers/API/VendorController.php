@@ -818,8 +818,7 @@ class VendorController extends Controller
                 'bankid' => 'required',
                 'branch' => 'required',
                 'account_holder_name' => 'required',
-                'accountno' => 'required|numeric',
-                
+                'accountno' => 'required|numeric',                
             ],
             [
                 'bankid.required' => 'Please select the Bank',
