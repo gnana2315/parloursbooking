@@ -536,6 +536,7 @@ class VendorController extends Controller
                             [
                                 'pbvd_vendor_id' => $vendor->pbv_id,
                                 'pbvd_required_document_id' => $request->document_id,
+                                'pbvd_document_name' => $fileName,
                             ],
                             [
                                 'pbvd_document_name' => $fileName,
