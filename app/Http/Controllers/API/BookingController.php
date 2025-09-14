@@ -958,7 +958,7 @@ class BookingController extends Controller
             ->orderBy('pbb_booking_date', 'desc')
             ->first();
 
-        if ($bookings->isEmpty()) {
+        if (!$bookings) {
             return response()->json(['message' => 'No bookings found'], 404);
         }
 
