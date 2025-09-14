@@ -817,7 +817,6 @@ class VendorController extends Controller
             [
                 'bankid' => 'required',
                 'branch' => 'required',
-                'branch_code' => 'required',
                 'account_holder_name' => 'required',
                 'accountno' => 'required|numeric',
                 
@@ -825,7 +824,6 @@ class VendorController extends Controller
             [
                 'bankid.required' => 'Please select the Bank',
                 'branch.required' => 'Please enter the Branch name',
-                'branch_code.required' => 'Please enter the Branch Code',
                 'account_holder_name' => 'Please enter the account holder name',
                 'accountno.required' => 'Please enter the bank Account No',
                 'accountno.numeric' => 'Bank no must be Numeric',
