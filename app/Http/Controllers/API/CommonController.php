@@ -918,54 +918,85 @@ class CommonController extends Controller
     /**
  * @OA\Get(
  *     path="/api/required-documents",
- *     summary="Get Required Documents for Vendor",
- *     description="Fetch required documents for the authenticated vendor based on their vendor type.",
- *     tags={"Vendor"},
+ *     summary="Get required documents for vendor",
+ *     description="Retrieves all required documents for the authenticated vendor including uploaded files and upload constraints",
+ *     tags={"Vendor Documents"},
  *     security={{"bearerAuth":{}}},
- *
  *     @OA\Response(
  *         response=200,
- *         description="List of required documents with upload status",
+ *         description="Successful operation",
  *         @OA\JsonContent(
- *             type="object",
  *             @OA\Property(property="success", type="boolean", example=true),
  *             @OA\Property(
  *                 property="data",
  *                 type="array",
  *                 @OA\Items(
  *                     type="object",
- *                     @OA\Property(property="id", type="integer", example=1),
- *                     @OA\Property(property="name", type="string", example="Business Registration"),
- *                     @OA\Property(property="label", type="string", example="BR Document"),
- *                     @OA\Property(property="is_single", type="boolean", example=true),
- *                     @OA\Property(property="required", type="boolean", example=true),
- *                     @OA\Property(property="document_status", type="string", example="Approved"),
- *                     @OA\Property(property="uploaded", type="boolean", example=true),
- *                     @OA\Property(property="file_name", type="string", example="br_doc.pdf", nullable=true),
- *                     @OA\Property(property="file_path", type="string", example="https://domain.com/uploads/vendors/br_doc.pdf", nullable=true),
- *                     @OA\Property(property="uploaded_at", type="string", format="date-time", example="2025-08-20T12:34:56Z", nullable=true),
+ *                     @OA\Property(property="id", type="integer", example=10),
+ *                     @OA\Property(property="name", type="string", example="certificates"),
+ *                     @OA\Property(property="label", type="string", example="Certificates"),
+ *                     @OA\Property(property="is_single", type="boolean", example=false),
+ *                     @OA\Property(property="required", type="boolean", example=false),
+ *                     @OA\Property(property="status", type="string", example="present", enum={"present", "missing"}),
+ *                     @OA\Property(property="items_count", type="integer", example=7),
+ *                     @OA\Property(
+ *                         property="items",
+ *                         type="array",
+ *                         maxItems=3,
+ *                         @OA\Items(
+ *                             type="object",
+ *                             @OA\Property(property="itemId", type="integer", example=901),
+ *                             @OA\Property(property="file_name", type="string", example="cert_2024.pdf"),
+ *                             @OA\Property(property="file_url", type="string", format="uri", example="https://api.example.com/storage/cert_2024.pdf"),
+ *                             @OA\Property(property="mime", type="string", example="application/pdf"),
+ *                             @OA\Property(property="size", type="integer", example=345678),
+ *                             @OA\Property(property="uploaded_at", type="string", format="date-time", example="2025-09-14T10:22:11Z")
+ *                         )
+ *                     ),
+ *                     @OA\Property(
+ *                         property="constraints",
+ *                         type="object",
+ *                         @OA\Property(
+ *                             property="allowed_types",
+ *                             type="array",
+ *                             @OA\Items(type="string", example="image/*")
+ *                         ),
+ *                         @OA\Property(property="max_size_mb", type="integer", example=2),
+ *                         @OA\Property(property="max_files", type="integer", example=5)
+ *                     ),
+ *                     @OA\Property(property="preview_limit", type="integer", example=3)
  *                 )
  *             )
  *         )
  *     ),
- *
  *     @OA\Response(
  *         response=400,
- *         description="Vendor type ID is required",
+ *         description="Bad Request - Vendor type ID is required",
  *         @OA\JsonContent(
- *             type="object",
  *             @OA\Property(property="success", type="boolean", example=false),
  *             @OA\Property(property="message", type="string", example="Vendor type ID is required")
  *         )
  *     ),
- *
  *     @OA\Response(
  *         response=404,
  *         description="Vendor not found",
  *         @OA\JsonContent(
- *             type="object",
  *             @OA\Property(property="success", type="boolean", example=false),
  *             @OA\Property(property="message", type="string", example="Vendor not found for the user")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=401,
+ *         description="Unauthorized",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="Unauthenticated.")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=500,
+ *         description="Internal server error",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="Server error")
  *         )
  *     )
  * )
