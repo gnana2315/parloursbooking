@@ -972,10 +972,19 @@ class BookingController extends Controller
             return response()->json(['message' => 'No bookings found'], 404);
         }
 
-        dd($bookings->customer);
-        // if($bookings['pbb_booking_details'] == null){}
-        //     $bookings['pbb_booking_details']['name'] = $bookings->customer->;
-        // }   
+        //dd($bookings->customer);
+        //age calculation
+        $birthDate = new DateTime($bookings->customer->pbc_dob);
+        $today = new DateTime();
+        $age = $today->diff($birthDate)->y;
+
+        if($bookings['pbb_booking_details'] == null){
+            $bookings['pbb_booking_details']['name'] = $bookings->customer->pbc_first_name.' '.$bookings->customer->pbc_last_name;
+            $bookings['pbb_booking_details']['contact_no'] = $bookings->customer->pbc_contact_no;
+            $bookings['pbb_booking_details']['age'] = $age;
+            $bookings['pbb_booking_details']['gender'] = ($bookings->customer->pbc_sex = 1) ? 'Male' : 'Female';
+            $bookings['pbb_booking_details']['address'] = $bookings->customer->pbc_address.' '.$bookings->customer->pbc_city;
+        }   
 
         return response()->json([
             'status' => true,
