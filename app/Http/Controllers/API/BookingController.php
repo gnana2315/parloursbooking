@@ -955,7 +955,7 @@ class BookingController extends Controller
             ->orderBy('pbb_booking_date', 'desc')
             ->first();
 
-        dd($bookings['pbb_booking_details'] = $bookings->customer);
+        dd($bookings);
 
         if (!$bookings) {
             return response()->json(['message' => 'No bookings found'], 404);
