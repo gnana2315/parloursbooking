@@ -519,7 +519,7 @@ class VendorController extends Controller
                     // $fileUrl = Storage::disk('public')->url($filePath);
                     $fileUrl = asset('storage/' . $filePath);
 
-                    if($documents->pbrd_is_single != 0){
+                    if(!($documents->pbrd_is_single)){
                         vendorDocuments::updateOrCreate(
                             [
                                 'pbvd_vendor_id' => $vendor->pbv_id,
