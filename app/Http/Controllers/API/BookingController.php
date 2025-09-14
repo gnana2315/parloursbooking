@@ -428,10 +428,15 @@ class BookingController extends Controller
                 'address' => $request->address,
             ];
         }else{
-            $booking_details_generated = [
-                'remarks' => $request->remarks,
-            ];
+            $booking_details_generated = null;
         }
+
+        // Convert minutes to hours and minutes
+        $hours = floor($request->booking_duration / 60);
+        $remainingMinutes = $request->booking_duration % 60;
+
+        // Format as HH:MM:SS
+        $duration = sprintf('%02d:%02d:00', $hours, $remainingMinutes);
 
         $addbooking = Booking::create([
             'pbb_vendor_id' => $request->vendor_id,
@@ -439,14 +444,15 @@ class BookingController extends Controller
             'pbb_promo_id' => $request->promocode_id,
             'pbb_booking_details' => json_encode($booking_details_generated),
             'pbb_booking_date' => $request->booking_date,
-            'pbb_booking_duration' => $request->booking_duration,
+            'pbb_booking_duration' => $duration,
             'pbb_booking_start_time' => $request->booking_start_time,
             'pbb_booking_end_time' => $request->booking_end_time,
             'pbb_ref_no' => 'BOONOLKIINNEG_'.uniqid('BOONOLKIINNEG_'),
             'pbb_type' => 'Online',
             'pbb_service_location' => $request->service_location,
             'pbb_contact_no' => ($request->booking_for_someone == 1) ? $request->someone_contact_no : $customer->customer_contact_no,
-            'pbb_status' => 1
+            'pbb_status' => 1,
+            'pbb_remarks' => $request->remarks
         ]);
 
         if($addbooking){
@@ -696,13 +702,20 @@ class BookingController extends Controller
             'remarks' => $request->remarks,
         ];
 
+        // Convert minutes to hours and minutes
+        $hours = floor($request->booking_duration / 60);
+        $remainingMinutes = $request->booking_duration % 60;
+
+        // Format as HH:MM:SS
+        $duration = sprintf('%02d:%02d:00', $hours, $remainingMinutes);
+
         $addbooking = Booking::create([
             'pbb_vendor_id' => $request->vendor_id,
             'pbb_customer_id' => null,
             'pbb_promo_id' => $request->promocode_id,
             'pbb_booking_details' => json_encode($booking_details_generated),
             'pbb_booking_date' => $request->booking_date,
-            'pbb_booking_duration' => $request->booking_duration,
+            'pbb_booking_duration' => $duration,
             'pbb_booking_start_time' => $request->booking_start_time,
             'pbb_booking_end_time' => $request->booking_end_time,
             'pbb_ref_no' => 'BMOAONKUIANLG_'.uniqid('BMOAONKUIANLG_'),
@@ -840,9 +853,9 @@ class BookingController extends Controller
         }
 
         $bookings = booking::where('pbb_vendor_id', $vendor->pbv_id)
-            // ->with(['bookingDetails.services' => function ($q) {
-            //     $q->select('pbs_price', 'pbs_duration');
-            // }])
+            ->with(['bookingDetails.services' => function ($q) {
+                $q->select('pbs_name', 'pbs_duration');
+            }])
             ->orderBy('pbb_booking_date', 'desc')
             ->get();
 
@@ -950,16 +963,17 @@ class BookingController extends Controller
     {
         $bookings = booking::where('pbb_id', $id)
             ->with(['customer', 'bookingDetails.services' => function ($q) {
-                $q->select('pbs_id', 'pbs_service_type', 'pbs_service_for', 'pbs_name', 'pbs_price', 'pbs_duration');
+                $q->select('pbs_id', 'pbs_service_type', 'pbs_service_for', 'pbs_name', 'pbs_price', 'pbs_duration', 'pbs_image');
             }])
             ->orderBy('pbb_booking_date', 'desc')
             ->first();
 
-        dd($bookings);
-
         if (!$bookings) {
             return response()->json(['message' => 'No bookings found'], 404);
         }
+
+        if($bookings['pbb_booking_details'] == null)
+            $bookings['pbb_booking_details'] = $bookings->customer;
 
         return response()->json([
             'status' => true,
