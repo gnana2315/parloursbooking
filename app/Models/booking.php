@@ -44,6 +44,10 @@ class booking extends Model
         'deleted_at',
     ];
 
+    protected $casts = [
+        'pbb_booking_details' => 'array',    
+    ];
+    
     public function customer() {
         return $this->belongsTo(Customer::class, 'pbb_customer_id', 'pbc_id');
     }
