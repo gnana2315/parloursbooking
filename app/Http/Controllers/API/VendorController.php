@@ -520,7 +520,7 @@ class VendorController extends Controller
                     $fileUrl = asset('storage/' . $filePath);
                     // dd($documents->pbrd_is_single);
                     if($documents->pbrd_is_single){
-                        vendorDocuments::updateOrCreate(
+                        $document_update = vendorDocuments::updateOrCreate(
                             [
                                 'pbvd_vendor_id' => $vendor->pbv_id,
                                 'pbvd_required_document_id' => $request->document_id,
@@ -531,6 +531,7 @@ class VendorController extends Controller
                                 'pbvd_document_status' => '1'
                             ]
                         );
+                        dd($document_update);
                     }else{
                         vendorDocuments::updateOrCreate(
                             [
