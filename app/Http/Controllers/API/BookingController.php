@@ -978,13 +978,15 @@ class BookingController extends Controller
         $today = Carbon::now();
         $age = $today->diffInYears($birthDate);
 
-        if($bookings['pbb_booking_details'] == null){
-            $bookings['pbb_booking_details']['name'] = $bookings->customer->pbc_first_name.' '.$bookings->customer->pbc_last_name;
-            $bookings['pbb_booking_details']['contact_no'] = $bookings->customer->pbc_contact_no;
-            $bookings['pbb_booking_details']['age'] = $age;
-            $bookings['pbb_booking_details']['gender'] = ($bookings->customer->pbc_sex = 1) ? 'Male' : 'Female';
-            $bookings['pbb_booking_details']['address'] = $bookings->customer->pbc_address.' '.$bookings->customer->pbc_city;
-        }   
+        $bookingDetails = [
+            'name' => $bookings->customer->pbc_first_name . ' ' . $bookings->customer->pbc_last_name,
+            'contact_no' => $bookings->customer->pbc_contact_no,
+            'age' => $age,
+            'gender' => ($bookings->customer->pbc_sex == 1) ? 'Male' : 'Female',
+            'address' => $bookings->customer->pbc_address . ' ' . $bookings->customer->pbc_city
+        ];
+    
+        $bookings->pbb_booking_details = $bookingDetails;
 
         return response()->json([
             'status' => true,
