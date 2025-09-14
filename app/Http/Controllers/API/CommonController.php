@@ -1030,118 +1030,115 @@ class CommonController extends Controller
     //     ], 400);
     // }
     public function getRequiredDocuments()
-{
-    $user = auth()->user();
+    {
+        $user = auth()->user();
 
-    $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
+        $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
 
-    if (!$vendor) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Vendor not found for the user'
-        ], 404);
-    }
+        if (!$vendor) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Vendor not found for the user'
+            ], 404);
+        }
 
-    $vendor_type_id = $vendor->pbv_vendortype;
+        $vendor_type_id = $vendor->pbv_vendortype;
 
-    if ($vendor_type_id) {
-        $documents = requiredDocument::where('pbrd_vendor_type', $vendor_type_id)
-            ->get();
-
-        $requiredDocuments = [];
-
-        foreach ($documents as $doc) {
-            // Get all uploaded documents for this requirement
-            $uploadedDocuments = vendorDocuments::where('pbvd_vendor_id', $user->pbu_vid)
-                ->where('pbvd_required_document_id', $doc->pbrd_id)
-                ->orderBy('created_at', 'desc')
+        if ($vendor_type_id) {
+            $documents = requiredDocument::where('pbrd_vendor_type', $vendor_type_id)
                 ->get();
 
-            $items_count = $uploadedDocuments->count();
-            $status = $items_count > 0 ? 'present' : 'missing';
+            $requiredDocuments = [];
 
-            // Get first 3 items for preview
-            $previewItems = $uploadedDocuments->take(3)->map(function ($document) {
-                return [
-                    'itemId' => $document->pbvd_id,
-                    'file_name' => $document->pbvd_document_name,
-                    'file_url' => $document->pbvd_document_url,
-                    'mime' => $this->getMimeTypeFromFileName($document->pbvd_document_name),
-                    'size' => $this->getFileSize($document->pbvd_document_url), // You might need to implement this
-                    'uploaded_at' => $document->created_at->toIso8601String()
+            foreach ($documents as $doc) {
+                // Get all uploaded documents for this requirement
+                $uploadedDocuments = vendorDocuments::where('pbvd_vendor_id', $user->pbu_vid)
+                    ->where('pbvd_required_document_id', $doc->pbrd_id)
+                    ->orderBy('created_at', 'desc')
+                    ->get();
+
+                $items_count = $uploadedDocuments->count();
+                $status = $items_count > 0 ? 'present' : 'missing';
+
+                // Get first 3 items for preview
+                $previewItems = $uploadedDocuments->take(3)->map(function ($document) {
+                    return [
+                        'itemId' => $document->pbvd_id,
+                        'file_name' => $document->pbvd_document_name,
+                        'file_url' => $document->pbvd_document_url,
+                        'mime' => $this->getMimeTypeFromFileName($document->pbvd_document_name),
+                        'size' => $this->getFileSize($document->pbvd_document_url), // You might need to implement this
+                        'uploaded_at' => $document->created_at->toIso8601String()
+                    ];
+                });
+
+                // Parse constraints from your database or use defaults
+                $constraints = [
+                    'allowed_types' => $doc->pbrd_allowed_types ? json_decode($doc->pbrd_allowed_types, true) : ['image/*', 'application/pdf'],
+                    'max_size_mb' => $doc->pbrd_max_size ?? 2,
+                    'max_files' => $doc->pbrd_max_files ?? ($doc->pbrd_is_single ? 1 : 20)
                 ];
-            });
 
-            // Parse constraints from your database or use defaults
-            $constraints = [
-                'allowed_types' => $doc->pbrd_allowed_types ? json_decode($doc->pbrd_allowed_types, true) : ['image/*', 'application/pdf'],
-                'max_size_mb' => $doc->pbrd_max_size ?? 10,
-                'max_files' => $doc->pbrd_max_files ?? ($doc->pbrd_is_single ? 1 : 20)
-            ];
+                $documentData = [
+                    'id' => $doc->pbrd_id,
+                    'name' => $doc->pbrd_name,
+                    'label' => $doc->pbrd_label,
+                    'is_single' => (bool)$doc->pbrd_is_single,
+                    'required' => (bool)$doc->pbrd_required,
+                    'status' => $status,
+                    'items_count' => $items_count,
+                    'items' => $previewItems->toArray(),
+                    // 'items_href' => "/api/vendor-docs/{$doc->pbrd_id}/items",
+                    'constraints' => $constraints,
+                    'preview_limit' => 3
+                ];
 
-            $documentData = [
-                'id' => $doc->pbrd_id,
-                'name' => $doc->pbrd_name,
-                'label' => $doc->pbrd_label,
-                'is_single' => (bool)$doc->pbrd_is_single,
-                'required' => (bool)$doc->pbrd_required,
-                'status' => $status,
-                'items_count' => $items_count,
-                'items' => $previewItems->toArray(),
-                'items_href' => "/api/vendor-docs/{$doc->pbrd_id}/items",
-                'constraints' => $constraints,
-                'preview_limit' => 3
-            ];
+                $requiredDocuments[] = $documentData;
+            }
 
-            $requiredDocuments[] = $documentData;
+            return response()->json([
+                'success' => true,
+                'data' => $requiredDocuments
+            ], 200);
         }
 
         return response()->json([
-            'success' => true,
-            'data' => $requiredDocuments
-        ], 200);
+            'success' => false,
+            'message' => 'Vendor type ID is required'
+        ], 400);
     }
 
-    return response()->json([
-        'success' => false,
-        'message' => 'Vendor type ID is required'
-    ], 400);
-}
-
-// Helper method to get MIME type from filename
-private function getMimeTypeFromFileName($filename)
-{
-    $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
-    
-    $mimeTypes = [
-        'pdf' => 'application/pdf',
-        'jpg' => 'image/jpeg',
-        'jpeg' => 'image/jpeg',
-        'png' => 'image/png',
-        'gif' => 'image/gif',
-        'doc' => 'application/msword',
-        'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    ];
-    
-    return $mimeTypes[$extension] ?? 'application/octet-stream';
-}
-
-// Helper method to get file size (you might need to implement this based on your storage)
-private function getFileSize($fileUrl)
-{
-    // If files are stored locally
-    if (strpos($fileUrl, asset('storage/')) === 0) {
-        $relativePath = str_replace(asset('storage/'), '', $fileUrl);
-        $filePath = storage_path('app/public/' . $relativePath);
+    // Helper method to get MIME type from filename
+    private function getMimeTypeFromFileName($filename)
+    {
+        $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
         
-        if (file_exists($filePath)) {
-            return filesize($filePath);
-        }
+        $mimeTypes = [
+            'pdf' => 'application/pdf',
+            'jpg' => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'png' => 'image/png',
+        ];
+        
+        return $mimeTypes[$extension] ?? 'application/octet-stream';
     }
-    
-    // Default size or implement remote file size detection
-    return 0;
-}
+
+    // Helper method to get file size (you might need to implement this based on your storage)
+    private function getFileSize($fileUrl)
+    {
+        // If files are stored locally
+        if (strpos($fileUrl, asset('storage/')) === 0) {
+            $relativePath = str_replace(asset('storage/'), '', $fileUrl);
+            $filePath = storage_path('app/public/' . $relativePath);
+            
+            if (file_exists($filePath)) {
+                return filesize($filePath);
+            }
+        }
+        
+        // Default size or implement remote file size detection
+        return 0;
+    }
 
     /**
  * @OA\Get(
