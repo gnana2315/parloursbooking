@@ -974,9 +974,9 @@ class BookingController extends Controller
 
         //dd($bookings->customer);
         //age calculation
-        $birthDate = new DateTime($bookings->customer->pbc_dob);
-        $today = new DateTime();
-        $age = $today->diff($birthDate)->y;
+        $birthDate = Carbon::parse($bookings->customer->pbc_dob);
+        $today = Carbon::now();
+        $age = $today->diffInYears($birthDate);
 
         if($bookings['pbb_booking_details'] == null){
             $bookings['pbb_booking_details']['name'] = $bookings->customer->pbc_first_name.' '.$bookings->customer->pbc_last_name;
