@@ -24,6 +24,7 @@ class vendorBankInfo extends Model
         'pbvb_id',
         'pbvb_vendorid',
         'pbvb_bankname',
+        'pbvb_holder_name',
         'pbvb_branch',
         'pbvb_branch_code',
         'pbvb_accountno',
