@@ -488,42 +488,57 @@ class VendorController extends Controller
         $request->validate(
             [
                 'document_id' => 'required|integer|exists:required_document,pbrd_id',
-                'document' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048'
+                'document' => 'required',
+                'document.*' => 'file|mimes:jpg,jpeg,png,pdf|max:2048'
             ],
             [
                 'document_id.required' => 'Document ID is required',
                 'document_id.integer' => 'Document ID must be an integer',
                 'document_id.exists' => 'Document ID does not exist',
                 'document.required' => 'Document is required',
-                'document.file' => 'Document must be a file',
-                'document.mimes' => 'Document must be a file of type: jpg, jpeg, png, pdf',
-                'document.max' => 'Document may not be greater than 2MB',
+                'document.*.file' => 'Document must be a file',
+                'document.*.mimes' => 'Document must be a file of type: jpg, jpeg, png, pdf',
+                'document.*.max' => 'Document may not be greater than 2MB',
             ]
         );
 
-        $file = $request->file('document');
+        if($request->hasFile('document')){
+            $files = $request->file('document');
+            
+            if(!is_array($files)){
+                $files = [$files];
+            }
 
-        // generate unique filename
-        $fileName = time().'_'.$file->getClientOriginalName();
+            foreach ($files as $file) {
+                if ($file->isValid()) {
+                    // generate unique filename
+                    $fileName = time().'_'.$file->getClientOriginalName();
 
-        // store file (change 'public' to 's3' if using AWS S3)
-        $filePath = $file->storeAs('uploads/vendors/'.$vendor->pbv_id, $fileName, 'public');
+                    // store file (change 'public' to 's3' if using AWS S3)
+                    $filePath = $file->storeAs('uploads/vendors/'.$vendor->pbv_id, $fileName, 'public');
 
-        // full url for access (public disk: storage/app/public/uploads/...)
-        // $fileUrl = Storage::disk('public')->url($filePath);
-        $fileUrl = asset('storage/' . $filePath);
+                    // full url for access (public disk: storage/app/public/uploads/...)
+                    // $fileUrl = Storage::disk('public')->url($filePath);
+                    $fileUrl = asset('storage/' . $filePath);
 
-        vendorDocuments::updateOrCreate(
-            [
-                'pbvd_vendor_id' => $vendor->pbv_id,
-                'pbvd_required_document_id' => $request->document_id,
-            ],
-            [
-                'pbvd_document_name' => $fileName,
-                'pbvd_document_url' => $fileUrl,
-                'pbvd_document_status' => '1'
-            ]
-        );
+                    vendorDocuments::updateOrCreate(
+                        [
+                            'pbvd_vendor_id' => $vendor->pbv_id,
+                            'pbvd_required_document_id' => $request->document_id,
+                            'pbvd_document_name' => $fileName,
+                        ],
+                        [
+                            'pbvd_document_url' => $fileUrl,
+                            'pbvd_document_status' => '1'
+                        ]
+                    );
+                }else{
+                    return response()->json(['message' => 'Invalid file upload'], 400);
+                }
+            }
+        } else {
+            return response()->json(['message' => 'No document uploaded'], 400);
+        }   
 
         return response()->json([
             'success' => true,
