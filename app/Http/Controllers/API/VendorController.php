@@ -479,11 +479,7 @@ class VendorController extends Controller
             return response()->json(['message' => 'Vendor not found'], 404);
         }
 
-        // $check_document_upload = vendorDocuments::where([['pbvd_vendor_id', '=', $user->pbu_vid], ['pbvd_required_document_id', '=', $request->document_id]])->first();
-
-        // if(!$check_document_upload){
-        //     return response()->json(['message' => 'This document already uploaded'], 404);
-        // }
+        $documents = requiredDocument::where('pbrd_vendor_type', $vendor->pbv_vendortype)->get();
         
         $request->validate(
             [
@@ -501,6 +497,8 @@ class VendorController extends Controller
                 'document.*.max' => 'Document may not be greater than 2MB',
             ]
         );
+
+        $documents = requiredDocument::where('pbrd_id', $request->document_id)->get();
 
         if($request->hasFile('document')){
             $files = $request->file('document');
@@ -521,17 +519,32 @@ class VendorController extends Controller
                     // $fileUrl = Storage::disk('public')->url($filePath);
                     $fileUrl = asset('storage/' . $filePath);
 
-                    vendorDocuments::updateOrCreate(
-                        [
-                            'pbvd_vendor_id' => $vendor->pbv_id,
-                            'pbvd_required_document_id' => $request->document_id,
-                            'pbvd_document_name' => $fileName,
-                        ],
-                        [
-                            'pbvd_document_url' => $fileUrl,
-                            'pbvd_document_status' => '1'
-                        ]
-                    );
+                    if($documents->pbrd_is_single != 0){
+                        vendorDocuments::updateOrCreate(
+                            [
+                                'pbvd_vendor_id' => $vendor->pbv_id,
+                                'pbvd_required_document_id' => $request->document_id,
+                                'pbvd_document_name' => $fileName,
+                            ],
+                            [
+                                'pbvd_document_url' => $fileUrl,
+                                'pbvd_document_status' => '1'
+                            ]
+                        );
+                    }else{
+                        vendorDocuments::updateOrCreate(
+                            [
+                                'pbvd_vendor_id' => $vendor->pbv_id,
+                                'pbvd_required_document_id' => $request->document_id,
+                            ],
+                            [
+                                'pbvd_document_name' => $fileName,
+                                'pbvd_document_url' => $fileUrl,
+                                'pbvd_document_status' => '1'
+                            ]
+                        );
+
+                    }
                 }else{
                     return response()->json(['message' => 'Invalid file upload'], 400);
                 }

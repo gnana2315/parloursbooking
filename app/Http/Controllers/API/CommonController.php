@@ -1107,7 +1107,7 @@ class CommonController extends Controller
                 $constraints = [
                     'allowed_types' => $doc->pbrd_allowed_types ? json_decode($doc->pbrd_allowed_types, true) : ['image/*', 'application/pdf'],
                     'max_size_mb' => $doc->pbrd_max_size ?? 2,
-                    'max_files' => $doc->pbrd_max_files ?? ($doc->pbrd_is_single ? 1 : 5)
+                    'max_files' => $doc->pbrd_max_files ?? (($doc->pbrd_is_single = 1) ? 1 : 5)
                 ];
 
                 $documentData = [
