@@ -319,15 +319,32 @@ class AuthController extends Controller
                 ]
             );
 
+            // $userRegister = vendors::create([
+            //     'pbv_vendortype' => $request->vendor_type,
+            //     'pbv_first_name' => $request->first_name,
+            //     'pbv_last_name' => $request->last_name,
+            //     'pbv_address' => $request->address,
+            //     'pbv_city' => $request->city,
+            //     'pbv_gender' => $request->gender,
+            //     'pbv_dob' => $request->dob,
+            //     'pbv_contactno' => $user->pbu_mobileno,
+            //     'pbv_accept_terms' => $request->accept_terms
+            // ]);
+
+            users::create([
+                'pbu_mobileno' => $user->pbu_mobileno,
+                'pbu_first_name' => $request->first_name,
+                'pbu_last_name' => $request->last_name,
+                'pbu_address' => $request->address,
+                'pbu_city' => $request->city,
+                'pbu_gender' => $request->gender,
+                'pbu_dob' => $request->dob,
+            ]);
+
             $userRegister = vendors::create([
                 'pbv_vendortype' => $request->vendor_type,
                 'pbv_first_name' => $request->first_name,
                 'pbv_last_name' => $request->last_name,
-                'pbv_address' => $request->address,
-                'pbv_city' => $request->city,
-                'pbv_gender' => $request->gender,
-                'pbv_dob' => $request->dob,
-                'pbv_contactno' => $user->pbu_mobileno,
                 'pbv_accept_terms' => $request->accept_terms
             ]);
 
