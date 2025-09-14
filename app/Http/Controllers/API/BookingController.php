@@ -956,7 +956,7 @@ class BookingController extends Controller
                 $q->select('pbs_id', 'pbs_service_type', 'pbs_service_for', 'pbs_name', 'pbs_price', 'pbs_duration');
             }])
             ->orderBy('pbb_booking_date', 'desc')
-            ->get();
+            ->first();
 
         if ($bookings->isEmpty()) {
             return response()->json(['message' => 'No bookings found'], 404);
