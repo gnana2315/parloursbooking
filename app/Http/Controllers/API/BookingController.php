@@ -972,8 +972,10 @@ class BookingController extends Controller
             return response()->json(['message' => 'No bookings found'], 404);
         }
 
-        if($bookings['pbb_booking_details'] == null)
-            $bookings['pbb_booking_details'] = $bookings->customer;
+        dd($bookings->customer);
+        // if($bookings['pbb_booking_details'] == null){}
+        //     $bookings['pbb_booking_details']['name'] = $bookings->customer->;
+        // }   
 
         return response()->json([
             'status' => true,
