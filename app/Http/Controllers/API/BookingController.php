@@ -961,12 +961,15 @@ class BookingController extends Controller
  */
     public function getBookingDetailsById($id)
     {        
-        $bookings = booking::where('pbb_id', $id)
-            ->with(['customer', 'bookingDetails.services' => function ($q) {
-                $q->select('pbs_name', 'pbs_price', 'pbs_duration', 'pbs_image');
-            }])
-            ->orderBy('pbb_booking_date', 'desc')
-            ->first();
+        // $bookings = booking::where('pbb_id', $id)
+        //     ->with(['customer', 'bookingDetails.services' => function ($q) {
+        //         $q->select('pbs_name', 'pbs_price', 'pbs_duration', 'pbs_image');
+        //     }])
+        //     ->orderBy('pbb_booking_date', 'desc')
+        //     ->first();
+        $bookings = booking::with(['customer', 'vendors', 'bookingDetails', 'ratings'])
+                    ->where('pbb_id', $id)
+                    ->first();
 
         if (!$bookings) {
             return response()->json(['message' => 'No bookings found'], 404);
@@ -988,8 +991,8 @@ class BookingController extends Controller
     
         $bookings->pbb_booking_details = $bookingDetails;
 
-        $bookingDetail->services = $booking->bookingDetails->flatMap(function ($bookingDetail) {
-            return $bookingDetail->services ? [$bookingDetail->services] : [];
+        $bookings->booking_details = $booking->bookingDetails->flatMap(function ($bookingDetail) {
+            return $bookings->services ? [$bookingDetail->services] : [];
         })->toArray();
 
         return response()->json([
