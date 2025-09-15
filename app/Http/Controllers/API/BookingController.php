@@ -862,11 +862,35 @@ class BookingController extends Controller
         if ($bookings->isEmpty()) {
             return response()->json(['message' => 'No bookings found'], 404);
         }
+        
+        $generated_bookings = [
+            'pbbd_id' => $bookings->pbbd_id,
+            'pbb_promo_id' => $bookings->pbb_promo_id,
+            'pbb_booking_date' => $bookings->pbb_booking_date,
+            'pbb_booking_duration' => $bookings->pbb_booking_duration,
+            'pbb_booking_start_time' => $bookings->pbb_booking_start_time,
+            'pbb_booking_end_time' => $bookings->pbb_booking_end_time,
+            'pbb_ref_no' => $bookings->pbb_ref_no,
+            'pbb_type' => $bookings->pbb_type,
+            'pbb_service_location' => $bookings->pbb_service_location,
+            'pbb_contact_no' => $bookings->pbb_contact_no,
+            'pbb_status' => $bookings->pbb_status,
+            'created_at' => $bookings->created_at,
+            'updated_at' => $bookings->updated_at,
+            'deleted_at' => $bookings->deleted_at,
+            'pbb_remarks' => $bookings->pbb_remarks,
+            'pbbd_total_amount' => $bookings->bookingDetails->sum('pbbd_amount'),
+            'services' => $bookings->bookingDetails->map(function ($detail) {
+                return [
+                    'pbs_name' => $detail->services->pbs_name,
+                ];
+            }),
+        ];       
 
         return response()->json([
             'status' => true,
             'message' => 'Bookings retrieved successfully',
-            'data' => $bookings
+            'data' => $generated_bookings
         ], 200);
     }
 
@@ -961,12 +985,6 @@ class BookingController extends Controller
  */
     public function getBookingDetailsById($id)
     {        
-        // $bookings = booking::where('pbb_id', $id)
-        //     ->with(['customer', 'bookingDetails.services' => function ($q) {
-        //         $q->select('pbs_name', 'pbs_price', 'pbs_duration', 'pbs_image');
-        //     }])
-        //     ->orderBy('pbb_booking_date', 'desc')
-        //     ->first();
         $bookings = booking::with([
             'customer',
             'bookingDetails.services',
@@ -1007,7 +1025,7 @@ class BookingController extends Controller
             'updated_at' => $bookings->updated_at,
             'deleted_at' => $bookings->deleted_at,
             'pbb_remarks' => $bookings->pbb_remarks,
-            'pbbd_total_amount' => $bookings->bookingDetails->sum('pbbd_total_amount'),
+            'pbbd_total_amount' => $bookings->bookingDetails->sum('pbbd_amount'),
             'services' => $bookings->bookingDetails->map(function ($detail) {
                 return [
                     'pbs_id' => $detail->services->pbs_id,
