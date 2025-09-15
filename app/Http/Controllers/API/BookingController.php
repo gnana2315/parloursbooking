@@ -960,18 +960,13 @@ class BookingController extends Controller
  * )
  */
     public function getBookingDetailsById($id)
-    {
-        $booking_details = bookingDetail::where('pbbd_booking_id', $id)
-            ->with(['services' => function ($q) {
-                $q->select('pbs_id', 'pbs_service_type', 'pbs_service_for', 'pbs_name', 'pbs_price', 'pbs_duration', 'pbs_image');
+    {        
+        $booking_details = booking::where('pbb_id', $id)
+            ->with(['customer', 'bookingDetails.services' => function ($q) {
+                $q->select('pbs_name', 'pbs_price', 'pbs_duration', 'pbs_image');
             }])
-            ->get();
-        // $bookings = booking::where('pbb_id', $id)
-        //     ->with(['customer', 'bookingDetails.services' => function ($q) {
-        //         $q->select('pbs_name', 'pbs_price', 'pbs_duration', 'pbs_image');
-        //     }])
-        //     ->orderBy('pbb_booking_date', 'desc')
-        //     ->first();
+            ->orderBy('pbb_booking_date', 'desc')
+            ->first();
 
         if (!$booking_details) {
             return response()->json(['message' => 'No bookings found'], 404);
@@ -979,19 +974,19 @@ class BookingController extends Controller
 
         //dd($bookings->customer);
         //age calculation
-        // $birthDate = Carbon::parse($bookings->customer->pbc_dob);
-        // $today = Carbon::now();
-        // $age = $today->diffInYears($birthDate);
+        $birthDate = Carbon::parse($bookings->customer->pbc_dob);
+        $today = Carbon::now();
+        $age = $today->diffInYears($birthDate);
 
-        // $bookingDetails = [
-        //     'name' => $bookings->customer->pbc_first_name . ' ' . $bookings->customer->pbc_last_name,
-        //     'contact_no' => $bookings->customer->pbc_contact_no,
-        //     'age' => $age,
-        //     'gender' => ($bookings->customer->pbc_sex == 1) ? 'Male' : 'Female',
-        //     'address' => $bookings->customer->pbc_address . ' ' . $bookings->customer->pbc_city
-        // ];
+        $bookingDetails = [
+            'name' => $bookings->customer->pbc_first_name . ' ' . $bookings->customer->pbc_last_name,
+            'contact_no' => $bookings->customer->pbc_contact_no,
+            'age' => $age,
+            'gender' => ($bookings->customer->pbc_sex == 1) ? 'Male' : 'Female',
+            'address' => $bookings->customer->pbc_address . ' ' . $bookings->customer->pbc_city
+        ];
     
-        // $bookings->pbb_booking_details = $bookingDetails;
+        $bookings->pbb_booking_details = $bookingDetails;
 
         return response()->json([
             'status' => true,
