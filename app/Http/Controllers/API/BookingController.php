@@ -991,7 +991,7 @@ class BookingController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'Booking Details retrieved successfully',
-            'data' => $booking_details
+            'data' => $bookings
         ], 200);
     }
 }
