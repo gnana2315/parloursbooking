@@ -977,25 +977,52 @@ class BookingController extends Controller
         }
 
         //dd($bookings->customer);
-        //age calculation
-        // $birthDate = Carbon::parse($bookings->customer->pbc_dob);
-        // $today = Carbon::now();
-        // $age = $today->diffInYears($birthDate);
+        // age calculation
+        $birthDate = Carbon::parse($bookings->customer->pbc_dob);
+        $today = Carbon::now();
+        $age = $today->diffInYears($birthDate);
 
-        // $bookingDetails = [
-        //     'name' => $bookings->customer->pbc_first_name . ' ' . $bookings->customer->pbc_last_name,
-        //     'contact_no' => $bookings->customer->pbc_contact_no,
-        //     'age' => $age,
-        //     'gender' => ($bookings->customer->pbc_sex == 1) ? 'Male' : 'Female',
-        //     'address' => $bookings->customer->pbc_address . ' ' . $bookings->customer->pbc_city
-        // ];
-    
-        // $bookings->pbb_booking_details = $bookingDetails;        
+        $bookingDetails = [
+            'name' => $bookings->customer->pbc_first_name . ' ' . $bookings->customer->pbc_last_name,
+            'contact_no' => $bookings->customer->pbc_contact_no,
+            'age' => $age,
+            'gender' => ($bookings->customer->pbc_sex == 1) ? 'Male' : 'Female',
+            'address' => $bookings->customer->pbc_address . ' ' . $bookings->customer->pbc_city
+        ];    
+        
+        $booking_details = [
+            'pbbd_id' => $bookings->pbbd_id,
+            'pbb_promo_id' => $bookings->pbb_promo_id,
+            'pbb_booking_details' => $bookingDetails,
+            'pbb_booking_date' => $bookings->pbb_booking_date,
+            'pbb_booking_duration' => $bookings->pbb_booking_duration,
+            'pbb_booking_start_time' => $bookings->pbb_booking_start_time,
+            'pbb_booking_end_time' => $bookings->pbb_booking_end_time,
+            'pbb_ref_no' => $bookings->pbb_ref_no,
+            'pbb_type' => $bookings->pbb_type,
+            'pbb_service_location' => $bookings->pbb_service_location,
+            'pbb_contact_no' => $bookings->pbb_contact_no,
+            'pbb_status' => $bookings->pbb_status,
+            'created_at' => $bookings->created_at,
+            'updated_at' => $bookings->updated_at,
+            'deleted_at' => $bookings->deleted_at,
+            'pbb_remarks' => $bookings->pbb_remarks,
+            'pbbd_total_amount' => $bookings->bookingDetails->sum('pbbd_total_amount'),
+            'services' => $bookings->bookingDetails->map(function ($detail) {
+                return [
+                    'pbs_id' => $detail->services->pbs_id,
+                    'pbs_name' => $detail->services->pbs_name,
+                    'pbs_price' => $detail->services->pbs_price,
+                    'pbs_duration' => $detail->services->pbs_duration,
+                    'pbs_image' => $detail->services->pbs_image,
+                ];
+            }),
+        ];       
 
         return response()->json([
             'status' => true,
             'message' => 'Booking Details retrieved successfully',
-            'data' => $bookings
+            'data' => $booking_details
         ], 200);
     }
 }
