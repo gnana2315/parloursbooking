@@ -874,6 +874,11 @@ class BookingController extends Controller
                 'gender' => ($booking->customer->pbc_sex == 1) ? 'Male' : 'Female',
                 'address' => $booking->customer->pbc_address . ' ' . $booking->customer->pbc_city
             ];
+
+            // Convert services to string array
+            $serviceNames = $booking->bookingDetails->map(function ($detail) {
+                return $detail->services->pbs_name ?? null;
+            })->filter()->values()->toArray();
             
             return [
                 'pbb_id' => $booking->pbb_id,
@@ -893,11 +898,7 @@ class BookingController extends Controller
                 'deleted_at' => $booking->deleted_at,
                 'pbb_remarks' => $booking->pbb_remarks,
                 'pbbd_total_amount' => $booking->bookingDetails->sum('pbbd_amount'),
-                'services' => $booking->bookingDetails->map(function ($detail) {
-                    return [
-                        'pbs_name' => $detail->services->pbs_name ?? null,
-                    ];
-                }),
+                'services' => $serviceNames,
             ];
         }); 
 
