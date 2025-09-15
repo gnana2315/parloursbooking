@@ -969,7 +969,7 @@ class BookingController extends Controller
         //     ->first();
         $bookings = booking::with([
             'customer',
-            'bookingDetails.service',
+            'bookingDetails.services',
         ])->find($id);
 
         if (!$bookings) {
