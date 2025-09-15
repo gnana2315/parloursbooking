@@ -853,7 +853,7 @@ class BookingController extends Controller
         }
 
         $bookings = booking::where('pbb_vendor_id', $vendor->pbv_id)
-            ->with(['bookingDetails.services' => function ($q) {
+            ->with(['customer', 'bookingDetails.services' => function ($q) {
                 $q->select('pbs_name', 'pbs_duration');
             }])
             ->orderBy('pbb_booking_date', 'desc')
