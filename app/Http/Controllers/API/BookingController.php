@@ -961,14 +961,14 @@ class BookingController extends Controller
  */
     public function getBookingDetailsById($id)
     {        
-        $booking_details = booking::where('pbb_id', $id)
+        $bookings = booking::where('pbb_id', $id)
             ->with(['customer', 'bookingDetails.services' => function ($q) {
                 $q->select('pbs_name', 'pbs_price', 'pbs_duration', 'pbs_image');
             }])
             ->orderBy('pbb_booking_date', 'desc')
             ->first();
 
-        if (!$booking_details) {
+        if (!$bookings) {
             return response()->json(['message' => 'No bookings found'], 404);
         }
 
