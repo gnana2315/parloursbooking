@@ -967,9 +967,10 @@ class BookingController extends Controller
         //     }])
         //     ->orderBy('pbb_booking_date', 'desc')
         //     ->first();
-        $bookings = booking::with(['customer', 'vendors', 'bookingDetails', 'ratings'])
-                    ->where('pbb_id', $id)
-                    ->first();
+        $bookings = booking::with([
+            'customer',
+            'bookingDetails.service',
+        ])->find($id);
 
         if (!$bookings) {
             return response()->json(['message' => 'No bookings found'], 404);
