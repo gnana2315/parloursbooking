@@ -862,10 +862,24 @@ class BookingController extends Controller
         if ($bookings->isEmpty()) {
             return response()->json(['message' => 'No bookings found'], 404);
         }
+
+        // age calculation
+        $birthDate = Carbon::parse($bookings->customer->pbc_dob);
+        $today = Carbon::now();
+        $age = $today->diffInYears($birthDate);
+
+        $bookingDetails = [
+            'name' => $bookings->customer->pbc_first_name . ' ' . $bookings->customer->pbc_last_name,
+            'contact_no' => $bookings->customer->pbc_contact_no,
+            'age' => $age,
+            'gender' => ($bookings->customer->pbc_sex == 1) ? 'Male' : 'Female',
+            'address' => $bookings->customer->pbc_address . ' ' . $bookings->customer->pbc_city
+        ];
         
         $generated_bookings = [
             'pbbd_id' => $bookings->pbbd_id,
             'pbb_promo_id' => $bookings->pbb_promo_id,
+            'pbb_booking_details' => $bookingDetails,
             'pbb_booking_date' => $bookings->pbb_booking_date,
             'pbb_booking_duration' => $bookings->pbb_booking_duration,
             'pbb_booking_start_time' => $bookings->pbb_booking_start_time,
