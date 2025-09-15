@@ -988,6 +988,10 @@ class BookingController extends Controller
     
         $bookings->pbb_booking_details = $bookingDetails;
 
+        $bookingDetail->services = $booking->bookingDetails->flatMap(function ($bookingDetail) {
+            return $bookingDetail->services ? [$bookingDetail->services] : [];
+        })->toArray();
+
         return response()->json([
             'status' => true,
             'message' => 'Booking Details retrieved successfully',
