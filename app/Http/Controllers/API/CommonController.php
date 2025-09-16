@@ -1088,7 +1088,6 @@ class CommonController extends Controller
                     ->orderBy('created_at', 'desc')
                     ->get();                
 
-                // Get first 3 items for preview
                 $previewItems = $uploadedDocuments->map(function ($document) {
                     return [
                         'itemId' => $document->pbvd_id,
@@ -1118,7 +1117,7 @@ class CommonController extends Controller
                     'label' => $doc->pbrd_label,
                     'is_single' => (bool)$doc->pbrd_is_single,
                     'required' => (bool)$doc->pbrd_required,
-                    'status' => $status,
+                    'status' => ($uploadedDocuments->pbvd_document_status) ? $uploadedDocuments->pbvd_document_status : 0,
                     'items' => $previewItems->toArray(),
                     // 'items_href' => "/api/vendor-docs/{$doc->pbrd_id}/items",
                     'constraints' => $constraints,
