@@ -1101,8 +1101,8 @@ class CommonController extends Controller
                 });
 
                 $status = $uploadedDocuments->map(function ($document) {
-                    return $document->pbvd_document_status;
-                });
+                    return (string)$document->pbvd_document_status;
+                })->toArray();
 
                 // Parse constraints from your database or use defaults
                 $constraints = [
