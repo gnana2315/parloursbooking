@@ -1096,7 +1096,8 @@ class CommonController extends Controller
                         'file_url' => $document->pbvd_document_url,
                         'mime' => $this->getMimeTypeFromFileName($document->pbvd_document_name),
                         'size' => $this->getFileSize($document->pbvd_document_url), // You might need to implement this
-                        'uploaded_at' => $document->created_at->toIso8601String()
+                        'uploaded_at' => $document->created_at->toIso8601String(),
+                        'status' => $document->pbvd_document_status,
                     ];
                 });
 
