@@ -1086,7 +1086,7 @@ class CommonController extends Controller
                 $uploadedDocuments = vendorDocuments::where('pbvd_vendor_id', $user->pbu_vid)
                     ->where('pbvd_required_document_id', $doc->pbrd_id)
                     ->orderBy('created_at', 'desc')
-                    ->first();                
+                    ->get();                
 
                 $previewItems = $uploadedDocuments->map(function ($document) {
                     return [
@@ -1096,13 +1096,9 @@ class CommonController extends Controller
                         'mime' => $this->getMimeTypeFromFileName($document->pbvd_document_name),
                         'size' => $this->getFileSize($document->pbvd_document_url), // You might need to implement this
                         'uploaded_at' => $document->created_at->toIso8601String(),
-                        'status' => $document->pbvd_document_status,
                     ];
                 });
 
-                $status = $uploadedDocuments->map(function ($document) {
-                    return (string)$document->pbvd_document_status;
-                })->toArray();
 
                 // Parse constraints from your database or use defaults
                 $constraints = [
