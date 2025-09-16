@@ -1086,7 +1086,7 @@ class CommonController extends Controller
                 $uploadedDocuments = vendorDocuments::where('pbvd_vendor_id', $user->pbu_vid)
                     ->where('pbvd_required_document_id', $doc->pbrd_id)
                     ->orderBy('created_at', 'desc')
-                    ->get();                
+                    ->first();                
 
                 $previewItems = $uploadedDocuments->map(function ($document) {
                     return [
