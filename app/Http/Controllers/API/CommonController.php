@@ -1086,13 +1086,10 @@ class CommonController extends Controller
                 $uploadedDocuments = vendorDocuments::where('pbvd_vendor_id', $user->pbu_vid)
                     ->where('pbvd_required_document_id', $doc->pbrd_id)
                     ->orderBy('created_at', 'desc')
-                    ->get();
-
-                $items_count = $uploadedDocuments->count();
-                $status = $doc->pbrd_status;
+                    ->get();                
 
                 // Get first 3 items for preview
-                $previewItems = $uploadedDocuments->take(3)->map(function ($document) {
+                $previewItems = $uploadedDocuments->map(function ($document) {
                     return [
                         'itemId' => $document->pbvd_id,
                         'file_name' => $document->pbvd_document_name,
@@ -1101,6 +1098,10 @@ class CommonController extends Controller
                         'size' => $this->getFileSize($document->pbvd_document_url), // You might need to implement this
                         'uploaded_at' => $document->created_at->toIso8601String()
                     ];
+                });
+
+                $status = $uploadedDocuments->map(function ($document) {
+                    return $document->pbvd_document_status;
                 });
 
                 // Parse constraints from your database or use defaults
@@ -1117,11 +1118,9 @@ class CommonController extends Controller
                     'is_single' => (bool)$doc->pbrd_is_single,
                     'required' => (bool)$doc->pbrd_required,
                     'status' => $status,
-                    'items_count' => $items_count,
                     'items' => $previewItems->toArray(),
                     // 'items_href' => "/api/vendor-docs/{$doc->pbrd_id}/items",
                     'constraints' => $constraints,
-                    'preview_limit' => 3
                 ];
 
                 $requiredDocuments[] = $documentData;
