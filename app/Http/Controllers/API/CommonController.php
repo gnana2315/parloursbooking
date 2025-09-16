@@ -1087,7 +1087,8 @@ class CommonController extends Controller
                     ->where('pbvd_required_document_id', $doc->pbrd_id)
                     ->orderBy('created_at', 'desc')
                     ->get();
-                
+
+                $items_count = $uploadedDocuments->count();
                 $status = $doc->pbrd_status;
 
                 // Get first 3 items for preview
