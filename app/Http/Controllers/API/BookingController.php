@@ -1024,7 +1024,7 @@ class BookingController extends Controller
         ];    
         
         $booking_details = [
-            'pbbd_id' => $bookings->bookingDetails->pbbd_id,
+            'pbb_id' => $bookings->pbb_id,
             'pbb_promo_id' => $bookings->pbb_promo_id,
             'pbb_booking_details' => $bookingDetails,
             'pbb_booking_date' => $bookings->pbb_booking_date,
@@ -1043,6 +1043,7 @@ class BookingController extends Controller
             'pbbd_total_amount' => $bookings->bookingDetails->sum('pbbd_amount'),
             'services' => $bookings->bookingDetails->map(function ($detail) {
                 return [
+                    'pbbd_id' => $detail->pbbd_id,
                     'pbs_id' => $detail->services->pbs_id,
                     'pbs_name' => $detail->services->pbs_name,
                     'pbs_price' => $detail->services->pbs_price,
