@@ -1113,7 +1113,7 @@ class CommonController extends Controller
                     'label' => $doc->pbrd_label,
                     'is_single' => (bool)$doc->pbrd_is_single,
                     'required' => (bool)$doc->pbrd_required,
-                    'status' => ($uploadedDocuments->pbvd_document_status) ? $uploadedDocuments->pbvd_document_status : 0,
+                    'status' => ($uploadedDocuments->isNotEmpty()) ? (string)$uploadedDocuments->first()->pbvd_document_status : '0',
                     'items' => $previewItems->toArray(),
                     // 'items_href' => "/api/vendor-docs/{$doc->pbrd_id}/items",
                     'constraints' => $constraints,
