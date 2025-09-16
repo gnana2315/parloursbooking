@@ -1024,7 +1024,7 @@ class BookingController extends Controller
         ];    
         
         $booking_details = [
-            'pbbd_id' => $bookings->pbbd_id,
+            'pbbd_id' => $bookings->bookingDetails->pbbd_id,
             'pbb_promo_id' => $bookings->pbb_promo_id,
             'pbb_booking_details' => $bookingDetails,
             'pbb_booking_date' => $bookings->pbb_booking_date,
