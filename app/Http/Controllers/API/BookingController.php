@@ -322,7 +322,6 @@ class BookingController extends Controller
  *                 @OA\Items(
  *                     @OA\Property(property="service_id", type="integer", example=1),
  *                     @OA\Property(property="booking_date", type="string", format="date", example="2025-08-02"),
- *                     @OA\Property(property="booking_duration", type="string", format="time", example="01:30:00"),
  *                     @OA\Property(property="booking_start_time", type="string", format="time", example="10:00:00"),
  *                     @OA\Property(property="booking_end_time", type="string", format="time", example="11:30:00"),
  *                     @OA\Property(property="service_location", type="string", example="Home"),
@@ -386,7 +385,6 @@ class BookingController extends Controller
                 'promocode_id' => 'nullable',
                 'booking_details' => 'required',
                 'booking_date' => 'required',
-                'booking_duration' => 'required|date_format:H:i:s',
                 'booking_start_time' => 'required|date_format:H:i:s',
                 'booking_end_time' => 'required|date_format:H:i:s',
                 'service_location' => 'required',
@@ -396,7 +394,6 @@ class BookingController extends Controller
                 'promocode_id.required' => 'Promo code ID is required',
                 'booking_details.required' => 'Booking details are required',
                 'booking_date.required' => 'Booking date is required',
-                'booking_duration.required' => 'Booking duration is required',
                 'booking_start_time.required' => 'Booking start time is required',
                 'booking_end_time.required' => 'Booking end time is required',
                 'service_location.required' => 'Service location is required',
@@ -410,6 +407,7 @@ class BookingController extends Controller
                 'message' => 'Vendor not found',
             ], 404);
         }
+
         $customer = customer::where('pbc_user_id', $user->pbu_id)->first();
         if (!$customer) {
             return response()->json([
@@ -418,24 +416,30 @@ class BookingController extends Controller
             ], 404);
         }
 
-        $booking_details_generated = [];
-        if($request->booking_for_someone == 1){
-            $booking_details_generated = [
-                'name' => $request->someone_name,
-                'contact_no' => $request->someone_contact_no,
-                'age' => $request->age,
-                'gender' => $request->gender,
-                'address' => $request->address,
-            ];
-        }else{
-            $booking_details_generated = null;
+        $booking_details_generated = [
+            'name' => $request->someone_name,
+            'contact_no' => $request->someone_contact_no,
+            'age' => $request->age,
+            'gender' => $request->gender,
+            'address' => $request->address,
+            'remarks' => $request->remarks,
+        ];
+
+        $booking_details = $request->services;
+        $total_amount = 0;
+        $total_duration = 0; // in minutes
+
+        foreach ($booking_details as $value) {
+            $service = services::where('pbs_id', $value['service_id'])->first();
+            if ($service) {
+                $total_amount += $service->pbs_price;
+                $total_duration += $service->pbs_duration; // ✅ add service duration (minutes)
+            }
         }
 
-        // Convert minutes to hours and minutes
-        $hours = floor($request->booking_duration / 60);
-        $remainingMinutes = $request->booking_duration % 60;
-
-        // Format as HH:MM:SS
+        // ✅ Convert total duration to HH:MM:SS
+        $hours = floor($total_duration / 60);
+        $remainingMinutes = $total_duration % 60;
         $duration = sprintf('%02d:%02d:00', $hours, $remainingMinutes);
 
         $addbooking = Booking::create([
@@ -451,17 +455,13 @@ class BookingController extends Controller
             'pbb_type' => 'Online',
             'pbb_service_location' => $request->service_location,
             'pbb_contact_no' => ($request->booking_for_someone == 1) ? $request->someone_contact_no : $customer->customer_contact_no,
-            'pbb_status' => 1,
-            'pbb_remarks' => $request->remarks
+            'pbb_status' => 1
         ]);
 
-        if($addbooking){
-            $booking_details = $request->booking_details;
-            $total_amount = 0;
-            foreach($booking_details as $key => $value){
+        if ($addbooking) {
+            foreach ($booking_details as $value) {
                 $service = services::where('pbs_id', $value['service_id'])->first();
-                if($service){
-                    $total_amount += $service->pbs_price;
+                if ($service) {
                     bookingDetail::create([
                         'pbbd_booking_id' => $addbooking->pbb_id,
                         'pbbd_service_id' => $value['service_id'],
@@ -482,19 +482,16 @@ class BookingController extends Controller
                     'booking_id' => $addbooking->pbb_id,
                     'booking_ref_no' => $addbooking->pbb_ref_no,
                     'vendor_id' => $addbooking->pbb_vendor_id,
-                    'total_amount' => $total_amount
+                    'total_amount' => $total_amount,
+                    'total_duration' => $duration,
+                    'booking_end_time' => $endTime
                 ]
             ], 200);
-            $status_code = 200;
-            $message = "Booking Added Successfully";
-        }else{
-            $status_code = 500;
-            $message = "Unable to add the booking now. Please try again later";
         }
 
         return response()->json([
-            'message' => $message,
-        ], $status_code);
+            'message' => "Unable to add the booking now. Please try again later",
+        ], 500);       
     }
 
     /**
@@ -606,7 +603,6 @@ class BookingController extends Controller
  *             required={"vendor_id", "booking_date", "booking_duration", "booking_start_time", "booking_end_time", "service_location", "services"},
  *             @OA\Property(property="vendor_id", type="integer", example=9),
  *             @OA\Property(property="booking_date", type="string", format="date", example="2025-08-10"),
- *             @OA\Property(property="booking_duration", type="string", format="time", example="01:00:00"),
  *             @OA\Property(property="booking_start_time", type="string", format="time", example="10:00:00"),
  *             @OA\Property(property="booking_end_time", type="string", format="time", example="11:00:00"),
  *             @OA\Property(property="service_location", type="string", example="Home"),
@@ -667,7 +663,6 @@ class BookingController extends Controller
         $request->validate(
             [
                 'booking_date' => 'required',
-                'booking_duration' => 'required|date_format:H:i:s',
                 'booking_start_time' => 'required|date_format:H:i:s',
                 'booking_end_time' => 'required|date_format:H:i:s',
                 'service_location' => 'required',
@@ -675,7 +670,6 @@ class BookingController extends Controller
             ],
             [
                 'booking_date.required' => 'Booking date is required',
-                'booking_duration.required' => 'Booking duration is required',
                 'booking_start_time.required' => 'Booking start time is required',
                 'booking_end_time.required' => 'Booking end time is required',
                 'service_location.required' => 'Service location is required',
@@ -692,7 +686,14 @@ class BookingController extends Controller
             ], 404);
         }
 
-        $booking_details_generated = [];
+        $customer = customer::where('pbc_user_id', $user->pbu_id)->first();
+        if (!$customer) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Customer not found',
+            ], 404);
+        }
+
         $booking_details_generated = [
             'name' => $request->someone_name,
             'contact_no' => $request->someone_contact_no,
@@ -702,11 +703,21 @@ class BookingController extends Controller
             'remarks' => $request->remarks,
         ];
 
-        // Convert minutes to hours and minutes
-        $hours = floor($request->booking_duration / 60);
-        $remainingMinutes = $request->booking_duration % 60;
+        $booking_details = $request->services;
+        $total_amount = 0;
+        $total_duration = 0; // in minutes
 
-        // Format as HH:MM:SS
+        foreach ($booking_details as $value) {
+            $service = services::where('pbs_id', $value['service_id'])->first();
+            if ($service) {
+                $total_amount += $service->pbs_price;
+                $total_duration += $service->pbs_duration; // ✅ add service duration (minutes)
+            }
+        }
+
+        // ✅ Convert total duration to HH:MM:SS
+        $hours = floor($total_duration / 60);
+        $remainingMinutes = $total_duration % 60;
         $duration = sprintf('%02d:%02d:00', $hours, $remainingMinutes);
 
         $addbooking = Booking::create([
@@ -725,13 +736,10 @@ class BookingController extends Controller
             'pbb_status' => 1
         ]);
 
-        if($addbooking){
-            $booking_details = $request->services;
-            $total_amount = 0;
-            foreach($booking_details as $key => $value){
+        if ($addbooking) {
+            foreach ($booking_details as $value) {
                 $service = services::where('pbs_id', $value['service_id'])->first();
-                if($service){
-                    $total_amount += $service->pbs_price;
+                if ($service) {
                     bookingDetail::create([
                         'pbbd_booking_id' => $addbooking->pbb_id,
                         'pbbd_service_id' => $value['service_id'],
@@ -752,19 +760,18 @@ class BookingController extends Controller
                     'booking_id' => $addbooking->pbb_id,
                     'booking_ref_no' => $addbooking->pbb_ref_no,
                     'vendor_id' => $addbooking->pbb_vendor_id,
-                    'total_amount' => $total_amount
+                    'total_amount' => $total_amount,
+                    'total_duration' => $duration,
+                    'booking_end_time' => $endTime
                 ]
             ], 200);
-            $status_code = 200;
-            $message = "Booking Added Successfully";
-        }else{
-            $status_code = 500;
-            $message = "Unable to add the booking now. Please try again later";
         }
 
         return response()->json([
-            'message' => $message,
-        ], $status_code);
+            'message' => "Unable to add the booking now. Please try again later",
+        ], 500);
+
+        
     }
 
     /**
