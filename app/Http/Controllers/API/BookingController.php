@@ -458,7 +458,7 @@ class BookingController extends Controller
             'pbb_booking_duration' => $duration,
             'pbb_booking_start_time' => $request->booking_start_time,
             'pbb_booking_end_time' => $request->booking_end_time,
-            'pbb_ref_no' => 'BOONOLKIINNEG_'.uniqid('BOONOLKIINNEG_'),
+            'pbb_ref_no' => uniqid('BOONOLKIINNEG_'),
             'pbb_type' => 'Online',
             'pbb_service_location' => $request->service_location,
             'pbb_contact_no' => ($request->booking_for_someone == 1) ? $request->someone_contact_no : $customer->customer_contact_no,
