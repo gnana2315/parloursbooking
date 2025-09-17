@@ -480,6 +480,7 @@ class CustomersController extends Controller
             'servicefor' => $vendor_results->pbv_servicefor,
             'vendortype' => $vendor_results->pbv_vendortype,
             'business_name' => $vendor_results->pbv_business_name,
+            'description' => $vendor_results->pbv_description,
             'brno' => $vendor_results->pbv_brno,
             'email' => $vendor_results->pbv_email,
             'contact_no' => $vendor_results->pbv_contactno,
