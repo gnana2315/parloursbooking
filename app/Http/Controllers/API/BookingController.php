@@ -304,34 +304,40 @@ class BookingController extends Controller
 
 /**
  * @OA\Post(
- *     path="/addOnlineBooking",
+ *     path="/api/addOnlineBooking",
+ *     tags={"Bookings"},
  *     summary="Add Online Booking",
- *     description="Allows a customer to create a new online booking with one or more services.",
- *     operationId="addOnlineBooking",
- *     tags={"Booking"},
+ *     description="Create a new online booking for a vendor with services.",
  *     security={{"bearerAuth":{}}},
  *
  *     @OA\RequestBody(
  *         required=true,
  *         @OA\JsonContent(
- *             @OA\Property(property="vendor_id", type="integer", example=9),
+ *             type="object",
+ *             required={
+ *                 "vendor_id","booking_details","booking_date",
+ *                 "booking_start_time","booking_end_time","service_location"
+ *             },
+ *             @OA\Property(property="vendor_id", type="integer", example=12),
  *             @OA\Property(property="promocode_id", type="integer", nullable=true, example=null),
+ *             @OA\Property(property="booking_details", type="string", example="Haircut and Facial"),
+ *             @OA\Property(property="booking_date", type="string", format="date", example="2025-09-20"),
+ *             @OA\Property(property="booking_start_time", type="string", format="time", example="10:00:00"),
+ *             @OA\Property(property="booking_end_time", type="string", format="time", example="11:30:00"),
+ *             @OA\Property(property="service_location", type="string", example="Salon Branch - Main Street"),
+ *             @OA\Property(property="booking_for_someone", type="integer", example=1, description="1 if booking for someone else"),
+ *             @OA\Property(property="someone_name", type="string", example="John Doe"),
+ *             @OA\Property(property="someone_contact_no", type="string", example="9876543210"),
+ *             @OA\Property(property="age", type="integer", example=28),
+ *             @OA\Property(property="gender", type="string", example="Male"),
+ *             @OA\Property(property="address", type="string", example="123, Elm Street, Colombo"),
+ *             @OA\Property(property="remarks", type="string", example="Please prepare hair products in advance."),
  *             @OA\Property(
- *                 property="booking_details",
+ *                 property="services",
  *                 type="array",
  *                 @OA\Items(
- *                     @OA\Property(property="service_id", type="integer", example=1),
- *                     @OA\Property(property="booking_date", type="string", format="date", example="2025-08-02"),
- *                     @OA\Property(property="booking_start_time", type="string", format="time", example="10:00:00"),
- *                     @OA\Property(property="booking_end_time", type="string", format="time", example="11:30:00"),
- *                     @OA\Property(property="service_location", type="string", example="Home"),
- *                     @OA\Property(property="booking_for_someone", type="integer", enum={0,1}, example=0),
- *                     @OA\Property(property="someone_name", type="string", example="John Doe"),
- *                     @OA\Property(property="someone_contact_no", type="string", example="0771234567"),
- *                     @OA\Property(property="age", type="integer", example=25),
- *                     @OA\Property(property="gender", type="string", example="Male"),
- *                     @OA\Property(property="address", type="string", example="123 Street Name"),
- *                     @OA\Property(property="remarks", type="string", example="No special requests.")
+ *                     type="object",
+ *                     @OA\Property(property="service_id", type="integer", example=5)
  *                 )
  *             )
  *         )
@@ -339,17 +345,18 @@ class BookingController extends Controller
  *
  *     @OA\Response(
  *         response=200,
- *         description="Booking created successfully",
+ *         description="Booking added successfully",
  *         @OA\JsonContent(
+ *             type="object",
  *             @OA\Property(property="status", type="boolean", example=true),
  *             @OA\Property(property="message", type="string", example="Booking added successfully"),
  *             @OA\Property(
  *                 property="data",
  *                 type="object",
  *                 @OA\Property(property="booking_id", type="integer", example=101),
- *                 @OA\Property(property="booking_ref_no", type="string", example="BOONOLKIINNEG_64fcd541e0f59"),
- *                 @OA\Property(property="vendor_id", type="integer", example=9),
- *                 @OA\Property(property="total_amount", type="number", format="float", example=2000.00)
+ *                 @OA\Property(property="booking_ref_no", type="string", example="BOONOLKIINNEG_650f3f5d9c9a1"),
+ *                 @OA\Property(property="vendor_id", type="integer", example=12),
+ *                 @OA\Property(property="total_amount", type="number", format="float", example=1500)
  *             )
  *         )
  *     ),
@@ -358,23 +365,22 @@ class BookingController extends Controller
  *         response=404,
  *         description="Vendor or Customer not found",
  *         @OA\JsonContent(
+ *             type="object",
  *             @OA\Property(property="status", type="boolean", example=false),
  *             @OA\Property(property="message", type="string", example="Vendor not found")
  *         )
  *     ),
  *
  *     @OA\Response(
- *         response=422,
- *         description="Validation error"
- *     ),
- *
- *     @OA\Response(
  *         response=500,
- *         description="Server error"
+ *         description="Unable to add the booking",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="message", type="string", example="Unable to add the booking now. Please try again later")
+ *         )
  *     )
  * )
  */
-
 
     public function addOnlineBooking(Request $request){
         $user = auth()->user();
@@ -591,64 +597,76 @@ class BookingController extends Controller
 
     /**
  * @OA\Post(
- *     path="/addManualBooking",
- *     summary="Add Manual Booking",
+ *     path="/api/addManualBooking",
  *     tags={"Booking"},
+ *     summary="Add a manual booking",
+ *     description="Create a new manual booking for a vendor, including services, customer details, and booking information.",
  *     security={{"bearerAuth":{}}},
+ *
  *     @OA\RequestBody(
  *         required=true,
  *         @OA\JsonContent(
- *             required={"vendor_id", "booking_date", "booking_duration", "booking_start_time", "booking_end_time", "service_location", "services"},
- *             @OA\Property(property="vendor_id", type="integer", example=9),
- *             @OA\Property(property="booking_date", type="string", format="date", example="2025-08-10"),
- *             @OA\Property(property="booking_start_time", type="string", format="time", example="10:00:00"),
- *             @OA\Property(property="booking_end_time", type="string", format="time", example="11:00:00"),
- *             @OA\Property(property="service_location", type="string", example="Home"),
- *             @OA\Property(property="promocode_id", type="integer", example=2),
- *             @OA\Property(property="booking_for_someone", type="boolean", example=true),
- *             @OA\Property(property="someone_name", type="string", example="Jane Doe"),
- *             @OA\Property(property="someone_contact_no", type="string", example="0771234567"),
- *             @OA\Property(property="age", type="integer", example=28),
- *             @OA\Property(property="gender", type="string", example="Female"),
- *             @OA\Property(property="address", type="string", example="123 Street, City"),
- *             @OA\Property(property="remarks", type="string", example="Please be on time"),
+ *             type="object",
+ *             required={"vendor_id", "booking_date", "booking_start_time", "booking_end_time", "service_location", "services"},
+ *             @OA\Property(property="vendor_id", type="integer", example=3, description="ID of the vendor"),
+ *             @OA\Property(property="promocode_id", type="integer", nullable=true, example=null, description="Promo code ID (optional)"),
+ *             @OA\Property(property="booking_date", type="string", format="date", example="2025-09-20", description="Date of booking"),
+ *             @OA\Property(property="booking_start_time", type="string", format="time", example="10:30:00", description="Booking start time"),
+ *             @OA\Property(property="booking_end_time", type="string", format="time", example="11:30:00", description="Booking end time"),
+ *             @OA\Property(property="service_location", type="string", example="In Parlour", description="Service location"),
+ *             @OA\Property(property="booking_for_someone", type="integer", example=1, description="1 if booking for someone else, 0 if self"),
+ *             @OA\Property(property="someone_name", type="string", example="John Doe", description="Name of the person for whom booking is made"),
+ *             @OA\Property(property="someone_contact_no", type="string", example="+919876543210", description="Contact number of the person"),
+ *             @OA\Property(property="age", type="integer", example=28, description="Age of the person"),
+ *             @OA\Property(property="gender", type="string", example="Male", description="Gender of the person"),
+ *             @OA\Property(property="address", type="string", example="123 Main Street, Colombo", description="Address of the person"),
+ *             @OA\Property(property="remarks", type="string", example="Please handle carefully", description="Additional remarks"),
  *             @OA\Property(
  *                 property="services",
  *                 type="array",
+ *                 description="List of services for the booking",
  *                 @OA\Items(
- *                     @OA\Property(property="service_id", type="integer", example=3)
+ *                     type="object",
+ *                     required={"service_id"},
+ *                     @OA\Property(property="service_id", type="integer", example=12, description="ID of the service"),
  *                 )
  *             )
  *         )
  *     ),
+ *
  *     @OA\Response(
  *         response=200,
  *         description="Booking added successfully",
  *         @OA\JsonContent(
+ *             type="object",
  *             @OA\Property(property="status", type="boolean", example=true),
  *             @OA\Property(property="message", type="string", example="Booking added successfully"),
  *             @OA\Property(
  *                 property="data",
  *                 type="object",
- *                 @OA\Property(property="booking_id", type="integer", example=1),
- *                 @OA\Property(property="booking_ref_no", type="string", example="BMOAONKUIANLG_65bf2346dfab2"),
- *                 @OA\Property(property="vendor_id", type="integer", example=9),
+ *                 @OA\Property(property="booking_id", type="integer", example=101),
+ *                 @OA\Property(property="booking_ref_no", type="string", example="BMOAONKUIANLG_66fabc1234abcd"),
+ *                 @OA\Property(property="vendor_id", type="integer", example=3),
  *                 @OA\Property(property="total_amount", type="number", format="float", example=1500.00)
  *             )
  *         )
  *     ),
+ *
  *     @OA\Response(
  *         response=404,
  *         description="Vendor not found",
  *         @OA\JsonContent(
+ *             type="object",
  *             @OA\Property(property="status", type="boolean", example=false),
  *             @OA\Property(property="message", type="string", example="Vendor not found")
  *         )
  *     ),
+ *
  *     @OA\Response(
  *         response=500,
- *         description="Unable to add the booking now. Please try again later",
+ *         description="Unable to add booking",
  *         @OA\JsonContent(
+ *             type="object",
  *             @OA\Property(property="message", type="string", example="Unable to add the booking now. Please try again later")
  *         )
  *     )
