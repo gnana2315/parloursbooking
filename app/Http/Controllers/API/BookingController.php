@@ -432,7 +432,7 @@ class BookingController extends Controller
             'remarks' => $request->remarks,
         ];
 
-        $booking_details = $request->services;
+        $booking_details = $request->booking_details;
         $total_amount = 0;
         $total_duration = 0; // in minutes
 
