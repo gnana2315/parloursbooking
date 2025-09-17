@@ -483,8 +483,6 @@ class BookingController extends Controller
                     'booking_ref_no' => $addbooking->pbb_ref_no,
                     'vendor_id' => $addbooking->pbb_vendor_id,
                     'total_amount' => $total_amount,
-                    'total_duration' => $duration,
-                    'booking_end_time' => $endTime
                 ]
             ], 200);
         }
@@ -753,8 +751,6 @@ class BookingController extends Controller
                     'booking_ref_no' => $addbooking->pbb_ref_no,
                     'vendor_id' => $addbooking->pbb_vendor_id,
                     'total_amount' => $total_amount,
-                    'total_duration' => $duration,
-                    'booking_end_time' => $endTime
                 ]
             ], 200);
         }
