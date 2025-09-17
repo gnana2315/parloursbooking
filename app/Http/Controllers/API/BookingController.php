@@ -686,14 +686,6 @@ class BookingController extends Controller
             ], 404);
         }
 
-        $customer = customer::where('pbc_user_id', $user->pbu_id)->first();
-        if (!$customer) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Customer not found',
-            ], 404);
-        }
-
         $booking_details_generated = [
             'name' => $request->someone_name,
             'contact_no' => $request->someone_contact_no,
