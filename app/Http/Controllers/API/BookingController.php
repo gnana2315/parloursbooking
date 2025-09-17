@@ -694,7 +694,7 @@ class BookingController extends Controller
             ]
         );
 
-        $vendor = vendors::find($request->vendor_id);
+        $vendor = vendors::find($user->pbu_vid);
         if (!$vendor) {
             return response()->json([
                 'status' => false,
