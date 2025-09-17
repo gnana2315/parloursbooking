@@ -389,7 +389,7 @@ class BookingController extends Controller
             [
                 'vendor_id' => 'required',
                 'promocode_id' => 'nullable',
-                'booking_details' => 'required',
+                'booking_details.*.service_id' => 'required|integer',
                 'booking_date' => 'required',
                 'booking_start_time' => 'required|date_format:H:i:s',
                 'booking_end_time' => 'required|date_format:H:i:s',
@@ -398,7 +398,8 @@ class BookingController extends Controller
             [
                 'vendor_id.required' => 'Vendor ID is required',
                 'promocode_id.required' => 'Promo code ID is required',
-                'booking_details.required' => 'Booking details are required',
+                'booking_details.*.service_id.required' => 'Service ID is required',
+                'booking_details.*.service_id.integer' => 'Service ID must be an integer',
                 'booking_date.required' => 'Booking date is required',
                 'booking_start_time.required' => 'Booking start time is required',
                 'booking_end_time.required' => 'Booking end time is required',
