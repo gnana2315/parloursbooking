@@ -730,7 +730,7 @@ class BookingController extends Controller
         $duration = sprintf('%02d:%02d:00', $hours, $remainingMinutes);
 
         $addbooking = Booking::create([
-            'pbb_vendor_id' => $request->vendor_id,
+            'pbb_vendor_id' => $vendor->pbv_id,
             'pbb_customer_id' => null,
             'pbb_promo_id' => $request->promocode_id,
             'pbb_booking_details' => json_encode($booking_details_generated),
