@@ -516,8 +516,8 @@ class VendorController extends Controller
                     $filePath = $file->storeAs('uploads/vendors/'.$vendor->pbv_id, $fileName, 'public');
 
                     // full url for access (public disk: storage/app/public/uploads/...)
-                    // $fileUrl = Storage::disk('public')->url($filePath);
-                    $fileUrl = asset('storage/' . $filePath);
+                    $fileUrl = Storage::disk('public')->url($filePath);
+                    // $fileUrl = asset('storage/' . $filePath);
                     // dd($documents->pbrd_is_single);
                     if($documents->pbrd_is_single){
                         $document_update = vendorDocuments::updateOrCreate(
