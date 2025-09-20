@@ -90,7 +90,7 @@ Route::middleware(['auth:sanctum', 'validate.token'])->group(function () {
     Route::get('/getVendorDetails', [VendorController::class, 'getVendorDetails']);
 
     //common
-    Route::get('/vendors/{business_type_id}', [CommonController::class, 'getVendors' ]);
+    Route::get('/vendors/{service_for_id}', [CommonController::class, 'getVendors' ]);
     Route::get('/required-documents', [CommonController::class, 'getRequiredDocuments' ]);
     Route::get('/searchVendors', [CommonController::class, 'searchVendors' ]);
     Route::get('/serviceTypes', [CommonController::class, 'getServiceTypes' ]);

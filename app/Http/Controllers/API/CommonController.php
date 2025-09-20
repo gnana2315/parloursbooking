@@ -24,15 +24,15 @@ class CommonController extends Controller
 {
     /**
  * @OA\Get(
- *     path="/api/vendors/{vendor_type_id}",
- *     summary="Get vendors by vendor type",
- *     description="Returns list of active vendors for the specified vendor type",
+ *     path="/api/vendors/{service_for_id}",
+ *     summary="Get vendors by service for",
+ *     description="Returns list of active vendors for the specified service for",
  *     operationId="getVendors",
  *     tags={"Common"},
  *     @OA\Parameter(
- *         name="vendor_type_id",
+ *         name="service_for_id",
  *         in="path",
- *         description="ID of vendor type to filter vendors",
+ *         description="ID of service for to filter vendors",
  *         required=true,
  *         @OA\Schema(
  *             type="integer",
@@ -70,7 +70,7 @@ class CommonController extends Controller
  *     )
  * )
  */
-    public function getVendors($vendor_type_id, $token = null){
+    public function getVendors($service_for_id){
         try {
             $vendors = vendors::join('vendor_config', 'vendor_config.pbvc_vendorid', '=', 'vendor.pbv_id')
             // ->join('vendor_standard_availability', 'vendor_standard_availability.pbvsa_vendor_id', '=', 'vendor.pbv_id')
@@ -89,7 +89,7 @@ class CommonController extends Controller
             )
             ->where([
                 ['pbv_status', '=', 1],
-                ['pbv_vendortype', '=', $vendor_type_id],
+                ['pbv_servicefor', '=', $service_for_id],
             ])
             // ->groupBy('vendor.pbv_id')
             ->get();
