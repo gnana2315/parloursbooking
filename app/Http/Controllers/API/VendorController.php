@@ -479,6 +479,21 @@ class VendorController extends Controller
             return response()->json(['message' => 'Vendor not found'], 404);
         }
 
+        $vendorTypeRanges = [
+            1 => [1, 7],   // Business Vendor
+            2 => [8, 14],  // Therapist Vendor
+        ];
+
+        if (!array_key_exists($vendor->pbv_vendortype, $vendorTypeRanges)) {
+            return response()->json(['message' => 'Invalid vendor type'], 400);
+        }
+
+        list($minId, $maxId) = $vendorTypeRanges[$vendor->pbv_vendortype];
+
+        if ($request->document_id < $minId || $request->document_id > $maxId) {
+            return response()->json(['message' => 'This document does not belong to your vendor type'], 403);
+        }
+        
         $documents = requiredDocument::where('pbrd_vendor_type', $vendor->pbv_vendortype)->get();
         
         $request->validate(
