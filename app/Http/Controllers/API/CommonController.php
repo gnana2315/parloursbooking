@@ -317,29 +317,16 @@ class CommonController extends Controller
  * )
  */
     public function getVendorTypes(){
-        // $vendorTypes = vendorType::where('pbvt_status', 1)->get();
-        // if ($vendorTypes->isEmpty()) {
-        //     return response()->json([
-        //         'success' => false,
-        //         'message' => 'No vendor types found'
-        //     ], 404);
-        // }
-        // return response()->json([
-        //     'success' => true,
-        //     'data' => $vendorTypes
-        // ], 200);
-        $serviceFor = serviceFor::where('pbsf_status', 1)->get();
-
-        if ($serviceFor->isEmpty()) {
+        $vendorTypes = vendorType::where('pbvt_status', 1)->get();
+        if ($vendorTypes->isEmpty()) {
             return response()->json([
                 'success' => false,
-                'message' => 'No service for found'
+                'message' => 'No vendor types found'
             ], 404);
         }
-
         return response()->json([
             'success' => true,
-            'data' => $serviceFor
+            'data' => $vendorTypes
         ], 200);
     }
 
@@ -612,18 +599,31 @@ class CommonController extends Controller
     public function getBusinessCategory(){
         $user= auth()->user();
 
-        $businesscategorylists = businessCategory::where('pbbc_status', '=', 1)->get();
+        $serviceFor = serviceFor::where('pbsf_status', 1)->get();
 
-        if ($businesscategorylists->isEmpty()) {
+        if ($serviceFor->isEmpty()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Business Categories are not found'
+                'message' => 'No service for found'
             ], 404);
         }
+
         return response()->json([
             'success' => true,
-            'data' => $businesscategorylists
+            'data' => $serviceFor
         ], 200);
+        // $businesscategorylists = businessCategory::where('pbbc_status', '=', 1)->get();
+
+        // if ($businesscategorylists->isEmpty()) {
+        //     return response()->json([
+        //         'success' => false,
+        //         'message' => 'Business Categories are not found'
+        //     ], 404);
+        // }
+        // return response()->json([
+        //     'success' => true,
+        //     'data' => $businesscategorylists
+        // ], 200);
     }
 
     /**
