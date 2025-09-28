@@ -317,16 +317,29 @@ class CommonController extends Controller
  * )
  */
     public function getVendorTypes(){
-        $vendorTypes = vendorType::where('pbvt_status', 1)->get();
-        if ($vendorTypes->isEmpty()) {
+        // $vendorTypes = vendorType::where('pbvt_status', 1)->get();
+        // if ($vendorTypes->isEmpty()) {
+        //     return response()->json([
+        //         'success' => false,
+        //         'message' => 'No vendor types found'
+        //     ], 404);
+        // }
+        // return response()->json([
+        //     'success' => true,
+        //     'data' => $vendorTypes
+        // ], 200);
+        $serviceFor = serviceFor::where('pbsf_status', 1)->get();
+
+        if ($serviceFor->isEmpty()) {
             return response()->json([
                 'success' => false,
-                'message' => 'No vendor types found'
+                'message' => 'No service for found'
             ], 404);
         }
+
         return response()->json([
             'success' => true,
-            'data' => $vendorTypes
+            'data' => $serviceFor
         ], 200);
     }
 
