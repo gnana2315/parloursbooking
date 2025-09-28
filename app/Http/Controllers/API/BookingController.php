@@ -17,6 +17,9 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use App\Models\deviceToken;
+use App\Services\FirebaseService;
+use App\Services\OneSignalService;
 
 class BookingController extends Controller
 {
@@ -382,7 +385,7 @@ class BookingController extends Controller
  * )
  */
 
-    public function addOnlineBooking(Request $request){
+    public function addOnlineBooking(Request $request, OneSignalService $oneSignalService){
         $user = auth()->user();
 
         $request->validate(
@@ -481,6 +484,17 @@ class BookingController extends Controller
                     ]);
                 }
             }
+
+            $vendors_user_id = users::where('pbu_vid', $request->vendor_id)->first();
+            $checkUserDeviceToken = deviceToken::where('pbdt_user_id', $vendors_user_id->pbu_id)->first();
+
+            $oneSignalService->sendToUser($checkUserDeviceToken->pbdt_device_token, 'Booking Confirmed', 'Booking added successfully');
+
+            notification::create([
+                'pbn_user_id' => $user->pbu_id,
+                'pbn_title' => 'Booking Confirmed',
+                'pbn_message' => 'Booking added successfully',
+            ]);
 
             return response()->json([
                 'status' => true,
