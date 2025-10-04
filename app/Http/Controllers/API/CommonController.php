@@ -611,6 +611,8 @@ class CommonController extends Controller
                                     'pbbc_description' => $item->pbsf_description,
                                     'pbbc_image' => $item->pbsf_icon,
                                     'pbbc_status' => $item->pbsf_status,
+                                    'created_at' => $item->created_at,
+                                    'updated_at' => $item->updated_at,
                                 ];
                             });
 
