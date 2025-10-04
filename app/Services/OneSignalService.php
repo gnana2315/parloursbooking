@@ -27,14 +27,14 @@ class OneSignalService
         ]);
     }
 
-    public function sendToUser($deviceToken, $title, $message)
+    public function sendToUser($userID, $title, $message)
     {
         return Http::withHeaders([
             'Authorization' => 'Basic ' . $this->apiKey,
             'Content-Type'  => 'application/json',
         ])->post('https://onesignal.com/api/v1/notifications', [
             'app_id' => $this->appId,
-            'include_player_ids' => [$deviceToken],
+            'include_external_user_ids' => [$userID],
             'headings' => ['en' => $title],
             'contents' => ['en' => $message],
         ]);

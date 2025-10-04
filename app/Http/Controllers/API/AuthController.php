@@ -592,22 +592,31 @@ class AuthController extends Controller
         ];
         // dd($finalData);
         
-        $checkUserDeviceToken = deviceToken::where('pbdt_user_id', $user->pbu_id);
+        // $checkUserDeviceToken = deviceToken::where('pbdt_user_id', $user->pbu_id);
         // dd($checkUserDeviceToken->pbdt_device_token);
-        if($checkUserDeviceToken->pbdt_device_token == null){
-            deviceToken::create([
-                'pbdt_user_id' => $user->pbu_id,
-                'pbdt_device_token' => $request->device_token,
-            ]);
-        }else{
-            $oneSignalService->sendToUser($checkUserDeviceToken->pbdt_device_token, 'Welcome!', 'Your profile has been created.');
+        // if($checkUserDeviceToken->pbdt_device_token == null){
+        //     deviceToken::create([
+        //         'pbdt_user_id' => $user->pbu_id,
+        //         'pbdt_device_token' => $request->device_token,
+        //     ]);
+        // }else{
+        //     $oneSignalService->sendToUser($user->pbu_id, 'Welcome!', 'Your profile has been created.');
 
-            notification::create([
-                'pbn_user_id' => $user->pbu_id,
-                'pbn_title' => 'Welcome!',
-                'pbn_message' => 'Your profile has been created.',
-            ]);
-        }
+        //     notification::create([
+        //         'pbn_user_id' => $user->pbu_id,
+        //         'pbn_title' => 'Welcome!',
+        //         'pbn_message' => 'Your profile has been created.',
+        //     ]);
+        // }
+        $oneSignalService->sendToUser($user->pbu_id, 'Welcome!', 'Your profile has been created.');
+
+        notification::create([
+            'pbn_user_id' => $user->pbu_id,
+            'pbn_type' => 'specific',
+            'pbn_title' => 'Welcome!',
+            'pbn_message' => 'Your profile has been created.',
+            'pbn_is_read' => 0,
+        ]);
 
         $token_text = $user->pbu_id.'_user_login_session';
         $token = $user->createToken($token_text)->plainTextToken;
