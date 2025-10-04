@@ -1440,7 +1440,7 @@ class VendorController extends Controller
         //             ['vendor.pbv_id', $vendor_id], ['vendor.pbv_status', 1]
         //         ])
         //         ->get(); 
-        $vendor_results = vendors::with(['config', 'city', 'availability', 'vendorDocuments'])
+        $vendor_results = vendors::with(['city', 'availability', 'vendorDocuments'])
             ->where('pbv_id', $user->pbu_vid)
             ->where('pbv_status', 1)
             ->first();      
