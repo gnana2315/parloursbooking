@@ -600,7 +600,6 @@ class CommonController extends Controller
      * )
      */
     public function getBusinessCategory(){
-        dd('test');
         $user= auth()->user();
 
         $serviceFor = serviceFor::where('pbsf_status', 1)->get();
