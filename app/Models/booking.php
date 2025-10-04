@@ -37,6 +37,8 @@ class booking extends Model
         'pbb_ref_no',
         'pbb_type',
         'pbb_service_location',
+        'pbb_total_amount',
+        'pbb_discounts',
         'pbb_contact_no',
         'pbb_status',
         'created_at',

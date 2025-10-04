@@ -12,7 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('bookings', function (Blueprint $table) {
-            $table->string('pbb_remarks')->nullable();
+            $table->float('pbb_total_amount')->default(0)->after('pbb_service_location');
+            $table->float('pbb_discounts')->default(0)->after('pbb_total_amount');
         });
     }
 
@@ -22,7 +23,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('bookings', function (Blueprint $table) {
-            $table->dropColumn('pbb_remarks');
+            $table->dropColumn('pbb_total_amount');
+            $table->dropColumn('pbb_discounts');
         });
     }
 };

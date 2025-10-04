@@ -10,6 +10,7 @@ use App\Models\bookingDetail;
 use App\Models\vendorStandardAvailability;
 use App\Models\vendorSpecialCloses;
 use App\Models\services;
+use App\Models\paymentTransection;
 use Validator;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
@@ -464,6 +465,8 @@ class BookingController extends Controller
             'pbb_ref_no' => uniqid('BOONOLKIINNEG_'),
             'pbb_type' => 'Online',
             'pbb_service_location' => $request->service_location,
+            'pbb_total_amount' => $total_amount,
+            'pbb_discounts' => 0,
             'pbb_contact_no' => ($request->booking_for_someone == 1) ? $request->someone_contact_no : $customer->customer_contact_no,
             'pbb_status' => 1
         ]);
@@ -496,6 +499,29 @@ class BookingController extends Controller
                 'pbn_message' => 'Booking added successfully',
             ]);
 
+            // ✅ Add Payment Transaction
+            $platform_fee_percentage = 10; // example: 10% commission
+            $platform_fee = ($total_amount * $platform_fee_percentage) / 100;
+            $vendor_amount = $total_amount - $platform_fee;
+
+            $payment = paymentTransection::create([
+                'pbpt_transaction_id'   => uniqid('TXN_'), // unique transaction ID
+                'pbpt_booking_id'       => $addbooking->pbb_id,
+                'pbpt_vendor_id'        => $request->vendor_id,
+                'pbpt_customer_id'      => $customer->pbc_id,
+                'pbpt_payment_method'   => 'Online', // fallback
+                'pbpt_total_amount'     => $total_amount,
+                'pbpt_discount_amount'  => 0, // you can add logic if promo applied
+                'pbpt_final_amount'     => $total_amount,
+                'pbpt_platform_fee'     => $platform_fee,
+                'pbpt_vendor_amount'    => $vendor_amount,
+                'pbpt_payment_response' => null, // store gateway response if online
+                'pbpt_payment_ref_no'   => uniqid('PAYREF_'),
+                'pbpt_description'      => 'Payment for booking #' . $addbooking->pbb_ref_no,
+                'pbpt_status'           => 1, // 1 = success, 0 = pending, etc.
+                'pbpt_remarks'          => 'Auto-generated payment record'
+            ]);
+
             return response()->json([
                 'status' => true,
                 'message' => 'Booking added successfully',
@@ -507,6 +533,8 @@ class BookingController extends Controller
                 ]
             ], 200);
         }
+
+        
 
         return response()->json([
             'message' => "Unable to add the booking now. Please try again later",

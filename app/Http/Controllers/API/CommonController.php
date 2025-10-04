@@ -14,6 +14,7 @@ use App\Models\cities;
 use App\Models\deviceToken;
 use App\Models\requiredDocument;
 use App\Models\vendorDocuments;
+use App\Models\paymentTransection;
 use App\Services\DialogESMSService;
 
 use App\Http\Controllers\Controller;
@@ -1235,28 +1236,25 @@ class CommonController extends Controller
             ], 404);
         }
 
-        // $bookingsCount = bookings::where('pbb_vendor_id', $vendor->pbv_id)->count();
-        $bookingsCount = 23;
+        $bookingsCount = bookings::where('pbb_vendor_id', $vendor->pbv_id)->count();
+        // $bookingsCount = 23;
 
-        // $earnedAmount = bookings::join('booking_details', 'bookings.pbb_id', '=', 'booking_details.pbbd_booking_id')
-        //     ->where('pbb_vendor_id', $vendor->pbv_id)
-        //     ->sum('pbb_amount');
+        $earnedAmount = bookings::where('pbb_vendor_id', $vendor->pbv_id)
+            ->sum('pbb_total_amount');
 
-        $earnedAmount = 1575;
+        // $earnedAmount = 1575;
         $earnedAmount_formatted_currency = number_format($earnedAmount, 2, '.', ',');
 
-        // $paidAmount = bookings::join('booking_details', 'bookings.pbb_id', '=', 'booking_details.pbbd_booking_id')
-        //     ->where('pbb_vendor_id', $vendor->pbv_id)
-        //     ->sum('pbb_amount');
+        $paidAmount = bookings::whereIn(['pbb_vendor_id', $vendor->pbv_id], ['pbb_payment_status', 1])
+            ->sum('pbb_total_amount');
 
-        $paidAmount = 645;
+        // $paidAmount = 645;
         $paidAmount_formatted_currency = number_format($paidAmount, 2, '.', ',');
 
-        // $pendingAmount = bookings::join('booking_details', 'bookings.pbb_id', '=', 'booking_details.pbbd_booking_id')
-        //     ->where('pbb_vendor_id', $vendor->pbv_id)
-        //     ->sum('pbb_amount');
+        $pendingAmount = bookings::whereIn(['pbb_vendor_id', $vendor->pbv_id], ['pbb_payment_status', 0])
+            ->sum('pbb_total_amount');
 
-        $pendingAmount = 930;
+        // $pendingAmount = 930;
         $pendingAmount_formatted_currency = number_format($pendingAmount, 2, '.', ',');
 
         return response()->json([
