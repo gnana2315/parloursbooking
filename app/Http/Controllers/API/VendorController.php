@@ -1441,8 +1441,7 @@ class VendorController extends Controller
         //         ])
         // 
         // $vendor_results = vendors::with(['city', 'availability', 'vendorDocuments'])
-        $vendor_results = vendors::with(['city'])
-            ->where('pbv_id', $user->pbu_vid)
+        $vendor_results = vendors::where('pbv_id', $user->pbu_vid)
             ->where('pbv_status', 1)
             ->first();    
         dd($vendor_results);
