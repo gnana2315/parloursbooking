@@ -1262,14 +1262,16 @@ class CommonController extends Controller
         // $earnedAmount = 1575;
         $earnedAmount_formatted_currency = number_format($earnedAmount, 2, '.', ',');
 
-        $paidAmount = booking::whereIn(['pbb_vendor_id', $vendor->pbv_id], ['pbb_status', 1])
-            ->sum('pbb_total_amount');
+        $paidAmount = booking::where('pbb_vendor_id', $vendor->pbv_id)
+                            ->where('pbb_status', 1)
+                            ->sum('pbb_total_amount');
 
         // $paidAmount = 645;
         $paidAmount_formatted_currency = number_format($paidAmount, 2, '.', ',');
 
-        $pendingAmount = booking::whereIn(['pbb_vendor_id', $vendor->pbv_id], ['pbb_status', 0])
-            ->sum('pbb_total_amount');
+        $pendingAmount = booking::where('pbb_vendor_id', $vendor->pbv_id)
+                            ->where('pbb_status', 0)
+                            ->sum('pbb_total_amount');
 
         // $pendingAmount = 930;
         $pendingAmount_formatted_currency = number_format($pendingAmount, 2, '.', ',');
