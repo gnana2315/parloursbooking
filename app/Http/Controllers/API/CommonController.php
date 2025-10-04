@@ -14,6 +14,7 @@ use App\Models\cities;
 use App\Models\deviceToken;
 use App\Models\requiredDocument;
 use App\Models\vendorDocuments;
+use App\Models\bookings;
 use App\Models\paymentTransection;
 use App\Services\DialogESMSService;
 
