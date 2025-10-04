@@ -608,13 +608,16 @@ class AuthController extends Controller
         //         'pbn_message' => 'Your profile has been created.',
         //     ]);
         // }
-        $oneSignalService->sendToUser($user->pbu_id, 'Welcome!', 'Your profile has been created.');
+        $notification_title = 'Welcome!';
+        $notification_message = 'Login Successfully!';
+
+        $oneSignalService->sendToUser($user->pbu_id, $notification_title, $notification_message);
 
         notification::create([
             'pbn_user_id' => $user->pbu_id,
             'pbn_type' => 'specific',
-            'pbn_title' => 'Welcome!',
-            'pbn_message' => 'Your profile has been created.',
+            'pbn_title' => $notification_title,
+            'pbn_message' => $notification_message,
             'pbn_is_read' => 0,
         ]);
 
