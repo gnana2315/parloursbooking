@@ -1439,15 +1439,9 @@ class VendorController extends Controller
         //         ->where([
         //             ['vendor.pbv_id', $vendor_id], ['vendor.pbv_status', 1]
         //         ])
-        //         ->get(); 
-        dd(
-            vendors::with(['city', 'availability', 'vendorDocuments'])
-                ->where('pbv_id', $user->pbu_vid)
-                ->where('pbv_status', 1)
-                ->toSql(),
-            [$user->pbu_vid]
-        );
-        $vendor_results = vendors::with(['city', 'availability', 'vendorDocuments'])
+        // 
+        // $vendor_results = vendors::with(['city', 'availability', 'vendorDocuments'])
+        $vendor_results = vendors::with(['city'])
             ->where('pbv_id', $user->pbu_vid)
             ->where('pbv_status', 1)
             ->first();    
