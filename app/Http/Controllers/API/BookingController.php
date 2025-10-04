@@ -488,15 +488,19 @@ class BookingController extends Controller
                 }
             }
 
-            $vendors_user_id = users::where('pbu_vid', $request->vendor_id)->first();
-            $checkUserDeviceToken = deviceToken::where('pbdt_user_id', $vendors_user_id->pbu_id)->first();
+            // $vendors_user_id = users::where('pbu_vid', $request->vendor_id)->first();
+            // $checkUserDeviceToken = deviceToken::where('pbdt_user_id', $vendors_user_id->pbu_id)->first();
+            $notification_title = 'Booking Confirmed!';
+            $notification_message = 'Booking added successfully!. Your booking reference no:'. $addbooking->pbb_ref_no;
 
-            $oneSignalService->sendToUser($checkUserDeviceToken->pbdt_device_token, 'Booking Confirmed', 'Booking added successfully');
+            $oneSignalService->sendToUser($vendors_user_id->pbu_id, $notification_title, $notification_message);
 
             notification::create([
                 'pbn_user_id' => $user->pbu_id,
-                'pbn_title' => 'Booking Confirmed',
-                'pbn_message' => 'Booking added successfully',
+                'pbn_type' => 'specific',
+                'pbn_title' => $notification_title,
+                'pbn_message' => $notification_message,
+                'pbn_is_read' => 0,
             ]);
 
             // ✅ Add Payment Transaction
