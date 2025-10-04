@@ -1443,8 +1443,7 @@ class VendorController extends Controller
         $vendor_results = vendors::with(['city', 'availability', 'vendorDocuments'])
             ->where('pbv_id', $user->pbu_vid)
             ->where('pbv_status', 1)
-            ->first();
-        dd($user->pbu_vid);    
+            ->get();   
         dd($vendor_results);
         if (!$vendor_results) {
             return response()->json(['message' => 'Vendor not found'], 404);
