@@ -649,13 +649,53 @@ class AuthController extends Controller
      *      )
      * )
      */
-    public function userLogout(Request $request){
-        $request->user()->tokens()->delete(); // Remove all tokens
+    public function userLogout(Request $request)
+    {
+        $user = $request->user();
+
+        if (!$user) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Unauthenticated. Invalid or expired token.',
+            ], 401);
+        }
+
+        $currentToken = $request->bearerToken(); // raw JWT/Personal Access Token
+
+        if (!$currentToken) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Token not provided',
+            ], 400);
+        }
+
+        // Get token instance from DB (works if you’re using Sanctum / Passport)
+        $token = $user->tokens()->where('id', $user->currentAccessToken()->id ?? null)->first();
+
+        if (!$token) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Invalid or expired token',
+            ], 401);
+        }
+
+        // Optional: check expiry if you’re using `expires_at` field in tokens table
+        if ($token->expires_at && now()->greaterThan($token->expires_at)) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Token has expired',
+            ], 401);
+        }
+
+        // ✅ Delete current token only
+        $token->delete();
 
         return response()->json([
-            'message' => 'Logged out successfully'
+            'status'  => true,
+            'message' => 'Logged out successfully',
         ], 200);
-    }    
+    }
+    
 
     /**
      * @OA\Post(
