@@ -602,7 +602,17 @@ class CommonController extends Controller
     public function getBusinessCategory(){
         $user= auth()->user();
 
-        $serviceFor = serviceFor::where('pbsf_status', 1)->get();
+        $serviceFor = serviceFor::where('pbsf_status', 1)
+                                ->get()
+                                ->map(function ($item) {
+                                return [
+                                    'pbbc_id' => $item->pbsf_id,
+                                    'pbbc_name' => $item->pbsf_name,
+                                    'pbbc_description' => $item->pbsf_description,
+                                    'pbbc_image' => $item->pbsf_icon,
+                                    'pbbc_status' => $item->pbsf_status,
+                                ];
+                            });
 
         if ($serviceFor->isEmpty()) {
             return response()->json([
