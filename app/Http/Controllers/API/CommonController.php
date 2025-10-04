@@ -867,33 +867,49 @@ class CommonController extends Controller
     public function notificationlist()
     {
         $user = auth()->user();
-        // $notifications = notification::where('pbn_user_id', $user->pbu_id)->orderBy('created_at', 'desc')->get();
-        $notifications = [
-            [
-                "id" => 1,
-                "title" => "Booking Confirmed",
-                "message" => "Your booking at Glow Beauty Parlour is confirmed for 20 June at 3:00 PM.",
-                "type" => "booking",
-                "is_read" => false,
-                "created_at" => "2025-06-17 10:30:00"
-            ],
-            [
-                "id" => 2,
-                "title" => "New Promo Code",
-                "message" => "Get 15% off on your next booking with code GLOW15!",
-                "type" => "promo",
-                "is_read" => false,
-                "created_at" => "2025-06-16 08:45:00"
-            ],
-            [
-                "id" => 3,
-                "title" => "Profile Updated",
-                "message" => "Your profile information has been successfully updated.",
-                "type" => "profile",
-                "is_read" => true,
-                "created_at" => "2025-06-15 14:20:00"
-            ]
-        ];
+        $notifications = notification::where(function ($q) use ($user) {
+                            $q->where('pbn_user_id', $user->pbu_id)
+                            ->orWhere('pbn_type', 'general');
+                        })
+                        ->orderBy('created_at', 'desc')
+                        ->get()
+                        ->map(function ($item) {
+                            return [
+                                'id'         => $item->pbn_id,
+                                'title'      => $item->pbn_title,
+                                'message'    => $item->pbn_message,
+                                'type'       => $item->pbn_type,
+                                'is_read'    => (bool) $item->pbn_is_read,
+                                'created_at' => $item->created_at->format('Y-m-d H:i:s'),
+                            ];
+                        });
+        
+        // $notifications = [
+        //     [
+        //         "id" => 1,
+        //         "title" => "Booking Confirmed",
+        //         "message" => "Your booking at Glow Beauty Parlour is confirmed for 20 June at 3:00 PM.",
+        //         "type" => "booking",
+        //         "is_read" => false,
+        //         "created_at" => "2025-06-17 10:30:00"
+        //     ],
+        //     [
+        //         "id" => 2,
+        //         "title" => "New Promo Code",
+        //         "message" => "Get 15% off on your next booking with code GLOW15!",
+        //         "type" => "promo",
+        //         "is_read" => false,
+        //         "created_at" => "2025-06-16 08:45:00"
+        //     ],
+        //     [
+        //         "id" => 3,
+        //         "title" => "Profile Updated",
+        //         "message" => "Your profile information has been successfully updated.",
+        //         "type" => "profile",
+        //         "is_read" => true,
+        //         "created_at" => "2025-06-15 14:20:00"
+        //     ]
+        // ];
         $notificationlist = collect($notifications);
         if ($notificationlist->isEmpty()) {
             return response()->json([

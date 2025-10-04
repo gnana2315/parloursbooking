@@ -21,6 +21,7 @@ class notification extends Model
     protected $fillable = [
         'pbn_id',
         'pbn_user_id',
+        'pbn_type',
         'pbn_title',
         'pbn_message',
         'pbn_is_read',
