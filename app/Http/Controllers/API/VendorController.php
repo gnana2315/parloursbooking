@@ -39,7 +39,7 @@ class VendorController extends Controller
                 [
                     'business_name' => 'required',
                     'address' => 'required',
-                    'city' => 'required',
+                    'city_id' => 'required',
                     'longatitude' => 'required',
                     'latitude' => 'required',
                     'email' => 'email|unique:vendor,pbv_email'
@@ -48,7 +48,7 @@ class VendorController extends Controller
                 [
                     'business_name.required' => 'Parlour name is required',
                     'address.required' => 'Address is required',
-                    'city.required' => 'City is required',
+                    'city_id.required' => 'City is required',
                     'longatitude.required' => 'Location is required',
                     'latitude.required' => 'Location is required',
                     'email.email' => 'Email must be a valid email address',
@@ -62,14 +62,14 @@ class VendorController extends Controller
                 [
                     'business_category' => 'required',
                     'address' => 'required',
-                    'city' => 'required',
+                    'city_id' => 'required',
                     'email' => 'email|unique:vendor,pbv_email',
                     'nic_no' => 'required'
                 ],
                 [
                     'business_category.required' => 'Business Category is required',
                     'address.required' => 'Address is required',
-                    'city.required' => 'City is required',
+                    'city_id.required' => 'City is required',
                     'email.email' => 'Email must be a valid email address',
                     'email.unique' => 'Email already exists',
                     'nic_no.required' => 'NIC No is required'
@@ -86,7 +86,7 @@ class VendorController extends Controller
             'pbv_display_name' => ($request->business_type == '1') ? $request->display_name : $therapist_name,
             'pbv_brno' => ($request->business_type == '1') ? $request->br_no : $request->nic_no,
             'pbv_address' => $request->address,
-            'pbv_city' => $request->city,
+            'pbv_city' => $request->city_id,
             'pbv_longatitude' => ($request->business_type == '1') ? $request->longatitude : null,
             'pbv_latitude' => ($request->business_type == '1') ? $request->latitude : null,
             'pbv_email' => $request->email,
@@ -174,7 +174,7 @@ class VendorController extends Controller
                 [
                     'business_name' => 'required',
                     'address' => 'required',
-                    'city' => 'required',
+                    'city_id' => 'required',
                     'longatitude' => 'required',
                     'latitude' => 'required',
                     'email' => 'email|unique:vendor,pbv_email'
@@ -183,7 +183,7 @@ class VendorController extends Controller
                 [
                     'business_name.required' => 'Parlour name is required',
                     'address.required' => 'Address is required',
-                    'city.required' => 'City is required',
+                    'city_id.required' => 'City is required',
                     'longatitude.required' => 'Location is required',
                     'latitude.required' => 'Location is required',
                     'email.email' => 'Email must be a valid email address',
@@ -203,7 +203,7 @@ class VendorController extends Controller
             'pbv_short_description' => $request->short_description,
             'pbv_brno' => $request->br_no,
             'pbv_address' => $request->address,
-            'pbv_city' => $request->city,
+            'pbv_city' => $request->city_id,
             'pbv_longatitude' => $request->longatitude,
             'pbv_latitude' => $request->latitude,
             'pbv_email' => $request->email,
@@ -295,7 +295,7 @@ class VendorController extends Controller
             $request->validate(
                 [
                     'address' => 'required',
-                    'city' => 'required',
+                    'city_id' => 'required',
                     'service_area' => 'required',
                     'email' => 'email|unique:vendor,pbv_email',
                     'contact_no' => 'required',
@@ -303,7 +303,7 @@ class VendorController extends Controller
                 ],
                 [
                     'address.required' => 'Address is required',
-                    'city.required' => 'City is required',
+                    'city_id.required' => 'City is required',
                     'service_area.required' => 'Service area is required',
                     'email.email' => 'Email must be a valid email address',
                     'email.unique' => 'Email already exists',
@@ -323,7 +323,7 @@ class VendorController extends Controller
             'pbv_short_description' => $request->short_bio ?? null,
             'pbv_brno' => $request->nic_no,
             'pbv_address' => $request->address,
-            'pbv_city' => $request->city,
+            'pbv_city' => $request->city_id,
             'pbv_therapist_service_area' => $request->service_area ?? null,
             'pbv_longatitude' => null,
             'pbv_latitude' => null,
