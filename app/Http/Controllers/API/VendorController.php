@@ -124,13 +124,13 @@ class VendorController extends Controller
  *     @OA\RequestBody(
  *         required=true,
  *         @OA\JsonContent(
- *             required={"business_name", "address", "city", "longatitude", "latitude", "email"},
+ *             required={"business_name", "address", "city_id", "longatitude", "latitude", "email"},
  *             @OA\Property(property="business_name", type="string", example="Beauty Parlour"),
  *             @OA\Property(property="display_name", type="string", example="Parlour Deluxe"),
  *             @OA\Property(property="short_description", type="string", example="A premium beauty parlour offering bridal makeup"),
  *             @OA\Property(property="br_no", type="string", example=null, nullable=true, description="Business Registration No (optional for parlour)"),
  *             @OA\Property(property="address", type="string", example="123 Main Street"),
- *             @OA\Property(property="city", type="string", example="Colombo"),
+ *             @OA\Property(property="city_id", type="string", example="Colombo"),
  *             @OA\Property(property="longatitude", type="number", format="float", example=79.8612),
  *             @OA\Property(property="latitude", type="number", format="float", example=6.9271),
  *             @OA\Property(property="email", type="string", format="email", example="parlour@example.com"),
@@ -242,12 +242,12 @@ class VendorController extends Controller
  *     @OA\RequestBody(
  *         required=true,
  *         @OA\JsonContent(
- *             required={"address","city","service_area","email","contact_no","nic_no"},
+ *             required={"address","city_id","service_area","email","contact_no","nic_no"},
  *             @OA\Property(property="display_name", type="string", example="Therapist John"),
  *             @OA\Property(property="short_bio", type="string", example="Certified therapist with 5 years of experience."),
  *             @OA\Property(property="nic_no", type="string", example="901234567V"),
  *             @OA\Property(property="address", type="string", example="45 Park Lane"),
- *             @OA\Property(property="city", type="string", example="Kandy"),
+ *             @OA\Property(property="city_id", type="string", example="Kandy"),
  *             @OA\Property(property="service_area", type="string", example="Colombo, Kandy"),
  *             @OA\Property(property="email", type="string", format="email", example="therapist@example.com"),
  *             @OA\Property(property="contact_no", type="string", example="+94712345678")
