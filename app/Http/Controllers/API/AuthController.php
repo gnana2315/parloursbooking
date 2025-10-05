@@ -69,7 +69,10 @@ class AuthController extends Controller
     public function userRegisterMobileNo(Request $request){
         User::where('pbu_mobileno', $request->phone_no)
             ->where('pbu_usertype', $request->user_type)
-            ->whereNull('pbu_mobileno_verified_at')
+            ->where(function ($query) {
+                $query->whereNull('pbu_mobileno_verified_at')
+                    ->orWhere('password', NULL);
+            })
             ->delete();
         $request->validate(
             [
