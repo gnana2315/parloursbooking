@@ -7,6 +7,7 @@ use App\Models\vendorDocuments;
 use App\Models\vendorStandardAvailability;
 use App\Models\vendorConfig;
 use App\Models\cities;
+use App\Models\booking;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -83,5 +84,9 @@ class vendors extends Model
     public function city()
     {
         return $this->belongsTo(cities::class, 'pbv_city', 'pbc_cid');
+    }
+
+    public function booking(){
+        return $this->hasMany(booking::class, 'pbb_vendor_id', 'pbv_id');
     }
 }

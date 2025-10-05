@@ -11,6 +11,10 @@ use App\Models\vendorStandardAvailability;
 use App\Models\vendorSpecialCloses;
 use App\Models\services;
 use App\Models\paymentTransection;
+use App\Models\vendorPayouts;
+use App\Models\vendorPayoutItems;
+use App\Models\vendorPayoutHistory;
+
 use Validator;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
@@ -526,6 +530,24 @@ class BookingController extends Controller
                 'pbpt_remarks'          => 'Auto-generated payment record'
             ]);
 
+            $vendorPayout = vendorPayouts::firstOrCreate(
+                ['pbvp_vendor_id' => $request->vendor_id],
+                ['pbvp_total_earned' => 0, 'pbvp_total_paid' => 0, 'pbvp_total_due' => 0]
+            );
+
+            $vendorPayout->increment('pbvp_total_earned', $vendor_amount);
+            $vendorPayout->increment('pbvp_total_due', $vendor_amount);
+
+            $payoutItem = vendorPayoutItems::create([
+                'pbvpi_payout_id'   => $vendorPayout->pbvp_id,
+                'pbvpi_booking_id'  => $addbooking->pbb_id,
+                'pbvpi_payment_id'  => $payment->pbpt_id,
+                'pbvpi_amount'      => $total_amount,
+                'pbvpi_platform_fee'=> $platform_fee,
+                'pvpi_vendor_amount'=> $vendor_amount,
+                'pvpi_status'      => '0'
+            ]);
+
             return response()->json([
                 'status' => true,
                 'message' => 'Booking added successfully',
@@ -538,7 +560,14 @@ class BookingController extends Controller
             ], 200);
         }
 
-        
+        vendorPayoutHistory::create([
+            'pbvph_vendor_id' => $request->vendor_id,
+            'pbvph_amount' => $vendor_amount,
+            'pbvph_method' => 'system',
+            'pbvph_reference' => $payment->pbpt_transaction_id,
+            'pbvph_description' => 'Booking #' . $addbooking->pbb_ref_no . ' recorded as pending payout',
+            'pbvph_status' => '0'
+        ]);
 
         return response()->json([
             'message' => "Unable to add the booking now. Please try again later",
@@ -1117,6 +1146,88 @@ class BookingController extends Controller
             'status' => true,
             'message' => 'Booking Details retrieved successfully',
             'data' => $booking_details
+        ], 200);
+    }
+
+    public function vendorPayouts()
+    {
+        $user = auth()->user();
+
+        $request->validate([
+            'payout_item_ids' => 'required|array', // e.g., [1, 2, 3]
+            'payout_item_ids.*' => 'integer|exists:vendor_payout_items,pbvpi_id',
+            'paying_amount' => 'required|numeric|min:0',
+            'payment_method' => 'required|string',
+        ]);
+
+        $vendor = vendors::with('booking')->where('pbv_id', $user->pbu_vid)->first();
+        if (!$vendor) {
+            return response()->json(['message' => 'Vendor not found'], 404);
+        }
+
+        $payouts = vendorPayouts::where('pbvp_vendor_id', $vendor->pbv_id)->first();
+        if (!$payouts) {
+            return response()->json(['message' => 'No payout records found'], 404);
+        }
+
+        $amountToPay = $request->paying_amount;
+        $payment_moethod = $request->payment_method; // e.g., 'bank', 'paypal', etc.
+        $selectedItemIds = $request->payout_item_ids;
+
+        $selectedItems = vendorPayoutItems::whereIn('pbvpi_id', $selectedItemIds)
+                                            ->where('pbvpi_status', '0')
+                                            ->get();
+
+        $totalSelectedAmount = $selectedItems->sum('pbvpi_vendor_amount');
+
+        // ✅ Validation: the amount paid must not exceed due total
+        if ($amountToPay > $vendorPayout->pbvp_total_due) {
+            return response()->json(['message' => 'Paying amount exceeds total due'], 422);
+        }
+
+        if ($totalSelectedAmount <= 0) {
+            return response()->json(['message' => 'No valid payout items found to process'], 404);
+        }
+
+        if ($amountToPay > 0) {
+            $payoutHistory = vendorPayoutHistory::create([
+                'pbvph_vendor_id' => $vendorId,
+                'pbvph_amount' => $amountToPay,
+                'pbvph_method' => $payment_moethod,
+                'pbvph_reference' => 'PAYOUT_' . uniqid(),
+                'pbvph_description' => 'Vendor payout processed',
+                'pbvph_status' => '1'
+            ]);
+
+            // Update vendor payout totals
+            $vendorPayout->increment('pbvp_total_paid', $amountToPay);
+            $vendorPayout->decrement('pbvp_total_due', $amountToPay);
+
+            // Mark related payout items as paid
+            vendorPayoutItems::whereIn('pbvpi_id', $selectedItemIds)
+                ->update(
+                    [
+                        'pbvpi_status' => '1',
+                        'updated_at' => now(),
+                        'pbvpi_payout_history_id' => $payoutHistory->pbvph_id
+                    ]
+                );
+        }
+
+        $payoutItems = vendorPayoutItems::where('pbvpi_payout_id', $payouts->pbvp_id)
+            ->with(['booking', 'payment'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Payout records retrieved successfully',
+            'data' => [
+                'total_earned' => $payouts->pbvp_total_earned,
+                'total_paid' => $payouts->pbvp_total_paid,
+                'total_due' => $payouts->pbvp_total_due,
+                'payout_items' => $payoutItems
+            ]
         ], 200);
     }
 }

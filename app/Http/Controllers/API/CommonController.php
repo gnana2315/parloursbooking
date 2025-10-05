@@ -1201,9 +1201,8 @@ class CommonController extends Controller
         // $earnedAmount = 1575;
         $earnedAmount_formatted_currency = number_format($earnedAmount, 2, '.', ',');
 
-        $paidAmount = booking::where('pbb_vendor_id', $vendor->pbv_id)
-                            ->where('pbb_status', 1)
-                            ->sum('pbb_total_amount');
+        $paidAmount = paymentTransection::where('pbpt_vendor_id', $vendor->pbv_id)
+                            ->sum('pbpt_vendor_amount');
 
         // $paidAmount = 645;
         $paidAmount_formatted_currency = number_format($paidAmount, 2, '.', ',');

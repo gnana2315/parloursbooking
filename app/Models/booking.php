@@ -54,12 +54,15 @@ class booking extends Model
     public function customer() {
         return $this->belongsTo(Customer::class, 'pbb_customer_id', 'pbc_id');
     }
+
     public function vendors(){
         return $this->belongsTo(vendors::class, 'pbb_vendor_id');
     }
+
     public function bookingDetails(){
         return $this->hasMany(bookingDetail::class, 'pbbd_booking_id', 'pbb_id');
     }
+    
     public function ratings(){
         return $this->hasMany(ratings::class, 'pbr_booking_id');
     }
