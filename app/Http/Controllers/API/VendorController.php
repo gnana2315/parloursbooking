@@ -15,6 +15,10 @@ use App\Models\services;
 use App\Models\customer;
 use App\Models\requiredDocument;
 use App\Models\vendorDocuments;
+use App\Models\paymentTransection;
+use App\Models\booking;
+use App\Models\vendorPayouts;
+
 use Validator;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -1548,12 +1552,21 @@ class VendorController extends Controller
             return response()->json(['message' => 'Vendor not found'], 404);
         }
 
-        // $startOfWeek = now()->startOfWeek();
-        // $endOfWeek = now()->endOfWeek();
+        $startOfWeek = now()->startOfWeek();
+        $endOfWeek = now()->endOfWeek();
 
-        // $earnings = bookings::where('pbv_vendor_id', $vendor->pbv_id)
-        //     ->whereBetween('pb_bk_date', [$startOfWeek, $endOfWeek])
-        //     ->sum('pb_bk_total');
+        $earnings = paymentTransaction::with(['booking','payoutItems'])
+            ->where('pbpt_vendor_id', $vendor->pbv_id)
+            ->whereBetween('pbb_booking_date', [$startOfWeek, $endOfWeek])
+            ->get()
+            ->map(function ($transaction) {
+                return [
+                    'date' => $transaction->created_at->format('Y-m-d'),
+                    'booking_ref_no' => $transaction->pbb_ref_no,
+                    'amount' => $transaction->pbpt_vendor_amount,
+                    'status' => ($transaction->pbvpi_status == 1) ? 'Paid' : 'Unpaid',
+                ];
+            })->toArray();
 
         // return response()->json([
         //     'success' => true,
@@ -1563,38 +1576,38 @@ class VendorController extends Controller
         //         'week_end' => $endOfWeek->format('Y-m-d')
         //     ]
         // ], 200);
-        $earnings = [
-            [
-                'date' => now()->format('Y-m-d'),
-                'booking_ref_no' => 'PBV-123456',
-                'amount' => 15000.00,
-                'status' => 'Completed',
-            ],
-            [
-                'date' => now()->format('Y-m-d'),
-                'booking_ref_no' => 'PBV-4646',
-                'amount' => 7000.00,
-                'status' => 'Completed',
-            ],
-            [
-                'date' => now()->format('Y-m-d'),
-                'booking_ref_no' => 'PBV-7890',
-                'amount' => 12000.00,
-                'status' => 'Completed',
-            ],
-            [
-                'date' => now()->format('Y-m-d'),
-                'booking_ref_no' => 'PBV-4567',
-                'amount' => 8000.00,
-                'status' => 'Completed',
-            ],
-            [
-                'date' => now()->format('Y-m-d'),
-                'booking_ref_no' => 'PBV-8901',
-                'amount' => 5000.00,
-                'status' => 'Completed',
-            ]
-        ];
+        // $earnings = [
+        //     [
+        //         'date' => now()->format('Y-m-d'),
+        //         'booking_ref_no' => 'PBV-123456',
+        //         'amount' => 15000.00,
+        //         'status' => 'Completed',
+        //     ],
+        //     [
+        //         'date' => now()->format('Y-m-d'),
+        //         'booking_ref_no' => 'PBV-4646',
+        //         'amount' => 7000.00,
+        //         'status' => 'Completed',
+        //     ],
+        //     [
+        //         'date' => now()->format('Y-m-d'),
+        //         'booking_ref_no' => 'PBV-7890',
+        //         'amount' => 12000.00,
+        //         'status' => 'Completed',
+        //     ],
+        //     [
+        //         'date' => now()->format('Y-m-d'),
+        //         'booking_ref_no' => 'PBV-4567',
+        //         'amount' => 8000.00,
+        //         'status' => 'Completed',
+        //     ],
+        //     [
+        //         'date' => now()->format('Y-m-d'),
+        //         'booking_ref_no' => 'PBV-8901',
+        //         'amount' => 5000.00,
+        //         'status' => 'Completed',
+        //     ]
+        // ];
         return response()->json([
             'success' => true,
             'data' => $earnings
@@ -1642,8 +1655,17 @@ class VendorController extends Controller
             return response()->json(['message' => 'Vendor not found'], 404);
         }
 
-        // $startOfWeek = now()->startOfWeek();
-        // $endOfWeek = now()->endOfWeek();
+        $payouts = paymentTransaction::with(['booking','payoutItems'])
+            ->where('pbpt_vendor_id', $vendor->pbv_id)
+            ->where('pbvpi_status', 1) 
+            ->get()
+            ->map(function ($transaction) {
+                return [
+                    'date' => $transaction->created_at->format('Y-m-d'),
+                    'booking_ref_no' => $transaction->pbb_ref_no,
+                    'amount' => $transaction->pbvpi_vendor_amount,
+                ];
+            })->toArray();
 
         // $earnings = bookings::where('pbv_vendor_id', $vendor->pbv_id)
         //     ->whereBetween('pb_bk_date', [$startOfWeek, $endOfWeek])
@@ -1657,33 +1679,33 @@ class VendorController extends Controller
         //         'week_end' => $endOfWeek->format('Y-m-d')
         //     ]
         // ], 200);
-        $payouts = [
-            [
-                'date' => now()->format('Y-m-d'),
-                'booking_ref_no' => 'PBV-123456',
-                'amount' => 15000.00
-            ],
-            [
-                'date' => now()->format('Y-m-d'),
-                'booking_ref_no' => 'PBV-4646',
-                'amount' => 7000.00
-            ],
-            [
-                'date' => now()->format('Y-m-d'),
-                'booking_ref_no' => 'PBV-7890',
-                'amount' => 12000.00
-            ],
-            [
-                'date' => now()->format('Y-m-d'),
-                'booking_ref_no' => 'PBV-4567',
-                'amount' => 8000.00
-            ],
-            [
-                'date' => now()->format('Y-m-d'),
-                'booking_ref_no' => 'PBV-8901',
-                'amount' => 5000.00
-            ]
-        ];
+        // $payouts = [
+        //     [
+        //         'date' => now()->format('Y-m-d'),
+        //         'booking_ref_no' => 'PBV-123456',
+        //         'amount' => 15000.00
+        //     ],
+        //     [
+        //         'date' => now()->format('Y-m-d'),
+        //         'booking_ref_no' => 'PBV-4646',
+        //         'amount' => 7000.00
+        //     ],
+        //     [
+        //         'date' => now()->format('Y-m-d'),
+        //         'booking_ref_no' => 'PBV-7890',
+        //         'amount' => 12000.00
+        //     ],
+        //     [
+        //         'date' => now()->format('Y-m-d'),
+        //         'booking_ref_no' => 'PBV-4567',
+        //         'amount' => 8000.00
+        //     ],
+        //     [
+        //         'date' => now()->format('Y-m-d'),
+        //         'booking_ref_no' => 'PBV-8901',
+        //         'amount' => 5000.00
+        //     ]
+        // ];
         return response()->json([
             'success' => true,
             'data' => $payouts
@@ -1730,53 +1752,51 @@ class VendorController extends Controller
             return response()->json(['message' => 'Vendor not found'], 404);
         }
 
-        // $startOfWeek = now()->startOfWeek();
-        // $endOfWeek = now()->endOfWeek();
-
-        // $earnings = bookings::where('pbv_vendor_id', $vendor->pbv_id)
-        //     ->whereBetween('pb_bk_date', [$startOfWeek, $endOfWeek])
-        //     ->sum('pb_bk_total');
-
-        // return response()->json([
-        //     'success' => true,
-        //     'data' => [
-        //         'earnings' => $earnings,
-        //         'week_start' => $startOfWeek->format('Y-m-d'),
-        //         'week_end' => $endOfWeek->format('Y-m-d')
+        $allEarnings = paymentTransaction::with(['booking','payoutItems'])
+            ->where('pbpt_vendor_id', $vendor->pbv_id)
+            ->get()
+            ->map(function ($transaction) {
+                return [
+                    'date' => $transaction->created_at->format('Y-m-d'),
+                    'booking_ref_no' => $transaction->pbb_ref_no,
+                    'amount' => $transaction->pbvpi_vendor_amount,
+                    'status' => ($transaction->pbvpi_status == 1) ? 'Paid' : 'Unpaid',
+                ];
+            })->toArray();
+        
+        // $allEarnings = [
+        //     [
+        //         'date' => now()->format('Y-m-d'),
+        //         'booking_ref_no' => 'PBV-123456',
+        //         'amount' => 15000.00,
+        //         'status' => 'Paid',
+        //     ],
+        //     [
+        //         'date' => now()->format('Y-m-d'),
+        //         'booking_ref_no' => 'PBV-4646',
+        //         'amount' => 7000.00,
+        //         'status' => 'Unpaid',
+        //     ],
+        //     [
+        //         'date' => now()->format('Y-m-d'),
+        //         'booking_ref_no' => 'PBV-7890',
+        //         'amount' => 12000.00,
+        //         'status' => 'Unpaid',
+        //     ],
+        //     [
+        //         'date' => now()->format('Y-m-d'),
+        //         'booking_ref_no' => 'PBV-4567',
+        //         'amount' => 8000.00,
+        //         'status' => 'Paid',
+        //     ],
+        //     [
+        //         'date' => now()->format('Y-m-d'),
+        //         'booking_ref_no' => 'PBV-8901',
+        //         'amount' => 5000.00,
+        //         'status' => 'Paid',
         //     ]
-        // ], 200);
-        $allEarnings = [
-            [
-                'date' => now()->format('Y-m-d'),
-                'booking_ref_no' => 'PBV-123456',
-                'amount' => 15000.00,
-                'status' => 'Paid',
-            ],
-            [
-                'date' => now()->format('Y-m-d'),
-                'booking_ref_no' => 'PBV-4646',
-                'amount' => 7000.00,
-                'status' => 'Unpaid',
-            ],
-            [
-                'date' => now()->format('Y-m-d'),
-                'booking_ref_no' => 'PBV-7890',
-                'amount' => 12000.00,
-                'status' => 'Unpaid',
-            ],
-            [
-                'date' => now()->format('Y-m-d'),
-                'booking_ref_no' => 'PBV-4567',
-                'amount' => 8000.00,
-                'status' => 'Paid',
-            ],
-            [
-                'date' => now()->format('Y-m-d'),
-                'booking_ref_no' => 'PBV-8901',
-                'amount' => 5000.00,
-                'status' => 'Paid',
-            ]
-        ];
+        // ];
+
         return response()->json([
             'success' => true,
             'data' => $allEarnings
@@ -1920,48 +1940,46 @@ class VendorController extends Controller
             return response()->json(['message' => 'Vendor not found'], 404);
         }
 
-        // $startOfWeek = now()->startOfWeek();
-        // $endOfWeek = now()->endOfWeek();
-
-        // $earnings = bookings::where('pbv_vendor_id', $vendor->pbv_id)
-        //     ->whereBetween('pb_bk_date', [$startOfWeek, $endOfWeek])
-        //     ->sum('pb_bk_total');
-
-        // return response()->json([
-        //     'success' => true,
-        //     'data' => [
-        //         'earnings' => $earnings,
-        //         'week_start' => $startOfWeek->format('Y-m-d'),
-        //         'week_end' => $endOfWeek->format('Y-m-d')
+        $toBePaidList = paymentTransaction::with(['booking','payoutItems'])
+            ->where('pbpt_vendor_id', $vendor->pbv_id)
+            ->where('pbvpi_status', 0)
+            ->get()
+            ->map(function ($transaction) {
+                return [
+                    'date' => $transaction->created_at->format('Y-m-d'),
+                    'booking_ref_no' => $transaction->pbb_ref_no,
+                    'amount' => $transaction->pbvpi_vendor_amount,
+                ];
+            })->toArray();
+        
+        // $toBePaidList = [
+        //     [
+        //         'date' => now()->format('Y-m-d'),
+        //         'booking_ref_no' => 'PBV-123456',
+        //         'amount' => 1500.00,
+        //     ],
+        //     [
+        //         'date' => now()->format('Y-m-d'),
+        //         'booking_ref_no' => 'PBV-4646',
+        //         'amount' => 700.00,
+        //     ],
+        //     [
+        //         'date' => now()->format('Y-m-d'),
+        //         'booking_ref_no' => 'PBV-7890',
+        //         'amount' => 1200.00,
+        //     ],
+        //     [
+        //         'date' => now()->format('Y-m-d'),
+        //         'booking_ref_no' => 'PBV-4567',
+        //         'amount' => 800.00,
+        //     ],
+        //     [
+        //         'date' => now()->format('Y-m-d'),
+        //         'booking_ref_no' => 'PBV-8901',
+        //         'amount' => 500.00,
         //     ]
-        // ], 200);
-        $toBePaidList = [
-            [
-                'date' => now()->format('Y-m-d'),
-                'booking_ref_no' => 'PBV-123456',
-                'amount' => 1500.00,
-            ],
-            [
-                'date' => now()->format('Y-m-d'),
-                'booking_ref_no' => 'PBV-4646',
-                'amount' => 700.00,
-            ],
-            [
-                'date' => now()->format('Y-m-d'),
-                'booking_ref_no' => 'PBV-7890',
-                'amount' => 1200.00,
-            ],
-            [
-                'date' => now()->format('Y-m-d'),
-                'booking_ref_no' => 'PBV-4567',
-                'amount' => 800.00,
-            ],
-            [
-                'date' => now()->format('Y-m-d'),
-                'booking_ref_no' => 'PBV-8901',
-                'amount' => 500.00,
-            ]
-        ];
+        // ];
+
         return response()->json([
             'success' => true,
             'data' => $toBePaidList

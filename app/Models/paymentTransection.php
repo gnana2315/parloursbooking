@@ -52,4 +52,8 @@ class paymentTransection extends Model
     public function vendor(){
         return $this->belongsTo(vendors::class, 'pbpt_vendor_id', 'pbv_id');
     }
+
+    public function payoutItems(){
+        return $this->hasMany(vendorPayoutItems::class, 'pbvpi_payment_id', 'pbpt_id');
+    }
 }
