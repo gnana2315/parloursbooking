@@ -18,6 +18,7 @@ use App\Models\vendorDocuments;
 use App\Models\paymentTransection;
 use App\Models\booking;
 use App\Models\vendorPayouts;
+use App\Models\vendorPayoutItems;
 
 use Validator;
 use App\Http\Controllers\Controller;
@@ -1555,7 +1556,7 @@ class VendorController extends Controller
         $startOfWeek = now()->startOfWeek();
         $endOfWeek = now()->endOfWeek();
 
-        $earnings = paymentTransaction::with(['booking','payoutItems'])
+        $earnings = paymentTransection::with(['booking','payoutItems'])
             ->where('pbpt_vendor_id', $vendor->pbv_id)
             ->whereBetween('pbb_booking_date', [$startOfWeek, $endOfWeek])
             ->get()
@@ -1655,7 +1656,7 @@ class VendorController extends Controller
             return response()->json(['message' => 'Vendor not found'], 404);
         }
 
-        $payouts = paymentTransaction::with(['booking','payoutItems'])
+        $payouts = paymentTransection::with(['booking','payoutItems'])
             ->where('pbpt_vendor_id', $vendor->pbv_id)
             ->where('pbvpi_status', 1) 
             ->get()
@@ -1752,7 +1753,7 @@ class VendorController extends Controller
             return response()->json(['message' => 'Vendor not found'], 404);
         }
 
-        $allEarnings = paymentTransaction::with(['booking','payoutItems'])
+        $allEarnings = paymentTransection::with(['booking','payoutItems'])
             ->where('pbpt_vendor_id', $vendor->pbv_id)
             ->get()
             ->map(function ($transaction) {
@@ -1940,7 +1941,7 @@ class VendorController extends Controller
             return response()->json(['message' => 'Vendor not found'], 404);
         }
 
-        $toBePaidList = paymentTransaction::with(['booking','payoutItems'])
+        $toBePaidList = paymentTransection::with(['booking','payoutItems'])
             ->where('pbpt_vendor_id', $vendor->pbv_id)
             ->where('pbvpi_status', 0)
             ->get()
