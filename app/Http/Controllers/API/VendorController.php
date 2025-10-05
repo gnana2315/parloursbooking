@@ -1558,7 +1558,9 @@ class VendorController extends Controller
 
         $earnings = paymentTransection::with(['booking','payoutItems'])
             ->where('pbpt_vendor_id', $vendor->pbv_id)
-            ->whereBetween('pbb_booking_date', [$startOfWeek, $endOfWeek])
+            ->whereHas('booking', function ($q) use ($startOfWeek, $endOfWeek) {
+                $q->whereBetween('pbb_booking_date', [$startOfWeek, $endOfWeek]);
+            })
             ->get()
             ->map(function ($transaction) {
                 return [
@@ -1657,7 +1659,7 @@ class VendorController extends Controller
         }
 
         $payouts = paymentTransection::with(['booking','payoutItems'])
-            ->where('pbpt_vendor_id', $vendor->pbv_id)
+            ->where('pbpt_vendor_id', $vendor->pbv_id) 
             ->where('pbvpi_status', 1) 
             ->get()
             ->map(function ($transaction) {
