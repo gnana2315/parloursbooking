@@ -1202,13 +1202,13 @@ class CommonController extends Controller
         // $earnedAmount = 1575;
         $earnedAmount_formatted_currency = number_format($earnedAmount, 2, '.', ',');
 
-        $paidAmount = vendorPayouts::where('pbpt_vendor_id', $vendor->pbv_id)
+        $paidAmount = vendorPayouts::where('pbvp_vendor_id', $vendor->pbv_id)
                             ->get('pbvp_total_paid');
 
         // $paidAmount = 645;
         $paidAmount_formatted_currency = number_format($paidAmount, 2, '.', ',');
 
-        $pendingAmount = vendorPayouts::where('pbpt_vendor_id', $vendor->pbv_id)
+        $pendingAmount = vendorPayouts::where('pbvp_vendor_id', $vendor->pbv_id)
                             ->get('pbvp_total_due');
 
         // $pendingAmount = 930;
