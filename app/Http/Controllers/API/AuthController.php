@@ -376,7 +376,8 @@ class AuthController extends Controller
                     'accept_terms.required' => 'Please accept the terms and conditions',
                 ]
             );
-
+            
+            $publicPath = '';
             if ($request->hasFile('profile_image')) {
                 $profile_image = $request->file('profile_image');
                 $folder = 'uploads/customers/';
