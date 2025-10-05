@@ -568,7 +568,7 @@ class AuthController extends Controller
             $loggedVendors = vendors::where('pbv_id', $user->pbu_vid)->first();
         }else if($user->pbu_usertype == '2'){          
             $loggedCustomers = customer::where('pbc_user_id', $user->pbu_id)->first();
-            dd($loggedCustomers);
+            //dd($loggedCustomers);
         }
 
         $finalData = [
