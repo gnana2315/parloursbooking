@@ -1660,7 +1660,9 @@ class VendorController extends Controller
 
         $payouts = paymentTransection::with(['booking','payoutItems'])
             ->where('pbpt_vendor_id', $vendor->pbv_id) 
-            ->where('pbvpi_status', 1) 
+            ->whereHas('payoutItems', function ($query) {
+                $query->where('pbvpi_status', 1);
+            })
             ->get()
             ->map(function ($transaction) {
                 return [
@@ -1944,8 +1946,10 @@ class VendorController extends Controller
         }
 
         $toBePaidList = paymentTransection::with(['booking','payoutItems'])
-            ->where('pbpt_vendor_id', $vendor->pbv_id)
-            ->where('pbvpi_status', 0)
+            ->where('pbpt_vendor_id', $vendor->pbv_id)            
+            ->whereHas('payoutItems', function ($query) {
+                $query->where('pbvpi_status', 1);
+            })
             ->get()
             ->map(function ($transaction) {
                 return [
