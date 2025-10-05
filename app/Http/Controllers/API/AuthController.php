@@ -563,11 +563,12 @@ class AuthController extends Controller
         if($user->pbu_status == 0){
             return response()->json(['message' => 'Please create the User.'], 500);   
         }
-        dd($user);
+        
         if($user->pbu_usertype == '1'){
             $loggedVendors = vendors::where('pbv_id', $user->pbu_vid)->first();
         }else if($user->pbu_usertype == '2'){          
             $loggedCustomers = customer::where('pbc_user_id', $user->pbu_id)->first();
+            dd($loggedCustomers);
         }
 
         $finalData = [
