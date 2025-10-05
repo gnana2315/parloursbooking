@@ -76,14 +76,15 @@ class CommonController extends Controller
  */
     public function getVendors($service_for_id){
         try {
-            $vendors = vendors::join('vendor_config', 'vendor_config.pbvc_vendorid', '=', 'vendor.pbv_id')
+            $vendors = vendors
+            //::join('vendor_config', 'vendor_config.pbvc_vendorid', '=', 'vendor.pbv_id')
             // ->join('vendor_standard_availability', 'vendor_standard_availability.pbvsa_vendor_id', '=', 'vendor.pbv_id')
-            ->join('cities', 'cities.pbc_cid', '=', 'vendor.pbv_city')
+            ::join('cities', 'cities.pbc_cid', '=', 'vendor.pbv_city')
             // ->join('ratings', 'ratings.pbr_vendor_id', '=', 'vendor.pbv_id', 'left')
             ->select(
                 'vendor.*',
-                'vendor_config.pbvc_display_name',
-                'vendor_config.pbvc_logo',
+                //'vendor_config.pbvc_display_name',
+                //'vendor_config.pbvc_logo',
                 // 'vendor_standard_availability.pbvsa_start_time',
                 // 'vendor_standard_availability.pbvsa_end_time',
                 // 'vendor_standard_availability.pbvsa_day',
