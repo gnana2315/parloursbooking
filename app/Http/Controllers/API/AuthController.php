@@ -551,7 +551,7 @@ class AuthController extends Controller
                     ->first();        
         
         // Check if user exists and password is correct
-        if (!$user || !Hash::check($request->password, $user->password)) {
+        if (!$user || empty($user->password) || !Hash::check($request->password, $user->password)) {
             return response()->json(['message' => 'Invalid mobile number or password'], 500);
         }
 
