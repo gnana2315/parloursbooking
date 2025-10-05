@@ -331,7 +331,7 @@ class AuthController extends Controller
             //     'pbv_accept_terms' => $request->accept_terms
             // ]);
 
-            users::create([
+            User::create([
                 'pbu_mobileno' => $user->pbu_mobileno,
                 'pbu_first_name' => $request->first_name,
                 'pbu_last_name' => $request->last_name,
