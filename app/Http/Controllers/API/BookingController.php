@@ -547,8 +547,8 @@ class BookingController extends Controller
                 'pbvpi_payment_id'  => $payment->pbpt_id,
                 'pbvpi_amount'      => $total_amount,
                 'pbvpi_platform_fee'=> $platform_fee,
-                'pvpi_vendor_amount'=> $vendor_amount,
-                'pvpi_status'      => '0'
+                'pbvpi_vendor_amount'=> $vendor_amount,
+                'pbvpi_status'      => '0'
             ]);
 
             return response()->json([
