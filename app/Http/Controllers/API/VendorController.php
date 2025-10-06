@@ -563,7 +563,6 @@ class VendorController extends Controller
                                 'pbvd_document_status' => '1'
                             ]
                         );
-
                     }
                 }else{
                     return response()->json(['message' => 'Invalid file upload'], 400);
