@@ -1200,7 +1200,7 @@ class CommonController extends Controller
             ->sum('pbb_total_amount');
 
         // $earnedAmount = 1575;
-        // $earnedAmount_formatted_currency = number_format($earnedAmount, 2, '.', ',');
+        $earnedAmount_formatted_currency = number_format($earnedAmount, 2, '.', ',');
 
         $paidAmount = vendorPayouts::where('pbvp_vendor_id', $vendor->pbv_id)->get();
 
@@ -1222,7 +1222,7 @@ class CommonController extends Controller
             'success' => true,
             'data' => [
                 'bookingsCount' => $bookingsCount,
-                'earnedAmount' => $earnedAmount,
+                'earnedAmount' => $earnedAmount_formatted_currency,
                 'paidAmount' => ($paidAmount->isEmpty()) ? '0.00' : $paidAmount->pbvp_total_paid,
                 'pendingAmount' => ($pendingAmount->isEmpty()) ? '0.00' : $pendingAmount->pbvp_total_due
             ]
