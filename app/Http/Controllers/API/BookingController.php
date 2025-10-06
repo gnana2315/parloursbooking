@@ -448,7 +448,8 @@ class BookingController extends Controller
         foreach ($booking_details as $value) {
             $service = services::where('pbs_id', $value['service_id'])->first();
             if ($service) {
-                $total_amount += $service->pbs_price;
+                $price = floatval(str_replace(',', '', $service->pbs_price));
+                $total_amount += $price;
                 $total_duration += $service->pbs_duration; // ✅ add service duration (minutes)
             }
         }
@@ -479,15 +480,16 @@ class BookingController extends Controller
         if ($addbooking) {
             foreach ($booking_details as $value) {
                 $service = services::where('pbs_id', $value['service_id'])->first();
+                $price = floatval(str_replace(',', '', $service->pbs_price));
                 if ($service) {
                     bookingDetail::create([
                         'pbbd_booking_id' => $addbooking->pbb_id,
                         'pbbd_service_id' => $value['service_id'],
                         'pbbd_employee_id' => null,
                         'pbbd_promo_id' => null,
-                        'pbbd_amount' => $service->pbs_price,
+                        'pbbd_amount' => $price,
                         'pbbd_discount' => 0,
-                        'pbbd_total_amount' => $service->pbs_price,
+                        'pbbd_total_amount' => $price,
                         'pbb_status' => 1
                     ]);
                 }
@@ -795,7 +797,8 @@ class BookingController extends Controller
         foreach ($booking_details as $value) {
             $service = services::where('pbs_id', $value['service_id'])->first();
             if ($service) {
-                $total_amount += $service->pbs_price;
+                $price = floatval(str_replace(',', '', $service->pbs_price));
+                $total_amount += $price;
                 $total_duration += $service->pbs_duration; // ✅ add service duration (minutes)
             }
         }
@@ -824,15 +827,16 @@ class BookingController extends Controller
         if ($addbooking) {
             foreach ($booking_details as $value) {
                 $service = services::where('pbs_id', $value['service_id'])->first();
+                $price = floatval(str_replace(',', '', $service->pbs_price));
                 if ($service) {
                     bookingDetail::create([
                         'pbbd_booking_id' => $addbooking->pbb_id,
                         'pbbd_service_id' => $value['service_id'],
                         'pbbd_employee_id' => null,
                         'pbbd_promo_id' => null,
-                        'pbbd_amount' => $service->pbs_price,
+                        'pbbd_amount' => $price,
                         'pbbd_discount' => 0,
-                        'pbbd_total_amount' => $service->pbs_price,
+                        'pbbd_total_amount' => $price,
                         'pbb_status' => 1
                     ]);
                 }
