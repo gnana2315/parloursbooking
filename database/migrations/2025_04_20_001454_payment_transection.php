@@ -28,6 +28,9 @@ return new class extends Migration
             $table->string('pbpt_description')->nulable();
             $table->integer('pbpt_status')->comment('Payment Status:0-Pending|1-Paid|2-Refunded|3-Declined');
             $table->text('pbpt_remarks')->nullable();
+            // $table->foreign('pbpt_booking_id')->references('pbb_id')->on('bookings')->onDelete('cascade');
+            // $table->foreign('pbpt_vendor_id')->references('pbc_id')->on('customer')->onDelete('cascade');
+            // $table->foreign('pbpt_customer_id')->references('pbv_id')->on('vendor')->onDelete('cascade');
             $table->timestamps();
             $table->softDeletes($column = 'deleted_at', $precision = 0);
         });   
