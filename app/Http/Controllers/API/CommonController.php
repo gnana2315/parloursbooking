@@ -1202,7 +1202,7 @@ class CommonController extends Controller
         // $earnedAmount = 1575;
         $earnedAmount_formatted_currency = number_format($earnedAmount, 2, '.', ',');
 
-        $paidAmount = vendorPayouts::where('pbvp_vendor_id', $vendor->pbv_id)->get();
+        $paidAmount = vendorPayouts::where('pbvp_vendor_id', $vendor->pbv_id)->sum('pbvp_total_paid');
 
         // $paidAmount = 645;
         // if($paidAmount->isEmpty()){
@@ -1212,8 +1212,7 @@ class CommonController extends Controller
         //     $paidAmount_formatted_currency = $paidAmount->pbvp_total_paid;
         // }
 
-        $pendingAmount = vendorPayouts::where('pbvp_vendor_id', $vendor->pbv_id)
-                            ->get();
+        $pendingAmount = vendorPayouts::where('pbvp_vendor_id', $vendor->pbv_id)->sum('pbvp_total_due');
 
         // $pendingAmount = 930;
         // $pendingAmount_formatted_currency = number_format(($pendingAmount->pbvp_total_due != null) ? $pendingAmount->pbvp_total_due : 0, 2, '.', ',');
@@ -1223,8 +1222,8 @@ class CommonController extends Controller
             'data' => [
                 'bookingsCount' => $bookingsCount,
                 'earnedAmount' => $earnedAmount_formatted_currency,
-                'paidAmount' => ($paidAmount->isEmpty()) ? '0.00' : $paidAmount->pbvp_total_paid,
-                'pendingAmount' => ($pendingAmount->isEmpty()) ? '0.00' : $pendingAmount->pbvp_total_due
+                'paidAmount' => ($paidAmount->isEmpty()) ? '0.00' : $paidAmount,
+                'pendingAmount' => ($pendingAmount->isEmpty()) ? '0.00' : $pendingAmount
             ]
         ], 200);
     }
