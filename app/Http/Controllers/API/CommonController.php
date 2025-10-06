@@ -1222,8 +1222,8 @@ class CommonController extends Controller
             'data' => [
                 'bookingsCount' => $bookingsCount,
                 'earnedAmount' => $earnedAmount_formatted_currency,
-                'paidAmount' => ($paidAmount->isEmpty()) ? '0.00' : $paidAmount,
-                'pendingAmount' => ($pendingAmount->isEmpty()) ? '0.00' : $pendingAmount
+                'paidAmount' => $paidAmount,
+                'pendingAmount' => $pendingAmount
             ]
         ], 200);
     }
