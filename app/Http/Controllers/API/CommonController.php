@@ -1201,22 +1201,22 @@ class CommonController extends Controller
 
         // $earnedAmount = 1575;
         // $earnedAmount_formatted_currency = number_format($earnedAmount, 2, '.', ',');
-        
+
         $paidAmount = vendorPayouts::where('pbvp_vendor_id', $vendor->pbv_id)->get();
 
         // $paidAmount = 645;
-        if($paidAmount->isEmpty()){
-            $paidAmount_formatted_currency = '0.00';
-        }else{
-            // $paidAmount_formatted_currency = number_format($paidAmount->pbvp_total_paid, 2, '.', ',');
-            $paidAmount_formatted_currency = $paidAmount->pbvp_total_paid;
-        }
+        // if($paidAmount->isEmpty()){
+        //     $paidAmount_formatted_currency = '0.00';
+        // }else{
+        //     // $paidAmount_formatted_currency = number_format($paidAmount->pbvp_total_paid, 2, '.', ',');
+        //     $paidAmount_formatted_currency = $paidAmount->pbvp_total_paid;
+        // }
 
         $pendingAmount = vendorPayouts::where('pbvp_vendor_id', $vendor->pbv_id)
                             ->get();
 
         // $pendingAmount = 930;
-        $pendingAmount_formatted_currency = number_format(($pendingAmount->pbvp_total_due != null) ? $pendingAmount->pbvp_total_due : 0, 2, '.', ',');
+        // $pendingAmount_formatted_currency = number_format(($pendingAmount->pbvp_total_due != null) ? $pendingAmount->pbvp_total_due : 0, 2, '.', ',');
 
         return response()->json([
             'success' => true,
