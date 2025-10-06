@@ -442,7 +442,7 @@ class BookingController extends Controller
         ];
 
         $booking_details = $request->booking_details;
-        $total_amount = 0;
+        $total_amount = 0.00;
         $total_duration = 0; // in minutes
 
         foreach ($booking_details as $value) {
