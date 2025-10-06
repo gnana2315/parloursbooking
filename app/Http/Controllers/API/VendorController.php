@@ -2182,7 +2182,7 @@ class VendorController extends Controller
         if ($vendor->pbv_vendortype == '1') {
             $vendorInfoFields = ['pbv_business_name', 'pbv_address', 'pbv_city', 'pbv_longatitude', 'pbv_latitude', 'pbv_email'];
         } elseif ($vendor->pbv_vendortype == '2') {
-            $vendorInfoFields = ['business_category', 'pbv_address', 'pbv_city', 'pbv_email', 'pbv_brno'];
+            $vendorInfoFields = ['pbv_business_category', 'pbv_address', 'pbv_city', 'pbv_email', 'pbv_brno'];
         } else {
             return response()->json(['message' => 'Invalid vendor type'], 400);
         }
