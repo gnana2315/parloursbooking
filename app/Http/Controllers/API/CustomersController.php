@@ -467,6 +467,10 @@ class CustomersController extends Controller
             $logoUrl = $vendor_results->config->pbvc_logo ?? null;
         }
 
+        // ✅ Images (example: document types 7–10 are image types, adjust IDs as needed)
+        $imageDocuments = $vendorDocuments->where('pbvd_required_document_id', 7);
+        $images = $imageDocuments->pluck('pbvd_document_url')->toArray();
+
         // Add favorite flag
         $customer = customer::where('pbc_user_id', $user->pbu_id)->first();
         $favourites = $customer->pbc_fav ?? [];
@@ -494,7 +498,7 @@ class CustomersController extends Controller
             'logo' => $logoUrl, // Use the document URL or fallback
             'service_at_time' => $vendor_results->pbv_staff_count,
             'availability' => $this->groupAvailability($availability),
-            'images' => $vendor_results->pbv_images,
+            'images' => !empty($images) ? $images : json_decode($vendor_results->pbv_images, true),
             'rating' => 3,
             'isFav' => $isFav
         ];
