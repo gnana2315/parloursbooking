@@ -18,11 +18,11 @@ return new class extends Migration
             $table->unsignedBigInteger('pbpt_vendor_id')->nullable();
             $table->unsignedBigInteger('pbpt_customer_id')->nullable();
             $table->string('pbpt_payment_method')->nullable();
-            $table->float('pbpt_total_amount', 5, 2)->default(0.00);
-            $table->float('pbpt_discount_amount', 5, 2)->default(0.00);
-            $table->float('pbpt_final_amount', 5, 2)->default(0.00);
-            $table->float('pbpt_platform_fee', 5, 2)->default(0.00);
-            $table->float('pbpt_vendor_amount', 5, 2)->default(0.00);
+            $table->float('pbpt_total_amount', 10, 2)->default(0.00);
+            $table->float('pbpt_discount_amount', 10, 2)->default(0.00);
+            $table->float('pbpt_final_amount', 10, 2)->default(0.00);
+            $table->float('pbpt_platform_fee', 10, 2)->default(0.00);
+            $table->float('pbpt_vendor_amount', 10, 2)->default(0.00);
             $table->string('pbpt_payment_response')->nullable();
             $table->string('pbpt_payment_ref_no')->nullable();
             $table->string('pbpt_description')->nulable();
