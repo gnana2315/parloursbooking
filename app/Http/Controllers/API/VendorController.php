@@ -550,7 +550,7 @@ class VendorController extends Controller
                                 'pbvd_document_status' => '1'
                             ]
                         );
-                        dd($document_update);
+                        //dd($document_update);
                     }else{
                         vendorDocuments::updateOrCreate(
                             [
