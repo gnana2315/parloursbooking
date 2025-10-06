@@ -2210,17 +2210,17 @@ class VendorController extends Controller
             [
                 'type' => 'vendor_info_status',
                 'status' => $allHaveValues,
-                'updated_at' => $vendor->updated_at
+                'updated_at' => $vendor->updated_at ? $vendor->updated_at->format('Y-m-d H:i:s') : null,
             ],
             [
                 'type' => 'vendor_documents_status',
                 'status' => $allDocumentsUploaded,
-                'updated_at' => $latestDocumentUpdate
+                'updated_at' => $latestDocumentUpdate ? \Carbon\Carbon::parse($latestDocumentUpdate)->format('Y-m-d H:i:s') : null,
             ],
             [
                 'type' => 'vendor_bankdetails_status',
                 'status' => $allBankDetailsFilled,
-                'updated_at' => $bankDetails?->updated_at
+                'updated_at' => $bankDetails?->updated_at ? $bankDetails->updated_at->format('Y-m-d H:i:s') : null,
             ]
         ];
 
