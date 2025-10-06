@@ -96,7 +96,6 @@ class CommonController extends Controller
                 ['pbv_status', '=', 1],
                 ['pbv_servicefor', '=', $service_for_id],
             ])
-            // ->groupBy('vendor.pbv_id')
             ->get();
             
             if(!empty($vendors)){
@@ -1201,27 +1200,27 @@ class CommonController extends Controller
             ->sum('pbb_total_amount');
 
         // $earnedAmount = 1575;
-        $earnedAmount_formatted_currency = number_format($earnedAmount, 2, '.', ',');
+        // $earnedAmount_formatted_currency = number_format($earnedAmount, 2, '.', ',');
 
         $paidAmount = vendorPayouts::where('pbvp_vendor_id', $vendor->pbv_id)
                             ->get('pbvp_total_paid');
 
         // $paidAmount = 645;
-        $paidAmount_formatted_currency = number_format($paidAmount, 2, '.', ',');
+        // $paidAmount_formatted_currency = number_format($paidAmount, 2, '.', ',');
 
         $pendingAmount = vendorPayouts::where('pbvp_vendor_id', $vendor->pbv_id)
                             ->get('pbvp_total_due');
 
         // $pendingAmount = 930;
-        $pendingAmount_formatted_currency = number_format($pendingAmount, 2, '.', ',');
+        // $pendingAmount_formatted_currency = number_format($pendingAmount, 2, '.', ',');
 
         return response()->json([
             'success' => true,
             'data' => [
                 'bookingsCount' => $bookingsCount,
-                'earnedAmount' => $earnedAmount_formatted_currency,
-                'paidAmount' => $paidAmount_formatted_currency,
-                'pendingAmount' => $pendingAmount_formatted_currency
+                'earnedAmount' => $earnedAmount,
+                'paidAmount' => $paidAmount,
+                'pendingAmount' => $pendingAmount
             ]
         ], 200);
     }

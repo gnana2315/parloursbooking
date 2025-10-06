@@ -560,14 +560,14 @@ class BookingController extends Controller
             ], 200);
         }
 
-        vendorPayoutHistory::create([
-            'pbvph_vendor_id' => $request->vendor_id,
-            'pbvph_amount' => $vendor_amount,
-            'pbvph_method' => 'system',
-            'pbvph_reference' => $payment->pbpt_transaction_id,
-            'pbvph_description' => 'Booking #' . $addbooking->pbb_ref_no . ' recorded as pending payout',
-            'pbvph_status' => '0'
-        ]);
+        // vendorPayoutHistory::create([
+        //     'pbvph_vendor_id' => $request->vendor_id,
+        //     'pbvph_amount' => $vendor_amount,
+        //     'pbvph_method' => 'system',
+        //     'pbvph_reference' => $payment->pbpt_transaction_id,
+        //     'pbvph_description' => 'Booking #' . $addbooking->pbb_ref_no . ' recorded as pending payout',
+        //     'pbvph_status' => '0'
+        // ]);
 
         return response()->json([
             'message' => "Unable to add the booking now. Please try again later",
