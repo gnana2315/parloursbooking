@@ -1204,7 +1204,7 @@ class CommonController extends Controller
 
         $paidAmount = vendorPayouts::where('pbvp_vendor_id', $vendor->pbv_id)
                             ->get();
-
+        dd($paidAmount);
         // $paidAmount = 645;
         $paidAmount_formatted_currency = number_format((!empty($paidAmount)) ? $paidAmount->pbvp_total_paid : 0, 2, '.', ',');
 
