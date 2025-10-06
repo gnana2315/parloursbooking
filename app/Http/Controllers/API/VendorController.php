@@ -2206,9 +2206,18 @@ class VendorController extends Controller
                                 && !empty($bankDetails->pbvb_branch);
 
         $vendorDetailStatus = [
-            'vendor_info_status' => $allHaveValues,
-            'vendor_documents_status' => $allDocumentsUploaded,
-            'vendor_bankdetails_status' => $allBankDetailsFilled,
+            'vendor_info_status' => [
+                'status' => $allHaveValues,
+                'updated_at' => $vendor->updated_at
+            ],
+            'vendor_documents_status' => [
+                'status' => $allDocumentsUploaded,
+                'updated_at' => $documents->max('updated_at'),
+            ],
+            'vendor_bankdetails_status' => [
+                'status' => $allBankDetailsFilled,
+                'updated_at' => $bankDetails->updated_at
+            ]
         ];
 
         return response()->json([
