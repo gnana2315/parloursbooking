@@ -2197,6 +2197,7 @@ class VendorController extends Controller
         $allDocumentsUploaded = (count($documentIds) > 0)
                                 ? (count($documents) === count($documentIds))
                                 : true;
+        $latestDocumentUpdate = $documents->isNotEmpty() ? $documents->max('updated_at') : null;
 
         $bankDetails = vendorBankInfo::where('pbvb_vendorid', $vendor->pbv_id)->first();
         $allBankDetailsFilled = $bankDetails
@@ -2212,11 +2213,11 @@ class VendorController extends Controller
             ],
             'vendor_documents_status' => [
                 'status' => $allDocumentsUploaded,
-                'updated_at' => $documents->max('updated_at'),
+                'updated_at' => $latestDocumentUpdate,
             ],
             'vendor_bankdetails_status' => [
                 'status' => $allBankDetailsFilled,
-                'updated_at' => $bankDetails->updated_at
+                'updated_at' => $bankDetails?->updated_at
             ]
         ];
 
