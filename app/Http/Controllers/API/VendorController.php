@@ -2115,6 +2115,109 @@ class VendorController extends Controller
         ], 200);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/vendorDetailStatus",
+     *     summary="Get Vendor Detail Completion Status",
+     *     description="This API returns the status of vendor profile completion including vendor info, required documents, and bank details.",
+     *     operationId="getVendorDetailStatus",
+     *     tags={"Vendor"},
+     *     security={{"bearerAuth": {}}},
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful response with vendor detail status",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="vendor_info_status", type="boolean", example=true, description="True if all required vendor info fields are filled"),
+     *                 @OA\Property(property="vendor_documents_status", type="boolean", example=false, description="True if all required documents are uploaded"),
+     *                 @OA\Property(property="vendor_bankdetails_status", type="boolean", example=true, description="True if all bank details are provided")
+     *             )
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=400,
+     *         description="Invalid vendor type",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Invalid vendor type")
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=404,
+     *         description="Vendor not found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Vendor not found")
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized - JWT token missing or invalid",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Unauthenticated.")
+     *         )
+     *     )
+     * )
+     */
+    public function getVendorDetailStatus(){
+        $user = auth()->user();
+        $vendor = vendors::find($user->pbu_vid);        
+
+        if (!$vendor) {
+            return response()->json(['message' => 'Vendor not found'], 404);
+        }
+
+        $vendorInfoFields = [];
+        $documentIds = requiredDocument::where('pbrd_vendor_type', $vendor->pbv_vendortype)
+            ->pluck('pbrd_id')
+            ->toArray();        
+
+        if ($vendor->pbv_vendortype == '1') {
+            $vendorInfoFields = ['pbv_business_name', 'pbv_address', 'pbv_city', 'pbv_longatitude', 'pbv_latitude', 'pbv_email'];
+        } elseif ($vendor->pbv_vendortype == '2') {
+            $vendorInfoFields = ['business_category', 'pbv_address', 'pbv_city', 'pbv_email', 'pbv_brno'];
+        } else {
+            return response()->json(['message' => 'Invalid vendor type'], 400);
+        }
+
+        $allHaveValues = collect($vendorInfoFields)->every(function ($field) use ($vendor) {
+            return !is_null($vendor->$field);
+        });
+
+        $documents = vendorDocuments::where('pbvd_vendor_id', $vendor->pbv_id)
+            ->whereIn('pbvd_required_document_id', $documentIds)
+            ->get();
+        $allDocumentsUploaded = (count($documentIds) > 0)
+                                ? (count($documents) === count($documentIds))
+                                : true;
+
+        $bankDetails = vendorBankInfo::where('pbvb_vendorid', $vendor->pbv_id)->first();
+        $allBankDetailsFilled = $bankDetails
+                                && !empty($bankDetails->pbvb_bank_name)
+                                && !empty($bankDetails->pbvb_account_no)
+                                && !empty($bankDetails->pbvb_ifsc_code)
+                                && !empty($bankDetails->pbvb_branch);
+
+        $vendorDetailStatus = [
+            'vendor_info_status' => $allHaveValues,
+            'vendor_documents_status' => $allDocumentsUploaded,
+            'vendor_bankdetails_status' => $allBankDetailsFilled,
+        ];
+
+        return response()->json([
+            'success' => true,
+            'data' => $vendorDetailStatus
+        ], 200);
+    }
+
     function groupAvailability(array $availability) {
         $grouped = [];
         $tempGroup = null;
