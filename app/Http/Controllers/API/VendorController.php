@@ -518,7 +518,7 @@ class VendorController extends Controller
         );
 
         $documents = requiredDocument::where('pbrd_id', $request->document_id)->first();
-
+        var_dump($request->hasFile('document')); exit;
         if($request->hasFile('document')){
             $files = $request->file('document');
             
