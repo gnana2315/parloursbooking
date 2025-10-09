@@ -529,8 +529,7 @@ class VendorController extends Controller
             foreach ($files as $file) {
                 if ($file->isValid()) {
                     // generate unique filename
-                    dd($file->getClientOriginalName());
-                    $fileName = time().'_'.$file->getClientOriginalName().'.'.$file->getClientOriginalExtension();
+                    $fileName = time().'_'.$file->getClientOriginalName();
 
                     // store file (change 'public' to 's3' if using AWS S3)
                     $filePath = $file->storeAs('uploads/vendors/'.$vendor->pbv_id, $fileName, 'public');
