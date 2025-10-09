@@ -2201,10 +2201,11 @@ class VendorController extends Controller
 
         $bankDetails = vendorBankInfo::where('pbvb_vendorid', $vendor->pbv_id)->first();
         $allBankDetailsFilled = $bankDetails
-                                && !empty($bankDetails->pbvb_bank_name)
-                                && !empty($bankDetails->pbvb_account_no)
-                                && !empty($bankDetails->pbvb_ifsc_code)
-                                && !empty($bankDetails->pbvb_branch);
+                                && !empty($bankDetails->pbvb_bankname)
+                                && !empty($bankDetails->pbvb_holder_name)
+                                && !empty($bankDetails->pbvb_branch)
+                                && !empty($bankDetails->pbvb_accountno)
+                                && !empty($bankDetails->pbvb_branch_code);                                
 
         $vendorDetailStatus = [
             [
