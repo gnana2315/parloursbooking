@@ -518,7 +518,7 @@ class VendorController extends Controller
         );
 
         $documents = requiredDocument::where('pbrd_id', $request->document_id)->first();
-        
+
         if($request->hasFile('document')){
             $files = $request->file('document');
             
@@ -529,7 +529,7 @@ class VendorController extends Controller
             foreach ($files as $file) {
                 if ($file->isValid()) {
                     // generate unique filename
-                    $fileName = time().'_'.$file->getClientOriginalName();
+                    $fileName = time().'_'.$file->getClientOriginalName().'.'.$file->getClientOriginalExtension();
 
                     // store file (change 'public' to 's3' if using AWS S3)
                     $filePath = $file->storeAs('uploads/vendors/'.$vendor->pbv_id, $fileName, 'public');
