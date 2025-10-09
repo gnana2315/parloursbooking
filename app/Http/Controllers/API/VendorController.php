@@ -476,106 +476,6 @@ class VendorController extends Controller
     }
 
     public function vendorDocumentUpdate_v1(Request $request){
-        // $user = auth()->user();
-
-        // $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
-        // if (!$vendor) {
-        //     return response()->json(['message' => 'Vendor not found'], 404);
-        // }
-
-        // $vendorTypeRanges = [
-        //     1 => [1, 7],   // Business Vendor
-        //     2 => [8, 14],  // Therapist Vendor
-        // ];
-
-        // if (!array_key_exists($vendor->pbv_vendortype, $vendorTypeRanges)) {
-        //     return response()->json(['message' => 'Invalid vendor type'], 400);
-        // }
-
-        // list($minId, $maxId) = $vendorTypeRanges[$vendor->pbv_vendortype];
-
-        // if ($request->document_id < $minId || $request->document_id > $maxId) {
-        //     return response()->json(['message' => 'This document does not belong to your vendor type'], 403);
-        // }
-        
-        // $documents = requiredDocument::where('pbrd_vendor_type', $vendor->pbv_vendortype)->get();
-        
-        // $request->validate(
-        //     [
-        //         'document_id' => 'required|integer|exists:required_document,pbrd_id',
-        //         'document' => 'required',
-        //         'document.*' => 'file|mimes:jpg,jpeg,png,pdf|max:2048'
-        //     ],
-        //     [
-        //         'document_id.required' => 'Document ID is required',
-        //         'document_id.integer' => 'Document ID must be an integer',
-        //         'document_id.exists' => 'Document ID does not exist',
-        //         'document.required' => 'Document is required',
-        //         'document.*.file' => 'Document must be a file',
-        //         'document.*.mimes' => 'Document must be a file of type: jpg, jpeg, png, pdf',
-        //         'document.*.max' => 'Document may not be greater than 2MB',
-        //     ]
-        // );
-
-        // $documents = requiredDocument::where('pbrd_id', $request->document_id)->first();
-
-        // if($request->hasFile('document')){
-        //     $files = $request->file('document');
-            
-        //     if(!is_array($files)){
-        //         $files = [$files];
-        //     }
-
-        //     foreach ($files as $file) {
-        //         if ($file->isValid()) {
-        //             // generate unique filename
-        //             $fileName = time().'_'.$file->getClientOriginalName();
-
-        //             // store file (change 'public' to 's3' if using AWS S3)
-        //             $filePath = $file->storeAs('uploads/vendors/'.$vendor->pbv_id, $fileName, 'public');
-
-        //             // full url for access (public disk: storage/app/public/uploads/...)
-        //             $fileUrl = Storage::disk('public')->url($filePath);
-        //             // $fileUrl = asset('storage/' . $filePath);
-        //             // dd($documents->pbrd_is_single);
-        //             if($documents->pbrd_is_single){
-        //                 $document_update = vendorDocuments::updateOrCreate(
-        //                     [
-        //                         'pbvd_vendor_id' => $vendor->pbv_id,
-        //                         'pbvd_required_document_id' => $request->document_id,
-        //                     ],
-        //                     [
-        //                         'pbvd_document_name' => $fileName,
-        //                         'pbvd_document_url' => $fileUrl,
-        //                         'pbvd_document_status' => '1'
-        //                     ]
-        //                 );
-        //                 //dd($document_update);
-        //             }else{
-        //                 vendorDocuments::updateOrCreate(
-        //                     [
-        //                         'pbvd_vendor_id' => $vendor->pbv_id,
-        //                         'pbvd_required_document_id' => $request->document_id,
-        //                         'pbvd_document_name' => $fileName,
-        //                     ],
-        //                     [
-        //                         'pbvd_document_url' => $fileUrl,
-        //                         'pbvd_document_status' => '1'
-        //                     ]
-        //                 );
-        //             }
-        //         }else{
-        //             return response()->json(['message' => 'Invalid file upload'], 400);
-        //         }
-        //     }
-        // } else {
-        //     return response()->json(['message' => 'No document uploaded'], 400);
-        // }   
-
-        // return response()->json([
-        //     'success' => true,
-        //     'message' => 'Documents uploaded successfully'
-        // ], 200);
         $user = auth()->user();
 
         $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
@@ -583,96 +483,98 @@ class VendorController extends Controller
             return response()->json(['message' => 'Vendor not found'], 404);
         }
 
-        // Define allowed document ID ranges per vendor type
         $vendorTypeRanges = [
             1 => [1, 7],   // Business Vendor
             2 => [8, 14],  // Therapist Vendor
         ];
 
-        $vendorType = $vendor->pbv_vendortype;
-
-        if (!isset($vendorTypeRanges[$vendorType])) {
+        if (!array_key_exists($vendor->pbv_vendortype, $vendorTypeRanges)) {
             return response()->json(['message' => 'Invalid vendor type'], 400);
         }
 
-        [$minId, $maxId] = $vendorTypeRanges[$vendorType];
+        list($minId, $maxId) = $vendorTypeRanges[$vendor->pbv_vendortype];
 
-        // Check if the requested document ID belongs to this vendor type
         if ($request->document_id < $minId || $request->document_id > $maxId) {
             return response()->json(['message' => 'This document does not belong to your vendor type'], 403);
         }
+        
+        $documents = requiredDocument::where('pbrd_vendor_type', $vendor->pbv_vendortype)->get();
+        
+        $request->validate(
+            [
+                'document_id' => 'required|integer|exists:required_document,pbrd_id',
+                'document' => 'required',
+                'document.*' => 'file|mimes:jpg,jpeg,png,pdf|max:2048'
+            ],
+            [
+                'document_id.required' => 'Document ID is required',
+                'document_id.integer' => 'Document ID must be an integer',
+                'document_id.exists' => 'Document ID does not exist',
+                'document.required' => 'Document is required',
+                'document.*.file' => 'Document must be a file',
+                'document.*.mimes' => 'Document must be a file of type: jpg, jpeg, png, pdf',
+                'document.*.max' => 'Document may not be greater than 2MB',
+            ]
+        );
 
-        // ✅ Validation
-        $request->validate([
-            'document_id' => 'required|integer|exists:required_document,pbrd_id',
-            'document' => 'required',
-            'document.*' => 'file|mimes:jpg,jpeg,png,pdf|max:2048',
-        ], [
-            'document_id.required' => 'Document ID is required',
-            'document_id.integer' => 'Document ID must be an integer',
-            'document_id.exists' => 'Document ID does not exist',
-            'document.required' => 'Document is required',
-            'document.*.file' => 'Each document must be a file',
-            'document.*.mimes' => 'Documents must be jpg, jpeg, png, or pdf',
-            'document.*.max' => 'Each document may not be greater than 2MB',
-        ]);
+        $documents = requiredDocument::where('pbrd_id', $request->document_id)->first();
 
-        $documentDefinition = requiredDocument::find($request->document_id);
-        if (!$documentDefinition) {
-            return response()->json(['message' => 'Required document not found'], 404);
-        }
+        if($request->hasFile('document')){
+            $files = $request->file('document');
+            
+            if(!is_array($files)){
+                $files = [$files];
+            }
 
-        if (!$request->hasFile('document')) {
+            foreach ($files as $file) {
+                if ($file->isValid()) {
+                    // generate unique filename
+                    $fileName = time().'_'.$file->getClientOriginalName();
+
+                    // store file (change 'public' to 's3' if using AWS S3)
+                    $filePath = $file->storeAs('uploads/vendors/'.$vendor->pbv_id, $fileName, 'public');
+
+                    // full url for access (public disk: storage/app/public/uploads/...)
+                    $fileUrl = Storage::disk('public')->url($filePath);
+                    // $fileUrl = asset('storage/' . $filePath);
+                    // dd($documents->pbrd_is_single);
+                    if($documents->pbrd_is_single){
+                        $document_update = vendorDocuments::updateOrCreate(
+                            [
+                                'pbvd_vendor_id' => $vendor->pbv_id,
+                                'pbvd_required_document_id' => $request->document_id,
+                            ],
+                            [
+                                'pbvd_document_name' => $fileName,
+                                'pbvd_document_url' => $fileUrl,
+                                'pbvd_document_status' => '1'
+                            ]
+                        );
+                        //dd($document_update);
+                    }else{
+                        vendorDocuments::updateOrCreate(
+                            [
+                                'pbvd_vendor_id' => $vendor->pbv_id,
+                                'pbvd_required_document_id' => $request->document_id,
+                                'pbvd_document_name' => $fileName,
+                            ],
+                            [
+                                'pbvd_document_url' => $fileUrl,
+                                'pbvd_document_status' => '1'
+                            ]
+                        );
+                    }
+                }else{
+                    return response()->json(['message' => 'Invalid file upload'], 400);
+                }
+            }
+        } else {
             return response()->json(['message' => 'No document uploaded'], 400);
-        }
-
-        $files = is_array($request->file('document'))
-            ? $request->file('document')
-            : [$request->file('document')];
-
-        foreach ($files as $file) {
-            if (!$file->isValid()) {
-                return response()->json(['message' => 'Invalid file upload'], 400);
-            }
-
-            // Generate unique filename
-            $fileName = uniqid() . '_' . preg_replace('/\s+/', '_', $file->getClientOriginalName());
-
-            // Use S3 or public disk dynamically
-            $disk = config('filesystems.default', 'public'); // fallback to public if not set
-            $filePath = "uploads/vendors/{$vendor->pbv_id}/{$fileName}";
-
-            $storedPath = $file->storeAs("uploads/vendors/{$vendor->pbv_id}", $fileName, $disk);
-            $fileUrl = Storage::disk($disk)->url($storedPath);
-
-            if ($documentDefinition->pbrd_is_single) {
-                // Replace previous file for single document type
-                vendorDocuments::updateOrCreate(
-                    [
-                        'pbvd_vendor_id' => $vendor->pbv_id,
-                        'pbvd_required_document_id' => $request->document_id,
-                    ],
-                    [
-                        'pbvd_document_name' => $fileName,
-                        'pbvd_document_url' => $fileUrl,
-                        'pbvd_document_status' => 1,
-                    ]
-                );
-            } else {
-                // Allow multiple files for non-single types
-                vendorDocuments::create([
-                    'pbvd_vendor_id' => $vendor->pbv_id,
-                    'pbvd_required_document_id' => $request->document_id,
-                    'pbvd_document_name' => $fileName,
-                    'pbvd_document_url' => $fileUrl,
-                    'pbvd_document_status' => 1,
-                ]);
-            }
-        }
+        }   
 
         return response()->json([
             'success' => true,
-            'message' => 'Documents uploaded successfully',
+            'message' => 'Documents uploaded successfully'
         ], 200);
     }
     // public function vendorDocumentUpdate(Request $request){
