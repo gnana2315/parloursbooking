@@ -529,7 +529,7 @@ class VendorController extends Controller
             foreach ($files as $file) {
                 if ($file->isValid()) {
                     // generate unique filename
-                    return response()->json(['message' => $file->getClientOriginalName()], 400);
+                    dd($file->getClientOriginalName());
                     $fileName = time().'_'.$file->getClientOriginalName().'.'.$file->getClientOriginalExtension();
 
                     // store file (change 'public' to 's3' if using AWS S3)
