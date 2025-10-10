@@ -1562,6 +1562,7 @@ class VendorController extends Controller
             })
             ->get()
             ->map(function ($transaction) {
+                dd($transaction->payoutItems);
                 $totalAmount = $transaction->payoutItems->sum('pbvpi_vendor_amount');
                 $isPaid = $transaction->payoutItems->every(fn($item) => $item->pbvpi_status == 1);
 
