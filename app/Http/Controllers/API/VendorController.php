@@ -1562,11 +1562,14 @@ class VendorController extends Controller
             })
             ->get()
             ->map(function ($transaction) {
+                $totalAmount = $transaction->payoutItems->sum('pbvpi_vendor_amount');
+                $isPaid = $transaction->payoutItems->every(fn($item) => $item->pbvpi_status == 1);
+
                 return [
                     'date' => $transaction->created_at->format('Y-m-d'),
                     'booking_ref_no' => $transaction->booking->pbb_ref_no,
-                    'amount' => $transaction->payoutItems->pbpt_vendor_amount,
-                    'status' => ($transaction->payoutItems->pbvpi_status == 1) ? 'Paid' : 'Unpaid',
+                    'amount' => $totalAmount,
+                    'status' => $isPaid ? 'Paid' : 'Unpaid',
                 ];
             })->toArray();
 
