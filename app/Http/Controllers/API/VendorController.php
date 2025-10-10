@@ -1564,9 +1564,9 @@ class VendorController extends Controller
             ->map(function ($transaction) {
                 return [
                     'date' => $transaction->created_at->format('Y-m-d'),
-                    'booking_ref_no' => $transaction->pbb_ref_no,
-                    'amount' => $transaction->pbpt_vendor_amount,
-                    'status' => ($transaction->pbvpi_status == 1) ? 'Paid' : 'Unpaid',
+                    'booking_ref_no' => $transaction->booking->pbb_ref_no,
+                    'amount' => $transaction->payoutItems->pbpt_vendor_amount,
+                    'status' => ($transaction->payoutItems->pbvpi_status == 1) ? 'Paid' : 'Unpaid',
                 ];
             })->toArray();
 
@@ -1666,8 +1666,8 @@ class VendorController extends Controller
             ->map(function ($transaction) {
                 return [
                     'date' => $transaction->created_at->format('Y-m-d'),
-                    'booking_ref_no' => $transaction->pbb_ref_no,
-                    'amount' => $transaction->pbvpi_vendor_amount,
+                    'booking_ref_no' => $transaction->booking->pbb_ref_no,
+                    'amount' => $transaction->payoutItems->pbvpi_vendor_amount,
                 ];
             })->toArray();
 
@@ -1762,9 +1762,9 @@ class VendorController extends Controller
             ->map(function ($transaction) {
                 return [
                     'date' => $transaction->created_at->format('Y-m-d'),
-                    'booking_ref_no' => $transaction->pbb_ref_no,
-                    'amount' => $transaction->pbvpi_vendor_amount,
-                    'status' => ($transaction->pbvpi_status == 1) ? 'Paid' : 'Unpaid',
+                    'booking_ref_no' => $transaction->booking->pbb_ref_no ?? null,
+                    'amount' => $transaction->payoutItems->pbvpi_vendor_amount ?? null,
+                    'status' => ($transaction->payoutItems->pbvpi_status == 1) ? 'Paid' : 'Unpaid',
                 ];
             })->toArray();
         
@@ -1953,8 +1953,8 @@ class VendorController extends Controller
             ->map(function ($transaction) {
                 return [
                     'date' => $transaction->created_at->format('Y-m-d'),
-                    'booking_ref_no' => $transaction->pbb_ref_no,
-                    'amount' => $transaction->pbvpi_vendor_amount,
+                    'booking_ref_no' => $transaction->booking->pbb_ref_no,
+                    'amount' => $transaction->payoutItems->pbvpi_vendor_amount,
                 ];
             })->toArray();
         
