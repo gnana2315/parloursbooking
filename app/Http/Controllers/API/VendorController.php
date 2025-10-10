@@ -1562,7 +1562,6 @@ class VendorController extends Controller
             })
             ->get()
             ->map(function ($transaction) {
-                dd($transaction->payoutItems);
                 $totalAmount = $transaction->payoutItems->sum('pbvpi_vendor_amount');
                 $isPaid = $transaction->payoutItems->every(fn($item) => $item->pbvpi_status == 1);
 
@@ -1763,12 +1762,15 @@ class VendorController extends Controller
         $allEarnings = paymentTransection::with(['booking','payoutItems'])
             ->where('pbpt_vendor_id', $vendor->pbv_id)
             ->get()
-            ->map(function ($transaction) {
+            ->map(function ($transaction) {                
+                $totalAmount = $transaction->payoutItems->sum('pbvpi_vendor_amount');
+                $isPaid = $transaction->payoutItems->every(fn($item) => $item->pbvpi_status == 1);
+
                 return [
                     'date' => $transaction->created_at->format('Y-m-d'),
                     'booking_ref_no' => $transaction->booking->pbb_ref_no ?? null,
-                    'amount' => $transaction->payoutItems->pbvpi_vendor_amount ?? null,
-                    'status' => ($transaction->payoutItems->pbvpi_status == 1) ? 'Paid' : 'Unpaid',
+                    'amount' => $totalAmount,
+                    'status' => $isPaid ? 'Paid' : 'Unpaid',
                 ];
             })->toArray();
         
