@@ -498,7 +498,13 @@ class CustomersController extends Controller
             'logo' => $logoUrl, // Use the document URL or fallback
             'service_at_time' => $vendor_results->pbv_staff_count,
             'availability' => $this->groupAvailability($availability),
-            'images' => !empty($images) ? $images : json_decode($vendor_results->pbv_images, true),
+            'images' => !empty($images)
+                        ? $images
+                        : (is_string($vendor_results->pbv_images)
+                            ? json_decode($vendor_results->pbv_images, true)
+                            : (is_array($vendor_results->pbv_images)
+                                ? $vendor_results->pbv_images
+                                : [])),
             'rating' => 3,
             'isFav' => $isFav
         ];
