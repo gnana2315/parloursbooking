@@ -512,7 +512,7 @@ class CustomersController extends Controller
         return response()->json([
             'success' => true,
             'data' => $final_vendors
-        ], 200);
+        ], 200, [], JSON_UNESCAPED_SLASHES);
     }
 
     function groupAvailability(array $availability) {
