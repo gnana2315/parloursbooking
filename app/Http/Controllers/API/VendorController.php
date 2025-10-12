@@ -1147,11 +1147,11 @@ class VendorController extends Controller
 
             // 🧠 Check if there are any confirmed bookings for that vendor on the same day
             $conflictingBookings = booking::where('pbb_vendor_id', $vendor->pbv_id)
-                ->whereDate('pbb_start_time', $day)
+                ->whereDate('pbb_booking_start_time', $day)
                 ->where(function ($query) use ($fromTime, $toTime) {
                     $query->where(function ($q) use ($fromTime, $toTime) {
-                        $q->whereTime('pbb_start_time', '<', $toTime)
-                        ->whereTime('pbb_end_time', '>', $fromTime);
+                        $q->whereTime('pbb_booking_start_time', '<', $toTime)
+                        ->whereTime('pbb_booking_end_time', '>', $fromTime);
                     });
                 })
                 ->where('pbb_status', 1)
