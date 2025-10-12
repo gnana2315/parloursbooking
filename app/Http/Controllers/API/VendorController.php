@@ -1166,7 +1166,7 @@ class VendorController extends Controller
                 // ];
                 return response()->json([
                     'message' => 'Cannot close this time. Bookings already exist on this day.'
-                ], 200);
+                ], 500);
                 // continue;
             }
 
