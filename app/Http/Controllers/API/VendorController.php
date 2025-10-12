@@ -1140,6 +1140,36 @@ class VendorController extends Controller
         );
 
         foreach($request->all() as $special_close){
+            $day = $special_close['day'];
+            $fullDayClosed = $special_close['full_day_closed'];
+            $fromTime = $fullDayClosed ? '00:00:00' : $special_close['from_time'] . ':00';
+            $toTime = $fullDayClosed ? '23:59:59' : $special_close['to_time'] . ':00';
+
+            // 🧠 Check if there are any confirmed bookings for that vendor on the same day
+            $conflictingBookings = booking::where('pbb_vendor_id', $vendor->pbv_id)
+                ->whereDate('pbb_start_time', $day)
+                ->where(function ($query) use ($fromTime, $toTime) {
+                    $query->where(function ($q) use ($fromTime, $toTime) {
+                        $q->whereTime('pbb_start_time', '<', $toTime)
+                        ->whereTime('pbb_end_time', '>', $fromTime);
+                    });
+                })
+                ->where('pbb_status', 1)
+                ->get();
+
+            if ($conflictingBookings->count() > 0) {
+                // $conflicts[] = [
+                //     'day' => $day,
+                //     'from_time' => $fromTime,
+                //     'to_time' => $toTime,
+                //     'message' => 'Cannot close this time. Bookings already exist on this day.'
+                // ];
+                return response()->json([
+                    'message' => 'Cannot close this time. Bookings already exist on this day.'
+                ], 200);
+                // continue;
+            }
+
             vendorSpecialCloses::create([
                 'pbvsc_vendor_id' => $vendor->pbv_id,
                 'pbvsc_day' => $special_close['day'],
