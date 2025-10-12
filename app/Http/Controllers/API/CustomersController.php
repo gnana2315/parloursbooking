@@ -449,12 +449,40 @@ class CustomersController extends Controller
 
         // Process availability - $vendor_results is a single object, not a collection
         $availability = $vendor_results->availability->map(function ($item) {
+            $dayLabel = $item->pbvsa_day;
+            $formatTime = function ($t) {
+                if ($t === null || $t === '') {
+                    return null;
+                }
+
+                // If already a time string like "09:30" or "09:30:00", Carbon::parse will handle it.
+                try {
+                    return Carbon::parse($t)->format('H:i');
+                } catch (\Exception $e) {
+                    // Fallback: return original string (safer than throwing)
+                    return (string)$t;
+                }
+            };
+
+            $start = $formatTime($item->pbvsa_start_time);
+            $end   = $formatTime($item->pbvsa_end_time);
+
+            // If both exist show "HH:MM - HH:MM", else fallback
+            $timeString = ($start && $end) ? $start . ' - ' . $end : ($start ?: ($end ?: null));
+
             return [
-                'day' => $item->pbvsa_day,
-                'start_time' => $item->pbvsa_start_time,
-                'end_time' => $item->pbvsa_end_time,
-                'is_open' => $item->pbvsa_is_open,
+                'day' => $dayLabel,                 // e.g. "Monday" or numeric index — unchanged
+                'start_time' => $start,            // e.g. "09:30"
+                'end_time' => $end,                // e.g. "17:00"
+                'is_open' => (bool) $item->pbvsa_is_open,
+                'time' => $timeString,             // helper field if needed
             ];
+            // return [
+            //     'day' => $item->pbvsa_day,
+            //     'start_time' => $item->pbvsa_start_time,
+            //     'end_time' => $item->pbvsa_end_time,
+            //     'is_open' => $item->pbvsa_is_open,
+            // ];
         })->toArray();
 
         // Get logo from documents where required_document_id = 6
