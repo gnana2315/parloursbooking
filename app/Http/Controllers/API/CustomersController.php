@@ -523,7 +523,8 @@ class CustomersController extends Controller
             'longatitude' => $vendor_results->pbv_longatitude,
             'latitude' => $vendor_results->pbv_latitude,
             'status' => $vendor_results->pbv_status,
-            'created_at' => $vendor_results->pbv_created_at,
+            'description' => $vendor_results->pbv_short_description,
+            'created_at' => $vendor_results->created_at,
             'display_name' => $vendor_results->pbv_display_name,
             'logo' => $logoUrl, // Use the document URL or fallback
             'service_at_time' => $vendor_results->pbv_staff_count,

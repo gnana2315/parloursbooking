@@ -1455,12 +1455,40 @@ class VendorController extends Controller
 
         // Process availability - $vendor_results is a single object, not a collection
         $availability = $vendor_results->availability->map(function ($item) {
+            $dayLabel = $item->pbvsa_day;
+            $formatTime = function ($t) {
+                if ($t === null || $t === '') {
+                    return null;
+                }
+
+                // If already a time string like "09:30" or "09:30:00", Carbon::parse will handle it.
+                try {
+                    return Carbon::parse($t)->format('H:i');
+                } catch (\Exception $e) {
+                    // Fallback: return original string (safer than throwing)
+                    return (string)$t;
+                }
+            };
+
+            $start = $formatTime($item->pbvsa_start_time);
+            $end   = $formatTime($item->pbvsa_end_time);
+
+            // If both exist show "HH:MM - HH:MM", else fallback
+            $timeString = ($start && $end) ? $start . ' - ' . $end : ($start ?: ($end ?: null));
+
             return [
-                'day' => $item->pbvsa_day,
-                'start_time' => $item->pbvsa_start_time,
-                'end_time' => $item->pbvsa_end_time,
-                'is_open' => $item->pbvsa_is_open,
+                'day' => $dayLabel,                 // e.g. "Monday" or numeric index — unchanged
+                'start_time' => $start,            // e.g. "09:30"
+                'end_time' => $end,                // e.g. "17:00"
+                'is_open' => (bool) $item->pbvsa_is_open,
+                'time' => $timeString,             // helper field if needed
             ];
+            // return [
+            //     'day' => $item->pbvsa_day,
+            //     'start_time' => $item->pbvsa_start_time,
+            //     'end_time' => $item->pbvsa_end_time,
+            //     'is_open' => $item->pbvsa_is_open,
+            // ];
         })->toArray();
 
         // Get logo from documents where required_document_id = 6
@@ -1472,6 +1500,10 @@ class VendorController extends Controller
         if (!$logoUrl && $vendor_results->config) {
             $logoUrl = $vendor_results->config->pbvc_logo ?? null;
         }
+
+        // ✅ Images (example: document types 7–10 are image types, adjust IDs as needed)
+        $imageDocuments = $vendorDocuments->where('pbvd_required_document_id', 7);
+        $images = $imageDocuments->pluck('pbvd_document_url')->toArray();
 
         // Add favorite flag
         $customer = customer::where('pbc_user_id', $user->pbu_id)->first();
@@ -1494,14 +1526,21 @@ class VendorController extends Controller
             'longatitude' => $vendor_results->pbv_longatitude,
             'latitude' => $vendor_results->pbv_latitude,
             'status' => $vendor_results->pbv_status,
-            'created_at' => $vendor_results->pbv_created_at,
+            'description' => $vendor_results->pbv_short_description,
+            'created_at' => $vendor_results->created_at,
             'display_name' => $vendor_results->pbv_display_name,
             'logo' => $logoUrl, // Use the document URL or fallback
             'service_at_time' => $vendor_results->pbv_staff_count,
-            'availability' => $this->groupAvailability($availability),
-            'images' => $vendor_results->pbv_images,
+            'availability' => $this->groupAvailability($availability),            
+            'images' => !empty($images)
+                        ? $images
+                        : (is_string($vendor_results->pbv_images)
+                            ? json_decode($vendor_results->pbv_images, true)
+                            : (is_array($vendor_results->pbv_images)
+                                ? $vendor_results->pbv_images
+                                : [])),
             'rating' => 3,
-            'isFav' => $isFav
+            //'isFav' => $isFav
         ];
 
         return response()->json([
