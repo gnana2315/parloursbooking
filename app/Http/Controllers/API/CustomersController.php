@@ -188,6 +188,7 @@ class CustomersController extends Controller
 
         // Fetch vendor details for the favourites
         $vendors = vendors::whereIn('pbv_id', $favourites)
+                    ->where('pbv_status', 1)
                     ->get();
 
         return response()->json([
