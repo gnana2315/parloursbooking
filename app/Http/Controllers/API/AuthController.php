@@ -17,6 +17,7 @@ use App\Services\OneSignalService;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\File;
 use Carbon\Carbon;
 use Validator;
 
@@ -321,18 +322,6 @@ class AuthController extends Controller
                     'accept_terms.required' => 'Please accept the terms and conditions',
                 ]
             );
-
-            // $userRegister = vendors::create([
-            //     'pbv_vendortype' => $request->vendor_type,
-            //     'pbv_first_name' => $request->first_name,
-            //     'pbv_last_name' => $request->last_name,
-            //     'pbv_address' => $request->address,
-            //     'pbv_city' => $request->city,
-            //     'pbv_gender' => $request->gender,
-            //     'pbv_dob' => $request->dob,
-            //     'pbv_contactno' => $user->pbu_mobileno,
-            //     'pbv_accept_terms' => $request->accept_terms
-            // ]);
 
             $user->update([
                 'pbu_mobileno' => $user->pbu_mobileno,
