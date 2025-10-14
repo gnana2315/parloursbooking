@@ -955,9 +955,9 @@ class BookingController extends Controller
 
         $generated_bookings = $bookings->map(function ($booking) {
             // Age calculation for each booking's customer
-            $birthDate = Carbon::parse($booking->customer->pbc_dob);
+            $birthDate = $booking->customer->pbc_dob ? Carbon::parse($booking->customer->pbc_dob) : null;
             $today = Carbon::now();
-            $age = !empty($birthDate) ? $today->diffInYears($birthDate) : "-";
+            $age = $birthDate ? $today->diffInYears($birthDate) : "-";
 
             $bookingDetails = [
                 'name' => $booking->customer->pbc_first_name . ' ' . $booking->customer->pbc_last_name,
