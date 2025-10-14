@@ -954,6 +954,8 @@ class BookingController extends Controller
         }
 
         $generated_bookings = $bookings->map(function ($booking) {
+            $customer = $booking->customer;
+            
             if ($customer) {
                 // Customer exists — calculate age and other details
                 $birthDate = $customer->pbc_dob ? Carbon::parse($customer->pbc_dob) : null;
