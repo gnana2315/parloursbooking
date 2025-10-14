@@ -957,7 +957,7 @@ class BookingController extends Controller
             // Age calculation for each booking's customer
             $birthDate = Carbon::parse($booking->customer->pbc_dob);
             $today = Carbon::now();
-            $age = $today->diffInYears($birthDate);
+            $age = !empty($birthDate) ? $today->diffInYears($birthDate) : "-";
 
             $bookingDetails = [
                 'name' => $booking->customer->pbc_first_name . ' ' . $booking->customer->pbc_last_name,
