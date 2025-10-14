@@ -954,18 +954,28 @@ class BookingController extends Controller
         }
 
         $generated_bookings = $bookings->map(function ($booking) {
-            // Age calculation for each booking's customer
-            $birthDate = $booking->customer->pbc_dob ? Carbon::parse($booking->customer->pbc_dob) : null;
-            $today = Carbon::now();
-            $age = $birthDate ? $today->diffInYears($birthDate) : "-";
+            if ($customer) {
+                // Customer exists — calculate age and other details
+                $birthDate = $customer->pbc_dob ? Carbon::parse($customer->pbc_dob) : null;
+                $age = $birthDate ? Carbon::now()->diffInYears($birthDate) : '-';
 
-            $bookingDetails = [
-                'name' => $booking->customer->pbc_first_name . ' ' . $booking->customer->pbc_last_name,
-                'contact_no' => $booking->customer->pbc_contact_no,
-                'age' => $age,
-                'gender' => ($booking->customer->pbc_sex == 1) ? 'Male' : 'Female',
-                'address' => $booking->customer->pbc_address . ' ' . $booking->customer->pbc_city
-            ];
+                $bookingDetails = [
+                    'name' => trim(($customer->pbc_first_name ?? '') . ' ' . ($customer->pbc_last_name ?? '')),
+                    'contact_no' => $customer->pbc_contact_no ?? '-',
+                    'age' => $age,
+                    'gender' => ($customer->pbc_sex == 1) ? 'Male' : 'Female',
+                    'address' => trim(($customer->pbc_address ?? '') . ' ' . ($customer->pbc_city ?? '')),
+                ];
+            } else {
+                // Manual booking (no linked customer)
+                $bookingDetails = [
+                    'name' => $booking->pbb_customer_name ?? 'Walk-in Customer',
+                    'contact_no' => $booking->pbb_contact_no ?? '-',
+                    'age' => '-',
+                    'gender' => '-',
+                    'address' => $booking->pbb_customer_address ?? '-',
+                ];
+            }
 
             // Convert services to string array
             $serviceNames = $booking->bookingDetails->map(function ($detail) {
