@@ -1561,6 +1561,7 @@ class VendorController extends Controller
             'created_at' => $vendor_results->created_at,
             'display_name' => $vendor_results->pbv_display_name,
             'logo' => $logoUrl, // Use the document URL or fallback
+            'profile_image' => $vendor_results->pbv_profile_image,
             'service_at_time' => $vendor_results->pbv_staff_count,
             'availability' => $this->groupAvailability($availability),            
             'images' => !empty($images)
