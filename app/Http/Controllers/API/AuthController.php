@@ -333,11 +333,33 @@ class AuthController extends Controller
                 'pbu_dob' => $request->dob,
             ]);
 
+            $publicPath = '';
+            if ($request->hasFile('profile_image')) {
+                $profile_image = $request->file('profile_image');
+                $folder = 'uploads/vendors/';
+                $folderPath = public_path($folder);
+
+                // Create the folder if it doesn't exist
+                if (!File::exists($folderPath)) {
+                    File::makeDirectory($folderPath, 0755, true);
+                }
+
+                $profile_image_filename = $user->pbu_id . '_' . time() . '_profile_image.' . $profile_image->getClientOriginalExtension();
+                $profile_image->move($folderPath, $profile_image_filename);
+
+                // Generate public URL path
+                $publicPath = url($folder . '/' . $profile_image_filename);
+
+                // Save public URL in DB
+                $request->merge(['profile_image' => $publicPath]);
+            }
+
             $userRegister = vendors::create([
                 'pbv_vendortype' => $request->vendor_type,
                 'pbv_first_name' => $request->first_name,
                 'pbv_last_name' => $request->last_name,
-                'pbv_accept_terms' => $request->accept_terms
+                'pbv_accept_terms' => $request->accept_terms,
+                'pbv_profile_image' => $publicPath,
             ]);
 
             $user->update([
