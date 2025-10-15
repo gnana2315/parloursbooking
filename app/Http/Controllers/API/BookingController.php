@@ -1113,19 +1113,43 @@ class BookingController extends Controller
             return response()->json(['message' => 'No bookings found'], 404);
         }
 
+        $customer = $bookings->customer;
+            
+        if ($customer) {
+            // Customer exists — calculate age and other details
+            $birthDate = $customer->pbc_dob ? Carbon::parse($customer->pbc_dob) : null;
+            $age = $birthDate ? Carbon::now()->diffInYears($birthDate) : '-';
+
+            $bookingDetails = [
+                'name' => trim(($customer->pbc_first_name ?? '') . ' ' . ($customer->pbc_last_name ?? '')),
+                'contact_no' => $customer->pbc_contact_no ?? '-',
+                'age' => $age,
+                'gender' => ($customer->pbc_sex == 1) ? 'Male' : 'Female',
+                'address' => trim(($customer->pbc_address ?? '') . ' ' . ($customer->pbc_city ?? '')),
+            ];
+        } else {
+            // Manual booking (no linked customer)
+            $bookingDetails = [
+                'name' => $booking->pbb_customer_name ?? 'Walk-in Customer',
+                'contact_no' => $booking->pbb_contact_no ?? '-',
+                'age' => '-',
+                'gender' => '-',
+                'address' => $booking->pbb_customer_address ?? '-',
+            ];
+        }
         //dd($bookings->customer);
         // age calculation
-        $birthDate = Carbon::parse($bookings->customer->pbc_dob);
-        $today = Carbon::now();
-        $age = $today->diffInYears($birthDate);
+        // $birthDate = Carbon::parse($bookings->customer->pbc_dob);
+        // $today = Carbon::now();
+        // $age = $today->diffInYears($birthDate);
 
-        $bookingDetails = [
-            'name' => $bookings->customer->pbc_first_name . ' ' . $bookings->customer->pbc_last_name,
-            'contact_no' => $bookings->customer->pbc_contact_no,
-            'age' => $age,
-            'gender' => ($bookings->customer->pbc_sex == 1) ? 'Male' : 'Female',
-            'address' => $bookings->customer->pbc_address . ' ' . $bookings->customer->pbc_city
-        ];    
+        // $bookingDetails = [
+        //     'name' => $bookings->customer->pbc_first_name . ' ' . $bookings->customer->pbc_last_name,
+        //     'contact_no' => $bookings->customer->pbc_contact_no,
+        //     'age' => $age,
+        //     'gender' => ($bookings->customer->pbc_sex == 1) ? 'Male' : 'Female',
+        //     'address' => $bookings->customer->pbc_address . ' ' . $bookings->customer->pbc_city
+        // ];    
         
         $booking_details = [
             'pbb_id' => $bookings->pbb_id,
