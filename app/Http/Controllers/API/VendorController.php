@@ -192,7 +192,6 @@ class VendorController extends Controller
                     // 'br_no.required' => 'BR No is required'
                 ]
             );
-            $request->br_no = null;
         }else{
             return response()->json(['message' => 'Invalid vendor type'], 400);
         }
@@ -202,7 +201,7 @@ class VendorController extends Controller
             'pbv_business_name' => $request->business_name,
             'pbv_display_name' => !empty($request->display_name) ? $request->display_name : $request->business_name,
             'pbv_short_description' => $request->short_description,
-            'pbv_brno' => $request->br_no,
+            'pbv_brno' => $request->br_no ?? null,
             'pbv_address' => $request->address,
             'pbv_city' => $request->city_id,
             'pbv_longatitude' => $request->longatitude,
@@ -861,17 +860,20 @@ class VendorController extends Controller
                 'accountno.numeric' => 'Bank no must be Numeric',
             ]
         );
-
-        $vendorBankInfoUpdate = vendorBankInfo::create([
-            'pbvb_vendorid' => $vendor->pbv_id,
-            'pbvb_bankname' => $request->bankid,
-            'pbvb_branch' => $request->branch,
-            'pbvb_branch_code' => $request->branch_code,
-            'pbvb_holder_name' => $request->account_holder_name,
-            'pbvb_accountno' => $request->accountno,
-            'pbvb_is_active' => 1,
-            'pbvb_status' => 0
-        ]);
+        
+        $vendorBankInfoUpdate = vendorBankInfo::updateOrCreate(            
+            ['pbvb_vendorid' => $vendor->pbv_id],
+            [
+                'pbvb_vendorid' => $vendor->pbv_id,
+                'pbvb_bankname' => $request->bankid,
+                'pbvb_branch' => $request->branch,
+                'pbvb_branch_code' => $request->branch_code,
+                'pbvb_holder_name' => $request->account_holder_name,
+                'pbvb_accountno' => $request->accountno,
+                'pbvb_is_active' => 1,
+                'pbvb_status' => 0
+            ]
+        );
 
         if($vendorBankInfoUpdate){
             $status_code = 200;
@@ -2281,8 +2283,7 @@ class VendorController extends Controller
                                 && !empty($bankDetails->pbvb_bankname)
                                 && !empty($bankDetails->pbvb_holder_name)
                                 && !empty($bankDetails->pbvb_branch)
-                                && !empty($bankDetails->pbvb_accountno)
-                                && !empty($bankDetails->pbvb_branch_code);                                
+                                && !empty($bankDetails->pbvb_accountno);                                
 
         $vendorDetailStatus = [
             [
