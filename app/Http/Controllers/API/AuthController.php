@@ -358,6 +358,9 @@ class AuthController extends Controller
                 'pbv_vendortype' => $request->vendor_type,
                 'pbv_first_name' => $request->first_name,
                 'pbv_last_name' => $request->last_name,
+                'pbv_address' => $request->address,
+                'pbv_gender' => $request->gender,
+                'pbv_dob' => $request_dob,
                 'pbv_accept_terms' => $request->boolean('accept_terms'),
                 'pbv_profile_image' => $publicPath,
             ]);

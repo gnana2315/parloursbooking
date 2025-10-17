@@ -48,7 +48,12 @@ class vendors extends Model
         'pbv_therapist_service_area',
         'created_at',
         'updated_at',
-        'deleted_at'
+        'deleted_at',
+        'pbv_images',
+        'pbv_first_name',
+        'pbv_last_name',
+        'pbv_gender',
+        'pbv_dob'
     ];
 
     protected $casts = [
