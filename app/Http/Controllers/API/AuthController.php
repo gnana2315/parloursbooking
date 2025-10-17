@@ -744,16 +744,18 @@ class AuthController extends Controller
     public function userForgotPassword(Request $request){
         $request->validate(
             [
+                'user_type' => 'required',
                 'phone_no' => 'required|exists:users,pbu_mobileno',
             ],
             [
+                'user_type.required' => 'User Type undefined',
                 'phone_no.required' => 'Phone No Required',
                 'phone_no.exists' => 'Phone No not in the system',
             ]
         );
         
         // Find user by mobile number
-        $user = User::where('pbu_mobileno', $request->phone_no)->first();
+        $user = User::whereIn(['pbu_mobileno', $request->phone_no, 'user_type', $request->user_type])->first();
 
         $verfivation_code = $this->generateVerificationCode($user->pbu_id); 
 
