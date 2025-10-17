@@ -349,7 +349,7 @@ class VendorController extends Controller
             ]);
             
             $message = 'Vendor Details saved successfully'; 
-            $status = 200;
+            $status = 200; 
         }else{
             $message = 'Vendor Details failed to save';
             $status = 500;
