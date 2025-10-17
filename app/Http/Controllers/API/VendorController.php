@@ -167,34 +167,39 @@ class VendorController extends Controller
  * )
  */
     public function businessVendorRegister(Request $request){
-        $user = auth()->user();        
+        $user = auth()->user();
         
         $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
-        if($vendor->pbv_vendortype == '1'){
-            $request->validate(
-                [
-                    'business_name' => 'required',
-                    'address' => 'required',
-                    'city_id' => 'required',
-                    'longatitude' => 'required',
-                    'latitude' => 'required',
-                    'email' => 'email|unique:vendor,pbv_email'
-                    // 'br_no' => 'required'
-                ],
-                [
-                    'business_name.required' => 'Parlour name is required',
-                    'address.required' => 'Address is required',
-                    'city_id.required' => 'City is required',
-                    'longatitude.required' => 'Location is required',
-                    'latitude.required' => 'Location is required',
-                    'email.email' => 'Email must be a valid email address',
-                    'email.unique' => 'Email already exists'
-                    // 'br_no.required' => 'BR No is required'
-                ]
-            );
-        }else{
+
+        if (!$vendor) {
+            return response()->json(['message' => 'Vendor not found'], 404);
+        }
+
+        if ($vendor->pbv_vendortype != '1') {
             return response()->json(['message' => 'Invalid vendor type'], 400);
         }
+
+        $request->validate(
+            [
+                'business_name' => 'required',
+                'address' => 'required',
+                'city_id' => 'required',
+                'longatitude' => 'required',
+                'latitude' => 'required',
+                'email' => 'email|unique:vendor,pbv_email'
+                // 'br_no' => 'required'
+            ],
+            [
+                'business_name.required' => 'Parlour name is required',
+                'address.required' => 'Address is required',
+                'city_id.required' => 'City is required',
+                'longatitude.required' => 'Location is required',
+                'latitude.required' => 'Location is required',
+                'email.email' => 'Email must be a valid email address',
+                'email.unique' => 'Email already exists'
+                // 'br_no.required' => 'BR No is required'
+            ]
+        );
 
         $vendorsUpdate = $vendor->update([ 
             'pbv_tenentid' => 1,
@@ -291,29 +296,33 @@ class VendorController extends Controller
         
         $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
         
-        if ($vendor->pbv_vendortype == '2'){
-            $request->validate(
-                [
-                    'address' => 'required',
-                    'city_id' => 'required',
-                    'service_area' => 'required',
-                    'email' => 'email|unique:vendor,pbv_email',
-                    'contact_no' => 'required',
-                    'nic_no' => 'required'
-                ],
-                [
-                    'address.required' => 'Address is required',
-                    'city_id.required' => 'City is required',
-                    'service_area.required' => 'Service area is required',
-                    'email.email' => 'Email must be a valid email address',
-                    'email.unique' => 'Email already exists',
-                    'contact_no.required' => 'Contact No is required',
-                    'nic_no.required' => 'NIC No is required'
-                ]
-            );
-        }else{
+        if (!$vendor) {
+            return response()->json(['message' => 'Vendor not found'], 404);
+        }
+
+        if ($vendor->pbv_vendortype != '2') {
             return response()->json(['message' => 'Invalid vendor type'], 400);
         }
+
+        $request->validate(
+            [
+                'address' => 'required',
+                'city_id' => 'required',
+                'service_area' => 'required',
+                'email' => 'email|unique:vendor,pbv_email',
+                'contact_no' => 'required',
+                'nic_no' => 'required'
+            ],
+            [
+                'address.required' => 'Address is required',
+                'city_id.required' => 'City is required',
+                'service_area.required' => 'Service area is required',
+                'email.email' => 'Email must be a valid email address',
+                'email.unique' => 'Email already exists',
+                'contact_no.required' => 'Contact No is required',
+                'nic_no.required' => 'NIC No is required'
+            ]
+        );
 
         $therapist_name = $user->pbu_first_name . ' ' .$user->pbu_last_name;
         $vendorsUpdate = $vendor->update([ 
