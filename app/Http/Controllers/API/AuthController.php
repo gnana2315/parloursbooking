@@ -360,7 +360,7 @@ class AuthController extends Controller
                 'pbv_last_name' => $request->last_name,
                 'pbv_address' => $request->address,
                 'pbv_gender' => $request->gender,
-                'pbv_dob' => $request_dob,
+                'pbv_dob' => $request->dob,
                 'pbv_accept_terms' => $request->boolean('accept_terms'),
                 'pbv_profile_image' => $publicPath,
             ]);
