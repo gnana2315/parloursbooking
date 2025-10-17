@@ -2282,7 +2282,7 @@ class VendorController extends Controller
         $documents = vendorDocuments::where('pbvd_vendor_id', $vendor->pbv_id)
             ->whereIn('pbvd_required_document_id', $documentIds)
             ->get();
-        dd($documents);
+        dd(count($documents), count($documentIds));
         $allDocumentsUploaded = (count($documentIds) > 0)
                                 ? (count($documents) === count($documentIds))
                                 : true;
