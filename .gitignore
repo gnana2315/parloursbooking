@@ -9,6 +9,7 @@
 config/l5-swagger.php
 
 # Laravel specific
+/storage/
 /storage/app/public
 /storage/framework/cache/*
 /storage/framework/sessions/*
