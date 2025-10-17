@@ -358,7 +358,7 @@ class AuthController extends Controller
                 'pbv_vendortype' => $request->vendor_type,
                 'pbv_first_name' => $request->first_name,
                 'pbv_last_name' => $request->last_name,
-                'pbv_accept_terms' => ($request->accept_terms) ? 1 : 0,
+                'pbv_accept_terms' => $request->boolean('accept_terms'),
                 'pbv_profile_image' => $publicPath,
             ]);
 
@@ -419,7 +419,7 @@ class AuthController extends Controller
                 'pbc_dob' => $request->dob,
                 'pbc_contact_no' => $user->pbu_mobileno,
                 'pbc_profile_image' => $publicPath,
-                'pbc_accept_terms' => ($request->accept_terms) ? 1 : 0,
+                'pbc_accept_terms' => $request->boolean('accept_terms'),
                 'pbc_status' => 1
             ]);
 
