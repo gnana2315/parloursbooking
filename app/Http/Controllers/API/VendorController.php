@@ -2327,9 +2327,8 @@ class VendorController extends Controller
             : null;
 
         // check if any service are present in vendor services
-        $vendorServices = services::where('pbs_vendor_id', $vendor->pbv_id)
-                                        ->pluck('pbs_id')
-                                        ->toArray();
+        $vendorServices = vendorServices::where('pbs_vendor_id', $vendor->pbv_id)
+                                        ->get(['pbs_service_id', 'updated_at']);        
 
         $hasServices = !empty($vendorServices) ? true : false;
 
