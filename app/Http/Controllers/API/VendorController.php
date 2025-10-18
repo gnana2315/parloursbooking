@@ -2288,6 +2288,81 @@ class VendorController extends Controller
         //                         : true;
         $documents = vendorDocuments::where('pbvd_vendor_id', $vendor->pbv_id)
                                     ->whereIn('pbvd_required_document_id', $documentIds)
+                                    ->pluck('pbvd_required_document_id')
+                                    ->toArray();
+
+        // Check if all required document IDs are present in uploaded list
+        $allDocumentsUploaded = empty($documentIds)
+            ? true
+            : !array_diff($documentIds, $documents);
+        $latestDocumentUpdate = $documents->isNotEmpty() ? $documents->max('updated_at') : null;
+
+        $bankDetails = vendorBankInfo::where('pbvb_vendorid', $vendor->pbv_id)->first();
+        
+        $allBankDetailsFilled = $bankDetails
+                                && !empty($bankDetails->pbvb_bankname)
+                                && !empty($bankDetails->pbvb_holder_name)
+                                && !empty($bankDetails->pbvb_branch)
+                                && !empty($bankDetails->pbvb_accountno);                                
+
+        $vendorDetailStatus = [
+            [
+                'type' => 'vendor_info_status',
+                'status' => $allHaveValues,
+                'updated_at' => $vendor->updated_at ? $vendor->updated_at->format('Y-m-d H:i:s') : null,
+            ],
+            [
+                'type' => 'vendor_documents_status',
+                'status' => $allDocumentsUploaded,
+                'updated_at' => $latestDocumentUpdate ? \Carbon\Carbon::parse($latestDocumentUpdate)->format('Y-m-d H:i:s') : null,
+            ],
+            [
+                'type' => 'vendor_bankdetails_status',
+                'status' => $allBankDetailsFilled,
+                'updated_at' => $bankDetails?->updated_at ? $bankDetails->updated_at->format('Y-m-d H:i:s') : null,
+            ]
+        ];
+
+        return response()->json([
+            'success' => true,
+            'data' => $vendorDetailStatus
+        ], 200);
+    }
+
+    public function getVendorDetailStatus_v1(){
+        $user = auth()->user();
+        $vendor = vendors::find($user->pbu_vid);        
+
+        if (!$vendor) {
+            return response()->json(['message' => 'Vendor not found'], 404);
+        }
+
+        $vendorInfoFields = [];
+        $documentIds = requiredDocument::where('pbrd_vendor_type', $vendor->pbv_vendortype)
+            ->pluck('pbrd_id')
+            ->toArray();        
+
+        if ($vendor->pbv_vendortype == '1') {
+            $vendorInfoFields = ['pbv_business_name', 'pbv_address', 'pbv_city', 'pbv_longatitude', 'pbv_latitude', 'pbv_email'];
+        } elseif ($vendor->pbv_vendortype == '2') {
+            $vendorInfoFields = ['pbv_business_category', 'pbv_address', 'pbv_city', 'pbv_email', 'pbv_brno'];
+        } else {
+            return response()->json(['message' => 'Invalid vendor type'], 400);
+        }
+
+        $allHaveValues = collect($vendorInfoFields)->every(function ($field) use ($vendor) {
+            return !is_null($vendor->$field);
+        });
+
+        // $documents = vendorDocuments::where('pbvd_vendor_id', $vendor->pbv_id)
+        //     ->whereIn('pbvd_required_document_id', $documentIds)
+        //     ->get();
+        
+        // $allDocumentsUploaded = (count($documentIds) > 0)
+        //                         ? (count($documents) === count($documentIds))
+        //                         : true;
+        $documents = vendorDocuments::where('pbvd_vendor_id', $vendor->pbv_id)
+                                    ->whereIn('pbvd_required_document_id', $documentIds)
                                     ->get(['pbvd_required_document_id', 'updated_at']);
 
         $uploadedIds = $documents->pluck('pbvd_required_document_id')->toArray();
