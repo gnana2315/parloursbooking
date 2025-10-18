@@ -2309,9 +2309,9 @@ class VendorController extends Controller
                                 && !empty($bankDetails->pbvb_branch)
                                 && !empty($bankDetails->pbvb_accountno); 
         
-        $vendorAvailability = vendorStandardAvailability::where('pbva_vendor_id', $vendor->pbv_id)
-                                                ->whereIn('pbva_day', ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'])
-                                                ->pluck('pbva_day')
+        $vendorAvailability = vendorStandardAvailability::where('pbvsa_vendor_id', $vendor->pbv_id)
+                                                ->whereIn('pbvsa_day', ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'])
+                                                ->pluck('pbvsa_day')
                                                 ->toArray();
 
         $requiredDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
