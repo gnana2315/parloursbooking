@@ -2288,14 +2288,18 @@ class VendorController extends Controller
         //                         : true;
         $documents = vendorDocuments::where('pbvd_vendor_id', $vendor->pbv_id)
                                     ->whereIn('pbvd_required_document_id', $documentIds)
-                                    ->pluck('pbvd_required_document_id')
-                                    ->toArray();
+                                    ->get(['pbvd_required_document_id', 'updated_at']);
+
+        $uploadedIds = $documents->pluck('pbvd_required_document_id')->toArray();
 
         // Check if all required document IDs are present in uploaded list
         $allDocumentsUploaded = empty($documentIds)
-            ? true
-            : !array_diff($documentIds, $documents);
-        $latestDocumentUpdate = !empty($documents) ? $documents->max('updated_at') : null;
+                                ? true
+                                : !array_diff($documentIds, $uploadedIds);
+
+        $latestDocumentUpdate = $documents->isNotEmpty()
+            ? $documents->max('updated_at')
+            : null;
 
         $bankDetails = vendorBankInfo::where('pbvb_vendorid', $vendor->pbv_id)->first();
 
