@@ -94,7 +94,7 @@ class VendorController extends Controller
             'pbv_contactno' => $user->pbu_mobileno,
             'pbv_accept_terms' => 1,
             'pbv_staff_count' => ($request->business_type == '1') ? $request->staff_no : 1,
-            'pbv_status' => 0,
+            'pbv_status' => 1,
         ]);
 
         if($vendorsUpdate){
@@ -215,7 +215,7 @@ class VendorController extends Controller
             'pbv_contactno' => $user->pbu_mobileno,
             'pbv_accept_terms' => 1,
             'pbv_staff_count' => $request->staff_no ?? 1,
-            'pbv_status' => 0,
+            'pbv_status' => 1,
         ]);
 
         if($vendorsUpdate){
@@ -340,7 +340,7 @@ class VendorController extends Controller
             'pbv_contactno' => $request->contact_no ?? $user->pbu_mobileno,
             'pbv_accept_terms' => 1,
             'pbv_staff_count' => 1,
-            'pbv_status' => 0,
+            'pbv_status' => 1,
         ]);
 
         if($vendorsUpdate){
@@ -1483,12 +1483,13 @@ class VendorController extends Controller
         //             // DB::raw('AVG(pb_ratings.pbr_rating) as average_rating')
         //         )
         //         ->where([
-        //             ['vendor.pbv_id', $vendor_id], ['vendor.pbv_status', 1]
+        //             ['vendor.pbv_id', $vendor_id], ['vendor.pbv_status', 2]
         //         ])
         // 
         // $vendor_results = vendors::with(['city', 'availability', 'vendorDocuments'])
         $vendor_results = vendors::with(['city', 'availability', 'vendorDocuments'])
             ->where('pbv_id', $user->pbu_vid)
+            ->where('pbv_status', 2)
             ->first();
             
         if (!$vendor_results) {

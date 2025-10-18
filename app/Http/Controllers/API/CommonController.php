@@ -93,7 +93,7 @@ class CommonController extends Controller
                 // DB::raw('AVG(pb_ratings.pbr_rating) as average_rating')
             )
             ->where([
-                ['pbv_status', '=', 1],
+                ['pbv_status', '=', 2],
                 ['pbv_servicefor', '=', $service_for_id],
             ])
             ->get();

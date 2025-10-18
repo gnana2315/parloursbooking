@@ -188,7 +188,7 @@ class CustomersController extends Controller
 
         // Fetch vendor details for the favourites
         $vendors = vendors::whereIn('pbv_id', $favourites)
-                    ->where('pbv_status', 1)
+                    ->where('pbv_status', 2)
                     ->get();
 
         return response()->json([
@@ -437,12 +437,12 @@ class CustomersController extends Controller
         //             // DB::raw('AVG(pb_ratings.pbr_rating) as average_rating')
         //         )
         //         ->where([
-        //             ['vendor.pbv_id', $vendor_id], ['vendor.pbv_status', 1]
+        //             ['vendor.pbv_id', $vendor_id], ['vendor.pbv_status', 2]
         //         ])
         //         ->get(); 
         $vendor_results = vendors::with(['config', 'city', 'availability', 'vendorDocuments'])
             ->where('pbv_id', $vendor_id)
-            ->where('pbv_status', 1)
+            ->where('pbv_status', 2)
             ->first();      
         //dd($vendor_results);
         if (!$vendor_results) {
