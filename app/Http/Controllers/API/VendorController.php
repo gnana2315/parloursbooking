@@ -2279,21 +2279,50 @@ class VendorController extends Controller
             return !is_null($vendor->$field);
         });
 
-        $documents = vendorDocuments::where('pbvd_vendor_id', $vendor->pbv_id)
-            ->whereIn('pbvd_required_document_id', $documentIds)
-            ->get();
+        // $documents = vendorDocuments::where('pbvd_vendor_id', $vendor->pbv_id)
+        //     ->whereIn('pbvd_required_document_id', $documentIds)
+        //     ->get();
         
-        $allDocumentsUploaded = (count($documentIds) > 0)
-                                ? (count($documents) === count($documentIds))
-                                : true;
+        // $allDocumentsUploaded = (count($documentIds) > 0)
+        //                         ? (count($documents) === count($documentIds))
+        //                         : true;
+        $documents = vendorDocuments::where('pbvd_vendor_id', $vendor->pbv_id)
+                                    ->whereIn('pbvd_required_document_id', $documentIds)
+                                    ->pluck('pbvd_required_document_id')
+                                    ->toArray();
+
+        // Check if all required document IDs are present in uploaded list
+        $allDocumentsUploaded = empty($documentIds)
+            ? true
+            : !array_diff($documentIds, $documents);
         $latestDocumentUpdate = $documents->isNotEmpty() ? $documents->max('updated_at') : null;
 
         $bankDetails = vendorBankInfo::where('pbvb_vendorid', $vendor->pbv_id)->first();
+
         $allBankDetailsFilled = $bankDetails
                                 && !empty($bankDetails->pbvb_bankname)
                                 && !empty($bankDetails->pbvb_holder_name)
                                 && !empty($bankDetails->pbvb_branch)
-                                && !empty($bankDetails->pbvb_accountno);                                
+                                && !empty($bankDetails->pbvb_accountno); 
+        
+        $vendorAvailability = vendorAvailability::where('pbva_vendor_id', $vendor->pbv_id)
+                                                ->whereIn('pbva_day', ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'])
+                                                ->pluck('pbva_day')
+                                                ->toArray();
+
+        $requiredDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+
+        // Check if all required weekdays are present
+        $hasWeekdayAvailability = !array_diff($requiredDays, $vendorAvailability);
+
+        $latestAvailabilityUpdate = $vendorAvailability->isNotEmpty() ? $vendorAvailability->max('updated_at') : null;
+
+        // check if any service are present in vendor services
+        $vendorServices = services::where('pbvs_vendor_id', $vendor->pbv_id)
+                                        ->pluck('pbs_id')
+                                        ->toArray();
+
+        $hasServices = !empty($vendorServices) ? true : false;
 
         $vendorDetailStatus = [
             [
@@ -2310,7 +2339,17 @@ class VendorController extends Controller
                 'type' => 'vendor_bankdetails_status',
                 'status' => $allBankDetailsFilled,
                 'updated_at' => $bankDetails?->updated_at ? $bankDetails->updated_at->format('Y-m-d H:i:s') : null,
-            ]
+            ],
+            [
+                'type' => 'vendor_weekday_availability_status',
+                'status' => $hasWeekdayAvailability,
+                'updated_at' => $latestAvailabilityUpdate ? \Carbon\Carbon::parse($latestAvailabilityUpdate)->format('Y-m-d H:i:s') : null,
+            ],
+            [
+                'type' => 'vendor_services_status',
+                'status' => $hasServices,
+                'updated_at' => $vendorServices->isNotEmpty() ? $vendorServices->max('updated_at')->format('Y-m-d H:i:s') : null,
+            ],
         ];
 
         return response()->json([
