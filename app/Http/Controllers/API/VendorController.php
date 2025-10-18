@@ -2295,7 +2295,7 @@ class VendorController extends Controller
         $allDocumentsUploaded = empty($documentIds)
             ? true
             : !array_diff($documentIds, $documents);
-        $latestDocumentUpdate = $documents->isNotEmpty() ? $documents->max('updated_at') : null;
+        $latestDocumentUpdate = !empty($documents) ? $documents->max('updated_at') : null;
 
         $bankDetails = vendorBankInfo::where('pbvb_vendorid', $vendor->pbv_id)->first();
 
