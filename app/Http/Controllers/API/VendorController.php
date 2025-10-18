@@ -2348,7 +2348,7 @@ class VendorController extends Controller
             [
                 'type' => 'vendor_services_status',
                 'status' => $hasServices,
-                'updated_at' => $vendorServices->isNotEmpty() ? $vendorServices->max('updated_at')->format('Y-m-d H:i:s') : null,
+                'updated_at' => !empty($vendorServices) ? $vendorServices->max('updated_at')->format('Y-m-d H:i:s') : null,
             ],
         ];
 
