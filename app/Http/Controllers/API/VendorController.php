@@ -2315,7 +2315,7 @@ class VendorController extends Controller
         // Check if all required weekdays are present
         $hasWeekdayAvailability = !array_diff($requiredDays, $vendorAvailability);
 
-        $latestAvailabilityUpdate = $vendorAvailability->isNotEmpty() ? $vendorAvailability->max('updated_at') : null;
+        $latestAvailabilityUpdate = !empty($vendorAvailability) ? $vendorAvailability->max('updated_at') : null;
 
         // check if any service are present in vendor services
         $vendorServices = services::where('pbvs_vendor_id', $vendor->pbv_id)
