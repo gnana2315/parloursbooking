@@ -2310,16 +2310,21 @@ class VendorController extends Controller
                                 && !empty($bankDetails->pbvb_accountno); 
         
         $vendorAvailability = vendorStandardAvailability::where('pbvsa_vendor_id', $vendor->pbv_id)
-                                                ->whereIn('pbvsa_day', ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'])
-                                                ->pluck('pbvsa_day')
-                                                ->toArray();
+                                                        ->whereIn('pbvsa_day', ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'])
+                                                        ->get(['pbvsa_day', 'updated_at']); // 👈 keep as Collection
 
         $requiredDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
-        // Check if all required weekdays are present
-        $hasWeekdayAvailability = !array_diff($requiredDays, $vendorAvailability);
+        // Extract only the day names for comparison
+        $availableDays = $vendorAvailability->pluck('pbvsa_day')->toArray();
 
-        $latestAvailabilityUpdate = !empty($vendorAvailability) ? $vendorAvailability->max('updated_at') : null;
+        // Check if all weekdays are available
+        $hasWeekdayAvailability = !array_diff($requiredDays, $availableDays);
+
+        // Get latest updated_at
+        $latestAvailabilityUpdate = $vendorAvailability->isNotEmpty()
+            ? $vendorAvailability->max('updated_at')
+            : null;
 
         // check if any service are present in vendor services
         $vendorServices = services::where('pbvs_vendor_id', $vendor->pbv_id)
