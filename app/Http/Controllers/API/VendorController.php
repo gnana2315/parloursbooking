@@ -173,7 +173,7 @@ class VendorController extends Controller
         $user = auth()->user();
         
         $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
-        Log::info('Vendor Response:', ['vendor' => $vendor]);
+        
         if (!$vendor) {
             return response()->json(['message' => 'Vendor not found'], 404);
         }
@@ -222,7 +222,7 @@ class VendorController extends Controller
             ]);
             throw $e; // Re-throw so Laravel handles the JSON response
         }
-        
+        Log::info('Vendor Response:', ['vendor' => $vendor]);
         $vendorsUpdate = $vendor->update([ 
             'pbv_tenentid' => 1,
             'pbv_business_name' => $request->business_name,
