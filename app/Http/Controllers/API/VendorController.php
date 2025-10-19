@@ -226,7 +226,7 @@ class VendorController extends Controller
             return response()->json([
                 'status' => false,
                 'message' => 'Validation failed',
-                'errors' => $e->errors()
+                'error' => $e->errors()
             ], 422);
         }
 
