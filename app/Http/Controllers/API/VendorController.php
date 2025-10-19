@@ -220,7 +220,7 @@ class VendorController extends Controller
             'pbv_staff_count' => $request->staff_no ?? 1,
             'pbv_status' => 1,
         ]);
-        Log::info('Vendor Request Update Response:', ['vendorsUpdate' => $vendorsUpdate]);
+        Log::info('Vendor Request Update Response :', ['vendorsUpdate' => $vendorsUpdate]);
 
         if($vendorsUpdate){
             $user->update([
