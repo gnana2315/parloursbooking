@@ -182,27 +182,46 @@ class VendorController extends Controller
             return response()->json(['message' => 'Invalid vendor type'], 400);
         }
 
-        $request->validate(
-            [
+        // $request->validate(
+        //     [
+        //         'business_name' => 'required',
+        //         'address' => 'required',
+        //         'city_id' => 'required',
+        //         'longatitude' => 'required',
+        //         'latitude' => 'required',
+        //         'email' => 'email|unique:vendor,pbv_email'
+        //         // 'br_no' => 'required'
+        //     ],
+        //     [
+        //         'business_name.required' => 'Parlour name is required',
+        //         'address.required' => 'Address is required',
+        //         'city_id.required' => 'City is required',
+        //         'longatitude.required' => 'Location is required',
+        //         'latitude.required' => 'Location is required',
+        //         'email.email' => 'Email must be a valid email address',
+        //         'email.unique' => 'Email already exists'
+        //         // 'br_no.required' => 'BR No is required'
+        //     ]
+        // );
+         try {
+            $validated = $request->validate([
                 'business_name' => 'required',
                 'address' => 'required',
                 'city_id' => 'required',
                 'longatitude' => 'required',
                 'latitude' => 'required',
                 'email' => 'email|unique:vendor,pbv_email'
-                // 'br_no' => 'required'
-            ],
-            [
-                'business_name.required' => 'Parlour name is required',
-                'address.required' => 'Address is required',
-                'city_id.required' => 'City is required',
-                'longatitude.required' => 'Location is required',
-                'latitude.required' => 'Location is required',
-                'email.email' => 'Email must be a valid email address',
-                'email.unique' => 'Email already exists'
-                // 'br_no.required' => 'BR No is required'
-            ]
-        );
+            ]);
+
+            Log::info('Validation successful', ['validated_data' => $validated]);
+
+        } catch (ValidationException $e) {
+            Log::error('Validation failed', [
+                'errors' => $e->errors(),
+                'input' => $request->all()
+            ]);
+            throw $e; // Re-throw so Laravel handles the JSON response
+        }
         
         $vendorsUpdate = $vendor->update([ 
             'pbv_tenentid' => 1,
