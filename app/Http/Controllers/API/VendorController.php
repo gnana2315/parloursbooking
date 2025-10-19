@@ -248,9 +248,9 @@ class VendorController extends Controller
         Log::info('Step 6: Vendor update result', ['success' => $vendorsUpdate]);
 
         if($vendorsUpdate){
-            $user->update([
-                'pbu_email' => $request->email,
-            ]);
+            // $user->update([
+            //     'pbu_email' => $request->email,
+            // ]);
             
             $message = 'Vendor Details saved successfully'; 
             $status = 200;
