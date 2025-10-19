@@ -20,6 +20,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\File;
 use Carbon\Carbon;
 use Validator;
+use Illuminate\Support\Facades\Log;
 
 
 /**
@@ -68,6 +69,7 @@ class AuthController extends Controller
      */
     //user mobile verification
     public function userRegisterMobileNo(Request $request){
+        Log::info('User Mobile No Register Requests:', $request->all());
         User::where('pbu_mobileno', $request->phone_no)
             ->where('pbu_usertype', $request->user_type)
             ->where(function ($query) {
@@ -204,6 +206,7 @@ class AuthController extends Controller
      * )
      */
     public function verifyVerificationCode(Request $request){
+        Log::info('Verify OTPRequests:', $request->all());
         $request->validate(
             [
                 'user_id' => 'required|exists:users,pbu_id',
@@ -290,6 +293,7 @@ class AuthController extends Controller
      */
     public function userRegistration(Request $request){
         //, FirebaseService $firebase
+        Log::info('User Register Requests:', $request->all());
         $user = User::find($request->user_id);
         if (!$user) {
             return response()->json(['message' => 'User not found'], 404);

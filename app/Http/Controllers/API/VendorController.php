@@ -28,10 +28,12 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class VendorController extends Controller
 {   
     public function vendorRegister(Request $request){
+        Log::info('Vendor Register Requests:', $request->all());
         $user = auth()->user();        
         
         $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
@@ -167,6 +169,7 @@ class VendorController extends Controller
  * )
  */
     public function businessVendorRegister(Request $request){
+        Log::info('Business Register Requests:', $request->all());
         $user = auth()->user();
         
         $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
@@ -292,6 +295,7 @@ class VendorController extends Controller
  * )
  */
     public function therapistVendorRegister(Request $request){
+        Log::info('Therapist Register Requests:', $request->all());
         $user = auth()->user();        
         
         $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
