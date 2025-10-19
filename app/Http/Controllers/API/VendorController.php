@@ -172,12 +172,12 @@ class VendorController extends Controller
         Log::info('Business Register Requests:', $request->all());
         $user = auth()->user();
         
-        $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
+        $vendor = vendors::where('pbv_id', $user->pbu_vid)->get();
         Log::info('Vendor Response:', $vendor);
         if (!$vendor) {
             return response()->json(['message' => 'Vendor not found'], 404);
         }
-
+        
         if ($vendor->pbv_vendortype != '1') {
             return response()->json(['message' => 'Invalid vendor type'], 400);
         }
