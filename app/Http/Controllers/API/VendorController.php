@@ -203,7 +203,7 @@ class VendorController extends Controller
                 // 'br_no.required' => 'BR No is required'
             ]
         );
-
+        
         $vendorsUpdate = $vendor->update([ 
             'pbv_tenentid' => 1,
             'pbv_business_name' => $request->business_name,
@@ -220,7 +220,7 @@ class VendorController extends Controller
             'pbv_staff_count' => $request->staff_no ?? 1,
             'pbv_status' => 1,
         ]);
-        Log::info('vendorsUpdate:', $vendorsUpdate);
+        Log::info('Vendor Request Update Response:', ['vendorsUpdate' => $vendorsUpdate]);
 
         if($vendorsUpdate){
             $user->update([
