@@ -29,6 +29,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 
 class VendorController extends Controller
 {   
@@ -222,7 +223,11 @@ class VendorController extends Controller
             Log::info('Step 4.1: Validation successful', ['validated_data' => $validated]);
         } catch (ValidationException $e) {
             Log::error('Step 4.2: Validation failed', ['errors' => $e->errors()]);
-            throw $e;
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
         }
 
         Log::info('Step 5: Attempting vendor update...');
