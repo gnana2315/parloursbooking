@@ -173,7 +173,7 @@ class VendorController extends Controller
         $user = auth()->user();
         
         $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
-
+        Log::info('Vendor Response:', $vendor);
         if (!$vendor) {
             return response()->json(['message' => 'Vendor not found'], 404);
         }
