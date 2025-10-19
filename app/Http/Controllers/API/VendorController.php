@@ -222,8 +222,8 @@ class VendorController extends Controller
             ]);
             Log::info('Step 4.1: Validation successful', ['validated_data' => $validated]);
         } catch (ValidationException $e) {
-            Log::error('Step 4.2: Validation failed', ['errors' => $e->errors()]);
             $firstError = collect($e->errors())->flatten()->first();
+            Log::error('Step 4.2: Validation failed', $firstError);
             return response()->json([
                 'status' => false,
                 'message' => $firstError,
@@ -1521,11 +1521,14 @@ class VendorController extends Controller
         // $vendor_results = vendors::with(['city', 'availability', 'vendorDocuments'])
         $vendor_results = vendors::with(['city', 'availability', 'vendorDocuments'])
             ->where('pbv_id', $user->pbu_vid)
-            ->where('pbv_status', 1)
             ->first();
             
         if (!$vendor_results) {
             return response()->json(['message' => 'Vendor not found'], 404);
+        }
+
+        if ($vendor_results->pbv_status != 1) {
+            return response()->json(['message' => 'You did not enter the parlour info'], 404);
         }
 
         // Process availability - $vendor_results is a single object, not a collection
