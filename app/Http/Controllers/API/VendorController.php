@@ -1489,7 +1489,7 @@ class VendorController extends Controller
         // $vendor_results = vendors::with(['city', 'availability', 'vendorDocuments'])
         $vendor_results = vendors::with(['city', 'availability', 'vendorDocuments'])
             ->where('pbv_id', $user->pbu_vid)
-            ->where('pbv_status', 2)
+            ->where('pbv_status', 1)
             ->first();
             
         if (!$vendor_results) {
