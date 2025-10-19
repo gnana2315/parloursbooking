@@ -1525,7 +1525,7 @@ class VendorController extends Controller
             return response()->json(['message' => 'Vendor not found'], 404);
         }
 
-        if ($vendor_results->pbv_status != 1) {
+        if ($vendor_results->pbv_status == 0 || $vendor_results->pbv_status == null) {
             return response()->json(['message' => 'You did not enter the parlour info'], 404);
         }
 
