@@ -169,58 +169,63 @@ class VendorController extends Controller
  * )
  */
     public function businessVendorRegister(Request $request){
-        Log::info('Business Register Requests:', $request->all());
+        Log::info('Step 1: Business Register Requests:', ['data' => $request->all()]);
+
         $user = auth()->user();
+        Log::info('Step 2: Authenticated User:', ['user_id' => $user->id ?? null]);
         
         $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
+        Log::info('Step 3: Vendor Retrieved:', ['vendor' => $vendor]);
         
         if (!$vendor) {
+            Log::warning('Step 3.1: Vendor not found', ['pbu_vid' => $user->pbu_vid]);
             return response()->json(['message' => 'Vendor not found'], 404);
         }
         
         if ($vendor->pbv_vendortype != '1') {
+            Log::warning('Step 3.2: Invalid vendor type', [
+                'vendor_id' => $vendor->pbv_id,
+                'pbv_vendortype' => $vendor->pbv_vendortype
+            ]);
             return response()->json(['message' => 'Invalid vendor type'], 400);
         }
 
-        $request->validate(
-            [
-                'business_name' => 'required',
-                'address' => 'required',
-                'city_id' => 'required',
-                'longatitude' => 'required',
-                'latitude' => 'required',
-                'email' => 'email|unique:vendor,pbv_email',
-            ],
-            [
-                'business_name.required' => 'Parlour name is required',
-                'address.required' => 'Address is required',
-                'city_id.required' => 'City is required',
-                'longatitude.required' => 'Location is required',
-                'latitude.required' => 'Location is required',
-                'email.email' => 'Email must be a valid email address',
-                'email.unique' => 'Email already exists'
-            ]
-        );
-        // try {
-        //     $validated = $request->validate([
+        Log::info('Step 4: Starting validation...');
+        // $request->validate(
+        //     [
         //         'business_name' => 'required',
         //         'address' => 'required',
         //         'city_id' => 'required',
         //         'longatitude' => 'required',
         //         'latitude' => 'required',
-        //         'email' => 'email|unique:vendor,pbv_email'
-        //     ]);
+        //         'email' => 'email|unique:vendor,pbv_email',
+        //     ],
+        //     [
+        //         'business_name.required' => 'Parlour name is required',
+        //         'address.required' => 'Address is required',
+        //         'city_id.required' => 'City is required',
+        //         'longatitude.required' => 'Location is required',
+        //         'latitude.required' => 'Location is required',
+        //         'email.email' => 'Email must be a valid email address',
+        //         'email.unique' => 'Email already exists'
+        //     ]
+        // );
+        try {
+            $validated = $request->validate([
+                'business_name' => 'required',
+                'address' => 'required',
+                'city_id' => 'required',
+                'longatitude' => 'required',
+                'latitude' => 'required',
+                'email' => 'email|unique:vendor,pbv_email'
+            ]);
+            Log::info('Step 4.1: Validation successful', ['validated_data' => $validated]);
+        } catch (ValidationException $e) {
+            Log::error('Step 4.2: Validation failed', ['errors' => $e->errors()]);
+            throw $e;
+        }
 
-        //     Log::info('Validation successful', ['validated_data' => $validated]);
-
-        // } catch (ValidationException $e) {
-        //     Log::error('Validation failed', [
-        //         'errors' => $e->errors(),
-        //         'input' => $request->all()
-        //     ]);
-        //     throw $e; // Re-throw so Laravel handles the JSON response
-        // }
-        Log::info('Vendor Response:', ['vendor' => $vendor]);
+        Log::info('Step 5: Attempting vendor update...');
         $vendorsUpdate = $vendor->update([ 
             'pbv_tenentid' => 1,
             'pbv_business_name' => $request->business_name,
@@ -237,7 +242,7 @@ class VendorController extends Controller
             'pbv_staff_count' => $request->staff_no ?? 1,
             'pbv_status' => 1,
         ]);
-        Log::info('Vendor Request Update Response :', ['vendorsUpdate' => $vendorsUpdate]);
+        Log::info('Step 6: Vendor update result', ['success' => $vendorsUpdate]);
 
         if($vendorsUpdate){
             $user->update([
