@@ -225,8 +225,7 @@ class VendorController extends Controller
             Log::error('Step 4.2: Validation failed', ['errors' => $e->errors()]);
             return response()->json([
                 'status' => false,
-                'message' => 'Validation failed',
-                'error' => $e->errors()
+                'message' => $e->errors(),
             ], 422);
         }
 
