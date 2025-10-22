@@ -494,6 +494,12 @@ class BookingController extends Controller
             }
 
             $vendors_user_id = User::where('pbu_vid', $request->vendor_id)->first();
+            if(!empty($vendors_user_id)){
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Vendor User Not Found',
+                ], 404);
+            }
             // $checkUserDeviceToken = deviceToken::where('pbdt_user_id', $vendors_user_id->pbu_id)->first();
             $notification_title = 'Booking Confirmed!';
             $notification_message = 'Booking added successfully!. Your booking reference no:'. $addbooking->pbb_ref_no;
