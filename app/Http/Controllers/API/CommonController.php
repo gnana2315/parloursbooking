@@ -19,6 +19,7 @@ use App\Models\paymentTransection;
 use App\Models\notification;
 use App\Models\vendorPayouts;
 use App\Services\DialogESMSService;
+use App\Services\OneSignalService;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
@@ -1225,6 +1226,39 @@ class CommonController extends Controller
                 'paidAmount' => $paidAmount,
                 'pendingAmount' => $pendingAmount
             ]
+        ], 200);
+    }
+
+    public function testNotification(Request $request, OneSignalService $oneSignalService){
+        $user = auth()->user();
+
+        $request->validate(
+            [
+                'id' => 'required|integer|exists:parlour_booking_users,pbu_id',
+                'title' => 'required|string|max:255',
+                'message' => 'required|string',
+            ],
+            [
+                'id.required' => 'User ID is required.',
+                'id.integer' => 'User ID must be an integer.',
+                'id.exists' => 'User ID does not exist.',
+                'title.required' => 'Title is required.',
+                'title.string' => 'Title must be a string.',
+                'title.max' => 'Title may not be greater than 255 characters.',
+                'message.required' => 'Message is required.',
+                'message.string' => 'Message must be a string.',
+            ]
+        );
+
+        OneSignalService::sendToUser(
+            $request->id,
+            $request->title,
+            $request->message
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Test notification sent.'
         ], 200);
     }
 

@@ -91,7 +91,6 @@ Route::middleware(['auth:sanctum', 'validate.token'])->group(function () {
     Route::get('/vendorDetailStatus', [VendorController::class, 'getVendorDetailStatus']);
     Route::get('/vendorDetailStatus_v1', [VendorController::class, 'getVendorDetailStatus_v1']);
 
-
     //common
     Route::get('/vendors/{service_for_id}', [CommonController::class, 'getVendors' ]);
     Route::get('/required-documents', [CommonController::class, 'getRequiredDocuments' ]);
@@ -106,6 +105,7 @@ Route::middleware(['auth:sanctum', 'validate.token'])->group(function () {
     Route::get('/cities', [CommonController::class, 'getCities']);
     Route::get('/getNotifications', [CommonController::class, 'notificationlist']);
     Route::get('/getStaticsByVendor', [CommonController::class, 'getStaticsByVendor']);
+    Route::post('/test-notification', [CommonController::class, 'testNotification']);
 
     //booking
     Route::get('/getBookingSlots', [BookingController::class, 'getBookingSlots']);
