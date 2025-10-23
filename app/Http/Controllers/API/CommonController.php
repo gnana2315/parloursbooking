@@ -1250,7 +1250,7 @@ class CommonController extends Controller
             ]
         );
 
-        OneSignalService::sendToUser(
+        $oneSignalService->sendToUser(
             $request->id,
             $request->title,
             $request->message
