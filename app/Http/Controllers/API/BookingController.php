@@ -494,6 +494,7 @@ class BookingController extends Controller
             }
 
             $vendors_user_id = User::where('pbu_vid', $request->vendor_id)->first();
+            dd($vendors_user_id);
             if(!empty($vendors_user_id)){
                 return response()->json([
                     'status' => false,
