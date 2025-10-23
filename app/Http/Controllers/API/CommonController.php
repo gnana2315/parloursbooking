@@ -1234,7 +1234,7 @@ class CommonController extends Controller
 
         $request->validate(
             [
-                'id' => 'required|integer|exists:parlour_booking_users,pbu_id',
+                'id' => 'required|integer|exists:users,pbu_id',
                 'title' => 'required|string|max:255',
                 'message' => 'required|string',
             ],
