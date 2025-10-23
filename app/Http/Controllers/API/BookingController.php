@@ -457,23 +457,54 @@ class BookingController extends Controller
         $remainingMinutes = $total_duration % 60;
         $duration = sprintf('%02d:%02d:00', $hours, $remainingMinutes);
 
-        $addbooking = Booking::create([
-            'pbb_vendor_id' => $request->vendor_id,
-            'pbb_customer_id' => $customer->pbc_id,
-            'pbb_promo_id' => $request->promocode_id,
-            'pbb_booking_details' => json_encode($booking_details_generated),
-            'pbb_booking_date' => $request->booking_date,
-            'pbb_booking_duration' => $duration,
-            'pbb_booking_start_time' => $request->booking_start_time,
-            'pbb_booking_end_time' => $request->booking_end_time,
-            'pbb_ref_no' => uniqid('BOONOLKIINNEG_'),
-            'pbb_type' => 'Online',
-            'pbb_service_location' => $request->service_location,
-            'pbb_total_amount' => $total_amount,
-            'pbb_discounts' => 0,
-            'pbb_contact_no' => ($request->booking_for_someone == 1) ? $request->someone_contact_no : $customer->customer_contact_no,
-            'pbb_status' => 1
-        ]);
+        // ✅ Prevent overlapping bookings (for same vendor)
+        $overlappingBooking = Booking::where('pbb_vendor_id', $request->vendor_id)
+            ->where('pbb_booking_date', $request->booking_date)
+            ->whereIn('pbb_status', [0, 1])
+            ->where(function ($q) use ($request) {
+                $q->whereBetween('pbb_booking_start_time', [$request->booking_start_time, $request->booking_end_time])
+                ->orWhereBetween('pbb_booking_end_time', [$request->booking_start_time, $request->booking_end_time])
+                ->orWhere(function ($q2) use ($request) {
+                    $q2->where('pbb_booking_start_time', '<=', $request->booking_start_time)
+                        ->where('pbb_booking_end_time', '>=', $request->booking_end_time);
+                });
+            })
+            ->first();
+
+        if ($overlappingBooking) {
+            return response()->json([
+                'status' => false,
+                'message' => 'The selected time slot is already booked by another customer.('.$overlappingBooking->pbb_ref_no.')',
+            ], 409);
+        }
+
+        try {
+            $addbooking = Booking::create([
+                'pbb_vendor_id' => $request->vendor_id,
+                'pbb_customer_id' => $customer->pbc_id,
+                'pbb_promo_id' => $request->promocode_id,
+                'pbb_booking_details' => json_encode($booking_details_generated),
+                'pbb_booking_date' => $request->booking_date,
+                'pbb_booking_duration' => $duration,
+                'pbb_booking_start_time' => $request->booking_start_time,
+                'pbb_booking_end_time' => $request->booking_end_time,
+                'pbb_ref_no' => uniqid('BOONOLKIINNEG_'),
+                'pbb_type' => 'Online',
+                'pbb_service_location' => $request->service_location,
+                'pbb_total_amount' => $total_amount,
+                'pbb_discounts' => 0,
+                'pbb_contact_no' => ($request->booking_for_someone == 1) ? $request->someone_contact_no : $customer->customer_contact_no,
+                'pbb_status' => 1
+            ]);
+        } catch (\Illuminate\Database\QueryException $e) {
+            if ($e->errorInfo[1] == 1062) { // duplicate entry
+                return response()->json([
+                    'status' => false,
+                    'message' => 'This booking already exists or was just created.',
+                ], 409);
+            }
+            throw $e;
+        }        
 
         if ($addbooking) {
             foreach ($booking_details as $value) {
