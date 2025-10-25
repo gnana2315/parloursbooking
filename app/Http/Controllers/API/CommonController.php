@@ -96,6 +96,8 @@ class CommonController extends Controller
 
                                     // Remove vendorDocuments if you don’t want to expose them
                                     unset($vendor->vendorDocuments);
+                                    $vendor->created_at = Carbon::parse($vendor->created_at)->format('d M Y h:i A');
+                                    $vendor->updated_at = Carbon::parse($vendor->updated_at)->format('d M Y h:i A');
 
                                     return $vendor;
                                 });
