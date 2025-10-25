@@ -25,6 +25,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 
 class CommonController extends Controller
 {
@@ -80,40 +81,49 @@ class CommonController extends Controller
         Log::info('getVendors Requests:', ['Requests' => $service_for_id]);
         try {
             $vendors = vendors::with(['vendorDocuments', 'city', 'ratings'])
-                                ->where([
-                                    ['pbv_status', '=', 2],
-                                    ['pbv_servicefor', '=', $service_for_id],
-                                ])
-                                ->get()
-                                ->map(function ($vendor) {
-                                    // Find the logo document (assuming required_document_id = 1 is the logo)
-                                    $logo = $vendor->vendorDocuments->firstWhere('pbvd_required_document_id', 6);
-                                    $city_id = $vendor->pbv_city;
-                                    // Replace logo image with logo URL if available
-                                    if ($logo) {
-                                        $vendor->pbv_logo_image = $logo->pbvd_document_url;
-                                    }
+                    ->where([
+                        ['pbv_status', '=', 2],
+                        ['pbv_servicefor', '=', $service_for_id],
+                    ])
+                    ->get()
+                    ->map(function ($vendor) {
+                        // --- 1️⃣ Extract documents ---
+                        $logo = $vendor->vendorDocuments->firstWhere('pbvd_required_document_id', 6);
 
-                                    // Remove vendorDocuments if you don’t want to expose them
-                                    unset($vendor->vendorDocuments);
+                        // Get all parlour images (multiple)
+                        $parlour_images = $vendor->vendorDocuments
+                            ->where('pbvd_required_document_id', 7)
+                            ->pluck('pbvd_document_url')
+                            ->values(); // reindex array (0,1,2,...)
 
-                                    if($city_id){
-                                        $vendor->pbc_cityname = $vendor->city->pbc_cityname;
-                                    }
-                                    unset($vendor->city);
+                        $city_id = $vendor->pbv_city;
 
-                                    // --- 2️⃣ Calculate average rating or null ---
-                                    if ($vendor->ratings && $vendor->ratings->count() > 0) {
-                                        $vendor->rating = round($vendor->ratings->avg('rating_value'), 1);
-                                    } else {
-                                        $vendor->rating = null;
-                                    }
-                                    unset($vendor->ratings);
-                                    $vendor->created_at = Carbon::parse($vendor->created_at)->format('d M Y h:i A');
-                                    $vendor->updated_at = Carbon::parse($vendor->updated_at)->format('d M Y h:i A');
+                        // --- 2️⃣ Assign logo image if available ---
+                        $vendor->pbv_logo_image = $logo ? $logo->pbvd_document_url : null;
 
-                                    return $vendor;
-                                });
+                        // --- 3️⃣ Assign all parlour images as array ---
+                        $vendor->pbv_images = $parlour_images->isNotEmpty() ? $parlour_images : null;
+
+                        // --- 4️⃣ Assign city name ---
+                        if ($city_id && $vendor->city) {
+                            $vendor->pbc_cityname = $vendor->city->pbc_cityname;
+                        }
+
+                        // --- 5️⃣ Calculate average rating or null ---
+                        $vendor->rating = $vendor->ratings->isNotEmpty()
+                            ? round($vendor->ratings->avg('rating_value'), 1)
+                            : null;
+
+                        // --- 6️⃣ Format created_at / updated_at ---
+                        $vendor->created_at = Carbon::parse($vendor->created_at)->format('d M Y h:i A');
+                        $vendor->updated_at = Carbon::parse($vendor->updated_at)->format('d M Y h:i A');
+
+                        // --- 7️⃣ Clean up ---
+                        unset($vendor->vendorDocuments, $vendor->city, $vendor->ratings);
+
+                        return $vendor;
+                    });
+
             // $vendors = vendors::join('cities', 'cities.pbc_cid', '=', 'vendor.pbv_city')
             // //::join('vendor_config', 'vendor_config.pbvc_vendorid', '=', 'vendor.pbv_id')
             // // ->join('vendor_standard_availability', 'vendor_standard_availability.pbvsa_vendor_id', '=', 'vendor.pbv_id')
