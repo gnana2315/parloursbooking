@@ -115,8 +115,8 @@ class CommonController extends Controller
                             : null;
 
                         // --- 6️⃣ Format created_at / updated_at ---
-                        $vendor->created_at = Carbon::parse($vendor->created_at)->format('d M Y h:i A');
-                        $vendor->updated_at = Carbon::parse($vendor->updated_at)->format('d M Y h:i A');
+                        $vendor->created_at = Carbon::parse($vendor->created_at)->format('d M Y h:i');
+                        $vendor->updated_at = Carbon::parse($vendor->updated_at)->format('d M Y h:i');
 
                         // --- 7️⃣ Clean up ---
                         unset($vendor->vendorDocuments, $vendor->city, $vendor->ratings);
