@@ -79,7 +79,7 @@ class CommonController extends Controller
     public function getVendors($service_for_id){
         Log::info('getVendors Requests:', ['Requests' => $service_for_id]);
         try {
-            $vendors = vendors::with(['vendorDocuments', 'city'])
+            $vendors = vendors::with(['vendorDocuments', 'city', 'ratings'])
                                 ->where([
                                     ['pbv_status', '=', 2],
                                     ['pbv_servicefor', '=', $service_for_id],

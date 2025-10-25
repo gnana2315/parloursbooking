@@ -8,6 +8,7 @@ use App\Models\vendorStandardAvailability;
 use App\Models\vendorConfig;
 use App\Models\cities;
 use App\Models\booking;
+use App\Models\ratings;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -93,5 +94,9 @@ class vendors extends Model
 
     public function booking(){
         return $this->hasMany(booking::class, 'pbb_vendor_id', 'pbv_id');
+    }
+
+    public function ratings(){
+        return $this->hasMany(ratings::class, 'pbr_vendor_id', 'pbv_id');
     }
 }
