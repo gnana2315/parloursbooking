@@ -79,32 +79,46 @@ class CommonController extends Controller
     public function getVendors($service_for_id){
         Log::info('getVendors Requests:', ['Requests' => $service_for_id]);
         try {
-            // $vendors = vendors::with(['vendorDocuments', 'city', 'ratings'])
-            //                     ->where([
-            //                         ['pbv_status', '=', 2],
-            //                         ['pbv_servicefor', '=', $service_for_id],
-            //                     ])
-            //                     ->get();
-            $vendors = vendors::join('cities', 'cities.pbc_cid', '=', 'vendor.pbv_city')
-            //::join('vendor_config', 'vendor_config.pbvc_vendorid', '=', 'vendor.pbv_id')
-            // ->join('vendor_standard_availability', 'vendor_standard_availability.pbvsa_vendor_id', '=', 'vendor.pbv_id')
-            // ->join('ratings', 'ratings.pbr_vendor_id', '=', 'vendor.pbv_id', 'left')
-            ->select(
-                'vendor.*',
-                //'vendor_config.pbvc_display_name',
-                //'vendor_config.pbvc_logo',
-                // 'vendor_standard_availability.pbvsa_start_time',
-                // 'vendor_standard_availability.pbvsa_end_time',
-                // 'vendor_standard_availability.pbvsa_day',
-                // 'vendor_standard_availability.pbvsa_is_open',
-                'cities.pbc_cityname',
-                // DB::raw('AVG(pb_ratings.pbr_rating) as average_rating')
-            )
-            ->where([
-                ['pbv_status', '=', 2],
-                ['pbv_servicefor', '=', $service_for_id],
-            ])
-            ->get();
+            $vendors = vendors::with(['vendorDocuments', 'city', 'ratings'])
+                                ->where([
+                                    ['pbv_status', '=', 2],
+                                    ['pbv_servicefor', '=', $service_for_id],
+                                ])
+                                ->get()
+                                ->map(function ($vendor) {
+                                    // Find the logo document (assuming required_document_id = 1 is the logo)
+                                    $logo = $vendor->vendorDocuments->firstWhere('pbvd_required_document_id', 6);
+
+                                    // Replace logo image with logo URL if available
+                                    if ($logo) {
+                                        $vendor->pbv_logo_image = $logo->pbvd_document_url;
+                                    }
+
+                                    // Remove vendorDocuments if you don’t want to expose them
+                                    unset($vendor->vendorDocuments);
+
+                                    return $vendor;
+                                });
+            // $vendors = vendors::join('cities', 'cities.pbc_cid', '=', 'vendor.pbv_city')
+            // //::join('vendor_config', 'vendor_config.pbvc_vendorid', '=', 'vendor.pbv_id')
+            // // ->join('vendor_standard_availability', 'vendor_standard_availability.pbvsa_vendor_id', '=', 'vendor.pbv_id')
+            // // ->join('ratings', 'ratings.pbr_vendor_id', '=', 'vendor.pbv_id', 'left')
+            // ->select(
+            //     'vendor.*',
+            //     //'vendor_config.pbvc_display_name',
+            //     //'vendor_config.pbvc_logo',
+            //     // 'vendor_standard_availability.pbvsa_start_time',
+            //     // 'vendor_standard_availability.pbvsa_end_time',
+            //     // 'vendor_standard_availability.pbvsa_day',
+            //     // 'vendor_standard_availability.pbvsa_is_open',
+            //     'cities.pbc_cityname',
+            //     // DB::raw('AVG(pb_ratings.pbr_rating) as average_rating')
+            // )
+            // ->where([
+            //     ['pbv_status', '=', 2],
+            //     ['pbv_servicefor', '=', $service_for_id],
+            // ])
+            // ->get();
             Log::info('getVendors Response:', ['Response' => $vendors]);
             if(!empty($vendors)){
                 return response()->json([
