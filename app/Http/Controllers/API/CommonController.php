@@ -88,7 +88,7 @@ class CommonController extends Controller
                                 ->map(function ($vendor) {
                                     // Find the logo document (assuming required_document_id = 1 is the logo)
                                     $logo = $vendor->vendorDocuments->firstWhere('pbvd_required_document_id', 6);
-
+                                    $city_id = $vendor->pbv_city;
                                     // Replace logo image with logo URL if available
                                     if ($logo) {
                                         $vendor->pbv_logo_image = $logo->pbvd_document_url;
@@ -96,6 +96,11 @@ class CommonController extends Controller
 
                                     // Remove vendorDocuments if you don’t want to expose them
                                     unset($vendor->vendorDocuments);
+
+                                    if($city_id){
+                                        $vendor->pbc_cityname = $vendor->city->pbc_cityname;
+                                    }
+                                    unset($vendor->city);
                                     $vendor->created_at = Carbon::parse($vendor->created_at)->format('d M Y h:i A');
                                     $vendor->updated_at = Carbon::parse($vendor->updated_at)->format('d M Y h:i A');
 
