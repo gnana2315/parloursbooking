@@ -17,8 +17,8 @@ use Illuminate\Support\Facades\Log;
 class CustomersController extends Controller
 {
     public function register($id, Request $request){
-        Log::info('Register Requests:', $request->all());
-        Log::info('Register id:', $id);
+        Log::info('Register Requests:', ['Requests' => $request->all()]);
+        Log::info('Register id:', ['id' => $id]);
         $user = auth()->user();
 
         $request->validate(
@@ -63,7 +63,7 @@ class CustomersController extends Controller
             $message = 'Customer Details failed to save';
             $status = 500;
         }
-        Log::info('Register Response:', $user);
+        Log::info('Register Response:', ['Response' => $user]);
 
         return response()->json([
             'message' => $message,
@@ -103,7 +103,7 @@ class CustomersController extends Controller
          * )
      */
     public function addRemoveCustomerFavourite(Request $request){
-        Log::info('addRemoveCustomerFavourite Requests:', $request->all());
+        Log::info('addRemoveCustomerFavourite Requests:', ['Requests' => $request->all()]);
         $user = auth()->user();
 
         $request->validate(
@@ -196,7 +196,7 @@ class CustomersController extends Controller
                     ->where('pbv_status', 2)
                     ->get();
 
-        Log::info('getCustomerFavourites Response:', $vendors);
+        Log::info('getCustomerFavourites Response:', ['Response' => $vendors]);
         return response()->json([
             'message' => 'Favourites retrieved successfully',
             'data' => $vendors
@@ -292,7 +292,7 @@ class CustomersController extends Controller
         // }
         // $bookings['total_amount'] = $bookingsWithTotal;
         //dd($bookings);
-        Log::info('bookingsWithTotal Response:', $bookingsWithTotal);
+        Log::info('bookingsWithTotal Response:', ['Response' => $bookingsWithTotal]);
         return response()->json([
             'message' => 'Bookings retrieved successfully',
             'data' => $bookingsWithTotal
@@ -335,7 +335,7 @@ class CustomersController extends Controller
         $user = auth()->user();
 
         $customer = customer::where('pbc_user_id', $user->pbu_id)->first();
-        Log::info('getCustomer Response:', $customer);
+        Log::info('getCustomer Response:', ['Response' => $customer]);
         return response()->json([
             'message' => 'Customer Details',
             'data' => $customer
@@ -546,7 +546,7 @@ class CustomersController extends Controller
             'rating' => 3,
             'isFav' => $isFav
         ];
-        Log::info('getVendorByID Response:', $final_vendors);
+        Log::info('getVendorByID Response:', ['Response' => $final_vendors]);
         return response()->json([
             'success' => true,
             'data' => $final_vendors

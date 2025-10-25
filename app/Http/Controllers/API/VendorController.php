@@ -34,7 +34,7 @@ use Illuminate\Validation\ValidationException;
 class VendorController extends Controller
 {   
     public function vendorRegister(Request $request){
-        Log::info('Vendor Register Requests:', $request->all());
+        Log::info('Vendor Register Requests:', ['Requests' => $request->all()]);
         $user = auth()->user();        
         
         $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
@@ -111,7 +111,7 @@ class VendorController extends Controller
             $message = 'Vendor Details failed to save';
             $status = 500;
         }
-        Log::info('Vendor Register Response:', $user);
+        Log::info('Vendor Register Response:', ['Response' => $user]);
         return response()->json([
             'message' => $message,
             'data' => $user
@@ -321,7 +321,7 @@ class VendorController extends Controller
  * )
  */
     public function therapistVendorRegister(Request $request){
-        Log::info('Therapist Register Requests:', $request->all());
+        Log::info('Therapist Register Requests:', ['Requests' => $request->all()]);
         $user = auth()->user();        
         
         $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
@@ -461,7 +461,7 @@ class VendorController extends Controller
  * )
  */
     public function vendorDocumentUpdate(Request $request){
-        Log::info('vendorDocumentUpdate Requests:', $request->all());
+        Log::info('vendorDocumentUpdate Requests:', ['Requests' => $request->all()]);
         $user = auth()->user();
 
         $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
@@ -516,7 +516,7 @@ class VendorController extends Controller
     }
 
     public function vendorDocumentUpdate_v1(Request $request){
-        Log::info('vendorDocumentUpdate_v1 Requests:', $request->all());
+        Log::info('vendorDocumentUpdate_v1 Requests:', ['Requests' => $request->all()]);
         $user = auth()->user();
 
         $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
@@ -838,7 +838,7 @@ class VendorController extends Controller
                 ];
             }
         }
-        Log::info('getVendorDocuments Response:', $document_paths);
+        Log::info('getVendorDocuments Response:', ['Response' => $document_paths]);
 
         return response()->json([
             'success' => true,
@@ -881,7 +881,7 @@ class VendorController extends Controller
      * )
      */
     public function vendorBankUpdate(Request $request){
-        Log::info('vendorBankUpdate Requests:', $request->all());
+        Log::info('vendorBankUpdate Requests:', ['Requests' => $request->all()]);
         $user = auth()->user();
 
         $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
@@ -961,7 +961,7 @@ class VendorController extends Controller
      * )
      */
     public function vendorConfig(Request $request){
-        Log::info('vendorConfig Requests:', $request->all());
+        Log::info('vendorConfig Requests:', ['Requests' => $request->all()]);
         $user = auth()->user();
         $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
         if (!$vendor) {
@@ -1046,7 +1046,7 @@ class VendorController extends Controller
      * )
      */
     public function vendorAvailability(Request $request){
-        Log::info('vendorAvailability Requests:', $request->all());
+        Log::info('vendorAvailability Requests:', ['Requests' => $request->all()]);
         $user = auth()->user();
         $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
         if (!$vendor) {
@@ -1164,7 +1164,7 @@ class VendorController extends Controller
      */
 
     public function vendorSpecialCloses(Request $request){
-        Log::info('vendorSpecialCloses Requests:', $request->all());
+        Log::info('vendorSpecialCloses Requests:', ['Requests' => $request->all()]);
         $user = auth()->user();
         $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
         if (!$vendor) {
@@ -1334,7 +1334,7 @@ class VendorController extends Controller
      */
 
     public function addVendorServices(Request $request){
-        Log::info('addVendorServices Requests:', $request->all());
+        Log::info('addVendorServices Requests:', ['Requests' => $request->all()]);
         $user = auth()->user();
         $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
         if (!$vendor) {
@@ -1627,7 +1627,7 @@ class VendorController extends Controller
             'rating' => 3,
             //'isFav' => $isFav
         ];
-        Log::info('getVendorfromvendorapp Response:', $final_vendors);
+        Log::info('getVendorfromvendorapp Response:', ['Response' => $final_vendors]);
 
         return response()->json([
             'success' => true,
@@ -1738,7 +1738,7 @@ class VendorController extends Controller
         //         'status' => 'Completed',
         //     ]
         // ];
-        Log::info('getThisWeekEarningsByVendor Response:', $earnings);
+        Log::info('getThisWeekEarningsByVendor Response:', ['Response' => $earnings]);
         return response()->json([
             'success' => true,
             'data' => $earnings
@@ -1839,7 +1839,7 @@ class VendorController extends Controller
         //         'amount' => 5000.00
         //     ]
         // ];
-        Log::info('payouts Response:', $payouts);
+        Log::info('payouts Response:', ['Response' => $payouts]);
         return response()->json([
             'success' => true,
             'data' => $payouts
@@ -1933,7 +1933,7 @@ class VendorController extends Controller
         //         'status' => 'Paid',
         //     ]
         // ];
-        Log::info('allEarnings Response:', $allEarnings);
+        Log::info('allEarnings Response:', ['Response' => $allEarnings]);
 
         return response()->json([
             'success' => true,
@@ -2030,7 +2030,7 @@ class VendorController extends Controller
                 ],
             ],
         ];
-        Log::info('incentives Response:', $incentives);
+        Log::info('incentives Response:', ['Response' => $incentives]);
 
         return response()->json([
             'success' => true,
@@ -2120,7 +2120,7 @@ class VendorController extends Controller
         //         'amount' => 500.00,
         //     ]
         // ];
-        Log::info('toBePaidList Response:', $toBePaidList);
+        Log::info('toBePaidList Response:', ['Response' => $toBePaidList]);
 
         return response()->json([
             'success' => true,
@@ -2184,7 +2184,7 @@ class VendorController extends Controller
         if (!$vendor_bank_info) {
             return response()->json(['message' => 'Vendor bank information not found'], 404);
         }
-        Log::info('getVendorBankDetails Response:', $vendor_bank_info);
+        Log::info('getVendorBankDetails Response:', ['Response' => $vendor_bank_info]);
 
         return response()->json([
             'success' => true,
@@ -2244,7 +2244,7 @@ class VendorController extends Controller
         if (!$vendor) {
             return response()->json(['message' => 'Vendor not found'], 404);
         }
-        Log::info('getVendorDetails Response:', $vendor);
+        Log::info('getVendorDetails Response:', ['Response' => $vendor]);
 
         return response()->json([
             'success' => true,
@@ -2376,7 +2376,7 @@ class VendorController extends Controller
             ]
         ];
 
-        Log::info('vendorDetailStatus Response:', $vendorDetailStatus);
+        Log::info('vendorDetailStatus Response:', ['Response' => $vendorDetailStatus]);
         return response()->json([
             'success' => true,
             'data' => $vendorDetailStatus
@@ -2489,7 +2489,7 @@ class VendorController extends Controller
             ],
         ];
 
-        Log::info('vendorDetailStatus_v1 Response:', $vendorDetailStatus);
+        Log::info('vendorDetailStatus_v1 Response:', ['Response' => $vendorDetailStatus]);
         return response()->json([
             'success' => true,
             'data' => $vendorDetailStatus

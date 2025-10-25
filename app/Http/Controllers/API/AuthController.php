@@ -69,7 +69,7 @@ class AuthController extends Controller
      */
     //user mobile verification
     public function userRegisterMobileNo(Request $request){
-        Log::info('User Mobile No Register Requests:', $request->all());
+        Log::info('User Mobile No Register Requests:', ['Requests' => $request->all()]);
         User::where('pbu_mobileno', $request->phone_no)
             ->where('pbu_usertype', $request->user_type)
             ->where(function ($query) {
@@ -147,7 +147,7 @@ class AuthController extends Controller
      * )
      */
     public function resendOtp(Request $request) {
-        Log::info('Resent OTP Requests:', $request->all());
+        Log::info('Resent OTP Requests:', ['Requests' => $request->all()]);
         $verfivation_code = $this->generateVerificationCode($request->user_id);
         
         $user = User::find($request->user_id);
@@ -206,7 +206,7 @@ class AuthController extends Controller
      * )
      */
     public function verifyVerificationCode(Request $request){
-        Log::info('Verify OTPRequests:', $request->all());
+        Log::info('Verify OTP Requests:', ['Requests' => $request->all()]);
         $request->validate(
             [
                 'user_id' => 'required|exists:users,pbu_id',
@@ -293,7 +293,7 @@ class AuthController extends Controller
      */
     public function userRegistration(Request $request){
         //, FirebaseService $firebase
-        Log::info('User Register Requests:', $request->all());
+        Log::info('User Register Requests:', ['Requests' => $request->all()]);
         $user = User::find($request->user_id);
         if (!$user) {
             return response()->json(['message' => 'User not found'], 404);
@@ -485,7 +485,7 @@ class AuthController extends Controller
      * )
      */
     public function userSetNewPassword(Request $request){
-        Log::info('User set new password Requests:', $request->all());
+        Log::info('User set new password Requests:', ['Requests' => $request->all()]);
         $user = $request->user();
         $request->validate(
             [
@@ -550,7 +550,7 @@ class AuthController extends Controller
      * )
      */
     public function userLogin(Request $request, OneSignalService $oneSignalService){
-        Log::info('User login Requests:', $request->all());
+        Log::info('User login Requests:', ['Requests' => $request->all()]);
         $request->validate(
             [
                 'user_type' => 'required',
@@ -616,7 +616,7 @@ class AuthController extends Controller
             'updated_at' => ($user->pbu_usertype == '1') ? $loggedVendors->updated_at : $loggedCustomers->updated_at,
         ];
         
-        Log::info('User login final data Requests:', $finalData);
+        Log::info('User login final data Response:', ['Response' => $finalData]);
         
         $notification_title = 'Welcome!';
         $notification_message = 'Login Successfully!';
@@ -661,7 +661,7 @@ class AuthController extends Controller
      */
     public function userLogout(Request $request)
     {        
-        Log::info('User logout Requests:', $request->all());
+        Log::info('User logout Requests:', ['Request' => $request->all()]);
         $user = $request->user();
 
         if (!$user) {
@@ -734,7 +734,7 @@ class AuthController extends Controller
      */
 
     public function userForgotPassword(Request $request){
-        Log::info('User forgot password Requests:', $request->all());
+        Log::info('User forgot password Requests:', ['Request' => $request->all()]);
         $request->validate(
             [
                 'user_type' => 'required',
@@ -792,7 +792,7 @@ class AuthController extends Controller
      */
 
     public function userResetPassword(Request $request){
-        Log::info('User reset password Requests:', $request->all());
+        Log::info('User reset password Requests:', ['Request' => $request->all()]);
         $request->validate(
             [ 
                 'user_id' => 'required',
@@ -860,7 +860,7 @@ class AuthController extends Controller
         }else if($user->pbu_usertype == '2'){            
             $userDetails = customer::where('pbc_user_id', $user->pbu_id)->first();
         }        
-        Log::info('Get User Response:', $userDetails);
+        Log::info('Get User Response:', ['Response' => $userDetails]);
         return response()->json([
             'message' => 'User Details',
             'data' => $userDetails
@@ -922,7 +922,7 @@ class AuthController extends Controller
             return response()->json(['message' => 'Vendor not found'], 404);
         }
         
-        Log::info('get vendor Responses:', $vendor);
+        Log::info('get vendor Responses:', ['Response' => $vendor]);
         return response()->json([
             'message' => 'Vendor Details',
             'data' => $vendor
