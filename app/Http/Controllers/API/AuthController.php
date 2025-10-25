@@ -147,7 +147,7 @@ class AuthController extends Controller
      * )
      */
     public function resendOtp(Request $request) {
-    
+        Log::info('Resent OTP Requests:', $request->all());
         $verfivation_code = $this->generateVerificationCode($request->user_id);
         
         $user = User::find($request->user_id);
@@ -485,6 +485,7 @@ class AuthController extends Controller
      * )
      */
     public function userSetNewPassword(Request $request){
+        Log::info('User set new password Requests:', $request->all());
         $user = $request->user();
         $request->validate(
             [
@@ -549,6 +550,7 @@ class AuthController extends Controller
      * )
      */
     public function userLogin(Request $request, OneSignalService $oneSignalService){
+        Log::info('User login Requests:', $request->all());
         $request->validate(
             [
                 'user_type' => 'required',
@@ -613,24 +615,9 @@ class AuthController extends Controller
             'created_at' => ($user->pbu_usertype == '1') ? $loggedVendors->created_at : $loggedCustomers->created_at,
             'updated_at' => ($user->pbu_usertype == '1') ? $loggedVendors->updated_at : $loggedCustomers->updated_at,
         ];
-        // dd($finalData);
         
-        // $checkUserDeviceToken = deviceToken::where('pbdt_user_id', $user->pbu_id);
-        // dd($checkUserDeviceToken->pbdt_device_token);
-        // if($checkUserDeviceToken->pbdt_device_token == null){
-        //     deviceToken::create([
-        //         'pbdt_user_id' => $user->pbu_id,
-        //         'pbdt_device_token' => $request->device_token,
-        //     ]);
-        // }else{
-        //     $oneSignalService->sendToUser($user->pbu_id, 'Welcome!', 'Your profile has been created.');
-
-        //     notification::create([
-        //         'pbn_user_id' => $user->pbu_id,
-        //         'pbn_title' => 'Welcome!',
-        //         'pbn_message' => 'Your profile has been created.',
-        //     ]);
-        // }
+        Log::info('User login final data Requests:', $finalData);
+        
         $notification_title = 'Welcome!';
         $notification_message = 'Login Successfully!';
 
@@ -673,7 +660,8 @@ class AuthController extends Controller
      * )
      */
     public function userLogout(Request $request)
-    {
+    {        
+        Log::info('User logout Requests:', $request->all());
         $user = $request->user();
 
         if (!$user) {
@@ -746,6 +734,7 @@ class AuthController extends Controller
      */
 
     public function userForgotPassword(Request $request){
+        Log::info('User forgot password Requests:', $request->all());
         $request->validate(
             [
                 'user_type' => 'required',
@@ -803,6 +792,7 @@ class AuthController extends Controller
      */
 
     public function userResetPassword(Request $request){
+        Log::info('User reset password Requests:', $request->all());
         $request->validate(
             [ 
                 'user_id' => 'required',
@@ -869,8 +859,8 @@ class AuthController extends Controller
             $userDetails = vendors::where('pbv_id', $user->pbu_vid)->first();
         }else if($user->pbu_usertype == '2'){            
             $userDetails = customer::where('pbc_user_id', $user->pbu_id)->first();
-        }
-
+        }        
+        Log::info('Get User Response:', $userDetails);
         return response()->json([
             'message' => 'User Details',
             'data' => $userDetails
@@ -931,7 +921,8 @@ class AuthController extends Controller
         if(!$vendor){
             return response()->json(['message' => 'Vendor not found'], 404);
         }
-
+        
+        Log::info('get vendor Responses:', $vendor);
         return response()->json([
             'message' => 'Vendor Details',
             'data' => $vendor

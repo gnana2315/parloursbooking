@@ -12,10 +12,13 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class CustomersController extends Controller
 {
     public function register($id, Request $request){
+        Log::info('Register Requests:', $request->all());
+        Log::info('Register id:', $id);
         $user = auth()->user();
 
         $request->validate(
@@ -60,6 +63,7 @@ class CustomersController extends Controller
             $message = 'Customer Details failed to save';
             $status = 500;
         }
+        Log::info('Register Response:', $user);
 
         return response()->json([
             'message' => $message,
@@ -99,6 +103,7 @@ class CustomersController extends Controller
          * )
      */
     public function addRemoveCustomerFavourite(Request $request){
+        Log::info('addRemoveCustomerFavourite Requests:', $request->all());
         $user = auth()->user();
 
         $request->validate(
@@ -191,6 +196,7 @@ class CustomersController extends Controller
                     ->where('pbv_status', 2)
                     ->get();
 
+        Log::info('getCustomerFavourites Response:', $vendors);
         return response()->json([
             'message' => 'Favourites retrieved successfully',
             'data' => $vendors
@@ -286,6 +292,7 @@ class CustomersController extends Controller
         // }
         // $bookings['total_amount'] = $bookingsWithTotal;
         //dd($bookings);
+        Log::info('bookingsWithTotal Response:', $bookingsWithTotal);
         return response()->json([
             'message' => 'Bookings retrieved successfully',
             'data' => $bookingsWithTotal
@@ -328,7 +335,7 @@ class CustomersController extends Controller
         $user = auth()->user();
 
         $customer = customer::where('pbc_user_id', $user->pbu_id)->first();
-
+        Log::info('getCustomer Response:', $customer);
         return response()->json([
             'message' => 'Customer Details',
             'data' => $customer
@@ -539,7 +546,7 @@ class CustomersController extends Controller
             'rating' => 3,
             'isFav' => $isFav
         ];
-
+        Log::info('getVendorByID Response:', $final_vendors);
         return response()->json([
             'success' => true,
             'data' => $final_vendors

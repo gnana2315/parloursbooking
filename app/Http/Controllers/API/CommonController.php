@@ -24,6 +24,7 @@ use App\Services\OneSignalService;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class CommonController extends Controller
 {
@@ -76,11 +77,11 @@ class CommonController extends Controller
  * )
  */
     public function getVendors($service_for_id){
+        Log::info('getVendors Requests:', $service_for_id);
         try {
-            $vendors = vendors
+            $vendors = vendors::join('cities', 'cities.pbc_cid', '=', 'vendor.pbv_city')
             //::join('vendor_config', 'vendor_config.pbvc_vendorid', '=', 'vendor.pbv_id')
             // ->join('vendor_standard_availability', 'vendor_standard_availability.pbvsa_vendor_id', '=', 'vendor.pbv_id')
-            ::join('cities', 'cities.pbc_cid', '=', 'vendor.pbv_city')
             // ->join('ratings', 'ratings.pbr_vendor_id', '=', 'vendor.pbv_id', 'left')
             ->select(
                 'vendor.*',
@@ -98,7 +99,7 @@ class CommonController extends Controller
                 ['pbv_servicefor', '=', $service_for_id],
             ])
             ->get();
-            
+            Log::info('getVendors Response:', $vendors);
             if(!empty($vendors)){
                 return response()->json([
                     'success' => true,
@@ -186,6 +187,7 @@ class CommonController extends Controller
     */
 
     public function searchVendors(Request $request){
+        Log::info('searchVendors Requests:', $request->all());
         $query = vendors::query();
         $query = vendors::query()
             ->where(function ($q) use ($request) {
@@ -329,6 +331,7 @@ class CommonController extends Controller
                 'message' => 'No vendor types found'
             ], 404);
         }
+        Log::info('getVendorTypes Response:', $vendorTypes);
         return response()->json([
             'success' => true,
             'data' => $vendorTypes
@@ -381,6 +384,7 @@ class CommonController extends Controller
                 'message' => 'No service types found'
             ], 404);
         }
+        Log::info('getServiceTypes Response:', $serviceTypes);
         return response()->json([
             'success' => true,
             'data' => $serviceTypes
@@ -433,7 +437,7 @@ class CommonController extends Controller
                 'message' => 'No service for found'
             ], 404);
         }
-
+        Log::info('getServiceFor Response:', $serviceFor);
         return response()->json([
             'success' => true,
             'data' => $serviceFor
@@ -489,6 +493,7 @@ class CommonController extends Controller
      * )
      */
     public function getServicesByVendor($vendor_id){
+        Log::info('getServicesByVendor Requests:', ['vendor_id' => $vendor_id]);
         $services = services::join('service_for', 'service_for.pbsf_id', '=', 'services.pbs_service_for')        
         ->where([
             ['pbs_status', '=', 1],
@@ -501,6 +506,7 @@ class CommonController extends Controller
                 'message' => 'No services found'
             ], 404);
         }
+        Log::info('getServicesByVendor Response:', $services);
         return response()->json([
             'success' => true,
             'data' => $services
@@ -556,6 +562,7 @@ class CommonController extends Controller
                 'message' => 'Banks are not found'
             ], 404);
         }
+        Log::info('getBankList Response:', $banklists);
         return response()->json([
             'success' => true,
             'data' => $banklists
@@ -624,7 +631,7 @@ class CommonController extends Controller
                 'message' => 'No service for found'
             ], 404);
         }
-
+        Log::info('getBusinessCategory Response:', $serviceFor);
         return response()->json([
             'success' => true,
             'data' => $serviceFor
@@ -737,7 +744,9 @@ class CommonController extends Controller
 
         // // Debug output
         // print_r($organized);
-        // die();       
+        // die();
+
+        Log::info('getAllPromoCodes Response:', $promos);
         return response()->json([
             'success' => true,
             'data' => $promos
@@ -793,7 +802,7 @@ class CommonController extends Controller
                 'message' => 'Cities are not found'
             ], 404);
         }
-
+        Log::info('getCities Response:', $cities);
         return response()->json([
             'success' => true,
             'data' => $cities
@@ -859,7 +868,7 @@ class CommonController extends Controller
                 'message' => 'No notifications found'
             ], 404);
         }
-
+        Log::info('notificationlist Response:', $notificationlist);
         return response()->json([
             'success' => true,
             'data' => $notificationlist
@@ -1093,7 +1102,7 @@ class CommonController extends Controller
 
                 $requiredDocuments[] = $documentData;
             }
-
+            Log::info('requiredDocuments Response:', $requiredDocuments);
             return response()->json([
                 'success' => true,
                 'data' => $requiredDocuments
@@ -1217,7 +1226,10 @@ class CommonController extends Controller
 
         // $pendingAmount = 930;
         // $pendingAmount_formatted_currency = number_format(($pendingAmount->pbvp_total_due != null) ? $pendingAmount->pbvp_total_due : 0, 2, '.', ',');
-
+        Log::info('bookingsCount Response:', $bookingsCount);
+        Log::info('earnedAmount Response:', $earnedAmount_formatted_currency);
+        Log::info('paidAmount Response:', $paidAmount);
+        Log::info('pendingAmount Response:', $pendingAmount);
         return response()->json([
             'success' => true,
             'data' => [

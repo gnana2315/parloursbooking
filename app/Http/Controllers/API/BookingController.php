@@ -392,6 +392,7 @@ class BookingController extends Controller
  */
 
     public function addOnlineBooking(Request $request, OneSignalService $oneSignalService){
+        Log::info('addOnlineBooking Requests:', $request->all());
         $user = auth()->user();
 
         $request->validate(
@@ -505,7 +506,7 @@ class BookingController extends Controller
             }
             throw $e;
         }        
-
+        Log::info('addOnlineBooking Response:', $addbooking);
         if ($addbooking) {
             foreach ($booking_details as $value) {
                 $service = services::where('pbs_id', $value['service_id'])->first();
@@ -568,7 +569,7 @@ class BookingController extends Controller
                 'pbpt_status'           => 1, // 1 = success, 0 = pending, etc.
                 'pbpt_remarks'          => 'Auto-generated payment record'
             ]);
-
+            Log::info('payment transection Response:', $payment);
             $vendorPayout = vendorPayouts::firstOrCreate(
                 ['pbvp_vendor_id' => $request->vendor_id],
                 ['pbvp_total_earned' => 0, 'pbvp_total_paid' => 0, 'pbvp_total_due' => 0]
@@ -586,7 +587,7 @@ class BookingController extends Controller
                 'pbvpi_vendor_amount'=> $vendor_amount,
                 'pbvpi_status'      => '0'
             ]);
-
+            Log::info('vendor payouts Response:', $payoutItem);
             return response()->json([
                 'status' => true,
                 'message' => 'Booking added successfully',
@@ -647,6 +648,7 @@ class BookingController extends Controller
      * )
     */
     public function addRating(Request $request){
+        Log::info('add rating Requests:', $request->all());
         $user = auth()->user();
 
         $request->validate(
@@ -690,7 +692,7 @@ class BookingController extends Controller
             'pbr_comments' => $request->review,
             'pbr_status' => 1,
         ]);
-
+        Log::info('add rating Response:', $addRating);
         if (!$addRating) {
             return response()->json([
                 'status' => false,
@@ -702,7 +704,6 @@ class BookingController extends Controller
             //     $booking->update(['pbb_status' => 2]);
             // }
         }
-
 
         return response()->json([
             'status' => true,
@@ -789,6 +790,7 @@ class BookingController extends Controller
  */
 
     public function addManualBooking(Request $request){
+        Log::info('addManualBooking Requests:', $request->all());
         $user = auth()->user();
         
         $request->validate(
@@ -859,7 +861,7 @@ class BookingController extends Controller
             'pbb_contact_no' => ($request->booking_for_someone == 1) ? $request->someone_contact_no : $customer->customer_contact_no,
             'pbb_status' => 1
         ]);
-
+        Log::info('addManualBooking Response:', $addbooking);
         if ($addbooking) {
             foreach ($booking_details as $value) {
                 $service = services::where('pbs_id', $value['service_id'])->first();
@@ -1043,7 +1045,7 @@ class BookingController extends Controller
                 'services' => $serviceNames,
             ];
         }); 
-
+        Log::info('Get Bookings Response:', $generated_bookings);
         return response()->json([
             'status' => true,
             'message' => 'Bookings retrieved successfully',
@@ -1218,7 +1220,7 @@ class BookingController extends Controller
                 ];
             }),
         ];       
-
+        Log::info('Get Booking Detailss Response:', $booking_details);
         return response()->json([
             'status' => true,
             'message' => 'Booking Details retrieved successfully',
@@ -1226,8 +1228,9 @@ class BookingController extends Controller
         ], 200);
     }
 
-    public function vendorPayouts()
+    public function vendorPayouts(Request $request)
     {
+        Log::info('Get Vendor Payouts Requests:', $request->all());
         $user = auth()->user();
 
         $request->validate([
