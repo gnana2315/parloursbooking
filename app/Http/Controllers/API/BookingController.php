@@ -314,7 +314,7 @@ class BookingController extends Controller
 /**
  * @OA\Post(
  *     path="/api/addOnlineBooking",
- *     tags={"Bookings"},
+ *     tags={"Booking"},
  *     summary="Add Online Booking",
  *     description="Create a new online booking for a vendor with services.",
  *     security={{"bearerAuth":{}}},
@@ -1058,7 +1058,7 @@ class BookingController extends Controller
  *     path="/api/bookings/{id}",
  *     summary="Get booking details by ID",
  *     description="Retrieves detailed information about a specific booking including customer details and services",
- *     tags={"Bookings"},
+ *     tags={"Booking"},
  *     security={{"bearerAuth":{}}},
  *     @OA\Parameter(
  *         name="id",
