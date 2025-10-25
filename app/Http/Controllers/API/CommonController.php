@@ -101,6 +101,14 @@ class CommonController extends Controller
                                         $vendor->pbc_cityname = $vendor->city->pbc_cityname;
                                     }
                                     unset($vendor->city);
+
+                                    // --- 2️⃣ Calculate average rating or null ---
+                                    if ($vendor->ratings && $vendor->ratings->count() > 0) {
+                                        $vendor->rating = round($vendor->ratings->avg('rating_value'), 1);
+                                    } else {
+                                        $vendor->rating = null;
+                                    }
+                                    unset($vendor->ratings);
                                     $vendor->created_at = Carbon::parse($vendor->created_at)->format('d M Y h:i A');
                                     $vendor->updated_at = Carbon::parse($vendor->updated_at)->format('d M Y h:i A');
 
