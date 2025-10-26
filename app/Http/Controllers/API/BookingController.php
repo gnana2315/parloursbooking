@@ -234,13 +234,13 @@ class BookingController extends Controller
         $closeTime = Carbon::createFromTimeString($availability->pbvsa_end_time)->setDateFrom(Carbon::parse($bookingDate));
 
         // ✅ Adjust open time if booking date is today
-        if ($bookingDate === $today) {
+        //if ($bookingDate === $today) {
             $bufferMinutes = 10;
             $adjustedNow = $now->copy()->addMinutes($bufferMinutes);
             if ($adjustedNow->gt($openTime)) {
                 $openTime = $adjustedNow;
             }
-        }
+        //}
 
         if ($openTime->copy()->addMinutes($serviceDuration)->gt($closeTime)) {
             Log::info('No available time slot: The remaining time before closing is shorter than the service duration.');
