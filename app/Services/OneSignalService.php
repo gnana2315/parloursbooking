@@ -27,20 +27,39 @@ class OneSignalService
         ]);
     }
 
-    public function sendToUser($userID, $title, $message)
+    public function sendToUser($userID, $title, $message, $customData)
     {
-        return Http::withHeaders([
-            'Authorization' => 'Basic ' . $this->apiKey,
-            'Content-Type'  => 'application/json',
-        ])->post('https://onesignal.com/api/v1/notifications', [
-            'app_id' => $this->appId,
-            'include_aliases' => [
-                'external_id' => [$userID]
-            ],
-            // 'include_external_user_ids' => [$userID],
+        $payload = [
+            'app_id' => env('ONESIGNAL_APP_ID'),
+            'include_external_user_ids' => [$userID], // ⚡ use external ID here
             'headings' => ['en' => $title],
             'contents' => ['en' => $message],
-        ]);
+            'channel_for_external_user_ids' => 'push', // ensures it targets push notifications
+        ];
+
+        // Add custom data if provided
+        if (!empty($customData)) {
+            $payload['custom_data'] = $customData;
+        }
+
+        $response = Http::withHeaders([
+            'Authorization' => 'Basic ' . env('ONESIGNAL_API_KEY'),
+            'Content-Type' => 'application/json'
+        ])->post('https://onesignal.com/api/v1/notifications', $payload);
+
+        return $response;
+        // return Http::withHeaders([
+        //     'Authorization' => 'Basic ' . $this->apiKey,
+        //     'Content-Type'  => 'application/json',
+        // ])->post('https://onesignal.com/api/v1/notifications', [
+        //     'app_id' => $this->appId,
+        //     'include_aliases' => [
+        //         'external_id' => [$userID]
+        //     ],
+        //     // 'include_external_user_ids' => [$userID],
+        //     'headings' => ['en' => $title],
+        //     'contents' => ['en' => $message],
+        // ]);
     }
     
     public function sendNotification($deviceToken, $title, $message, $data = [])

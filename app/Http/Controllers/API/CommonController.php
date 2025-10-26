@@ -1315,39 +1315,31 @@ class CommonController extends Controller
             $request->message
         );
 
-        $response = Http::withHeaders([
-            'Authorization' => 'Basic ' . env('ONESIGNAL_API_KEY'),
-            'Content-Type' => 'application/json'
-        ])->post('https://onesignal.com/api/v1/notifications', [
-            'app_id' => env('ONESIGNAL_APP_ID'),
-            'include_external_user_ids' => [$request->id], // ⚡ use external ID here
-            'headings' => ['en' => $request->title],
-            'contents' => ['en' => $request->message],
-            'channel_for_external_user_ids' => 'push' // ensures it targets push notifications
-        ]);
-
-        \Log::info('OneSignal Response:', ['body' => $response->body(), 'status' => $response->status()]);
-
-
         // $response = Http::withHeaders([
         //     'Authorization' => 'Basic ' . env('ONESIGNAL_API_KEY'),
         //     'Content-Type' => 'application/json'
         // ])->post('https://onesignal.com/api/v1/notifications', [
-        //     'app_id' => env('ONESIGNAL_APP_ID'),            
-        //     'include_external_user_ids' => [$request->id],
-        //     'target_channel' => 'push',
-        //     'headings' => ['en' => 'Test Notification'],
-        //     'contents' => ['en' => 'Hello World!'],
+        //     'app_id' => env('ONESIGNAL_APP_ID'),
+        //     'include_external_user_ids' => [$request->id], // ⚡ use external ID here
+        //     'headings' => ['en' => $request->title],
+        //     'contents' => ['en' => $request->message],
+        //     'channel_for_external_user_ids' => 'push' // ensures it targets push notifications
         // ]);
 
-        // // Log the response body to see OneSignal’s error message
-        // Log::info('OneSignal Response:', ['body' => $response->body(), 'status' => $response->status()]);
-
-        dd($notification);
+        // \Log::info('OneSignal Response:', ['body' => $response->body(), 'status' => $response->status()]);
+        if(!$notification){
+            $status = false;
+            $message = 'Failed to send test notification.';
+            $status_code = 500;
+        }else{
+            $status = true;
+            $message = 'Test notification sent.';
+            $status_code = 200;
+        }
         return response()->json([
-            'success' => true,
-            'message' => 'Test notification sent.'
-        ], 200);
+            'success' => $status,
+            'message' => $message
+        ], $status_code);
     }
 
     // Helper method to get status text
