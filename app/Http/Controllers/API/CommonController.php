@@ -1318,8 +1318,10 @@ class CommonController extends Controller
             'Authorization' => 'Basic ' . env('ONESIGNAL_API_KEY'),
             'Content-Type' => 'application/json'
         ])->post('https://onesignal.com/api/v1/notifications', [
-            'app_id' => env('ONESIGNAL_APP_ID'),
-            'include_player_ids' => [$request->id],
+            'app_id' => env('ONESIGNAL_APP_ID'),            
+            'include_aliases' => [
+                'external_id' => [$request->id]
+            ],
             'headings' => ['en' => 'Test Notification'],
             'contents' => ['en' => 'Hello World!'],
         ]);
