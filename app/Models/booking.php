@@ -56,7 +56,7 @@ class booking extends Model
     }
 
     public function vendors(){
-        return $this->belongsTo(vendors::class, 'pbb_vendor_id');
+        return $this->belongsTo(vendors::class, 'pbb_vendor_id', 'pbv_id');
     }
 
     public function bookingDetails(){
@@ -64,6 +64,6 @@ class booking extends Model
     }
     
     public function ratings(){
-        return $this->hasMany(ratings::class, 'pbr_booking_id');
+        return $this->hasMany(ratings::class, 'pbr_booking_id', 'pbb_id');
     }
 }
