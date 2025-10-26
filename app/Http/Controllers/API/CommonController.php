@@ -1314,19 +1314,26 @@ class CommonController extends Controller
             $request->title,
             $request->message
         );
-        $response = Http::withHeaders([
-            'Authorization' => 'Basic ' . env('ONESIGNAL_API_KEY'),
-            'Content-Type' => 'application/json'
-        ])->post('https://onesignal.com/api/v1/notifications', [
-            'app_id' => env('ONESIGNAL_APP_ID'),            
-            'include_external_user_ids' => [$request->id],
-            'target_channel' => 'push',
-            'headings' => ['en' => 'Test Notification'],
-            'contents' => ['en' => 'Hello World!'],
-        ]);
 
-        // Log the response body to see OneSignal’s error message
-        Log::info('OneSignal Response:', ['body' => $response->body(), 'status' => $response->status()]);
+        $playerId = "1c4677a7-d4eb-4f8c-84e8-eea15763949e";
+        $response = Http::withHeaders([
+            'Authorization' => 'Basic ' . env('ONESIGNAL_API_KEY')
+        ])->get("https://onesignal.com/api/v1/players/{$playerId}"); 
+
+        Log::info('Player Info:', ['response' => $response->json()]);
+        // $response = Http::withHeaders([
+        //     'Authorization' => 'Basic ' . env('ONESIGNAL_API_KEY'),
+        //     'Content-Type' => 'application/json'
+        // ])->post('https://onesignal.com/api/v1/notifications', [
+        //     'app_id' => env('ONESIGNAL_APP_ID'),            
+        //     'include_external_user_ids' => [$request->id],
+        //     'target_channel' => 'push',
+        //     'headings' => ['en' => 'Test Notification'],
+        //     'contents' => ['en' => 'Hello World!'],
+        // ]);
+
+        // // Log the response body to see OneSignal’s error message
+        // Log::info('OneSignal Response:', ['body' => $response->body(), 'status' => $response->status()]);
 
         dd($notification);
         return response()->json([
