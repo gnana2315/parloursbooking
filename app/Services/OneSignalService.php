@@ -27,7 +27,7 @@ class OneSignalService
         ]);
     }
 
-    public function sendToUser($userID, $title, $message, $customData)
+    public function sendToUser($userID, $title, $message, $customData = [])
     {
         $payload = [
             'app_id' => env('ONESIGNAL_APP_ID'),
