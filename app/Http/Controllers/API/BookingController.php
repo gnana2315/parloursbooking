@@ -218,6 +218,7 @@ class BookingController extends Controller
         // Get vendor's standard availability
         $availability = vendorStandardAvailability::where('pbvsa_vendor_id', $vendorId)
             ->where('pbvsa_day', date('l', strtotime($bookingDate)))
+            ->where('pbvsa_is_open', 1)
             ->first();
             
         if (!$availability || !$availability->pbvsa_is_open) {
