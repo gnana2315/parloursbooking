@@ -1322,6 +1322,7 @@ class CommonController extends Controller
             'include_aliases' => [
                 'external_id' => [$request->id]
             ],
+            'target_channel' => 'push',
             'headings' => ['en' => 'Test Notification'],
             'contents' => ['en' => 'Hello World!'],
         ]);
