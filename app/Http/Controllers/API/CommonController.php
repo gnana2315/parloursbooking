@@ -111,7 +111,7 @@ class CommonController extends Controller
 
                         // --- 5️⃣ Calculate average rating or null ---
                         $vendor->rating = $vendor->ratings->isNotEmpty()
-                            ? round($vendor->ratings->avg('rating_value'), 1)
+                            ? round($vendor->ratings->avg('pbr_rating'), 1)
                             : null;
 
                         // --- 6️⃣ Format created_at / updated_at ---

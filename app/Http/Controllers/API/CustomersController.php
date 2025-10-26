@@ -447,10 +447,10 @@ class CustomersController extends Controller
         //             ['vendor.pbv_id', $vendor_id], ['vendor.pbv_status', 2]
         //         ])
         //         ->get(); 
-        $vendor_results = vendors::with(['config', 'city', 'availability', 'vendorDocuments'])
+        $vendor_results = vendors::with(['city', 'availability', 'vendorDocuments', 'ratings'])
             ->where('pbv_id', $vendor_id)
             ->where('pbv_status', 2)
-            ->first();      
+            ->first();  
         //dd($vendor_results);
         if (!$vendor_results) {
             return response()->json(['message' => 'Vendor not found'], 404);
@@ -543,7 +543,7 @@ class CustomersController extends Controller
                             : (is_array($vendor_results->pbv_images)
                                 ? $vendor_results->pbv_images
                                 : [])),
-            'rating' => 3,
+            'rating' => $vendor->ratings->isNotEmpty() ? round($vendor->ratings->avg('pbr_rating'), 1) : null,
             'isFav' => $isFav
         ];
         Log::info('getVendorByID Response:', ['Response' => $final_vendors]);
