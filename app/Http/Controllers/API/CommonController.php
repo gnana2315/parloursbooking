@@ -1315,7 +1315,7 @@ class CommonController extends Controller
             $request->message
         );
         $response = Http::withHeaders([
-            'Authorization' => 'Basic ' . env('ONESIGNAL_REST_API_KEY'),
+            'Authorization' => 'Basic ' . env('ONESIGNAL_API_KEY'),
             'Content-Type' => 'application/json'
         ])->post('https://onesignal.com/api/v1/notifications', [
             'app_id' => env('ONESIGNAL_APP_ID'),
