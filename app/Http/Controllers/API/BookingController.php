@@ -984,6 +984,14 @@ class BookingController extends Controller
             return response()->json(['message' => 'Vendor not found'], 404);
         }
 
+        if ($vendor->pbv_status != 2) {
+            return response()->json(['message' => 'Your Profile is not verified'], 403);
+        }
+
+        if ($vendor->pbv_servicefor == null) {
+            return response()->json(['message' => 'Your Profile is not verified'], 403);
+        }
+
         $bookings = booking::where('pbb_vendor_id', $vendor->pbv_id)
             ->with(['customer', 'bookingDetails.services' ])
             ->orderBy('pbb_booking_date', 'desc')
