@@ -1313,6 +1313,19 @@ class CommonController extends Controller
             $request->title,
             $request->message
         );
+        $response = Http::withHeaders([
+            'Authorization' => 'Basic ' . env('ONESIGNAL_REST_API_KEY'),
+            'Content-Type' => 'application/json'
+        ])->post('https://onesignal.com/api/v1/notifications', [
+            'app_id' => env('ONESIGNAL_APP_ID'),
+            'include_player_ids' => [$playerId],
+            'headings' => ['en' => 'Test Notification'],
+            'contents' => ['en' => 'Hello World!'],
+        ]);
+
+        // Log the response body to see OneSignal’s error message
+        Log::info('OneSignal Response:', ['body' => $response->body(), 'status' => $response->status()]);
+
         dd($notification);
         return response()->json([
             'success' => true,
