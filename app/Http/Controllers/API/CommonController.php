@@ -1315,14 +1315,20 @@ class CommonController extends Controller
             $request->message
         );
 
-        $playerId = "1c4677a7-d4eb-4f8c-84e8-eea15763949e";
-        $appId = env('ONESIGNAL_APP_ID'); // Make sure this is the correct UUID
-
         $response = Http::withHeaders([
-            'Authorization' => 'Basic ' . env('ONESIGNAL_API_KEY')
-        ])->get("https://onesignal.com/api/v1/players/{$playerId}?app_id={$appId}");
+            'Authorization' => 'Basic ' . env('ONESIGNAL_API_KEY'),
+            'Content-Type' => 'application/json'
+        ])->post('https://onesignal.com/api/v1/notifications', [
+            'app_id' => env('ONESIGNAL_APP_ID'),
+            'include_external_user_ids' => [$request->id], // ⚡ use external ID here
+            'headings' => ['en' => $request->title],
+            'contents' => ['en' => $request->message],
+            'channel_for_external_user_ids' => 'push' // ensures it targets push notifications
+        ]);
 
-        Log::info('Player Info:', ['response' => $response->json()]);
+        \Log::info('OneSignal Response:', ['body' => $response->body(), 'status' => $response->status()]);
+
+
         // $response = Http::withHeaders([
         //     'Authorization' => 'Basic ' . env('ONESIGNAL_API_KEY'),
         //     'Content-Type' => 'application/json'
