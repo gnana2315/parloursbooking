@@ -442,7 +442,6 @@ class BookingController extends Controller
             'age' => $request->age,
             'gender' => $request->gender,
             'address' => $request->address,
-            'remarks' => $request->remarks,
         ];
 
         $booking_details = $request->booking_details;
@@ -1036,6 +1035,20 @@ class BookingController extends Controller
             $serviceNames = $booking->bookingDetails->map(function ($detail) {
                 return $detail->services->pbs_name ?? null;
             })->filter()->values()->toArray();
+
+            // Decode pbb_booking_details JSON
+            $booking_details_json = json_decode($booking->pbb_booking_details, true);
+
+            // Combine all key-value pairs into a readable string (if JSON exists)
+            if (!empty($booking_details_json)) {
+                $remarks = collect($booking_details_json)
+                    ->map(function ($value, $key) {
+                        return ucfirst($key) . ': ' . ($value ?? '-');
+                    })
+                    ->implode(', ');
+            } else {
+                $remarks = $booking->pbb_remarks ?? '-';
+            }
             
             return [
                 'pbb_id' => $booking->pbb_id,
@@ -1053,7 +1066,7 @@ class BookingController extends Controller
                 'created_at' => $booking->created_at,
                 'updated_at' => $booking->updated_at,
                 'deleted_at' => $booking->deleted_at,
-                'pbb_remarks' => $booking->pbb_remarks,
+                'pbb_remarks' => $remarks,
                 'pbbd_total_amount' => $booking->bookingDetails->sum('pbbd_amount'),
                 'services' => $serviceNames,
             ];
