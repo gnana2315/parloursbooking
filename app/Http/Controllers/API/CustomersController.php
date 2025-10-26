@@ -264,6 +264,8 @@ class CustomersController extends Controller
         }
         $bookings = $customer->bookings()->with(['vendors','bookingDetails.services'])->get();
 
+        $count = $customer->bookings()->count();
+        Log::info('Total Bookings Found:', ['count' => $count]);
         // $totalAmount = 0;
 
         $bookingsWithTotal = $bookings->map(function ($booking) {
@@ -285,13 +287,6 @@ class CustomersController extends Controller
                 }),
             ];
         });
-        // foreach ($bookings as $booking) {
-        //     foreach ($booking->bookingDetails as $detail) {
-        //         $totalAmount += $detail->pbbd_amount; // assuming this is the amount field
-        //     }
-        // }
-        // $bookings['total_amount'] = $bookingsWithTotal;
-        //dd($bookings);
         Log::info('bookingsWithTotal Response:', ['Response' => $bookingsWithTotal]);
         return response()->json([
             'message' => 'Bookings retrieved successfully',
