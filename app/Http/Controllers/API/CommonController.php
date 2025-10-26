@@ -1319,7 +1319,7 @@ class CommonController extends Controller
             'Content-Type' => 'application/json'
         ])->post('https://onesignal.com/api/v1/notifications', [
             'app_id' => env('ONESIGNAL_APP_ID'),
-            'include_player_ids' => [$playerId],
+            'include_player_ids' => [$request->id],
             'headings' => ['en' => 'Test Notification'],
             'contents' => ['en' => 'Hello World!'],
         ]);
