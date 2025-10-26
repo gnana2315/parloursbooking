@@ -1308,12 +1308,12 @@ class CommonController extends Controller
             ]
         );
 
-        $oneSignalService->sendToUser(
+        $notification = $oneSignalService->sendToUser(
             $request->id,
             $request->title,
             $request->message
         );
-
+        dd($notification);
         return response()->json([
             'success' => true,
             'message' => 'Test notification sent.'
