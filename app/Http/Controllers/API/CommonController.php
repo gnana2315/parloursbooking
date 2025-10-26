@@ -1316,9 +1316,11 @@ class CommonController extends Controller
         );
 
         $playerId = "1c4677a7-d4eb-4f8c-84e8-eea15763949e";
+        $appId = env('ONESIGNAL_APP_ID'); // Make sure this is the correct UUID
+
         $response = Http::withHeaders([
             'Authorization' => 'Basic ' . env('ONESIGNAL_API_KEY')
-        ])->get("https://onesignal.com/api/v1/players/{$playerId}"); 
+        ])->get("https://onesignal.com/api/v1/players/{$playerId}?app_id={$appId}");
 
         Log::info('Player Info:', ['response' => $response->json()]);
         // $response = Http::withHeaders([
