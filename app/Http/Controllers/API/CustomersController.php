@@ -262,14 +262,8 @@ class CustomersController extends Controller
                 'message' => 'Customer not found',
             ], 404);
         }
-        $allBookings = \App\Models\booking::where('pbb_customer_id', $customer->pbc_id)->get();
-        Log::info('All bookings directly from DB:', ['count' => $allBookings->count()]);
 
         $bookings = $customer->bookings()->with(['vendors','bookingDetails.services'])->get();
-
-        // $count = $customer->bookings()->count();
-        // Log::info('Total Bookings Found:', ['count' => $count]);
-        // $totalAmount = 0;
 
         $bookingsWithTotal = $bookings->map(function ($booking) {
             $total = $booking->bookingDetails->sum('pbbd_total_amount');
