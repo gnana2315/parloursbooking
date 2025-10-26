@@ -120,7 +120,7 @@ Route::middleware(['auth:sanctum', 'validate.token'])->group(function () {
     Route::post('/customer/favourite', [CustomersController::class, 'addRemoveCustomerFavourite']);
     Route::get('/customer/favourites', [CustomersController::class, 'getCustomerFavourites']);
     Route::get('/customer/bookings', [CustomersController::class, 'getBookingsByCustomerID']);
-    Route::get('/vendor/{vendor_id}', [CustomersController::class, 'getVendorById' ]);
+    Route::get('/vendor/{vendor_id}', [CustomersController::class, 'getVendorByID' ]);
 
     //transections
     Route::get('/getThisWeekEarningsByVendor', [VendorController::class, 'getThisWeekEarningsByVendor']);

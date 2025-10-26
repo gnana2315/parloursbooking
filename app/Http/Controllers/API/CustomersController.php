@@ -535,7 +535,7 @@ class CustomersController extends Controller
                             : (is_array($vendor_results->pbv_images)
                                 ? $vendor_results->pbv_images
                                 : [])),
-            'rating' => $vendor_results->ratings->isNotEmpty() ? round($vendor->ratings->avg('pbr_rating'), 1) : null,
+            'rating' => $vendor_results->ratings->isNotEmpty() ? round($vendor_results->ratings->avg('pbr_rating'), 1) : null,
             'isFav' => $isFav
         ];
         Log::info('getVendorByID Response:', ['Response' => $final_vendors]);
