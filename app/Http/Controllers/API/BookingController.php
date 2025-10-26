@@ -26,9 +26,14 @@ use Illuminate\Support\Facades\Log;
 use App\Models\deviceToken;
 use App\Services\FirebaseService;
 use App\Services\OneSignalService;
+use App\Services\DialogESMSService;
 
 class BookingController extends Controller
 {
+    public function __construct(DialogESMSService $smsService)
+    {
+        $this->smsService = $smsService;
+    }
     /**
      * @OA\Get(
         *     path="/api/getBookingSlots",
@@ -512,6 +517,7 @@ class BookingController extends Controller
         }        
         Log::info('addOnlineBooking Response:', ['Response' => $addbooking]);
         if ($addbooking) {
+            
             foreach ($booking_details as $value) {
                 $service = services::where('pbs_id', $value['service_id'])->first();
                 $price = floatval(str_replace(',', '', $service->pbs_price));
@@ -540,16 +546,49 @@ class BookingController extends Controller
             // $checkUserDeviceToken = deviceToken::where('pbdt_user_id', $vendors_user_id->pbu_id)->first();
             $notification_title = 'Booking Confirmed!';
             $notification_message = 'Booking added successfully!. Your booking reference no:'. $addbooking->pbb_ref_no;
+            $booking_details_for_notification = [
+                'booking_ref_no' => $addbooking->pbb_ref_no,
+                'booking_date' => $addbooking->pbb_booking_date,
+                'booking_start_time' => $addbooking->pbb_booking_start_time,
+                'booking_end_time' => $addbooking->pbb_booking_end_time,
+                'total_amount' => $addbooking->pbb_total_amount,
+            ];
 
-            $oneSignalService->sendToUser($vendors_user_id->pbu_id, $notification_title, $notification_message);
+            $booking_notification = $oneSignalService->sendToUser($vendors_user_id->pbu_id, $notification_title, $notification_message, $booking_details_for_notification);
 
-            notification::create([
-                'pbn_user_id' => $user->pbu_id,
-                'pbn_type' => 'specific',
-                'pbn_title' => $notification_title,
-                'pbn_message' => $notification_message,
-                'pbn_is_read' => 0,
-            ]);
+            if($booking_notification){
+                notification::create([
+                    'pbn_user_id' => $user->pbu_id,
+                    'pbn_type' => 'specific',
+                    'pbn_title' => $notification_title,
+                    'pbn_message' => $notification_message,
+                    'pbn_is_read' => 0,
+                ]);
+            }
+
+            $sms_customer_name = $request->someone_name ? $request->someone_name : $customer->pbc_first_name;
+            $sms_vendor_name = $vendor->pbv_business_name;
+            $sms_booking_date = $addbooking->pbb_booking_date;
+            $sms_booking_start_time = $addbooking->pbb_booking_start_time;
+            $sms_booking_end_time = $addbooking->pbb_booking_end_time;
+            $sms_total_amount = $addbooking->pbb_total_amount;
+            $sms_booking_ref_no = $addbooking->pbb_ref_no;
+            $sms_phone_no = $request->phone_no ? $request->phone_no : $customer->pbc_contact_no;
+
+            $apiKey = config('dialogesms.api_key');
+            $sender = config('dialogesms.sender');
+            $message = "Hello {$sms_customer_name}, your booking at {$sms_vendor_name} has been confirmed!\n\n" .
+                        "📅 Date: {$sms_booking_date}\n" .
+                        "⏰ Time: {$sms_booking_start_time} - {$sms_booking_end_time}\n" .
+                        "💰 Total Amount: {$sms_total_amount}\n" .
+                        "Booking Ref: {$sms_booking_ref_no}\n\n" .
+                        "Thank you for choosing Parlours Booking!";
+
+            // Store OTP to DB/Cache if needed here
+            //$smsEnable = filter_var($request->header('SMS_ENABLE', true), FILTER_VALIDATE_BOOLEAN);
+            //if($smsEnable){
+                $result = $this->smsService->sendMessage($apiKey, [$sms_phone_no], $message, $sender);       
+            //}
 
             // ✅ Add Payment Transaction
             $platform_fee_percentage = 10; // example: 10% commission

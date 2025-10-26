@@ -1314,19 +1314,7 @@ class CommonController extends Controller
             $request->title,
             $request->message
         );
-
-        // $response = Http::withHeaders([
-        //     'Authorization' => 'Basic ' . env('ONESIGNAL_API_KEY'),
-        //     'Content-Type' => 'application/json'
-        // ])->post('https://onesignal.com/api/v1/notifications', [
-        //     'app_id' => env('ONESIGNAL_APP_ID'),
-        //     'include_external_user_ids' => [$request->id], // ⚡ use external ID here
-        //     'headings' => ['en' => $request->title],
-        //     'contents' => ['en' => $request->message],
-        //     'channel_for_external_user_ids' => 'push' // ensures it targets push notifications
-        // ]);
-
-        // \Log::info('OneSignal Response:', ['body' => $response->body(), 'status' => $response->status()]);
+        
         if(!$notification){
             $status = false;
             $message = 'Failed to send test notification.';

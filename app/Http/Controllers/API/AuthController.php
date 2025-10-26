@@ -620,8 +620,12 @@ class AuthController extends Controller
         
         $notification_title = 'Welcome!';
         $notification_message = 'Login Successfully!';
+        $custom_data = [
+            'user_name' => $user->pbu_name,
+            'login_time' => Carbon::now()->toDateTimeString(),
+        ];
 
-        $oneSignalService->sendToUser($user->pbu_id, $notification_title, $notification_message);
+        $oneSignalService->sendToUser($user->pbu_id, $notification_title, $notification_message, $custom_data, $custom_data);
 
         notification::create([
             'pbn_user_id' => $user->pbu_id,
