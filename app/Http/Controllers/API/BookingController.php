@@ -555,7 +555,7 @@ class BookingController extends Controller
             ];
 
             $booking_notification = $oneSignalService->sendToUser($vendors_user_id->pbu_id, $notification_title, $notification_message, $booking_details_for_notification);
-
+            Log::info('booking_notification Response:', ['Response' => $booking_notification]);
             if($booking_notification){
                 notification::create([
                     'pbn_user_id' => $user->pbu_id,
@@ -577,10 +577,13 @@ class BookingController extends Controller
 
             $apiKey = config('dialogesms.api_key');
             $sender = config('dialogesms.sender');
+            // $message = "Hello {$sms_customer_name}, your booking at {$sms_vendor_name} has been confirmed!\n\n" .
+            //             "Date: {$sms_booking_date}\n" .
+            //             "Time: {$sms_booking_start_time} - {$sms_booking_end_time}\n" .
+            //             "Total Amount: {$sms_total_amount}\n" .
+            //             "Booking Ref: {$sms_booking_ref_no}\n\n" .
+            //             "Thank you for choosing Parlours Booking!";
             $message = "Hello {$sms_customer_name}, your booking at {$sms_vendor_name} has been confirmed!\n\n" .
-                        "📅 Date: {$sms_booking_date}\n" .
-                        "⏰ Time: {$sms_booking_start_time} - {$sms_booking_end_time}\n" .
-                        "💰 Total Amount: {$sms_total_amount}\n" .
                         "Booking Ref: {$sms_booking_ref_no}\n\n" .
                         "Thank you for choosing Parlours Booking!";
 
