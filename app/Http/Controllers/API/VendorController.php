@@ -1165,7 +1165,7 @@ class VendorController extends Controller
 
     public function vendorSpecialCloses(Request $request){
         Log::info('vendorSpecialCloses Requests:', ['Requests' => $request->all()]);
-        
+
         $user = auth()->user();
 
         $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
@@ -1194,8 +1194,8 @@ class VendorController extends Controller
         foreach($request->all() as $special_close){
             $day = Carbon::parse($special_close['day'])->toDateString();;
             $fullDayClosed = $special_close['full_day_closed'];
-            $fromTime = $fullDayClosed ? '00:00:00' : date('H:i:s', $special_close['from_time']);
-            $toTime = $fullDayClosed ? '23:59:59' : date('H:i:s', $special_close['to_time']);
+            $fromTime = $fullDayClosed ? '00:00:00' : $special_close['from_time'] . ':00';
+            $toTime = $fullDayClosed ? '23:59:59' : $special_close['to_time'] . ':00';
 
             Log::info('Checking Booking Conflicts:', [
                 'vendor_id' => $vendor->pbv_id,
