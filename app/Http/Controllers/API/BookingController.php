@@ -553,7 +553,7 @@ class BookingController extends Controller
                 'booking_end_time' => $addbooking->pbb_booking_end_time,
                 'total_amount' => $addbooking->pbb_total_amount,
             ];
-            Log::info('vendors_user_id Response:', ['Response' => $vendors_user_id]);
+            Log::info('vendors_user_id Response:', ['Response' => $vendors_user_id->pbu_id]);
             $booking_notification = $oneSignalService->sendToUser($vendors_user_id->pbu_id, $notification_title, $notification_message, $booking_details_for_notification);
             Log::info('booking_notification Response:', ['Response' => $booking_notification]);
             if($booking_notification){
