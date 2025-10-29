@@ -590,9 +590,9 @@ class BookingController extends Controller
             // Store OTP to DB/Cache if needed here
             //$smsEnable = filter_var($request->header('SMS_ENABLE', true), FILTER_VALIDATE_BOOLEAN);
             //if($smsEnable){
-                //$booking_sms_result = $this->smsService->sendMessage($apiKey, [$sms_phone_no], $message, $sender);       
+                $booking_sms_result = $this->smsService->sendMessage($apiKey, [$sms_phone_no], $message, $sender);       
             //}
-            //Log::info('booking_sms_result Response:', ['Response' => $booking_sms_result]);
+            Log::info('booking_sms_result Response:', ['Response' => $booking_sms_result]);
             // ✅ Add Payment Transaction
             $platform_fee_percentage = 10; // example: 10% commission
             $platform_fee = ($total_amount * $platform_fee_percentage) / 100;
