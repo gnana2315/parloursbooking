@@ -48,18 +48,6 @@ class OneSignalService
         ])->post('https://onesignal.com/api/v1/notifications', $payload);
 
         return $response;
-        // return Http::withHeaders([
-        //     'Authorization' => 'Basic ' . $this->apiKey,
-        //     'Content-Type'  => 'application/json',
-        // ])->post('https://onesignal.com/api/v1/notifications', [
-        //     'app_id' => $this->appId,
-        //     'include_aliases' => [
-        //         'external_id' => [$userID]
-        //     ],
-        //     // 'include_external_user_ids' => [$userID],
-        //     'headings' => ['en' => $title],
-        //     'contents' => ['en' => $message],
-        // ]);
     }
     
     public function sendNotification($deviceToken, $title, $message, $data = [])
