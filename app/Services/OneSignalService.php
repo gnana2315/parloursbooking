@@ -46,7 +46,7 @@ class OneSignalService
             'Authorization' => 'Basic ' . env('ONESIGNAL_API_KEY'),
             'Content-Type' => 'application/json'
         ])->post('https://onesignal.com/api/v1/notifications', $payload);
-
+        Log::info('OneSignal Response:', ['Response' => $response->json()]);
         return $response;
     }
     
