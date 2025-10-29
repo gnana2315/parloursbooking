@@ -1204,7 +1204,7 @@ class VendorController extends Controller
                 })
                 ->where('pbb_status', 1)
                 ->get();
-
+            Log::info('conflictingBookings Response:', ['Requests' => $conflictingBookings]);
             if ($conflictingBookings->count() > 0) {
                 // $conflicts[] = [
                 //     'day' => $day,
