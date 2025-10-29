@@ -1165,11 +1165,15 @@ class VendorController extends Controller
 
     public function vendorSpecialCloses(Request $request){
         Log::info('vendorSpecialCloses Requests:', ['Requests' => $request->all()]);
+        
         $user = auth()->user();
+
         $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
+
         if (!$vendor) {
             return response()->json(['message' => 'Vendor not found'], 404);
         }
+
         $request->validate(
             [
                 '*.day' => 'required',
