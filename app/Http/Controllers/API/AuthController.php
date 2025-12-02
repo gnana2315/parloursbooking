@@ -755,6 +755,13 @@ class AuthController extends Controller
         $user = User::where('pbu_mobileno', $request->phone_no)
                         ->where('pbu_usertype', $request->user_type)
                         ->first();
+        
+        if(!$user){
+            return response()->json([
+                'message' => 'There are no account in this mobile no. Please try again',
+                'data' => null,
+            ], 201);
+        }
 
         $verfivation_code = $this->generateVerificationCode($user->pbu_id); 
 
