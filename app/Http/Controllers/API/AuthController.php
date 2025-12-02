@@ -753,7 +753,7 @@ class AuthController extends Controller
         
         // Find user by mobile number
         $user = User::where('pbu_mobileno', $request->phone_no)
-                        ->where('user_type', $request->user_type)
+                        ->where('pbu_usertype', $request->user_type)
                         ->first();
 
         $verfivation_code = $this->generateVerificationCode($user->pbu_id); 
