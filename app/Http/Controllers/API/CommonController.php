@@ -302,7 +302,9 @@ class CommonController extends Controller
                     }]);
                     break;
                 case 'price_desc':
-                    $query->orderBy('pbs_price', 'desc');
+                    $query->with(['services' => function ($q) use ($request) {
+                        $q->orderBy('pbs_price', 'desc');
+                    }]);
                     break;
                 // case 'rating_asc':
                 //     $query->orderBy('rating', 'asc');
