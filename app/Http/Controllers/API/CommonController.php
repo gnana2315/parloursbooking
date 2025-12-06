@@ -296,8 +296,10 @@ class CommonController extends Controller
         // Sort
         if ($request->filled('sort')) {
             switch ($request->sort) {
-                case 'price_asc':
-                    $query->orderBy('pbs_price', 'asc');
+                case 'price_asc': 
+                    $query->with(['services' => function ($q) use ($request) {
+                        $q->orderBy('pbs_price', 'asc');
+                    }]);
                     break;
                 case 'price_desc':
                     $query->orderBy('pbs_price', 'desc');
