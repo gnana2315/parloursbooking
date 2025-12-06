@@ -15,6 +15,7 @@ use App\Models\vendorPayouts;
 use App\Models\vendorPayoutItems;
 use App\Models\vendorPayoutHistory;
 use App\Models\notification;
+use App\Models\promoCode;
 
 use Validator;
 use Carbon\Carbon;
@@ -96,95 +97,6 @@ class BookingController extends Controller
         *     )
         * )
     */
-    // public function getBookingSlots(Request $request){
-    //     $user = auth()->user();  
-        
-    //     $availableSlots = [];
-    //     $finalSlots = [];
-        
-    //     $vendorId = $request->query('vendor_id');
-    //     $bookingDate = $request->query('booking_date');
-    //     $serviceDuration = $request->query('service_total_duration');
-
-    //     // Get vendor's standard availability for that day
-    //     $availability = vendorStandardAvailability::where('pbvsa_vendor_id', $vendorId)
-    //         ->where('pbvsa_day', date('l', strtotime($bookingDate)))
-    //         ->first();
-            
-    //     if (!$availability || !$availability->pbvsa_is_open) {
-    //         return response()->json([
-    //             'status' => false,
-    //             'message' => 'Vendor is closed on selected date',
-    //             'data' => []
-    //         ], 200);
-    //     }
-
-    //     $openTime = Carbon::createFromTimeString($availability->pbvsa_start_time);
-    //     $closeTime = Carbon::createFromTimeString($availability->pbvsa_end_time);
-
-    //     $existingBookings = booking::where('pbb_vendor_id', $vendorId)
-    //         ->where('pbb_booking_date', $bookingDate)
-    //         ->where('pbb_status', '=', 1)
-    //         ->orderBy('pbb_booking_start_time')
-    //         ->get();
-
-    //     $availableSlots = [];
-    //     $finalSlots = [];
-    //     $currentStart = clone $openTime;
-
-    //     if ($existingBookings->isEmpty()) {
-    //         while ($currentStart->copy()->addMinutes($serviceDuration)->lte($closeTime)) {
-    //             $finalSlots[] = [
-    //                 'start' => $currentStart->format('H:i:s'),
-    //                 'end' => (clone $currentStart)->addMinutes($serviceDuration)->format('H:i:s'),
-    //             ];
-    //             $currentStart->addMinutes($serviceDuration);
-    //         }
-    //     } else {
-    //         foreach ($existingBookings as $booking) {
-    //             $bookingStart = Carbon::createFromTimeString($booking->pbb_booking_start_time);
-    //             $bookingEnd = Carbon::createFromTimeString($booking->pbb_booking_end_time);
-
-    //             if ($currentStart->lt($bookingStart)) {
-    //                 $availableSlots[] = [
-    //                     'start' => clone $currentStart,
-    //                     'end' => clone $bookingStart,
-    //                 ];
-    //             }
-
-    //             if ($currentStart->lt($bookingEnd)) {
-    //                 $currentStart = clone $bookingEnd;
-    //             }
-    //         }
-
-    //         if ($currentStart->lt($closeTime)) {
-    //             $availableSlots[] = [
-    //                 'start' => clone $currentStart,
-    //                 'end' => clone $closeTime,
-    //             ];
-    //         }
-
-    //         // Slice each available gap into proper service duration slots
-    //         foreach ($availableSlots as $slot) {
-    //             $startTime = $slot['start'];
-    //             $endTime = $slot['end'];
-
-    //             while ($startTime->copy()->addMinutes($serviceDuration)->lte($endTime)) {
-    //                 $finalSlots[] = [
-    //                     'start' => $startTime->format('H:i:s'),
-    //                     'end' => (clone $startTime)->addMinutes($serviceDuration)->format('H:i:s'),
-    //                 ];
-    //                 $startTime->addMinutes($serviceDuration);
-    //             }
-    //         }
-    //     }
-
-    //     return response()->json([
-    //         'status' => true,
-    //         'message' => 'Available slots',
-    //         'data' => $finalSlots,
-    //     ], 200);
-    // }
     public function getBookingSlots(Request $request){
         $user = auth()->user();  
         
@@ -318,6 +230,176 @@ class BookingController extends Controller
             'status' => true,
             'message' => 'Available slots',
             'data' => $finalSlots,
+        ], 200);
+    }
+
+    /**
+ * @OA\Get(
+ *     path="/api/calculate-total",
+ *     summary="Calculate total after applying promo code",
+ *     description="Returns subtotal, discount, and final total for selected services, considering vendor/service-specific promo codes and minimum booking amount.",
+ *     tags={"Booking"},
+ *     @OA\Parameter(
+ *         name="service_ids[]",
+ *         in="query",
+ *         required=true,
+ *         description="List of service IDs",
+ *         @OA\Schema(type="array", @OA\Items(type="integer"))
+ *     ),
+ *     @OA\Parameter(
+ *         name="vendor_id",
+ *         in="query",
+ *         required=false,
+ *         description="Vendor ID (required for vendor-specific promos)",
+ *         @OA\Schema(type="integer")
+ *     ),
+ *     @OA\Parameter(
+ *         name="promo_code",
+ *         in="query",
+ *         required=false,
+ *         description="Optional promo code",
+ *         @OA\Schema(type="string")
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Total calculated successfully",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="status", type="boolean", example=true),
+ *             @OA\Property(property="message", type="string", example="Total calculated successfully"),
+ *             @OA\Property(
+ *                 property="data",
+ *                 type="object",
+ *                 @OA\Property(property="sub_total", type="number", format="float", example=1500.00),
+ *                 @OA\Property(property="discount", type="number", format="float", example=150.00),
+ *                 @OA\Property(property="final_total", type="number", format="float", example=1350.00)
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=400,
+ *         description="Invalid input or promo code not applicable",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="status", type="boolean", example=false),
+ *             @OA\Property(property="message", type="string", example="This promo code requires a minimum booking amount of 500.")
+ *         )
+ *     )
+ * )
+ */
+    public function calculateTotal(Request $request)
+    {
+        // For GET, fetch query params
+        $service_ids = $request->query('service_ids', []);
+        $vendor_id = $request->query('vendor_id');
+        $promo_code = $request->query('promo_code');
+
+        $request->merge([
+            'service_ids' => $service_ids,
+            'vendor_id' => $vendor_id,
+            'promo_code' => $promo_code,
+        ]);
+        
+        $request->validate([
+            'service_ids' => 'required|array',
+            'service_ids.*' => 'integer|exists:services,pbs_id',
+            'vendor_id' => 'nullable|integer|exists:vendors,pbv_id',
+            'promo_code' => 'nullable|string'
+        ]);
+
+        // 1. Get services
+        $services = services::whereIn('pbs_id', $request->service_ids)->get();
+
+        if ($services->isEmpty()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'No valid services found',
+            ], 400);
+        }
+
+        // 2. Subtotal
+        $subTotal = $services->sum(function($service) {
+            return floatval(str_replace(',', '', $service->pbs_price));
+        });
+
+        $discountAmount = 0;
+        $finalTotal = $subTotal;
+
+        // 3. Apply Promo Code
+        if ($request->promo_code) {
+            $promo = promoCode::where('pbpc_code', $request->promo_code)
+                ->where('pbpc_status', 1)
+                ->first();
+
+            if (!$promo) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Invalid promo code',
+                ], 400);
+            }
+
+            // Determine eligible services
+            $eligibleServices = $services;
+
+            // Vendor-wise promo
+            if ($promo->type === 'vendor' && $request->vendor_id) {
+                $promoVendorIds = explode(',', $promo->pbpc_vendor_ids); // comma-separated vendor IDs
+                if (!in_array($request->vendor_id, $promoVendorIds)) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'This promo code is not valid for this vendor.',
+                    ], 400);
+                }
+                $eligibleServices = $services->filter(fn($s) => $s->pbs_vendor_id == $request->vendor_id);
+            }
+
+            // Service-wise promo
+            if ($promo->pbpc_promo_types === 'service' && $promo->pbpc_service_ids) {
+                $eligibleServiceIds = explode(',', $promo->pbpc_service_ids); // assuming comma separated
+                $eligibleServices = $services->filter(fn($s) => in_array($s->pbs_id, $eligibleServiceIds));
+            }
+
+            // Vendor's service-wise promo
+            if ($promo->pbpc_promo_types === 'vendor_service' && $request->vendor_id && $promo->pbpc_vendor_service_map) {
+                $promoVendorIds = explode(',', $promo->pbpc_vendor_ids);
+                if (!in_array($request->vendor_id, $promoVendorIds)) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'This promo code is not valid for this vendor.',
+                    ], 400);
+                }
+                $eligibleServiceIds = explode(',', $promo->pbpc_vendor_service_map);
+                $eligibleServices = $services->filter(fn($s) => $s->pbs_vendor_id == $request->vendor_id && in_array($s->pbs_id, $eligibleServiceIds));
+            }
+
+            // Calculate discount on eligible services
+            $eligibleTotal = $eligibleServices->sum(fn($s) => floatval(str_replace(',', '', $s->pbs_price)));
+
+             // Check minimum booking amount
+            if ($promo->pbpc_min_booking_amount && $eligibleTotal < $promo->pbpc_min_booking_amount) {
+                return response()->json([
+                    'status' => false,
+                    'message' => "This promo code requires a minimum booking amount of {$promo->pbpc_min_booking_amount}.",
+                ], 400);
+            }
+
+            if ($promo->pbpc_discount_type === 'percentage') {
+                $discountAmount = ($eligibleTotal * $promo->pbpc_value) / 100;
+            }
+
+            if ($promo->pbpc_discount_type === 'fixed') {
+                $discountAmount = min($promo->pbpc_value, $eligibleTotal); // cannot exceed eligible total
+            }
+
+            $finalTotal = max($subTotal - $discountAmount, 0);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Total calculated successfully',
+            'data' => [
+                'sub_total' => round($subTotal, 2),
+                'discount' => round($discountAmount, 2),
+                'final_total' => round($finalTotal, 2),
+            ]
         ], 200);
     }
 
