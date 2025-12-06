@@ -722,18 +722,44 @@ class AuthController extends Controller
      *      @OA\RequestBody(
      *          required=true,
      *          @OA\JsonContent(
-     *              required={"phone_no"},
+     *              required={"user_type", "phone_no"},
+     *              @OA\Property(property="user_type", type="string", example="1", description="User type: customer(2)/vendor(1)"),
      *              @OA\Property(property="phone_no", type="number", example="0711234567")
      *          ),
      *      ),
-     *      @OA\Response(
-     *          response=200,
-     *          description="Password Reset request accepted. Please check the OTP in you phone.",
-     *          @OA\JsonContent(
-     *              @OA\Property(property="token", type="string", example="generated_token_here")
-     *          ),
-     *      ),
-     *      @OA\Response(response=401, description="Unauthorized"),
+     *     @OA\Response(
+     *         response=201,
+     *         description="OTP sent successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Password Reset request accepted. Please check the OTP in your phone."),
+     *             @OA\Property(property="data", type="integer", example=12, description="User ID"),
+     *             @OA\Property(property="otp", type="string", example="849201", description="Generated OTP")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="User not found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="There are no account in this mobile no. Please try again"),
+     *             @OA\Property(property="data", type="string", nullable=true, example=null)
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="The given data was invalid"),
+     *             @OA\Property(
+     *                 property="errors",
+     *                 type="object",
+     *                 example={
+     *                    "phone_no": {"Phone No not in the system"},
+     *                    "user_type": {"User Type undefined"}
+     *                 }
+     *             )
+     *         )
+     *     )
      * )
      */
 
