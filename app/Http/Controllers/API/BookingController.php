@@ -297,11 +297,11 @@ class BookingController extends Controller
             'vendor_id' => $vendor_id,
             'promo_code' => $promo_code,
         ]);
-        
+
         $request->validate([
             'service_ids' => 'required|array',
             'service_ids.*' => 'integer|exists:services,pbs_id',
-            'vendor_id' => 'nullable|integer|exists:vendors,pbv_id',
+            'vendor_id' => 'nullable|integer|exists:vendor,pbv_id',
             'promo_code' => 'nullable|string'
         ]);
 
