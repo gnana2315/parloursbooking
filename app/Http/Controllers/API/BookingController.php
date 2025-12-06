@@ -863,11 +863,11 @@ class BookingController extends Controller
             $plaintext = $order_id . "|" . $total_amount;
 
             $publickey = "-----BEGIN PUBLIC KEY-----
-            MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC9l2HykxDIDVZeyDPJU4pA0imf
-            3nWsvyJgb3zTsnN8B0mFX6u5squ5NQcnQ03L8uQ56b4/isHBgiyKwfMr4cpEpCTY
-            /t1WSdJ5EokCI/F7hCM7aSSSY85S7IYOiC6pKR4WbaOYMvAMKn5gCobEPtosmPLz
-            gh8Lo3b8UsjPq2W26QIDAQAB
-            -----END PUBLIC KEY-----";
+MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCVdeXdMV7A9d2NV4kJKcS2eaJL
+jcildxE1/APuNiwI3ET5oDp50Vi8Hhzn7S3iN2Fq+Hjg5meSXLV2nlXkrLGuBOO3
+xUWblWi9SnKcVH73kjaTG7Oma9gvmf7kaci0P7lVWEdhWQ4/h1ovUu2qyOBrLopd
+xGE7cK7XzDMw/1o+ewIDAQAB
+-----END PUBLIC KEY-----";
 
             // Encrypt using WebXPay public key
             openssl_public_encrypt($plaintext, $encrypted, $publickey);
