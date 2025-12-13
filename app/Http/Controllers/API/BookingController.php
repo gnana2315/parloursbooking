@@ -949,61 +949,87 @@ class BookingController extends Controller
 
 //             $secretkey = "382b9d24-2dd1-4213-9c86-23a2ca3d5379";
 
-            $api = new Api('http://tokenize.stagingxpay.info/t/api/');
-            $jwt = $api->Auth('stagingxpay_user', 'LW8drgW5Aqia');
-            $details = $api->GetUserDetails($jwt);
+            // $api = new Api('http://tokenize.stagingxpay.info/t/api/');
+            // $jwt = $api->Auth('stagingxpay_user', 'LW8drgW5Aqia');
+            // $details = $api->GetUserDetails($jwt);
 
-            $order_id     = $addbooking->pbb_ref_no;  // unique_order_id
-            $total_amount = number_format($total_amount, 2, '.', '');       // total_amount
+            // $order_id     = $addbooking->pbb_ref_no;  // unique_order_id
+            // $total_amount = number_format($total_amount, 2, '.', '');       // total_amount
 
-            $plaintext = $order_id . "|" . $total_amount;
+            // $plaintext = $order_id . "|" . $total_amount;
 
-            $rsa = new \Crypt_RSA();
-            $rsa->loadKey($details->publickey);
-            $encrypted = base64_encode($rsa->encrypt($plaintext));
-            // $encrypted = $rsa->encrypt($plaintext);
-            // $payment   = base64_encode($encrypted);
+            // $rsa = new \Crypt_RSA();
+            // $rsa->loadKey($details->publickey);
+            // $encrypted = base64_encode($rsa->encrypt($plaintext));
+            // // $encrypted = $rsa->encrypt($plaintext);
+            // // $payment   = base64_encode($encrypted);
 
-            // WebXPay URL
-            // $checkout_url = "https://stagingxpay.info/index.php?route=checkout/billing";
+            // // WebXPay URL
+            // // $checkout_url = "https://stagingxpay.info/index.php?route=checkout/billing";
 
-            // // Return these fields to App
-            // $webxpay_payload = [
-            //     "checkout_url" => $checkout_url,
-            //     'secret_key' => $secretkey,
-            //     'payment' => $payment,
-            //     'process_currency' => 'LKR',
-            //     'customer' => [
-            //         'first_name' => $customer->pbc_first_name,
-            //         'last_name'  => $customer->pbc_last_name,
-            //         'email'      => $customer->pbc_email,
-            //         'contact'    => $customer->pbc_contact_no,
-            //         'address1'   => $customer->pbc_address,
-            //         'city'       => 'Colombo',
-            //         'country'    => 'Sri Lanka',
-            //     ]
+            // // // Return these fields to App
+            // // $webxpay_payload = [
+            // //     "checkout_url" => $checkout_url,
+            // //     'secret_key' => $secretkey,
+            // //     'payment' => $payment,
+            // //     'process_currency' => 'LKR',
+            // //     'customer' => [
+            // //         'first_name' => $customer->pbc_first_name,
+            // //         'last_name'  => $customer->pbc_last_name,
+            // //         'email'      => $customer->pbc_email,
+            // //         'contact'    => $customer->pbc_contact_no,
+            // //         'address1'   => $customer->pbc_address,
+            // //         'city'       => 'Colombo',
+            // //         'country'    => 'Sri Lanka',
+            // //     ]
+            // // ];
+            // // 5️⃣ Prepare customer details
+            // $customerData = [
+            //     'first_name' => $customer->pbc_first_name,
+            //     'last_name'  => $customer->pbc_last_name,
+            //     'email'      => $customer->pbc_email,
+            //     'contact'    => $customer->pbc_contact_no,
+            //     'address1'   => $customer->pbc_address,
+            //     'city'       => $customer->pbc_city,
+            //     'country'    => $customer->pbc_country,
             // ];
-            // 5️⃣ Prepare customer details
-            $customerData = [
-                'first_name' => $customer->pbc_first_name,
-                'last_name'  => $customer->pbc_last_name,
-                'email'      => $customer->pbc_email,
-                'contact'    => $customer->pbc_contact_no,
-                'address1'   => $customer->pbc_address,
-                'city'       => $customer->pbc_city,
-                'country'    => $customer->pbc_country,
-            ];
 
-            $processCurrency = 'LKR';
-            $secretKey = $details->secretKey;
+            // $processCurrency = 'LKR';
+            // $secretKey = $details->secretKey;
 
-            // 6️⃣ Return auto-submit HTML
-            return response()->view('webxpay-redirect', [
-                'payment' => $encrypted,
-                'secretKey' => $secretKey,
-                'customer' => $customerData,
-                'processCurrency' => $processCurrency
-            ]);
+            // // 6️⃣ Return auto-submit HTML
+            // return response()->view('webxpay-redirect', [
+            //     'payment' => $encrypted,
+            //     'secretKey' => $secretKey,
+            //     'customer' => $customerData,
+            //     'processCurrency' => $processCurrency
+            // ]);
+
+            $jwt = $webXPay->auth();
+    $details = $webXPay->getUserDetails($jwt);
+
+    // 5️⃣ Generate encrypted payment string
+    $payment = $webXPay->generatePaymentString($booking->pbb_ref_no, $total_amount, $details->publicKey);
+    $secretKey = $details->secretKey;
+
+    // 6️⃣ Customer details for WebXPay
+    $customerData = [
+        'first_name' => $customer->pbc_first_name,
+        'last_name' => $customer->pbc_last_name,
+        'email' => $customer->pbc_email,
+        'contact' => $customer->pbc_contact_no,
+        'address1' => $customer->pbc_address,
+        'city' => $customer->pbc_city,
+        'country' => $customer->pbc_country,
+    ];
+
+    // 7️⃣ Return auto-submit HTML Blade view
+    return view('webxpay-redirect', [
+        'payment' => $payment,
+        'secretKey' => $secretKey,
+        'customer' => $customerData,
+        'processCurrency' => 'LKR'
+    ]);
 
             // ✅ Add Payment Transaction
             // $platform_fee_percentage = 10; // example: 10% commission

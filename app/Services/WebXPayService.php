@@ -2,56 +2,54 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\Http;
+use phpseclib3\Crypt\RSA;
+use GuzzleHttp\Client;
 
 class WebXPayService
 {
-    protected $baseUrl;
-    protected $username;
-    protected $password;
-    protected $merchantNumber;
+    protected string $baseUrl;
+    protected string $username;
+    protected string $password;
+    protected Client $client;
 
     public function __construct()
     {
-        $this->baseUrl = config('webxpay.api_url');
-        $this->username = config('webxpay.username');
-        $this->password = config('webxpay.password');
-        $this->merchantNumber = config('webxpay.merchant_number');
+        $this->baseUrl = config('services.webxpay.base_url'); // e.g., http://tokenize.stagingxpay.info/t/api/
+        $this->username = config('services.webxpay.username'); // stagingxpay_user
+        $this->password = config('services.webxpay.password'); // LW8drgW5Aqia
+        $this->client = new Client(['base_uri' => $this->baseUrl]);
     }
 
-    // LOGIN & GET TOKEN
-    public function login()
+    // Authenticate and return JWT token
+    public function auth(): string
     {
-        $response = Http::asForm()->post($this->baseUrl . '/apiLogin', [
-            'api_username'       => $this->username,
-            'api_password'       => $this->password,
-            'merchant_number'    => $this->merchantNumber,
+        $res = $this->client->post('auth', [
+            'json' => [
+                'username' => $this->username,
+                'password' => $this->password,
+            ],
         ]);
-
-        if ($response->successful()) {
-            return $response->json()['token'] ?? null;
-        }
-
-        return null;
+        $data = json_decode($res->getBody()->getContents());
+        return $data->token ?? '';
     }
 
-    // GET TRANSACTION BY ORDER REFERENCE
-    public function getTransactionByOrderRef($token, $orderRef)
+    // Get user details (publicKey, secretKey)
+    public function getUserDetails(string $jwt): object
     {
-        return Http::withToken($token)
-            ->asForm()
-            ->post($this->baseUrl . '/getTransactionData', [
-                'order_refference_number' => $orderRef,
-            ])->json();
+        $res = $this->client->get('user-details', [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $jwt,
+            ],
+        ]);
+        return json_decode($res->getBody()->getContents());
     }
 
-    // GET TRANSACTION BY MERCHANT REFERENCE
-    public function getTransactionByMerchantRef($token, $merchantRef)
+    // Generate RSA encrypted payment string
+    public function generatePaymentString(string $orderId, float $amount, string $publicKey): string
     {
-        return Http::withToken($token)
-            ->asForm()
-            ->post($this->baseUrl . '/getTransactionByMerchantReference', [
-                'merchant_reference' => $merchantRef,
-            ])->json();
+        $plaintext = "{$orderId}|{$amount}";
+        $rsa = RSA::loadPublicKey($publicKey);
+        $encrypted = $rsa->encrypt($plaintext);
+        return base64_encode($encrypted);
     }
 }
