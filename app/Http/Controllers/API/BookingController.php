@@ -1228,9 +1228,13 @@ class BookingController extends Controller
                     ]
                 );
             }
-            
+
             // 8️⃣ WebXPay payment preparation
-            $jwt = $webXPay->auth();
+            try {
+                $jwt = $webXPay->auth(); // likely POST
+            } catch (\GuzzleHttp\Exception\ClientException $e) {
+                dd($e->getMessage(), $e->getResponse()->getBody()->getContents());
+            }
             $details = $webXPay->getUserDetails($jwt);
 
             $paymentString = $webXPay->generatePaymentString(
