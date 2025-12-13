@@ -38,8 +38,8 @@ return [
 
     'webxpay' => [
         'base_url' => env('WEBXPAY_BASE_URL', 'https://tokenize.stagingxpay.info/t/api/'),
-        'username' => env('WEBXPAY_USERNAME', 'stagingxpay_user'),
-        'password' => env('WEBXPAY_PASSWORD', 'LW8drgW5Aqia'),
+        'username' => env('WEBXPAY_USERNAME', 'hiHfnALcPd'),
+        'password' => env('WEBXPAY_PASSWORD', 'KE2U3jmqCr'),
     ],
 
 ];
