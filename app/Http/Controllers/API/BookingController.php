@@ -29,6 +29,7 @@ use App\Services\FirebaseService;
 use App\Services\OneSignalService;
 use App\Services\DialogESMSService;
 use phpseclib\Crypt\RSA;
+use App\Services\WebXPayService;
 
 class BookingController extends Controller
 {
@@ -743,7 +744,7 @@ class BookingController extends Controller
         ], 500);       
     }
 
-    public function addOnlineBooking_v1 (Request $request, OneSignalService $oneSignalService){
+    public function addOnlineBooking_v1 (Request $request, OneSignalService $oneSignalService, WebXPayService $webXPay){
         Log::info('addOnlineBooking_v1 Requests:', ['Requests' => $request->all()]);
         $user = auth()->user();
 
@@ -1009,7 +1010,7 @@ class BookingController extends Controller
     $details = $webXPay->getUserDetails($jwt);
 
     // 5️⃣ Generate encrypted payment string
-    $payment = $webXPay->generatePaymentString($booking->pbb_ref_no, $total_amount, $details->publicKey);
+    $payment = $webXPay->generatePaymentString($addbooking->pbb_ref_no, $total_amount, $details->publicKey);
     $secretKey = $details->secretKey;
 
     // 6️⃣ Customer details for WebXPay
