@@ -1233,7 +1233,13 @@ class BookingController extends Controller
             try {
                 $jwt = $webXPay->auth(); // likely POST
             } catch (\GuzzleHttp\Exception\ClientException $e) {
-                dd($e->getMessage(), $e->getResponse()->getBody()->getContents());
+                $responseBody = $e->getResponse()->getBody()->getContents();
+                Log::error('WebXPay auth error', ['body' => $responseBody]);
+                return response()->json([
+                    'status' => false,
+                    'message' => 'WebXPay auth failed',
+                    'details' => $responseBody
+                ], 500);
             }
             $details = $webXPay->getUserDetails($jwt);
 
