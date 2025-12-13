@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Http;
 use App\Models\deviceToken;
 use App\Services\FirebaseService;
 use App\Services\OneSignalService;
@@ -1215,19 +1216,57 @@ class BookingController extends Controller
             // 7️⃣ Notifications & SMS (Optional, kept same)
             $vendors_user = User::where('pbu_vid', $request->vendor_id)->first();
             if ($vendors_user) {
-                $oneSignalService->sendToUser(
+                $notification_title = 'Booking Confirmed!';
+                $notification_message = 'Booking added successfully!. Your booking reference no:'. $addbooking->pbb_ref_no;
+                $booking_details_for_notification = [
+                    'booking_ref_no' => $addbooking->pbb_ref_no,
+                    'booking_date' => $addbooking->pbb_booking_date,
+                    'booking_start_time' => $addbooking->pbb_booking_start_time,
+                    'booking_end_time' => $addbooking->pbb_booking_end_time,
+                    'total_amount' => $addbooking->pbb_total_amount,
+                ];
+                $booking_notification = $oneSignalService->sendToUser(
                     $vendors_user->pbu_id,
-                    'Booking Confirmed!',
-                    'Booking added successfully! Your booking ref no: ' . $addbooking->pbb_ref_no,
-                    [
-                        'booking_ref_no' => $addbooking->pbb_ref_no,
-                        'booking_date' => $addbooking->pbb_booking_date,
-                        'booking_start_time' => $addbooking->pbb_booking_start_time,
-                        'booking_end_time' => $addbooking->pbb_booking_end_time,
-                        'total_amount' => $addbooking->pbb_total_amount,
-                    ]
+                    $notification_title,
+                    $notification_message,
+                    $booking_details_for_notification
                 );
+
+                Log::info('booking_notification Response:', ['Response' => $booking_notification]);
+                if($booking_notification){
+                    notification::create([
+                        'pbn_user_id' => $user->pbu_id,
+                        'pbn_type' => 'specific',
+                        'pbn_title' => $notification_title,
+                        'pbn_message' => $notification_message,
+                        'pbn_is_read' => 0,
+                    ]);
+                }
             }
+
+            $sms_customer_name = $request->someone_name ? $request->someone_name : $customer->pbc_first_name;
+            $sms_vendor_name = $vendor->pbv_business_name;
+            $sms_booking_date = $addbooking->pbb_booking_date;
+            $sms_booking_start_time = $addbooking->pbb_booking_start_time;
+            $sms_booking_end_time = $addbooking->pbb_booking_end_time;
+            $sms_total_amount = $addbooking->pbb_total_amount;
+            $sms_booking_ref_no = $addbooking->pbb_ref_no;
+            $sms_phone_no = $request->phone_no ? $request->phone_no : $customer->pbc_contact_no;
+
+            $apiKey = config('dialogesms.api_key');
+            $sender = config('dialogesms.sender');
+
+            $message = "Hello {$sms_customer_name}, your booking at {$sms_vendor_name} has been confirmed!\n\n" .
+                        "Booking Ref: {$sms_booking_ref_no}\n\n" .
+                        "Thank you for choosing Parlours Booking!";
+            
+            $booking_sms_result = $this->smsService->sendMessage($apiKey, [$sms_phone_no], $message, $sender);       
+            Log::info('booking_sms_result Response:', ['Response' => $booking_sms_result]);
+
+            // ✅ Add Payment Transaction
+            $platform_fee_percentage = 10; // example: 10% commission
+            $platform_fee = ($total_amount * $platform_fee_percentage) / 100;
+            $vendor_amount = $total_amount - $platform_fee;
 
             // 8️⃣ WebXPay payment preparation
             try {
@@ -1241,6 +1280,13 @@ class BookingController extends Controller
                 );
 
                 $secretKey = $details->secretKey;
+
+                $webXResponse = Http::post('https://stagingxpay.info/index.php?route=checkout/billing/capturePay', [
+                    'enc_post_array_data' => $paymentString,
+                    'secret_key' => $secretKey
+                ]);
+
+                Log::info('WebXPay capturePay Response:', ['Response' => $webXResponse->body()]);
             } catch (\Throwable $e) {
                 $paymentString = null;
                 $secretKey = null;
