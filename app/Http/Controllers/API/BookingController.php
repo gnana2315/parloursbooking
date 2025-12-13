@@ -1231,25 +1231,21 @@ class BookingController extends Controller
 
             // 8️⃣ WebXPay payment preparation
             try {
-                $jwt = $webXPay->auth(); // likely POST
-            } catch (\GuzzleHttp\Exception\ClientException $e) {
-                $responseBody = $e->getResponse()->getBody()->getContents();
-                Log::error('WebXPay auth error', ['body' => $responseBody]);
-                return response()->json([
-                    'status' => false,
-                    'message' => 'WebXPay auth failed',
-                    'details' => $responseBody
-                ], 500);
+                $jwt = $webXPay->auth();                
+                $details = $webXPay->getUserDetails($jwt);
+
+                $paymentString = $webXPay->generatePaymentString(
+                    $addbooking->pbb_ref_no,
+                    $total_amount,
+                    $details->publicKey
+                );
+
+                $secretKey = $details->secretKey;
+            } catch (\Throwable $e) {
+                $paymentString = null;
+                $secretKey = null;
+                Log::error('WebXPay error: '.$e->getMessage());
             }
-            $details = $webXPay->getUserDetails($jwt);
-
-            $paymentString = $webXPay->generatePaymentString(
-                $addbooking->pbb_ref_no,
-                $total_amount,
-                $details->publicKey
-            );
-
-            $secretKey = $details->secretKey;
 
             $customerData = [
                 'first_name' => $customer->pbc_first_name,
