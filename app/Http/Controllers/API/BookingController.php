@@ -1344,7 +1344,7 @@ class BookingController extends Controller
                     'payment' => [
                         'checkout_url' => 'https://stagingxpay.info/index.php?route=checkout/billing',
                         'process_currency' => 'LKR',
-                        'secret_key' => $secretKey,
+                        'secret_key' => $detail->secretKey,
                         'payment' => $paymentString,
                         'customer' => $customerData,
                     ],
