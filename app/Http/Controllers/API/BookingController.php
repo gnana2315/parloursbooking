@@ -1286,10 +1286,10 @@ class BookingController extends Controller
                 //     'secret_key' => $secretKey
                 // ]);
 
-                $jwt = $this->webXPay->auth();
-                $details = $this->webXPay->getUserDetails($jwt);
+                $jwt = $webXPay->auth();
+                $details = $webXPay->getUserDetails($jwt);
 
-                $paymentResult = $this->webXPay->PayFromCustomerToken3ds([
+                $paymentResult = $webXPay->PayFromCustomerToken3ds([
                     'amount' => $totalAmount,
                     'currency' => 'LKR',
                     'customer' => [
