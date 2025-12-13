@@ -23,15 +23,37 @@ class WebXPayService
     // Authenticate and return JWT token
     public function auth(): string
     {
-        $res = $this->client->post('auth', [
-            'json' => [
-                'username' => $this->username,
-                'password' => $this->password,
-            ],
-        ]);
-        $data = json_decode($res->getBody()->getContents());
-        //return $data->token ?? '';
-        return $res->json()['jwt'] ?? null;
+        // $res = $this->client->post('auth', [
+        //     'json' => [
+        //         'username' => $this->username,
+        //         'password' => $this->password,
+        //     ],
+        // ]);
+        // $data = json_decode($res->getBody()->getContents());
+        // //return $data->token ?? '';
+        // return $res->json()['jwt'] ?? null;
+        $data = array("username" => "$username", "password" => "$password");
+
+        $response = $this->client->request(
+            'POST',
+            "auth",
+            [
+                'headers'  => ['content-type' => 'application/json', 'Accept' => 'application/json'],
+                'body' => json_encode($data)
+            ]
+        );
+
+        try {
+            $response = json_decode((string) $response->getBody());
+
+            if (isset($response->token)) {
+                return $response->token;
+            }
+
+            return null;
+        } catch (\Throwable $th) {
+            return $response;
+        }
     }
 
     // Get user details (publicKey, secretKey)

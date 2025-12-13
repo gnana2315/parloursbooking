@@ -37,7 +37,7 @@ return [
     ],
 
     'webxpay' => [
-        'base_url' => env('WEBXPAY_BASE_URL', 'http://tokenize.stagingxpay.info/t/api/'),
+        'base_url' => env('WEBXPAY_BASE_URL', 'https://tokenize.stagingxpay.info/t/api/'),
         'username' => env('WEBXPAY_USERNAME', 'stagingxpay_user'),
         'password' => env('WEBXPAY_PASSWORD', 'LW8drgW5Aqia'),
     ],
