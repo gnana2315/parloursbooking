@@ -1228,7 +1228,7 @@ class BookingController extends Controller
                     ]
                 );
             }
-            dd("Test");
+            
             // 8️⃣ WebXPay payment preparation
             $jwt = $webXPay->auth();
             $details = $webXPay->getUserDetails($jwt);
