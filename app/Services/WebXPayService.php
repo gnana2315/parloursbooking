@@ -30,7 +30,8 @@ class WebXPayService
             ],
         ]);
         $data = json_decode($res->getBody()->getContents());
-        return $data->token ?? '';
+        //return $data->token ?? '';
+        return $res->json()['jwt'] ?? null;
     }
 
     // Get user details (publicKey, secretKey)

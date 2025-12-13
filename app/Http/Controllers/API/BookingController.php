@@ -1260,8 +1260,8 @@ class BookingController extends Controller
                         "Booking Ref: {$sms_booking_ref_no}\n\n" .
                         "Thank you for choosing Parlours Booking!";
             
-            $booking_sms_result = $this->smsService->sendMessage($apiKey, [$sms_phone_no], $message, $sender);       
-            Log::info('booking_sms_result Response:', ['Response' => $booking_sms_result]);
+            //$booking_sms_result = $this->smsService->sendMessage($apiKey, [$sms_phone_no], $message, $sender);       
+            //Log::info('booking_sms_result Response:', ['Response' => $booking_sms_result]);
 
             // ✅ Add Payment Transaction
             $platform_fee_percentage = 10; // example: 10% commission
