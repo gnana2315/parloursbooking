@@ -965,7 +965,7 @@ xGE7cK7XzDMw/1o+ewIDAQAB
             // Return these fields to App
             $webxpay_payload = [
                 "checkout_url" => $checkout_url,
-                'secret_key' => $secretKey,
+                'secret_key' => $secretkey,
                 'payment' => $payment,
                 'process_currency' => 'LKR',
                 'customer' => [
