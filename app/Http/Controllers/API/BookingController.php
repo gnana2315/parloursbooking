@@ -1270,27 +1270,56 @@ class BookingController extends Controller
 
             // 8️⃣ WebXPay payment preparation
             try {
-                $jwt = $webXPay->auth();                
-                $details = $webXPay->getUserDetails($jwt);
+                // $jwt = $webXPay->auth(WEBXPAY_USERNAME, WEBXPAY_PASSWORD);                
+                // $details = $webXPay->getUserDetails($jwt);
 
-                $paymentString = $webXPay->generatePaymentString(
-                    $addbooking->pbb_ref_no,
-                    $total_amount,
-                    $details->publicKey
-                );
+                // $paymentString = $webXPay->generatePaymentString(
+                //     $addbooking->pbb_ref_no,
+                //     $total_amount,
+                //     $details->publicKey
+                // );
 
-                $secretKey = $details->secretKey;
+                // $secretKey = $details->secretKey;
 
-                $webXResponse = Http::post('https://stagingxpay.info/index.php?route=checkout/billing/capturePay', [
-                    'enc_post_array_data' => $paymentString,
-                    'secret_key' => $secretKey
-                ]);
+                // $webXResponse = Http::post('https://stagingxpay.info/index.php?route=checkout/billing/capturePay', [
+                //     'enc_post_array_data' => $paymentString,
+                //     'secret_key' => $secretKey
+                // ]);
 
-                Log::info('WebXPay capturePay Response:', ['Response' => $webXResponse->body()]);
+                $jwt = $this->webXPay->auth();
+                $details = $this->webXPay->getUserDetails($jwt);
+
+                $paymentResult = $this->webXPay->PayFromCustomerToken3ds([
+                    'amount' => $totalAmount,
+                    'currency' => 'LKR',
+                    'customer' => [
+                        'id' => $customer->pbc_id,
+                        'email' => $customer->pbc_email,
+                        'firstName' => $customer->pbc_first_name,
+                        'lastName' => $customer->pbc_last_name,
+                        'contactNumber' => $customer->pbc_contact_no,
+                    ],
+                    'orderNumber' => uniqid('ORDER_'),
+                    'bankMID' => $details->mid,
+                    'secure3dResponseURL' => config('app.url').'/api/webxpay/3ds-callback',
+                    'cardToken' => $data['card_token'], // previously saved token
+                ], $jwt);
+
+                if (isset($paymentResult->error) && $paymentResult->type === '3ds') {
+                    // 3DS is required; return HTML content for 3DS form
+                    return [
+                        'status' => true,
+                        'booking_ref' => $booking->pbb_ref_no,
+                        'requires_3ds' => true,
+                        '3ds_html' => $paymentResult->html3ds,
+                    ];
+                }
+                Log::info('paymentResult Response:', ['Response' => $paymentResult->body()]);
             } catch (\Throwable $e) {
-                $paymentString = null;
-                $secretKey = null;
-                Log::error('WebXPay error: '.$e->getMessage());
+                // $paymentString = null;
+                // $secretKey = null;
+                // Log::error('WebXPay error: '.$e->getMessage());
+                Log::error('WebXPay 3DS Payment Error: '.$e->getMessage());
             }
 
             $customerData = [
