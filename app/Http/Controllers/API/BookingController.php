@@ -28,6 +28,7 @@ use App\Models\deviceToken;
 use App\Services\FirebaseService;
 use App\Services\OneSignalService;
 use App\Services\DialogESMSService;
+use phpseclib\Crypt\RSA;
 
 class BookingController extends Controller
 {
@@ -939,11 +940,6 @@ class BookingController extends Controller
             // 🔐 WEBXPAY: Create payment encryption
             // -------------------------------------------------------------
 
-            $order_id     = $addbooking->pbb_ref_no;  // unique_order_id
-            $total_amount = (int)$total_amount;       // total_amount
-
-            $plaintext = $order_id . "|" . $total_amount;
-
             $publickey = "-----BEGIN PUBLIC KEY-----
 MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCVdeXdMV7A9d2NV4kJKcS2eaJL
 jcildxE1/APuNiwI3ET5oDp50Vi8Hhzn7S3iN2Fq+Hjg5meSXLV2nlXkrLGuBOO3
@@ -951,28 +947,36 @@ xUWblWi9SnKcVH73kjaTG7Oma9gvmf7kaci0P7lVWEdhWQ4/h1ovUu2qyOBrLopd
 xGE7cK7XzDMw/1o+ewIDAQAB
 -----END PUBLIC KEY-----";
 
-            // Encrypt using WebXPay public key
-            openssl_public_encrypt($plaintext, $encrypted, $publickey);
+            $secretkey = "382b9d24-2dd1-4213-9c86-23a2ca3d5379";
 
-            // Encode for sending
-            $payment_token = base64_encode($encrypted);
+            $order_id     = $addbooking->pbb_ref_no;  // unique_order_id
+            $total_amount = number_format($total_amount, 2, '.', '');       // total_amount
 
-            // Custom fields (optional)
-            $custom_fields = base64_encode(
-                $user->pbu_id . "|" . $request->vendor_id . "|" . $addbooking->pbb_id . "|mobile"
-            );
+            $plaintext = $order_id . "|" . $total_amount;
+
+            $rsa = new RSA();
+            $rsa->loadKey($publickey);
+            $encrypted = $rsa->encrypt($plaintext);
+            $payment   = base64_encode($encrypted);
 
             // WebXPay URL
-            $checkout_url = "https://webxpay.com/index.php?route=checkout/billing";
+            $checkout_url = "https://stagingxpay.info/index.php?route=checkout/billing";
 
             // Return these fields to App
             $webxpay_payload = [
                 "checkout_url" => $checkout_url,
-                "payment"      => $payment_token,
-                "custom"       => $custom_fields,
-                "currency"     => "LKR",
-                "secret_key"   => "630be963-59e2-447a-8f3b-93b3d7a3bf25", // replace with env()
-                "enc_method"   => "JCs3J+6oSz4V0LgE0zi/Bg=="
+                'secret_key' => $secretKey,
+                'payment' => $payment,
+                'process_currency' => 'LKR',
+                'customer' => [
+                    'first_name' => $customer->pbc_first_name,
+                    'last_name'  => $customer->pbc_last_name,
+                    'email'      => $customer->pbc_email,
+                    'contact'    => $customer->pbc_contact_no,
+                    'address1'   => $customer->pbc_address,
+                    'city'       => 'Colombo',
+                    'country'    => 'Sri Lanka',
+                ]
             ];
 
             // ✅ Add Payment Transaction
