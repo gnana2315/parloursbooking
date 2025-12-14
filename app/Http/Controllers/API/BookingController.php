@@ -1650,7 +1650,7 @@ class BookingController extends Controller
      *     summary="Mark booking as completed",
      *     description="Marks a booking as completed by updating the booking status.",
      *     operationId="markBookingStatus",
-     *     tags={"Bookings"},
+     *     tags={"Booking"},
      *     security={{"bearerAuth":{}}},
      *
      *     @OA\RequestBody(
