@@ -1494,7 +1494,7 @@ class VendorController extends Controller
             'pbs_image' => $publicPath,
             'pbs_price' => $request->service_price,
             'pbs_employees' => null,
-            'pbs_status' => 1
+            'pbs_status' => 0
         ]);
         
         if($added_vendor_service){
