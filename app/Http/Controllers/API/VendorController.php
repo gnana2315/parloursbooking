@@ -1515,7 +1515,7 @@ class VendorController extends Controller
  *     path="/api/vendor/profile",
  *     summary="Get authenticated vendor's profile",
  *     description="Retrieves detailed information about the currently authenticated vendor including availability, documents, and configuration",
- *     tags={"Vendors"},
+ *     tags={"Vendor"},
  *     security={{"bearerAuth":{}}},
  *     @OA\Response(
  *         response=200,
