@@ -653,9 +653,9 @@ class BookingController extends Controller
 
             $sms_customer_name = $request->someone_name ? $request->someone_name : $customer->pbc_first_name;
             $sms_vendor_name = $vendor->pbv_business_name;
-            $sms_booking_date = $addbooking->pbb_booking_date;
-            $sms_booking_start_time = $addbooking->pbb_booking_start_time;
-            $sms_booking_end_time = $addbooking->pbb_booking_end_time;
+            $sms_booking_date = $addbooking->pbb_booking_date->format('d M Y');
+            $sms_booking_start_time = $addbooking->pbb_booking_start_time->format('H:i A');
+            $sms_booking_end_time = $addbooking->pbb_booking_end_time->format('H:i A');
             $sms_total_amount = $addbooking->pbb_total_amount;
             $sms_booking_ref_no = $addbooking->pbb_ref_no;
             $sms_phone_no = $request->phone_no ? $request->phone_no : $customer->pbc_contact_no;
@@ -668,8 +668,9 @@ class BookingController extends Controller
             //             "Total Amount: {$sms_total_amount}\n" .
             //             "Booking Ref: {$sms_booking_ref_no}\n\n" .
             //             "Thank you for choosing Parlours Booking!";
-            $message = "Hello {$sms_customer_name}, your booking at {$sms_vendor_name} has been confirmed!\n\n" .
-                        "Booking Ref: {$sms_booking_ref_no}\n\n" .
+            
+            $message = "Dear Customer,\n".
+                        "Your booking is confirmed on {$sms_booking_date} at {$sms_booking_start_time} | Ref: {$sms_booking_ref_no}. Please arrive 10 mins early.\n" .
                         "Thank you for choosing Parlours Booking!";
 
             // Store OTP to DB/Cache if needed here
