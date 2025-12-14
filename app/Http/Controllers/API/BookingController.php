@@ -1644,11 +1644,11 @@ class BookingController extends Controller
         
     }
 
-    /**
+   /**
      * @OA\Post(
      *     path="/api/booking/mark-status",
-     *     summary="Mark booking as completed",
-     *     description="Marks a booking as completed by updating the booking status.",
+     *     summary="Mark booking status",
+     *     description="Update booking status as completed, rejected, or no customer.",
      *     operationId="markBookingStatus",
      *     tags={"Booking"},
      *     security={{"bearerAuth":{}}},
@@ -1656,21 +1656,28 @@ class BookingController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"booking_id"},
+     *             required={"booking_id","booking_status"},
      *             @OA\Property(
      *                 property="booking_id",
      *                 type="integer",
      *                 example=45,
-     *                 description="Booking ID to mark as completed"
+     *                 description="Booking ID"
+     *             ),
+     *             @OA\Property(
+     *                 property="booking_status",
+     *                 type="integer",
+     *                 enum={1,2,3},
+     *                 example=1,
+     *                 description="1 = Completed, 2 = Rejected, 3 = No Customer"
      *             )
      *         )
      *     ),
      *
      *     @OA\Response(
      *         response=200,
-     *         description="Booking marked as completed",
+     *         description="Booking status updated successfully",
      *         @OA\JsonContent(
-     *             @OA\Property(property="status", type="integer", example="1=completed,2=rejected,3=nocustomer"),
+     *             @OA\Property(property="status", type="boolean", example=true),
      *             @OA\Property(
      *                 property="message",
      *                 type="string",
@@ -1693,7 +1700,7 @@ class BookingController extends Controller
      *         response=404,
      *         description="Booking not found",
      *         @OA\JsonContent(
-     *             @OA\Property(property="status", type="integer", example="1=completed,2=rejected,3=nocustomer"),
+     *             @OA\Property(property="status", type="boolean", example=false),
      *             @OA\Property(
      *                 property="message",
      *                 type="string",
