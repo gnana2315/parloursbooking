@@ -1644,6 +1644,97 @@ class BookingController extends Controller
     }
 
     /**
+     * @OA\Post(
+     *     path="/api/booking/mark-completed",
+     *     summary="Mark booking as completed",
+     *     description="Marks a booking as completed by updating the booking status.",
+     *     operationId="markBookingAsCompleted",
+     *     tags={"Bookings"},
+     *     security={{"bearerAuth":{}}},
+     *
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"booking_id"},
+     *             @OA\Property(
+     *                 property="booking_id",
+     *                 type="integer",
+     *                 example=45,
+     *                 description="Booking ID to mark as completed"
+     *             )
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Booking marked as completed",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example=true),
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="Booking marked as completed successfully"
+     *             )
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=400,
+     *         description="Validation error"
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized"
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=404,
+     *         description="Booking not found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example=false),
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="Booking not found"
+     *             )
+     *         )
+     *     )
+     * )
+    */
+
+    public function markBookingAsCompleted(Request $request){
+        Log::info('markBookingAsCompleted Requests:', ['Requests' => $request->all()]);
+        $user = auth()->user();
+
+        $request->validate(
+            [
+                'booking_id' => 'required|integer',
+            ],
+            [
+                'booking_id.required' => 'Booking ID is required',
+                'booking_id.integer' => 'Booking ID must be an integer',
+            ]
+        );
+
+        $booking = booking::find($request->booking_id);
+        if (!$booking) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Booking not found',
+            ], 404);
+        }
+
+        $booking->pbb_status = 2; // Assuming 2 is the status code for completed bookings
+        $booking->save();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Booking marked as completed successfully',
+        ], 200);
+    }
+
+    /**
      * @OA\Get(
      *     path="/getBookings",
      *     summary="Get all bookings for the authenticated vendor",
