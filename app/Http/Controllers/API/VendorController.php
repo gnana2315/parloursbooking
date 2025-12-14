@@ -517,6 +517,7 @@ class VendorController extends Controller
 
     public function vendorDocumentUpdate_v1(Request $request){
         Log::info('vendorDocumentUpdate_v1 Requests:', ['Requests' => $request->all()]);
+        dd($request->all());
         $user = auth()->user();
 
         $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
