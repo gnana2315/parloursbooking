@@ -625,7 +625,7 @@ class VendorController extends Controller
      *     summary="Delete vendor document",
      *     description="Deletes a vendor document and removes the file from storage. Vendor is identified from the authenticated user.",
      *     operationId="deleteVendorDocument",
-     *     tags={"Vendor Documents"},
+     *     tags={"Vendor"},
      *     security={{"bearerAuth":{}}},
      *
      *     @OA\RequestBody(
