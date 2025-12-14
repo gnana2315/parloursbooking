@@ -1646,10 +1646,10 @@ class BookingController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/api/booking/mark-completed",
+     *     path="/api/booking/mark-status",
      *     summary="Mark booking as completed",
      *     description="Marks a booking as completed by updating the booking status.",
-     *     operationId="markBookingAsCompleted",
+     *     operationId="markBookingStatus",
      *     tags={"Bookings"},
      *     security={{"bearerAuth":{}}},
      *
@@ -1670,7 +1670,7 @@ class BookingController extends Controller
      *         response=200,
      *         description="Booking marked as completed",
      *         @OA\JsonContent(
-     *             @OA\Property(property="status", type="boolean", example=true),
+     *             @OA\Property(property="status", type="integer", example=1-completed/2-rejected/3-nocustomer),
      *             @OA\Property(
      *                 property="message",
      *                 type="string",
@@ -1704,13 +1704,14 @@ class BookingController extends Controller
      * )
     */
 
-    public function markBookingAsCompleted(Request $request){
-        Log::info('markBookingAsCompleted Requests:', ['Requests' => $request->all()]);
+    public function markBookingStatus(Request $request){
+        Log::info('Mark Booking Status Requests:', ['Requests' => $request->all()]);
         $user = auth()->user();
 
         $request->validate(
             [
                 'booking_id' => 'required|integer',
+                'booking_status' => 'required|integer',
             ],
             [
                 'booking_id.required' => 'Booking ID is required',
@@ -1726,7 +1727,7 @@ class BookingController extends Controller
             ], 404);
         }
 
-        $booking->pbb_status = 2; // Assuming 2 is the status code for completed bookings
+        $booking->pbb_status = $request->booking_status; // Assuming 2 is the status code for completed bookings
         $booking->save();
 
         return response()->json([
