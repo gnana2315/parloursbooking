@@ -619,6 +619,52 @@ class VendorController extends Controller
         ], 200);
     }
 
+    /**
+     * @OA\Delete(
+     *     path="/api/deleteVendorDocument",
+     *     summary="Delete vendor document",
+     *     description="Deletes a vendor document and removes the file from storage. Vendor is identified from the authenticated user.",
+     *     operationId="deleteVendorDocument",
+     *     tags={"Vendor Documents"},
+     *     security={{"bearerAuth":{}}},
+     *
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"document_id"},
+     *             @OA\Property(
+     *                 property="document_id",
+     *                 type="integer",
+     *                 example=12,
+     *                 description="Vendor document ID"
+     *             )
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Document deleted successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Document deleted successfully")
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized"
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=404,
+     *         description="Vendor or document not found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Document not found")
+     *         )
+     *     )
+     * )
+     */
+
     public function deleteVendorDocument(Request $request){
         Log::info('deleteVendorDocument Requests:', ['document_id' => $request->document_id]);
         $user = auth()->user();
