@@ -225,7 +225,7 @@ class VendorController extends Controller
             $firstError = collect($e->errors())->flatten()->first();
             Log::error('Step 4.2: Validation failed', ['error' => $firstError]);
             $message = $firstError; 
-            $status = 422;
+            $status = 500;
         }
 
         Log::info('Step 5: Attempting vendor update...');
