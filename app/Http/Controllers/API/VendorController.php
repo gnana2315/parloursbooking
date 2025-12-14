@@ -618,6 +618,36 @@ class VendorController extends Controller
             'message' => 'Documents uploaded successfully'
         ], 200);
     }
+
+    public function deleteVendorDocument(Request $request, $document_id){
+        Log::info('deleteVendorDocument Requests:', ['document_id' => $document_id]);
+        $user = auth()->user();
+
+        $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
+        if (!$vendor) {
+            return response()->json(['message' => 'Vendor not found'], 404);
+        }
+
+        $vendorDocument = vendorDocuments::where('pbvd_id', $document_id)
+            ->where('pbvd_vendor_id', $vendor->pbv_id)
+            ->first();
+
+        if (!$vendorDocument) {
+            return response()->json(['message' => 'Document not found'], 404);
+        }
+
+        // Delete the file from storage
+        $filePath = str_replace('/storage/', '', parse_url($vendorDocument->pbvd_document_url, PHP_URL_PATH));
+        Storage::disk('public')->delete($filePath);
+
+        // Delete the database record
+        $vendorDocument->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Document deleted successfully'
+        ], 200);
+    }
     // public function vendorDocumentUpdate(Request $request){
 
     //     $user = auth()->user();
