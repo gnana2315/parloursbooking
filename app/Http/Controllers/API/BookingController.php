@@ -1670,7 +1670,7 @@ class BookingController extends Controller
      *         response=200,
      *         description="Booking marked as completed",
      *         @OA\JsonContent(
-     *             @OA\Property(property="status", type="integer", example=1-completed/2-rejected/3-nocustomer),
+     *             @OA\Property(property="status", type="integer", example="1=completed,2=rejected,3=nocustomer"),
      *             @OA\Property(
      *                 property="message",
      *                 type="string",
@@ -1693,7 +1693,7 @@ class BookingController extends Controller
      *         response=404,
      *         description="Booking not found",
      *         @OA\JsonContent(
-     *             @OA\Property(property="status", type="boolean", example=false),
+     *             @OA\Property(property="status", type="integer", example="1=completed,2=rejected,3=nocustomer"),
      *             @OA\Property(
      *                 property="message",
      *                 type="string",
