@@ -619,8 +619,8 @@ class VendorController extends Controller
         ], 200);
     }
 
-    public function deleteVendorDocument(Request $request, $document_id){
-        Log::info('deleteVendorDocument Requests:', ['document_id' => $document_id]);
+    public function deleteVendorDocument(Request $request){
+        Log::info('deleteVendorDocument Requests:', ['document_id' => $request->document_id]);
         $user = auth()->user();
 
         $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
@@ -628,7 +628,7 @@ class VendorController extends Controller
             return response()->json(['message' => 'Vendor not found'], 404);
         }
 
-        $vendorDocument = vendorDocuments::where('pbvd_id', $document_id)
+        $vendorDocument = vendorDocuments::where('pbvd_id', $request->document_id)
             ->where('pbvd_vendor_id', $vendor->pbv_id)
             ->first();
 
