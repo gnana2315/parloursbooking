@@ -545,12 +545,13 @@ class CommonController extends Controller
      */
     public function getServicesByVendor($vendor_id){
         Log::info('getServicesByVendor Requests:', ['vendor_id' => $vendor_id]);
-        $services = services::join('service_for', 'service_for.pbsf_id', '=', 'services.pbs_service_for')        
-        ->where([
-            ['pbs_status', '=', 1],
-            ['pbs_vendor_id', '=', $vendor_id],
-        ])        
-        ->get();
+        $services = services::join('service_for', 'service_for.pbsf_id', '=', 'services.pbs_service_for')
+                    ::join('service_type', 'service_type.pbst_id', '=', 'services.pbs_service_type')      
+                    ->where([
+                        ['pbs_status', '=', 1],
+                        ['pbs_vendor_id', '=', $vendor_id],
+                    ])        
+                    ->get();
         if ($services->isEmpty()) {
             return response()->json([
                 'success' => false,
