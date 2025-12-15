@@ -200,41 +200,41 @@ class VendorController extends Controller
         }
 
         Log::info('Step 4: Starting validation...');
-        // $request->validate(
-        //     [
-        //         'business_name' => 'required',
-        //         'address' => 'required',
-        //         'city_id' => 'required',
-        //         'longatitude' => 'required',
-        //         'latitude' => 'required',
-        //         'email' => 'email|unique:vendor,pbv_email',
-        //     ],
-        //     [
-        //         'business_name.required' => 'Parlour name is required',
-        //         'address.required' => 'Address is required',
-        //         'city_id.required' => 'City is required',
-        //         'longatitude.required' => 'Location is required',
-        //         'latitude.required' => 'Location is required',
-        //         'email.email' => 'Email must be a valid email address',
-        //         'email.unique' => 'Email already exists'
-        //     ]
-        // );
-        try {
-            $validated = $request->validate([
+        $request->validate(
+            [
                 'business_name' => 'required',
                 'address' => 'required',
                 'city_id' => 'required',
                 'longatitude' => 'required',
                 'latitude' => 'required',
-                'email' => 'email|unique:vendor,pbv_email'
-            ]);
-            Log::info('Step 4.1: Validation successful', ['validated_data' => $validated]);
-        } catch (ValidationException $e) {
-            $firstError = collect($e->errors())->flatten()->first();
-            Log::error('Step 4.2: Validation failed', ['error' => $firstError]);
-            $message = $firstError; 
-            $status = 500;
-        }
+                'email' => 'email|unique:vendor,pbv_email',
+            ],
+            [
+                'business_name.required' => 'Parlour name is required',
+                'address.required' => 'Address is required',
+                'city_id.required' => 'City is required',
+                'longatitude.required' => 'Location is required',
+                'latitude.required' => 'Location is required',
+                'email.email' => 'Email must be a valid email address',
+                'email.unique' => 'Email already exists'
+            ]
+        );
+        // try {
+        //     $validated = $request->validate([
+        //         'business_name' => 'required',
+        //         'address' => 'required',
+        //         'city_id' => 'required',
+        //         'longatitude' => 'required',
+        //         'latitude' => 'required',
+        //         'email' => 'email|unique:vendor,pbv_email'
+        //     ]);
+        //     Log::info('Step 4.1: Validation successful', ['validated_data' => $validated]);
+        // } catch (ValidationException $e) {
+        //     $firstError = collect($e->errors())->flatten()->first();
+        //     Log::error('Step 4.2: Validation failed', ['error' => $firstError]);
+        //     $message = $firstError; 
+        //     $status = 500;
+        // }
 
         Log::info('Step 5: Attempting vendor update...');
         $vendorsUpdate = $vendor->update([ 
