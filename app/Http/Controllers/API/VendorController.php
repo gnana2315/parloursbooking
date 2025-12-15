@@ -220,14 +220,25 @@ class VendorController extends Controller
         //     ]
         // );
         try {
-            $validated = $request->validate([
-                'business_name' => 'required',
-                'address' => 'required',
-                'city_id' => 'required',
-                'longatitude' => 'required',
-                'latitude' => 'required',
-                'email' => 'email|unique:vendor,pbv_email'
-            ]);
+            $validated = $request->validate(
+                [
+                    'business_name' => 'required',
+                    'address' => 'required',
+                    'city_id' => 'required',
+                    'longatitude' => 'required',
+                    'latitude' => 'required',
+                    'email' => 'email|unique:vendor,pbv_email'
+                ],                
+                [
+                    'business_name.required' => 'Parlour name is required',
+                    'address.required' => 'Address is required',
+                    'city_id.required' => 'City is required',
+                    'longatitude.required' => 'Location is required',
+                    'latitude.required' => 'Location is required',
+                    'email.email' => 'Email must be a valid email address',
+                    'email.unique' => 'Email already exists'
+                ]
+            );
             Log::info('Step 4.1: Validation successful', ['validated_data' => $validated]);
         } catch (ValidationException $e) {
             $firstError = collect($e->errors())->flatten()->first();
