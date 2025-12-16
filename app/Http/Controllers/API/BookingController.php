@@ -290,13 +290,22 @@ class BookingController extends Controller
  */
     public function calculateTotal(Request $request)
     {
+        // Decode service_ids if sent as JSON string
+        if (is_string($request->query('service_ids'))) {
+            $decoded = json_decode($request->query('service_ids'), true);
+
+            if (json_last_error() === JSON_ERROR_NONE) {
+                $request->merge([
+                    'service_ids' => $decoded
+                ]);
+            }
+        }
+
         // For GET, fetch query params
-        $service_ids = $request->query('service_ids', []);
         $vendor_id = $request->query('vendor_id');
         $promo_code = $request->query('promo_code');
 
         $request->merge([
-            'service_ids' => $service_ids,
             'vendor_id' => $vendor_id,
             'promo_code' => $promo_code,
         ]);
