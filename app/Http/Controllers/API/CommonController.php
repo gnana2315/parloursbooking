@@ -296,9 +296,11 @@ class CommonController extends Controller
 
         // Filter by serviceType
         if ($request->filled('serviceType')) {
-            $query->where('pbs_service_type', $request->serviceType);
+            $query->whereHas('services', function ($q) use ($request) {
+                $q->where('pbs_service_type', $request->serviceType);
+            });
         }
-        
+
         // Sort
         if ($request->filled('sort')) {
             switch ($request->sort) {
