@@ -326,6 +326,7 @@ class CommonController extends Controller
         
         //var_dump($query);die();
         // Pagination
+        $query->where('pbv_status', 2); 
         $perPage = $request->get('per_page', 15);
         $vendors = $query->paginate($perPage);
         
