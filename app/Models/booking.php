@@ -48,7 +48,10 @@ class booking extends Model
     ];
 
     protected $casts = [
-        'pbb_booking_details' => 'array',    
+        'pbb_booking_details' => 'array',
+        'pbb_booking_date' => 'date',
+        'pbb_booking_start_time' => 'datetime:H:i:s',
+        'pbb_booking_end_time' => 'datetime:H:i:s',    
     ];
     
     public function customer() {
