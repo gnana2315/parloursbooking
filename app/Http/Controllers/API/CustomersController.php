@@ -271,9 +271,9 @@ class CustomersController extends Controller
                 'booking_id' => $booking->pbb_id,
                 'booking_ref_no' => $booking->pbb_ref_no,
                 'vendor' => $booking->vendors->pbv_business_name ?? null,
-                'booking_date' => $booking->pbb_booking_date,
-                'booking_start_time' => $booking->pbb_booking_start_time,
-                'booking_end_time' => $booking->pbb_booking_end_time,
+                'booking_date' => $booking->pbb_booking_date ? $booking->pbb_booking_date->format('Y-m-d') : null,
+                'booking_start_time' => $booking->pbb_booking_start_time ? $booking->pbb_booking_start_time->format('H:i:s') : null,
+                'booking_end_time' => $booking->pbb_booking_end_time ? $booking->pbb_booking_end_time->format('H:i:s') : null,
                 'total_amount' => $total,
                 'status' => $booking->pbb_status,
                 'services' => $booking->bookingDetails->map(function ($detail) {
