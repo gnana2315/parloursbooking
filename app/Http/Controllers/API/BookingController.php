@@ -348,6 +348,25 @@ class BookingController extends Controller
                 ], 400);
             }
 
+            // 🔥 NEW — Check promo start and end date
+            $today = now()->startOfDay();
+
+            if ($promo->pbpc_start_date && $today->lt(Carbon::parse($promo->pbpc_start_date))) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'This promo code is not active yet.',
+                ], 400);
+            }
+
+            if ($promo->pbpc_end_date && $today->gt(Carbon::parse($promo->pbpc_end_date))) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'This promo code has expired.',
+                ], 400);
+            }
+            // 🔥 NEW END
+
+
             // Determine eligible services
             $eligibleServices = $services;
 
