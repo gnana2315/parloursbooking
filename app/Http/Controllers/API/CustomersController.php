@@ -264,7 +264,7 @@ class CustomersController extends Controller
         }
 
         $bookings = $customer->bookings()->with(['vendors','bookingDetails.services'])->get();
-
+        
         $bookingsWithTotal = $bookings->map(function ($booking) {
             $total = $booking->bookingDetails->sum('pbbd_total_amount');
             return [
@@ -284,7 +284,7 @@ class CustomersController extends Controller
                 }),
             ];
         });
-        Log::info('bookingsWithTotal Response:', ['Response' => $bookingsWithTotal]);
+        Log::info('getBookingsByCustomerID Response:', ['Response' => $bookingsWithTotal]);
         return response()->json([
             'message' => 'Bookings retrieved successfully',
             'data' => $bookingsWithTotal
