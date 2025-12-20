@@ -1136,7 +1136,7 @@ class BookingController extends Controller
         OneSignalService $oneSignalService,
         WebXPayService $webXPay
     ) {
-        dd($request->header());
+        dd($request->header('postman-token'));
         Log::info('addOnlineBooking_v1 Requests:', ['Requests' => $request->all()]);
         
         $user = auth()->user();
