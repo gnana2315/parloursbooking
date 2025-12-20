@@ -4,6 +4,7 @@ namespace App\Services;
 
 use phpseclib3\Crypt\RSA;
 use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Http;
 
 class WebXPayService
 {
