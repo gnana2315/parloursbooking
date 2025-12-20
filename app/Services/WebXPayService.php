@@ -4,7 +4,6 @@ namespace App\Services;
 
 use phpseclib3\Crypt\RSA;
 use GuzzleHttp\Client;
-use Illuminate\Support\Facades\Http;
 
 class WebXPayService
 {
@@ -49,21 +48,27 @@ class WebXPayService
     }
 
     // Get user details (publicKey, secretKey)
-    public function getUserDetails($jwt)
+    public function getUserDetails(string $jwt): object
     {
-        $response = Http::withToken($jwt)->get($this->baseUrl . "GetUserDetails");
-        dd($response->json());
-        // Check if response is ok and contains data
-        if ($response->successful() && isset($response->json()['data'])) {
-            return $response->json()['data'];
-        }
+        $response = $this->client->request(
+            'GET',
+            "merchant/user",
+            [
+                'headers'  => ['content-type' => 'application/json', 'Accept' => 'application/json', 'Authorization' => "Bearer $jwt"]
+            ]
+        );        
 
-        // Log or return full response for debugging
-        return [
-            'success' => false,
-            'error'   => 'Invalid response from API',
-            'response' => $response->json()
-        ];
+        try {
+            $response = json_decode((string) $response->getBody());
+
+            if (isset($response->token)) {
+                return $response->token;
+            }
+
+            return null;
+        } catch (\Throwable $th) {
+            return $response;
+        }
     }
 
     // Generate RSA encrypted payment string
