@@ -1316,6 +1316,7 @@ class BookingController extends Controller
                 // ]);
 
                 $jwt = $webXPay->auth();
+                dd($jwt);
                 $details = $webXPay->getUserDetails($jwt);
 
                 $paymentResult = $webXPay->PayFromCustomerToken3ds([
