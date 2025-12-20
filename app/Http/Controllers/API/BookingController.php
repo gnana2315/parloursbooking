@@ -1305,7 +1305,7 @@ class BookingController extends Controller
             $bookingRefNo = $addbooking->pbb_ref_no;
 
             // Generate session ID: booking ref + random string (at least 31 characters)
-            $randomPart = Str::random(8); // random part for uniqueness
+            $randomPart = Str::random(4); // random part for uniqueness
             $sessionId = $bookingRefNo . '_' . $randomPart; 
             try {
                 $jwt = $webXPay->auth();
