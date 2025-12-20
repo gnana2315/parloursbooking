@@ -1341,7 +1341,7 @@ class BookingController extends Controller
                     ];
                 }
                 
-                Log::info('paymentResult Response:', ['Response' => $paymentResult->body()]);
+                Log::info('paymentResult Response:', ['Response' => $paymentResult]);
             } catch (\Throwable $e) {
                 // $paymentString = null;
                 // $secretKey = null;
