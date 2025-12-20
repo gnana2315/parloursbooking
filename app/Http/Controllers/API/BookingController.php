@@ -1308,31 +1308,31 @@ class BookingController extends Controller
                 $jwt = $webXPay->auth();
                 Log::info('WebXPay JWT:', ['JWT' => $jwt]);
 
-                 $sessionData = [
-                    'orderNumber' => $bookingRefNo,
-                    'amount' => $total_amount,
-                    'currency' => 'LKR',
-                    'customer' => [
-                        'id' => $customer->pbc_id,
-                        'email' => $customer->pbc_email,
-                        'firstName' => $customer->pbc_first_name,
-                        'lastName' => $customer->pbc_last_name,
-                        'contactNumber' => $customer->pbc_contact_no,
-                    ],
-                ];
+                // $sessionData = [
+                //     'orderNumber' => $bookingRefNo,
+                //     'amount' => $total_amount,
+                //     'currency' => 'LKR',
+                //     'customer' => [
+                //         'id' => $customer->pbc_id,
+                //         'email' => $customer->pbc_email,
+                //         'firstName' => $customer->pbc_first_name,
+                //         'lastName' => $customer->pbc_last_name,
+                //         'contactNumber' => $customer->pbc_contact_no,
+                //     ],
+                // ];
 
-                $sessionResponse = $webXPay->createSession($sessionData, $jwt);
-                if (!isset($sessionResponse->session)) {
-                    Log::error('WebXPay session creation failed', ['response' => $sessionResponse]);
-                    return response()->json(['status' => false, 'message' => 'Unable to create payment session'], 500);
-                }
+                // $sessionResponse = $webXPay->createSession($sessionData, $jwt);
+                // if (!isset($sessionResponse->session)) {
+                //     Log::error('WebXPay session creation failed', ['response' => $sessionResponse]);
+                //     return response()->json(['status' => false, 'message' => 'Unable to create payment session'], 500);
+                // }
 
-                $sessionId = $sessionResponse->session;
+                // $sessionId = $sessionResponse->session;
 
-                $paymentResult = $webXPay->PayFromSession3ds([
+                $paymentResult = $webXPay->PayFromCard([
                     //'amount' => $total_amount,
                     'amount' => "10",
-                    "session" => $sessionId,
+                    "session" => $bookingRefNo,
                     'currency' => 'LKR',
                     'customer' => [
                         'id' => $customer->pbc_id,

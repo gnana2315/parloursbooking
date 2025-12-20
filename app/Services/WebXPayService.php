@@ -93,6 +93,32 @@ class WebXPayService
         }
     }
 
+    public function PayFromCard(array $payFromCardRequest, string $jwt): ?object
+    {
+        try {
+            $response = $this->client->request(
+                'POST',
+                "cards/pay/",
+                [
+                    'headers' => [
+                        'content-type' => 'application/json',
+                        'Accept' => 'application/json',
+                        'Authorization' => "Bearer $jwt",
+                    ],
+                    'body' => json_encode($payFromCardRequest),
+                ]
+            );
+
+            return json_decode($response->getBody()->getContents());
+
+        } catch (\Throwable $e) {
+            return (object)[
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ];
+        }
+    }
+
     public function createSession(array $data, string $jwt): object
     {
             $response = $this->client->post('cards/session', [
