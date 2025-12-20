@@ -48,14 +48,9 @@ class WebXPayService
     }
 
     // Get user details (publicKey, secretKey)
-    public function getUserDetails(string $jwt): object
+    public function getUserDetails($jwt)
     {
-        $res = $this->client->get('user-details', [
-            'headers' => [
-                'Authorization' => 'Bearer ' . $jwt,
-            ],
-        ]);
-        return json_decode($res->getBody()->getContents());
+        return Http::withToken($jwt)->get($this->baseUrl . "GetUserDetails")->json()['data'];
     }
 
     // Generate RSA encrypted payment string

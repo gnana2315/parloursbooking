@@ -1136,6 +1136,9 @@ class BookingController extends Controller
         OneSignalService $oneSignalService,
         WebXPayService $webXPay
     ) {
+        $jwt = $webXPay->auth();
+        $userDetails = $webXPay->getUserDetails($jwt);
+        dd($userDetails);
         Log::info('addOnlineBooking_v1 Requests:', ['Requests' => $request->all()]);
         
         $user = auth()->user();
