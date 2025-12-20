@@ -1304,14 +1304,30 @@ class BookingController extends Controller
             // Assume you have the booking ref number
             $bookingRefNo = $addbooking->pbb_ref_no;
 
-            // Generate session ID: booking ref + random string (at least 31 characters)
-            $randomPart = Str::random(4); // random part for uniqueness
-            $sessionId = $bookingRefNo . '_' . $randomPart; 
+            $sessionData = [
+                'orderNumber' => $bookingRefNo,
+                'amount' => $total_amount,
+                'currency' => 'LKR',
+                'customer' => [
+                    'id' => $customer->pbc_id,
+                    'email' => $customer->pbc_email,
+                    'firstName' => $customer->pbc_first_name,
+                    'lastName' => $customer->pbc_last_name,
+                    'contactNumber' => $customer->pbc_contact_no,
+                ],
+            ];
+
+            $sessionResponse = $webXPay->createSession($sessionData, $jwt);
+            if (!isset($sessionResponse->session)) {
+                Log::error('WebXPay session creation failed', ['response' => $sessionResponse]);
+                return response()->json(['status' => false, 'message' => 'Unable to create payment session'], 500);
+            }
+
+            $sessionId = $sessionResponse->session;
+
             try {
                 $jwt = $webXPay->auth();
                 Log::info('WebXPay JWT:', ['JWT' => $jwt]);
-                //$details = $webXPay->getUserDetails($jwt);
-                //Log::info('WebXPay User Details:', ['Details' => $details]);
 
                 $paymentResult = $webXPay->PayFromSession3ds([
                     //'amount' => $total_amount,
