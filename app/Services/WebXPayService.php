@@ -51,7 +51,19 @@ class WebXPayService
     // Get user details (publicKey, secretKey)
     public function getUserDetails($jwt)
     {
-        return Http::withToken($jwt)->get($this->baseUrl . "GetUserDetails")->json()['data'];
+        $response = Http::withToken($jwt)->get($this->baseUrl . "GetUserDetails");
+
+        // Check if response is ok and contains data
+        if ($response->successful() && isset($response->json()['data'])) {
+            return $response->json()['data'];
+        }
+
+        // Log or return full response for debugging
+        return [
+            'success' => false,
+            'error'   => 'Invalid response from API',
+            'response' => $response->json()
+        ];
     }
 
     // Generate RSA encrypted payment string
