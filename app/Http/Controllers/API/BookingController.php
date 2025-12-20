@@ -1136,7 +1136,8 @@ class BookingController extends Controller
         WebXPayService $webXPay
     ) {
         Log::info('addOnlineBooking_v1 Requests:', ['Requests' => $request->all()]);
-        
+        $jwt = $webXPay->auth();
+        Log::info('WebXPay JWT:', ['JWT' => $jwt]);
         $user = auth()->user();
         
         try {
