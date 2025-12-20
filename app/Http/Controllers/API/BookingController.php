@@ -1299,25 +1299,10 @@ class BookingController extends Controller
 
             // 8️⃣ WebXPay payment preparation
             try {
-                // $jwt = $webXPay->auth(WEBXPAY_USERNAME, WEBXPAY_PASSWORD);                
-                // $details = $webXPay->getUserDetails($jwt);
-
-                // $paymentString = $webXPay->generatePaymentString(
-                //     $addbooking->pbb_ref_no,
-                //     $total_amount,
-                //     $details->publicKey
-                // );
-
-                // $secretKey = $details->secretKey;
-
-                // $webXResponse = Http::post('https://stagingxpay.info/index.php?route=checkout/billing/capturePay', [
-                //     'enc_post_array_data' => $paymentString,
-                //     'secret_key' => $secretKey
-                // ]);
-
                 $jwt = $webXPay->auth();
-                dd($jwt);
+                Log::info('WebXPay JWT:', ['JWT' => $jwt]);
                 $details = $webXPay->getUserDetails($jwt);
+                Log::info('WebXPay User Details:', ['Details' => $details]);
 
                 $paymentResult = $webXPay->PayFromCustomerToken3ds([
                     'amount' => $totalAmount,
