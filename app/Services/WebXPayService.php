@@ -52,7 +52,7 @@ class WebXPayService
     public function getUserDetails($jwt)
     {
         $response = Http::withToken($jwt)->get($this->baseUrl . "GetUserDetails");
-
+        dd($response);
         // Check if response is ok and contains data
         if ($response->successful() && isset($response->json()['data'])) {
             return $response->json()['data'];
