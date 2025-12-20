@@ -1302,7 +1302,8 @@ class BookingController extends Controller
             $checkout_url = '';
 
             // Assume you have the booking ref number
-            $bookingRefNo = $addbooking->pbb_ref_no;           
+            $bookingRefNo = $addbooking->pbb_ref_no; 
+            $sessionId = Str::random(31);          
 
             try {
                 $jwt = $webXPay->auth();
@@ -1329,10 +1330,12 @@ class BookingController extends Controller
 
                 // $sessionId = $sessionResponse->session;
                 // Log::error('WebXPay sessionId', ['response' => $sessionId]);
+
                 $paymentResult = $webXPay->PayFromSession3ds([
                     //'amount' => $total_amount,
                     'amount' => "10",
-                    "session" => $request->header('postman-token'),
+                    // 'session' => $request->header('postman-token'),
+                    'session' => $sessionId,
                     'currency' => 'LKR',
                     'customer' => [
                         'id' => $customer->pbc_id,
