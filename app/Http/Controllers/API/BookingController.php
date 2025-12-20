@@ -1306,7 +1306,7 @@ class BookingController extends Controller
                 //Log::info('WebXPay User Details:', ['Details' => $details]);
 
                 $paymentResult = $webXPay->PayFromSession3ds([
-                    'amount' => $totalAmount,
+                    'amount' => $total_amount,
                     'currency' => 'LKR',
                     'customer' => [
                         'id' => $customer->pbc_id,
