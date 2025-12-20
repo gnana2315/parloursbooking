@@ -1298,11 +1298,12 @@ class BookingController extends Controller
             $vendor_amount = $total_amount - $platform_fee;
 
             // 8️⃣ WebXPay payment preparation
+            $checkout_url = '';
             try {
                 $jwt = $webXPay->auth();
                 Log::info('WebXPay JWT:', ['JWT' => $jwt]);
-                $details = $webXPay->getUserDetails($jwt);
-                Log::info('WebXPay User Details:', ['Details' => $details]);
+                //$details = $webXPay->getUserDetails($jwt);
+                //Log::info('WebXPay User Details:', ['Details' => $details]);
 
                 $paymentResult = $webXPay->PayFromSession3ds([
                     'amount' => $totalAmount,
@@ -1315,12 +1316,13 @@ class BookingController extends Controller
                         'contactNumber' => $customer->pbc_contact_no,
                     ],
                     'orderNumber' => uniqid('ORDER_'),
-                    'bankMID' => $details->mid,
+                    'bankMID' => "TESTWEBXPATOKLKR",
                     'secure3dResponseURL' => config('app.url').'/api/webxpay/3ds-callback',
                     'cardToken' => $data['card_token'], // previously saved token
                 ], $jwt);
                 if (isset($paymentResult->error) && $paymentResult->type === '3ds') {
                     // 3DS is required; return HTML content for 3DS form
+                    $checkout_url = $paymentResult->html3ds;
                     return [
                         'status' => true,
                         'booking_ref' => $booking->pbb_ref_no,
@@ -1357,11 +1359,8 @@ class BookingController extends Controller
                     'vendor_id' => $addbooking->pbb_vendor_id,
                     'total_amount' => $total_amount,
                     'payment' => [
-                        'checkout_url' => 'https://stagingxpay.info/index.php?route=checkout/billing',
+                        'checkout_url' => $checkout_url,
                         'process_currency' => 'LKR',
-                        // 'secret_key' => $detail->secretKey,
-                        //'payment' => $paymentString,
-                        //'customer' => $customerData,
                     ],
                 ],
             ]);
