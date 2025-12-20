@@ -95,14 +95,14 @@ class WebXPayService
 
     public function createSession(array $data, string $jwt): object
     {
-            $response = $this->client->post('cards/session', [
-                'headers' => [
-                    'Content-Type' => 'application/json',
-                    'Authorization' => "Bearer $jwt",
-                ],
-                'body' => json_encode($data),
-            ]);
+        $response = $this->client->post('cards/session', [
+            'headers' => [
+                'Content-Type' => 'application/json',
+                'Authorization' => "Bearer $jwt",
+            ],
+            'body' => json_encode($data),
+        ]);
 
-            return json_decode((string) $response->getBody());
-        }
+        return json_decode((string) $response->getBody());
     }
+}
