@@ -26,7 +26,7 @@ class WebXPayService
         $data = array("username" => "$this->username", "password" => "$this->password");
 
         $response = $this->client->request(
-            'GET',
+            'POST',
             "auth",
             [
                 'headers'  => ['content-type' => 'application/json', 'Accept' => 'application/json'],
