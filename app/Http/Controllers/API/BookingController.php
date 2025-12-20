@@ -1136,7 +1136,6 @@ class BookingController extends Controller
         OneSignalService $oneSignalService,
         WebXPayService $webXPay
     ) {
-        dd($request->header('postman-token'));
         Log::info('addOnlineBooking_v1 Requests:', ['Requests' => $request->all()]);
         
         $user = auth()->user();
@@ -1333,7 +1332,7 @@ class BookingController extends Controller
                 $paymentResult = $webXPay->PayFromSession3ds([
                     //'amount' => $total_amount,
                     'amount' => "10",
-                    "session" => $request->input('sessionpay3ds'),
+                    "session" => $request->header('postman-token'),
                     'currency' => 'LKR',
                     'customer' => [
                         'id' => $customer->pbc_id,
