@@ -1299,6 +1299,13 @@ class BookingController extends Controller
 
             // 8️⃣ WebXPay payment preparation
             $checkout_url = '';
+
+            // Assume you have the booking ref number
+            $bookingRefNo = $addbooking->pbb_ref_no;
+
+            // Generate session ID: booking ref + random string (at least 31 characters)
+            $randomPart = Str::random(16); // random part for uniqueness
+            $sessionId = $bookingRefNo . '_' . $randomPart; 
             try {
                 $jwt = $webXPay->auth();
                 Log::info('WebXPay JWT:', ['JWT' => $jwt]);
@@ -1307,6 +1314,7 @@ class BookingController extends Controller
 
                 $paymentResult = $webXPay->PayFromSession3ds([
                     'amount' => $total_amount,
+                    "session" => $sessionId,
                     'currency' => 'LKR',
                     'customer' => [
                         'id' => $customer->pbc_id,
@@ -1315,11 +1323,11 @@ class BookingController extends Controller
                         'lastName' => $customer->pbc_last_name,
                         'contactNumber' => $customer->pbc_contact_no,
                     ],
-                    'orderNumber' => uniqid('ORDER_'),
+                    'orderNumber' => $bookingRefNo,
                     'bankMID' => "TESTWEBXPATOKLKR",
                     'secure3dResponseURL' => config('app.url').'/api/webxpay/3ds-callback',
-                    'cardToken' => $data['card_token'], // previously saved token
                 ], $jwt);
+
                 if (isset($paymentResult->error) && $paymentResult->type === '3ds') {
                     // 3DS is required; return HTML content for 3DS form
                     $checkout_url = $paymentResult->html3ds;
