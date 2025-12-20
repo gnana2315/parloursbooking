@@ -1303,7 +1303,7 @@ class BookingController extends Controller
 
             // Assume you have the booking ref number
             $bookingRefNo = $addbooking->pbb_ref_no; 
-            $sessionId = Str::random(31);          
+            $sessionId = $bookingRefNo . Str::random(4);          
 
             try {
                 $jwt = $webXPay->auth();
