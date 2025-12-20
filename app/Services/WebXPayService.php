@@ -67,49 +67,23 @@ class WebXPayService
         return base64_encode($encrypted);
     }
 
-    public function PayFromSession3ds(array $payFromCardRequest, string $jwt): ?object
-    {
-        try {
-            $response = $this->client->request(
-                'POST',
-                "cards/pay/session3ds",
-                [
-                    'headers' => [
-                        'content-type' => 'application/json',
-                        'Accept' => 'application/json',
-                        'Authorization' => "Bearer $jwt",
-                    ],
-                    'body' => json_encode($payFromCardRequest),
-                ]
-            );
-
-            return json_decode($response->getBody()->getContents());
-
-        } catch (\Throwable $e) {
-            return (object)[
-                'status' => 'error',
-                'message' => $e->getMessage()
-            ];
-        }
-    }
-
-    public function PayFromCard(array $payFromCardRequest, string $jwt): ?object
+    public function PayFromCard($payFromCardRequest, $jwt): object
     {
         try {
             $response = $this->client->request(
                 'POST',
                 "cards/pay/",
                 [
-                    'headers' => [
+                    'headers'  => [
                         'content-type' => 'application/json',
                         'Accept' => 'application/json',
-                        'Authorization' => "Bearer $jwt",
+                        'Authorization' => "Bearer $jwt"
                     ],
-                    'body' => json_encode($payFromCardRequest),
+                    'body' => json_encode($payFromCardRequest)
                 ]
             );
 
-            return json_decode($response->getBody()->getContents(), false);
+            return json_decode((string) $response->getBody());
 
         } catch (\Throwable $e) {
             return (object)[
