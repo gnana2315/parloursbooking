@@ -1203,7 +1203,7 @@ class BookingController extends Controller
 
             // 5️⃣ Create booking
             $addbooking = Booking::create([
-                'pbb_vendor_id' => $vendor->id,
+                'pbb_vendor_id' => $vendor->pbv_id,
                 'pbb_customer_id' => $customer->pbc_id,
                 'pbb_promo_id' => $request->promocode_id ?? null,
                 'pbb_booking_details' => json_encode([
