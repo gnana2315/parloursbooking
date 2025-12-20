@@ -23,7 +23,7 @@ class WebXPayService
     // Authenticate and return JWT token
     public function auth(): string
     {
-        $data = array("username" => "$username", "password" => "$password");
+        $data = array("username" => "$this->username", "password" => "$this->password");
 
         $response = $this->client->request(
             'POST',
