@@ -1138,240 +1138,240 @@ class BookingController extends Controller
         Log::info('addOnlineBooking_v1 Requests:', ['Requests' => $request->all()]);
         $jwt = $webXPay->auth();
         Log::info('WebXPay JWT:', ['JWT' => $jwt]);
-        $user = auth()->user();
+        // $user = auth()->user();
         
-        try {
-            // 1️⃣ Validation
-            $request->validate([
-                'vendor_id' => 'required',
-                'booking_details.*.service_id' => 'required|integer',
-                'booking_date' => 'required',
-                'booking_start_time' => 'required|date_format:H:i:s',
-                'booking_end_time' => 'required|date_format:H:i:s',
-                'service_location' => 'required',
-            ]);
+        // try {
+        //     // 1️⃣ Validation
+        //     $request->validate([
+        //         'vendor_id' => 'required',
+        //         'booking_details.*.service_id' => 'required|integer',
+        //         'booking_date' => 'required',
+        //         'booking_start_time' => 'required|date_format:H:i:s',
+        //         'booking_end_time' => 'required|date_format:H:i:s',
+        //         'service_location' => 'required',
+        //     ]);
 
-            // 2️⃣ Get vendor & customer
-            $vendor = vendors::find($request->vendor_id);
-            if (!$vendor) {
-                return response()->json(['status' => false, 'message' => 'Vendor not found'], 404);
-            }
+        //     // 2️⃣ Get vendor & customer
+        //     $vendor = vendors::find($request->vendor_id);
+        //     if (!$vendor) {
+        //         return response()->json(['status' => false, 'message' => 'Vendor not found'], 404);
+        //     }
 
-            $customer = customer::where('pbc_user_id', $user->pbu_id)->first();
-            if (!$customer) {
-                return response()->json(['status' => false, 'message' => 'Customer not found'], 404);
-            }
+        //     $customer = customer::where('pbc_user_id', $user->pbu_id)->first();
+        //     if (!$customer) {
+        //         return response()->json(['status' => false, 'message' => 'Customer not found'], 404);
+        //     }
 
-            // 3️⃣ Calculate total amount & duration
-            $booking_details = $request->booking_details;
-            $total_amount = 0;
-            $total_duration = 0;
+        //     // 3️⃣ Calculate total amount & duration
+        //     $booking_details = $request->booking_details;
+        //     $total_amount = 0;
+        //     $total_duration = 0;
 
-            foreach ($booking_details as $item) {
-                $service = services::where('pbs_id', $item['service_id'])->first();
-                if ($service) {
-                    $price = floatval(str_replace(',', '', $service->pbs_price));
-                    $total_amount += $price;
-                    $total_duration += $service->pbs_duration;
-                }
-            }
+        //     foreach ($booking_details as $item) {
+        //         $service = services::where('pbs_id', $item['service_id'])->first();
+        //         if ($service) {
+        //             $price = floatval(str_replace(',', '', $service->pbs_price));
+        //             $total_amount += $price;
+        //             $total_duration += $service->pbs_duration;
+        //         }
+        //     }
 
-            $hours = floor($total_duration / 60);
-            $minutes = $total_duration % 60;
-            $duration = sprintf('%02d:%02d:00', $hours, $minutes);
+        //     $hours = floor($total_duration / 60);
+        //     $minutes = $total_duration % 60;
+        //     $duration = sprintf('%02d:%02d:00', $hours, $minutes);
 
-            // 4️⃣ Prevent overlapping bookings
-            $overlappingBooking = Booking::where('pbb_vendor_id', $request->vendor_id)
-                ->where('pbb_booking_date', $request->booking_date)
-                ->whereIn('pbb_status', [0, 1])
-                ->where(function ($q) use ($request) {
-                    $q->whereBetween('pbb_booking_start_time', [$request->booking_start_time, $request->booking_end_time])
-                    ->orWhereBetween('pbb_booking_end_time', [$request->booking_start_time, $request->booking_end_time])
-                    ->orWhere(function ($q2) use ($request) {
-                        $q2->where('pbb_booking_start_time', '<=', $request->booking_start_time)
-                            ->where('pbb_booking_end_time', '>=', $request->booking_end_time);
-                    });
-                })
-                ->first();
+        //     // 4️⃣ Prevent overlapping bookings
+        //     $overlappingBooking = Booking::where('pbb_vendor_id', $request->vendor_id)
+        //         ->where('pbb_booking_date', $request->booking_date)
+        //         ->whereIn('pbb_status', [0, 1])
+        //         ->where(function ($q) use ($request) {
+        //             $q->whereBetween('pbb_booking_start_time', [$request->booking_start_time, $request->booking_end_time])
+        //             ->orWhereBetween('pbb_booking_end_time', [$request->booking_start_time, $request->booking_end_time])
+        //             ->orWhere(function ($q2) use ($request) {
+        //                 $q2->where('pbb_booking_start_time', '<=', $request->booking_start_time)
+        //                     ->where('pbb_booking_end_time', '>=', $request->booking_end_time);
+        //             });
+        //         })
+        //         ->first();
 
-            if ($overlappingBooking) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'The selected time slot is already booked by another customer. ('.$overlappingBooking->pbb_ref_no.')'
-                ], 409);
-            }
+        //     if ($overlappingBooking) {
+        //         return response()->json([
+        //             'status' => false,
+        //             'message' => 'The selected time slot is already booked by another customer. ('.$overlappingBooking->pbb_ref_no.')'
+        //         ], 409);
+        //     }
 
-            // 5️⃣ Create booking
-            $addbooking = Booking::create([
-                'pbb_vendor_id' => $vendor->id,
-                'pbb_customer_id' => $customer->pbc_id,
-                'pbb_promo_id' => $request->promocode_id ?? null,
-                'pbb_booking_details' => json_encode([
-                    'name' => $request->someone_name,
-                    'contact_no' => $request->someone_contact_no,
-                    'age' => $request->age,
-                    'gender' => $request->gender,
-                    'address' => $request->address,
-                ]),
-                'pbb_booking_date' => $request->booking_date,
-                'pbb_booking_duration' => $duration,
-                'pbb_booking_start_time' => $request->booking_start_time,
-                'pbb_booking_end_time' => $request->booking_end_time,
-                'pbb_ref_no' => uniqid('BOONOLKIINNEG_'),
-                'pbb_type' => 'Online',
-                'pbb_service_location' => $request->service_location,
-                'pbb_total_amount' => $total_amount,
-                'pbb_discounts' => 0,
-                'pbb_contact_no' => $request->booking_for_someone == 1 ? $request->someone_contact_no : $customer->customer_contact_no,
-                'pbb_status' => 1,
-            ]);
+        //     // 5️⃣ Create booking
+        //     $addbooking = Booking::create([
+        //         'pbb_vendor_id' => $vendor->id,
+        //         'pbb_customer_id' => $customer->pbc_id,
+        //         'pbb_promo_id' => $request->promocode_id ?? null,
+        //         'pbb_booking_details' => json_encode([
+        //             'name' => $request->someone_name,
+        //             'contact_no' => $request->someone_contact_no,
+        //             'age' => $request->age,
+        //             'gender' => $request->gender,
+        //             'address' => $request->address,
+        //         ]),
+        //         'pbb_booking_date' => $request->booking_date,
+        //         'pbb_booking_duration' => $duration,
+        //         'pbb_booking_start_time' => $request->booking_start_time,
+        //         'pbb_booking_end_time' => $request->booking_end_time,
+        //         'pbb_ref_no' => uniqid('BOONOLKIINNEG_'),
+        //         'pbb_type' => 'Online',
+        //         'pbb_service_location' => $request->service_location,
+        //         'pbb_total_amount' => $total_amount,
+        //         'pbb_discounts' => 0,
+        //         'pbb_contact_no' => $request->booking_for_someone == 1 ? $request->someone_contact_no : $customer->customer_contact_no,
+        //         'pbb_status' => 1,
+        //     ]);
 
-            // 6️⃣ Create booking details
-            foreach ($booking_details as $item) {
-                $service = services::where('pbs_id', $item['service_id'])->first();
-                if ($service) {
-                    bookingDetail::create([
-                        'pbbd_booking_id' => $addbooking->pbb_id,
-                        'pbbd_service_id' => $service->pbs_id,
-                        'pbbd_employee_id' => null,
-                        'pbbd_promo_id' => null,
-                        'pbbd_amount' => floatval(str_replace(',', '', $service->pbs_price)),
-                        'pbbd_discount' => 0,
-                        'pbbd_total_amount' => floatval(str_replace(',', '', $service->pbs_price)),
-                        'pbb_status' => 1,
-                    ]);
-                }
-            }
+        //     // 6️⃣ Create booking details
+        //     foreach ($booking_details as $item) {
+        //         $service = services::where('pbs_id', $item['service_id'])->first();
+        //         if ($service) {
+        //             bookingDetail::create([
+        //                 'pbbd_booking_id' => $addbooking->pbb_id,
+        //                 'pbbd_service_id' => $service->pbs_id,
+        //                 'pbbd_employee_id' => null,
+        //                 'pbbd_promo_id' => null,
+        //                 'pbbd_amount' => floatval(str_replace(',', '', $service->pbs_price)),
+        //                 'pbbd_discount' => 0,
+        //                 'pbbd_total_amount' => floatval(str_replace(',', '', $service->pbs_price)),
+        //                 'pbb_status' => 1,
+        //             ]);
+        //         }
+        //     }
 
-            // 7️⃣ Notifications & SMS (Optional, kept same)
-            $vendors_user = User::where('pbu_vid', $request->vendor_id)->first();
-            if ($vendors_user) {
-                $notification_title = 'Booking Confirmed!';
-                $notification_message = 'Booking added successfully!. Your booking reference no:'. $addbooking->pbb_ref_no;
-                $booking_details_for_notification = [
-                    'booking_ref_no' => $addbooking->pbb_ref_no,
-                    'booking_date' => $addbooking->pbb_booking_date,
-                    'booking_start_time' => $addbooking->pbb_booking_start_time,
-                    'booking_end_time' => $addbooking->pbb_booking_end_time,
-                    'total_amount' => $addbooking->pbb_total_amount,
-                ];
-                $booking_notification = $oneSignalService->sendToUser(
-                    $vendors_user->pbu_id,
-                    $notification_title,
-                    $notification_message,
-                    $booking_details_for_notification
-                );
+        //     // 7️⃣ Notifications & SMS (Optional, kept same)
+        //     $vendors_user = User::where('pbu_vid', $request->vendor_id)->first();
+        //     if ($vendors_user) {
+        //         $notification_title = 'Booking Confirmed!';
+        //         $notification_message = 'Booking added successfully!. Your booking reference no:'. $addbooking->pbb_ref_no;
+        //         $booking_details_for_notification = [
+        //             'booking_ref_no' => $addbooking->pbb_ref_no,
+        //             'booking_date' => $addbooking->pbb_booking_date,
+        //             'booking_start_time' => $addbooking->pbb_booking_start_time,
+        //             'booking_end_time' => $addbooking->pbb_booking_end_time,
+        //             'total_amount' => $addbooking->pbb_total_amount,
+        //         ];
+        //         $booking_notification = $oneSignalService->sendToUser(
+        //             $vendors_user->pbu_id,
+        //             $notification_title,
+        //             $notification_message,
+        //             $booking_details_for_notification
+        //         );
 
-                Log::info('booking_notification Response:', ['Response' => $booking_notification]);
-                if($booking_notification){
-                    notification::create([
-                        'pbn_user_id' => $user->pbu_id,
-                        'pbn_type' => 'specific',
-                        'pbn_title' => $notification_title,
-                        'pbn_message' => $notification_message,
-                        'pbn_is_read' => 0,
-                    ]);
-                }
-            }
+        //         Log::info('booking_notification Response:', ['Response' => $booking_notification]);
+        //         if($booking_notification){
+        //             notification::create([
+        //                 'pbn_user_id' => $user->pbu_id,
+        //                 'pbn_type' => 'specific',
+        //                 'pbn_title' => $notification_title,
+        //                 'pbn_message' => $notification_message,
+        //                 'pbn_is_read' => 0,
+        //             ]);
+        //         }
+        //     }
 
-            $sms_customer_name = $request->someone_name ? $request->someone_name : $customer->pbc_first_name;
-            $sms_vendor_name = $vendor->pbv_business_name;
-            $sms_booking_date = $addbooking->pbb_booking_date;
-            $sms_booking_start_time = $addbooking->pbb_booking_start_time;
-            $sms_booking_end_time = $addbooking->pbb_booking_end_time;
-            $sms_total_amount = $addbooking->pbb_total_amount;
-            $sms_booking_ref_no = $addbooking->pbb_ref_no;
-            $sms_phone_no = $request->phone_no ? $request->phone_no : $customer->pbc_contact_no;
+        //     $sms_customer_name = $request->someone_name ? $request->someone_name : $customer->pbc_first_name;
+        //     $sms_vendor_name = $vendor->pbv_business_name;
+        //     $sms_booking_date = $addbooking->pbb_booking_date;
+        //     $sms_booking_start_time = $addbooking->pbb_booking_start_time;
+        //     $sms_booking_end_time = $addbooking->pbb_booking_end_time;
+        //     $sms_total_amount = $addbooking->pbb_total_amount;
+        //     $sms_booking_ref_no = $addbooking->pbb_ref_no;
+        //     $sms_phone_no = $request->phone_no ? $request->phone_no : $customer->pbc_contact_no;
 
-            $apiKey = config('dialogesms.api_key');
-            $sender = config('dialogesms.sender');
+        //     $apiKey = config('dialogesms.api_key');
+        //     $sender = config('dialogesms.sender');
 
-            $message = "Hello {$sms_customer_name}, your booking at {$sms_vendor_name} has been confirmed!\n\n" .
-                        "Booking Ref: {$sms_booking_ref_no}\n\n" .
-                        "Thank you for choosing Parlours Booking!";
+        //     $message = "Hello {$sms_customer_name}, your booking at {$sms_vendor_name} has been confirmed!\n\n" .
+        //                 "Booking Ref: {$sms_booking_ref_no}\n\n" .
+        //                 "Thank you for choosing Parlours Booking!";
             
-            //$booking_sms_result = $this->smsService->sendMessage($apiKey, [$sms_phone_no], $message, $sender);       
-            //Log::info('booking_sms_result Response:', ['Response' => $booking_sms_result]);
+        //     //$booking_sms_result = $this->smsService->sendMessage($apiKey, [$sms_phone_no], $message, $sender);       
+        //     //Log::info('booking_sms_result Response:', ['Response' => $booking_sms_result]);
 
-            // ✅ Add Payment Transaction
-            $platform_fee_percentage = 10; // example: 10% commission
-            $platform_fee = ($total_amount * $platform_fee_percentage) / 100;
-            $vendor_amount = $total_amount - $platform_fee;
+        //     // ✅ Add Payment Transaction
+        //     $platform_fee_percentage = 10; // example: 10% commission
+        //     $platform_fee = ($total_amount * $platform_fee_percentage) / 100;
+        //     $vendor_amount = $total_amount - $platform_fee;
 
-            // 8️⃣ WebXPay payment preparation
-            try {
-                $jwt = $webXPay->auth();
-                Log::info('WebXPay JWT:', ['JWT' => $jwt]);
-                $details = $webXPay->getUserDetails($jwt);
-                Log::info('WebXPay User Details:', ['Details' => $details]);
+        //     // 8️⃣ WebXPay payment preparation
+        //     try {
+        //         $jwt = $webXPay->auth();
+        //         Log::info('WebXPay JWT:', ['JWT' => $jwt]);
+        //         $details = $webXPay->getUserDetails($jwt);
+        //         Log::info('WebXPay User Details:', ['Details' => $details]);
 
-                $paymentResult = $webXPay->PayFromCustomerToken3ds([
-                    'amount' => $totalAmount,
-                    'currency' => 'LKR',
-                    'customer' => [
-                        'id' => $customer->pbc_id,
-                        'email' => $customer->pbc_email,
-                        'firstName' => $customer->pbc_first_name,
-                        'lastName' => $customer->pbc_last_name,
-                        'contactNumber' => $customer->pbc_contact_no,
-                    ],
-                    'orderNumber' => uniqid('ORDER_'),
-                    'bankMID' => $details->mid,
-                    'secure3dResponseURL' => config('app.url').'/api/webxpay/3ds-callback',
-                    'cardToken' => $data['card_token'], // previously saved token
-                ], $jwt);
+        //         $paymentResult = $webXPay->PayFromCustomerToken3ds([
+        //             'amount' => $totalAmount,
+        //             'currency' => 'LKR',
+        //             'customer' => [
+        //                 'id' => $customer->pbc_id,
+        //                 'email' => $customer->pbc_email,
+        //                 'firstName' => $customer->pbc_first_name,
+        //                 'lastName' => $customer->pbc_last_name,
+        //                 'contactNumber' => $customer->pbc_contact_no,
+        //             ],
+        //             'orderNumber' => uniqid('ORDER_'),
+        //             'bankMID' => $details->mid,
+        //             'secure3dResponseURL' => config('app.url').'/api/webxpay/3ds-callback',
+        //             'cardToken' => $data['card_token'], // previously saved token
+        //         ], $jwt);
 
-                if (isset($paymentResult->error) && $paymentResult->type === '3ds') {
-                    // 3DS is required; return HTML content for 3DS form
-                    return [
-                        'status' => true,
-                        'booking_ref' => $booking->pbb_ref_no,
-                        'requires_3ds' => true,
-                        '3ds_html' => $paymentResult->html3ds,
-                    ];
-                }
-                Log::info('paymentResult Response:', ['Response' => $paymentResult->body()]);
-            } catch (\Throwable $e) {
-                // $paymentString = null;
-                // $secretKey = null;
-                // Log::error('WebXPay error: '.$e->getMessage());
-                Log::error('WebXPay 3DS Payment Error: '.$e->getMessage());
-            }
+        //         if (isset($paymentResult->error) && $paymentResult->type === '3ds') {
+        //             // 3DS is required; return HTML content for 3DS form
+        //             return [
+        //                 'status' => true,
+        //                 'booking_ref' => $booking->pbb_ref_no,
+        //                 'requires_3ds' => true,
+        //                 '3ds_html' => $paymentResult->html3ds,
+        //             ];
+        //         }
+        //         Log::info('paymentResult Response:', ['Response' => $paymentResult->body()]);
+        //     } catch (\Throwable $e) {
+        //         // $paymentString = null;
+        //         // $secretKey = null;
+        //         // Log::error('WebXPay error: '.$e->getMessage());
+        //         Log::error('WebXPay 3DS Payment Error: '.$e->getMessage());
+        //     }
 
-            $customerData = [
-                'first_name' => $customer->pbc_first_name,
-                'last_name' => $customer->pbc_last_name,
-                'email' => $customer->pbc_email,
-                'contact' => $customer->pbc_contact_no,
-                'address1' => $customer->pbc_address,
-                'city' => $customer->pbc_city,
-                'country' => $customer->pbc_country,
-            ];
+        //     $customerData = [
+        //         'first_name' => $customer->pbc_first_name,
+        //         'last_name' => $customer->pbc_last_name,
+        //         'email' => $customer->pbc_email,
+        //         'contact' => $customer->pbc_contact_no,
+        //         'address1' => $customer->pbc_address,
+        //         'city' => $customer->pbc_city,
+        //         'country' => $customer->pbc_country,
+        //     ];
 
-            // 9️⃣ Return JSON response (no HTML)
-            return response()->json([
-                'status' => true,
-                'message' => 'Booking added successfully',
-                'data' => [
-                    'booking_id' => $addbooking->pbb_id,
-                    'booking_ref_no' => $addbooking->pbb_ref_no,
-                    'vendor_id' => $addbooking->pbb_vendor_id,
-                    'total_amount' => $total_amount,
-                    'payment' => [
-                        'checkout_url' => 'https://stagingxpay.info/index.php?route=checkout/billing',
-                        'process_currency' => 'LKR',
-                        // 'secret_key' => $detail->secretKey,
-                        //'payment' => $paymentString,
-                        //'customer' => $customerData,
-                    ],
-                ],
-            ]);
-        } catch (\Throwable $e) {
-            Log::error('Error in addOnlineBooking_v1: ' . $e->getMessage(), [
-                'trace' => $e->getTraceAsString(),
-            ]);
-            return response()->json(['status' => false, 'message' => 'Unable to add the booking. '.$e->getMessage()], 500);
-        }
+        //     // 9️⃣ Return JSON response (no HTML)
+        //     return response()->json([
+        //         'status' => true,
+        //         'message' => 'Booking added successfully',
+        //         'data' => [
+        //             'booking_id' => $addbooking->pbb_id,
+        //             'booking_ref_no' => $addbooking->pbb_ref_no,
+        //             'vendor_id' => $addbooking->pbb_vendor_id,
+        //             'total_amount' => $total_amount,
+        //             'payment' => [
+        //                 'checkout_url' => 'https://stagingxpay.info/index.php?route=checkout/billing',
+        //                 'process_currency' => 'LKR',
+        //                 // 'secret_key' => $detail->secretKey,
+        //                 //'payment' => $paymentString,
+        //                 //'customer' => $customerData,
+        //             ],
+        //         ],
+        //     ]);
+        // } catch (\Throwable $e) {
+        //     Log::error('Error in addOnlineBooking_v1: ' . $e->getMessage(), [
+        //         'trace' => $e->getTraceAsString(),
+        //     ]);
+        //     return response()->json(['status' => false, 'message' => 'Unable to add the booking. '.$e->getMessage()], 500);
+        // }
     }
 
     /**
