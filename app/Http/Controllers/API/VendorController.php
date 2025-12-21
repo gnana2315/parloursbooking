@@ -203,7 +203,6 @@ class VendorController extends Controller
                 return response()->json(['message' => 'Email already exists'], 400);
             }
         }
-
         Log::info('Step 4: Starting validation...');
         // $request->validate(
         //     [
