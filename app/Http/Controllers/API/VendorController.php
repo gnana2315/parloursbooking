@@ -190,6 +190,11 @@ class VendorController extends Controller
             ]);
             return response()->json(['message' => 'Invalid vendor type'], 400);
         }
+        
+        if(isEmpty($request->email)){
+            Log::warning('Step 3.3: Email is empty', ['request_data' => $request->all()]);
+            return response()->json(['message' => 'Email is required'], 400);
+        }
 
         if($vendor->pbv_email && $vendor->pbv_email == $request->email){
             Log::warning('Step 3.3: Email mismatch', [
@@ -2519,7 +2524,7 @@ class VendorController extends Controller
         $allHaveValues = collect($vendorInfoFields)->every(function ($field) use ($vendor) {
             return !is_null($vendor->$field);
         });
-
+        
         // $documents = vendorDocuments::where('pbvd_vendor_id', $vendor->pbv_id)
         //     ->whereIn('pbvd_required_document_id', $documentIds)
         //     ->get();
