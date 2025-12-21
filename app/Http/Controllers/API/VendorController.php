@@ -191,7 +191,7 @@ class VendorController extends Controller
             return response()->json(['message' => 'Invalid vendor type'], 400);
         }
         
-        if(isEmpty($request->email)){
+        if($request->email == null){
             Log::warning('Step 3.3: Email is empty', ['request_data' => $request->all()]);
             return response()->json(['message' => 'Email is required'], 400);
         }
