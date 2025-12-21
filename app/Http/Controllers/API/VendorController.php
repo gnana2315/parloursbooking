@@ -203,6 +203,17 @@ class VendorController extends Controller
                 return response()->json(['message' => 'Email already exists'], 400);
             }
         }
+
+        $lat = trim($request->latitude);
+        $lng = trim($request->longatitude);
+
+        if ($lat === '' || $lng === '' || floatval($lat) == 0.0 || floatval($lng) == 0.0) {
+            Log::warning('Step 3.5: Invalid location coordinates', [
+                'latitude' => $request->latitude,
+                'longatitude' => $request->longatitude
+            ]);
+            return response()->json(['message' => 'Location is required'], 400);
+        }
         Log::info('Step 4: Starting validation...');
         // $request->validate(
         //     [
