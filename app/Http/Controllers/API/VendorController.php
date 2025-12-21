@@ -191,17 +191,17 @@ class VendorController extends Controller
             return response()->json(['message' => 'Invalid vendor type'], 400);
         }
         
-        if($request->email == null){
+        if(empty($request->email)){
             Log::warning('Step 3.3: Email is empty', ['request_data' => $request->all()]);
             return response()->json(['message' => 'Email is required'], 400);
-        }
-
-        if($vendor->pbv_email && $vendor->pbv_email == $request->email){
-            Log::warning('Step 3.3: Email mismatch', [
-                'vendor_email' => $vendor->pbv_email,
-                'request_email' => $request->email
-            ]);
-            return response()->json(['message' => 'Email already exists'], 400);
+        }else{
+            if($vendor->pbv_email && $vendor->pbv_email == $request->email){
+                Log::warning('Step 3.4: Email mismatch', [
+                    'vendor_email' => $vendor->pbv_email,
+                    'request_email' => $request->email
+                ]);
+                return response()->json(['message' => 'Email already exists'], 400);
+            }
         }
 
         Log::info('Step 4: Starting validation...');
