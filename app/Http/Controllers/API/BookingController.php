@@ -1134,11 +1134,7 @@ class BookingController extends Controller
     public function addOnlineBooking_v1(
         Request $request,
         OneSignalService $oneSignalService,
-        WebXPayService $webXPay
     ) {
-        $jwt = $webXPay->auth();
-        $userDetails = $webXPay->getUserDetails($jwt);
-        dd($userDetails);
         Log::info('addOnlineBooking_v1 Requests:', ['Requests' => $request->all()]);
         
         $user = auth()->user();
@@ -1246,7 +1242,7 @@ class BookingController extends Controller
                 }
             }
 
-            // 7️⃣ Notifications & SMS (Optional, kept same)
+            // 7️⃣ Notifications & SMS (Optional)
             $vendors_user = User::where('pbu_vid', $request->vendor_id)->first();
             if ($vendors_user) {
                 $notification_title = 'Booking Confirmed!';
@@ -1293,95 +1289,46 @@ class BookingController extends Controller
                         "Booking Ref: {$sms_booking_ref_no}\n\n" .
                         "Thank you for choosing Parlours Booking!";
             
-            //$booking_sms_result = $this->smsService->sendMessage($apiKey, [$sms_phone_no], $message, $sender);       
-            //Log::info('booking_sms_result Response:', ['Response' => $booking_sms_result]);
+            // SMS sending (uncomment when needed)
+            // $booking_sms_result = $this->smsService->sendMessage($apiKey, [$sms_phone_no], $message, $sender);
+            // Log::info('booking_sms_result Response:', ['Response' => $booking_sms_result]);
 
-            // ✅ Add Payment Transaction
-            $platform_fee_percentage = 10; // example: 10% commission
-            $platform_fee = ($total_amount * $platform_fee_percentage) / 100;
-            $vendor_amount = $total_amount - $platform_fee;
-
-            // 8️⃣ WebXPay payment preparation
-            $checkout_url = '';
-
-            // Assume you have the booking ref number
-            $bookingRefNo = $addbooking->pbb_ref_no; 
-            $sessionId = $bookingRefNo . Str::random(4);          
-
-            try {
-                $jwt = $webXPay->auth();
-                Log::info('WebXPay JWT:', ['JWT' => $jwt]);
-
-                // $sessionData = [
-                //     'orderNumber' => $bookingRefNo,
-                //     'amount' => $total_amount,
-                //     'currency' => 'LKR',
-                //     'customer' => [
-                //         'id' => $customer->pbc_id,
-                //         'email' => $customer->pbc_email,
-                //         'firstName' => $customer->pbc_first_name,
-                //         'lastName' => $customer->pbc_last_name,
-                //         'contactNumber' => $customer->pbc_contact_no,
-                //     ],
-                // ];
-
-                // $sessionResponse = $webXPay->createSession($sessionData, $jwt);
-                // if (!isset($sessionResponse->session)) {
-                //     Log::error('WebXPay session creation failed', ['response' => $sessionResponse]);
-                //     return response()->json(['status' => false, 'message' => 'Unable to create payment session'], 500);
-                // }
-
-                // $sessionId = $sessionResponse->session;
-                // Log::error('WebXPay sessionId', ['response' => $sessionId]);
-
-                $paymentResult = $webXPay->PayFromSession3ds([
-                    //'amount' => $total_amount,
-                    'amount' => "10",
-                    // 'session' => $request->header('postman-token'),
-                    'session' => $sessionId,
-                    'currency' => 'LKR',
-                    'customer' => [
-                        'id' => $customer->pbc_id,
-                        'email' => $customer->pbc_email,
-                        'firstName' => $customer->pbc_first_name,
-                        'lastName' => $customer->pbc_last_name,
-                        'contactNumber' => $customer->pbc_contact_no,
-                    ],
-                    'orderNumber' => $bookingRefNo,
-                    'bankMID' => "TESTWEBXPATOKLKR",
-                    'secure3dResponseURL' => config('app.url').'/api/webxpay/3ds-callback',
-                ], $jwt);
-
-                if (isset($paymentResult->error) && $paymentResult->type === '3ds') {
-                    // 3DS is required; return HTML content for 3DS form
-                    $checkout_url = $paymentResult->html3ds;
-                    return [
-                        'status' => true,
-                        'booking_ref' => $booking->pbb_ref_no,
-                        'requires_3ds' => true,
-                        '3ds_html' => $paymentResult->html3ds,
-                    ];
-                }
-                
-                Log::info('paymentResult Response:', ['Response' => $paymentResult]);
-            } catch (\Throwable $e) {
-                // $paymentString = null;
-                // $secretKey = null;
-                // Log::error('WebXPay error: '.$e->getMessage());
-                Log::error('WebXPay 3DS Payment Error: '.$e->getMessage());
+            // 8️⃣ Generate WebXPay payment encryption
+            $checkout_url = 'https://webxpay.com/index.php?route=checkout/billing';
+            $enc_method = 'JCs3J+6oSz4V0LgE0zi/Bg==';
+            
+            // Get public key from config
+            $publickey = config('webxpay.public_key');
+            if (!$publickey) {
+                throw new \Exception('WebXPay public key not configured');
+            }
+            
+            // Create plaintext: order_id|total_amount
+            $plaintext = $addbooking->pbb_ref_no . '|' . number_format($total_amount, 2, '.', '');
+            
+            // Encrypt using RSA public key
+            if (!openssl_public_encrypt($plaintext, $encrypted, $publickey)) {
+                throw new \Exception('Failed to encrypt payment data');
+            }
+            
+            // Base64 encode for transmission
+            $payment = base64_encode($encrypted);
+            
+            // Create custom fields (format: ref_no|booking_id|vendor_id|customer_id)
+            $custom_fields = base64_encode(
+                $addbooking->pbb_ref_no . '|' .
+                $addbooking->pbb_id . '|' .
+                $vendor->pbv_id . '|' .
+                $customer->pbc_id
+            );
+            
+            // Get secret key from config
+            $secret_key = config('webxpay.secret_key');
+            if (!$secret_key) {
+                throw new \Exception('WebXPay secret key not configured');
             }
 
-            $customerData = [
-                'first_name' => $customer->pbc_first_name,
-                'last_name' => $customer->pbc_last_name,
-                'email' => $customer->pbc_email,
-                'contact' => $customer->pbc_contact_no,
-                'address1' => $customer->pbc_address,
-                'city' => $customer->pbc_city,
-                'country' => $customer->pbc_country,
-            ];
-
-            // 9️⃣ Return JSON response (no HTML)
+            // 9️⃣ Return JSON response with all WebXPay fields
             return response()->json([
                 'status' => true,
                 'message' => 'Booking added successfully',
@@ -1392,10 +1339,27 @@ class BookingController extends Controller
                     'total_amount' => $total_amount,
                     'payment' => [
                         'checkout_url' => $checkout_url,
+                        'secret_key' => $secret_key,
+                        'payment' => $payment,
                         'process_currency' => 'LKR',
+                        'enc_method' => $enc_method,
+                        'custom_fields' => $custom_fields,
+                        'cms' => 'Laravel',
+                        'customer' => [
+                            'first_name' => $customer->pbc_first_name,
+                            'last_name' => $customer->pbc_last_name ?? '',
+                            'email' => $customer->pbc_email ?? '',
+                            'contact_number' => $customer->pbc_contact_no ?? '',
+                            'address_line_one' => $customer->pbc_address ?? '',
+                            'address_line_two' => '',
+                            'city' => $customer->pbc_city ?? 'Colombo',
+                            'state' => '',
+                            'postal_code' => '',
+                            'country' => $customer->pbc_country ?? 'Sri Lanka',
+                        ]
                     ],
                 ],
-            ]);
+            ], 200);
         } catch (\Throwable $e) {
             Log::error('Error in addOnlineBooking_v1: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
