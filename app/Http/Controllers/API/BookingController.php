@@ -1297,18 +1297,21 @@ class BookingController extends Controller
             $checkout_url = 'https://webxpay.com/index.php?route=checkout/billing';
             $enc_method = 'JCs3J+6oSz4V0LgE0zi/Bg==';
             
-            // Get public key from config
+            // Get public key from config and convert escaped newlines to actual newlines
             $publickey = config('webxpay.public_key');
             if (!$publickey) {
                 throw new \Exception('WebXPay public key not configured');
             }
+            
+            // Convert escaped newlines to actual newlines for proper key format
+            $publickey = str_replace('\n', "\n", $publickey);
             
             // Create plaintext: order_id|total_amount
             $plaintext = $addbooking->pbb_ref_no . '|' . number_format($total_amount, 2, '.', '');
             
             // Encrypt using RSA public key
             if (!openssl_public_encrypt($plaintext, $encrypted, $publickey)) {
-                throw new \Exception('Failed to encrypt payment data');
+                throw new \Exception('Failed to encrypt payment data: ' . openssl_error_string());
             }
             
             // Base64 encode for transmission
