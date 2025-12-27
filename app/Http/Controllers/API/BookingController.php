@@ -247,7 +247,7 @@ class BookingController extends Controller
  *     @OA\Parameter(
  *         name="service_ids[]",
  *         in="query",
- *         required=true,
+ *         required=false,
  *         description="List of service IDs",
  *         @OA\Schema(type="array", @OA\Items(type="integer"))
  *     ),
@@ -261,8 +261,15 @@ class BookingController extends Controller
  *     @OA\Parameter(
  *         name="promo_code",
  *         in="query",
- *         required=false,
+ *         required=true,
  *         description="Optional promo code",
+ *         @OA\Schema(type="string")
+ *     ),
+ *     @OA\Parameter(
+ *         name="booking_date",
+ *         in="query",
+ *         required=true,
+ *         description="booking date",
  *         @OA\Schema(type="string")
  *     ),
  *     @OA\Response(
