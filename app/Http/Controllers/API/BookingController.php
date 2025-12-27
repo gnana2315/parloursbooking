@@ -306,17 +306,20 @@ class BookingController extends Controller
         // For GET, fetch query params
         $vendor_id = $request->query('vendor_id');
         $promo_code = $request->query('promo_code');
+        $booking_date = $request->query('booking_date');
 
         $request->merge([
             'vendor_id' => $vendor_id,
             'promo_code' => $promo_code,
+            'booking_date' => $booking_date,
         ]);
 
         $request->validate([
             'service_ids' => 'required|array',
             'service_ids.*' => 'integer|exists:services,pbs_id',
             'vendor_id' => 'nullable|integer|exists:vendor,pbv_id',
-            'promo_code' => 'nullable|string'
+            'promo_code' => 'nullable|string',
+            'booking_date' => 'nullable|date',
         ]);
 
         // 1. Get services
@@ -351,19 +354,25 @@ class BookingController extends Controller
             }
 
             // 🔥 NEW — Check promo start and end date
-            $today = now()->startOfDay();
+            $bookingDate = $request->booking_date
+                ? Carbon::parse($request->booking_date)->startOfDay()
+                : now()->startOfDay();
 
-            if ($promo->pbpc_start_date && $today->lt(Carbon::parse($promo->pbpc_start_date))) {
+            if ($promo->pbpc_start_date &&
+                $bookingDate->lt(Carbon::parse($promo->pbpc_start_date)->startOfDay())) {
+
                 return response()->json([
                     'status' => false,
-                    'message' => 'This promo code is not active yet.',
+                    'message' => 'This promo code is not active for the selected booking date.',
                 ], 400);
             }
 
-            if ($promo->pbpc_end_date && $today->gt(Carbon::parse($promo->pbpc_end_date))) {
+            if ($promo->pbpc_end_date &&
+                $bookingDate->gt(Carbon::parse($promo->pbpc_end_date)->startOfDay())) {
+
                 return response()->json([
                     'status' => false,
-                    'message' => 'This promo code has expired.',
+                    'message' => 'This promo code has expired for the selected booking date.',
                 ], 400);
             }
             // 🔥 NEW END
