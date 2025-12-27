@@ -128,7 +128,7 @@ class VendorController extends Controller
  *     @OA\RequestBody(
  *         required=true,
  *         @OA\JsonContent(
- *             required={"business_name", "address", "city_id", "longatitude", "latitude", "email"},
+ *             required={"business_name", "address", "city_id", "longatitude", "latitude", "email", "contact_no"},
  *             @OA\Property(property="business_name", type="string", example="Beauty Parlour"),
  *             @OA\Property(property="display_name", type="string", example="Parlour Deluxe"),
  *             @OA\Property(property="short_description", type="string", example="A premium beauty parlour offering bridal makeup"),
@@ -138,6 +138,7 @@ class VendorController extends Controller
  *             @OA\Property(property="longatitude", type="number", format="float", example=79.8612),
  *             @OA\Property(property="latitude", type="number", format="float", example=6.9271),
  *             @OA\Property(property="email", type="string", format="email", example="parlour@example.com"),
+ *             @OA\Property(property="contact_no", type="string", example="+94712345678"),
  *             @OA\Property(property="staff_no", type="integer", example=5)
  *         )
  *     ),
@@ -242,7 +243,8 @@ class VendorController extends Controller
                     'city_id' => 'required',
                     'longatitude' => 'required',
                     'latitude' => 'required',
-                    'email' => 'email|unique:vendor,pbv_email'
+                    'email' => 'email|unique:vendor,pbv_email',
+                    'contact_no' => 'required|unique:vendor,pbv_contactno'
                 ],                
                 [
                     'business_name.required' => 'Parlour name is required',
@@ -251,7 +253,9 @@ class VendorController extends Controller
                     'longatitude.required' => 'Location is required',
                     'latitude.required' => 'Location is required',
                     'email.email' => 'Email must be a valid email address',
-                    'email.unique' => 'Email already exists'
+                    'email.unique' => 'Email already exists',
+                    'contact_no.required' => 'Contact No is required',
+                    'contact_no.unique' => 'Contact No already exists'
                 ]
             );
             Log::info('Step 4.1: Validation successful', ['validated_data' => $validated]);
@@ -276,7 +280,7 @@ class VendorController extends Controller
             'pbv_longatitude' => $request->longatitude,
             'pbv_latitude' => $request->latitude,
             'pbv_email' => $request->email,
-            'pbv_contactno' => $user->pbu_mobileno,
+            'pbv_contactno' => $request->phone_no ? $request->phone_no : $user->pbu_mobileno,
             'pbv_accept_terms' => 1,
             'pbv_staff_count' => $request->staff_no ?? 1,
             'pbv_status' => 1,
@@ -376,8 +380,8 @@ class VendorController extends Controller
                 'city_id' => 'required',
                 'service_area' => 'required',
                 'email' => 'email|unique:vendor,pbv_email',
-                'contact_no' => 'required',
-                'nic_no' => 'required'
+                'contact_no' => 'required|unique:vendor,pbv_contactno',
+                'nic_no' => 'required',
             ],
             [
                 'address.required' => 'Address is required',
@@ -386,7 +390,8 @@ class VendorController extends Controller
                 'email.email' => 'Email must be a valid email address',
                 'email.unique' => 'Email already exists',
                 'contact_no.required' => 'Contact No is required',
-                'nic_no.required' => 'NIC No is required'
+                'contact_no.unique' => 'Contact No already exists',
+                'nic_no.required' => 'NIC No is required',
             ]
         );
 
@@ -403,7 +408,7 @@ class VendorController extends Controller
             'pbv_longatitude' => null,
             'pbv_latitude' => null,
             'pbv_email' => $request->email,
-            'pbv_contactno' => $request->contact_no ?? $user->pbu_mobileno,
+            'pbv_contactno' => $request->contact_no ? $request->contact_no : $user->pbu_mobileno,
             'pbv_accept_terms' => 1,
             'pbv_staff_count' => 1,
             'pbv_status' => 1,
