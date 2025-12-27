@@ -1309,9 +1309,12 @@ class BookingController extends Controller
             // Create plaintext: order_id|total_amount
             $plaintext = $addbooking->pbb_ref_no . '|' . number_format($total_amount, 2, '.', '');
             
-            $rsa = new \Crypt_RSA();
-            $rsa->loadKey($publickey);
-            $encrypted = base64_encode($rsa->encrypt($plaintext));
+            // $rsa = new \Crypt_RSA();
+            // $rsa->loadKey($publickey);
+            // $encrypted = base64_encode($rsa->encrypt($plaintext));
+            $encrypted = $publicKey
+                        ->withPadding(RSA::ENCRYPTION_PKCS1)
+                        ->encrypt($plaintext);
             // Encrypt using RSA public key
             if (!openssl_public_encrypt($plaintext, $encrypted, $publickey)) {
                 throw new \Exception('Failed to encrypt payment data: ' . openssl_error_string());
