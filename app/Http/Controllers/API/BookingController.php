@@ -1222,7 +1222,7 @@ class BookingController extends Controller
                 'pbb_total_amount' => $total_amount,
                 'pbb_discounts' => 0,
                 'pbb_contact_no' => $request->booking_for_someone == 1 ? $request->someone_contact_no : $customer->customer_contact_no,
-                'pbb_status' => 1,
+                'pbb_status' => 0,
             ]);
 
             // 6️⃣ Create booking details
@@ -1237,57 +1237,57 @@ class BookingController extends Controller
                         'pbbd_amount' => floatval(str_replace(',', '', $service->pbs_price)),
                         'pbbd_discount' => 0,
                         'pbbd_total_amount' => floatval(str_replace(',', '', $service->pbs_price)),
-                        'pbb_status' => 1,
+                        'pbb_status' => 0,
                     ]);
                 }
             }
 
-            // 7️⃣ Notifications & SMS (Optional)
-            $vendors_user = User::where('pbu_vid', $request->vendor_id)->first();
-            if ($vendors_user) {
-                $notification_title = 'Booking Confirmed!';
-                $notification_message = 'Booking added successfully!. Your booking reference no:'. $addbooking->pbb_ref_no;
-                $booking_details_for_notification = [
-                    'booking_ref_no' => $addbooking->pbb_ref_no,
-                    'booking_date' => $addbooking->pbb_booking_date,
-                    'booking_start_time' => $addbooking->pbb_booking_start_time,
-                    'booking_end_time' => $addbooking->pbb_booking_end_time,
-                    'total_amount' => $addbooking->pbb_total_amount,
-                ];
-                $booking_notification = $oneSignalService->sendToUser(
-                    $vendors_user->pbu_id,
-                    $notification_title,
-                    $notification_message,
-                    $booking_details_for_notification
-                );
+            // // 7️⃣ Notifications & SMS (Optional)
+            // $vendors_user = User::where('pbu_vid', $request->vendor_id)->first();
+            // if ($vendors_user) {
+            //     $notification_title = 'Booking Confirmed!';
+            //     $notification_message = 'Booking added successfully!. Your booking reference no:'. $addbooking->pbb_ref_no;
+            //     $booking_details_for_notification = [
+            //         'booking_ref_no' => $addbooking->pbb_ref_no,
+            //         'booking_date' => $addbooking->pbb_booking_date,
+            //         'booking_start_time' => $addbooking->pbb_booking_start_time,
+            //         'booking_end_time' => $addbooking->pbb_booking_end_time,
+            //         'total_amount' => $addbooking->pbb_total_amount,
+            //     ];
+            //     $booking_notification = $oneSignalService->sendToUser(
+            //         $vendors_user->pbu_id,
+            //         $notification_title,
+            //         $notification_message,
+            //         $booking_details_for_notification
+            //     );
 
-                Log::info('booking_notification Response:', ['Response' => $booking_notification]);
-                if($booking_notification){
-                    notification::create([
-                        'pbn_user_id' => $user->pbu_id,
-                        'pbn_type' => 'specific',
-                        'pbn_title' => $notification_title,
-                        'pbn_message' => $notification_message,
-                        'pbn_is_read' => 0,
-                    ]);
-                }
-            }
+            //     Log::info('booking_notification Response:', ['Response' => $booking_notification]);
+            //     if($booking_notification){
+            //         notification::create([
+            //             'pbn_user_id' => $user->pbu_id,
+            //             'pbn_type' => 'specific',
+            //             'pbn_title' => $notification_title,
+            //             'pbn_message' => $notification_message,
+            //             'pbn_is_read' => 0,
+            //         ]);
+            //     }
+            // }
 
-            $sms_customer_name = $request->someone_name ? $request->someone_name : $customer->pbc_first_name;
-            $sms_vendor_name = $vendor->pbv_business_name;
-            $sms_booking_date = $addbooking->pbb_booking_date;
-            $sms_booking_start_time = $addbooking->pbb_booking_start_time;
-            $sms_booking_end_time = $addbooking->pbb_booking_end_time;
-            $sms_total_amount = $addbooking->pbb_total_amount;
-            $sms_booking_ref_no = $addbooking->pbb_ref_no;
-            $sms_phone_no = $request->phone_no ? $request->phone_no : $customer->pbc_contact_no;
+            // $sms_customer_name = $request->someone_name ? $request->someone_name : $customer->pbc_first_name;
+            // $sms_vendor_name = $vendor->pbv_business_name;
+            // $sms_booking_date = $addbooking->pbb_booking_date;
+            // $sms_booking_start_time = $addbooking->pbb_booking_start_time;
+            // $sms_booking_end_time = $addbooking->pbb_booking_end_time;
+            // $sms_total_amount = $addbooking->pbb_total_amount;
+            // $sms_booking_ref_no = $addbooking->pbb_ref_no;
+            // $sms_phone_no = $request->phone_no ? $request->phone_no : $customer->pbc_contact_no;
 
-            $apiKey = config('dialogesms.api_key');
-            $sender = config('dialogesms.sender');
+            // $apiKey = config('dialogesms.api_key');
+            // $sender = config('dialogesms.sender');
 
-            $message = "Hello {$sms_customer_name}, your booking at {$sms_vendor_name} has been confirmed!\n\n" .
-                        "Booking Ref: {$sms_booking_ref_no}\n\n" .
-                        "Thank you for choosing Parlours Booking!";
+            // $message = "Hello {$sms_customer_name}, your booking at {$sms_vendor_name} has been confirmed!\n\n" .
+            //             "Booking Ref: {$sms_booking_ref_no}\n\n" .
+            //             "Thank you for choosing Parlours Booking!";
             
             // SMS sending (uncomment when needed)
             // $booking_sms_result = $this->smsService->sendMessage($apiKey, [$sms_phone_no], $message, $sender);
@@ -1297,7 +1297,7 @@ class BookingController extends Controller
             $checkout_url = 'https://webxpay.com/index.php?route=checkout/billing';
             $enc_method = 'JCs3J+6oSz4V0LgE0zi/Bg==';
             
-            // Get public key from config and convert escaped newlines to actual newlines
+            // Get public key from config and convert escaped newlines to actual newlines   
             $publickey = config('webxpay.public_key');
             if (!$publickey) {
                 throw new \Exception('WebXPay public key not configured');
@@ -1309,6 +1309,9 @@ class BookingController extends Controller
             // Create plaintext: order_id|total_amount
             $plaintext = $addbooking->pbb_ref_no . '|' . number_format($total_amount, 2, '.', '');
             
+            $rsa = new \Crypt_RSA();
+            $rsa->loadKey($publickey);
+            $encrypted = base64_encode($rsa->encrypt($plaintext));
             // Encrypt using RSA public key
             if (!openssl_public_encrypt($plaintext, $encrypted, $publickey)) {
                 throw new \Exception('Failed to encrypt payment data: ' . openssl_error_string());
