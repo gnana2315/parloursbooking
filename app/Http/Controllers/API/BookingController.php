@@ -1181,18 +1181,26 @@ class BookingController extends Controller
             $duration = sprintf('%02d:%02d:00', $hours, $minutes);
 
             // 4️⃣ Prevent overlapping bookings
+            // $overlappingBooking = Booking::where('pbb_vendor_id', $request->vendor_id)
+            //     ->where('pbb_booking_date', $request->booking_date)
+            //     ->whereIn('pbb_status', [0, 1])
+            //     ->where(function ($q) use ($request) {
+            //         $q->whereBetween('pbb_booking_start_time', [$request->booking_start_time, $request->booking_end_time])
+            //         ->orWhereBetween('pbb_booking_end_time', [$request->booking_start_time, $request->booking_end_time])
+            //         ->orWhere(function ($q2) use ($request) {
+            //             $q2->where('pbb_booking_start_time', '<=', $request->booking_start_time)
+            //                 ->where('pbb_booking_end_time', '>=', $request->booking_end_time);
+            //         });
+            //     })
+            //     ->first();
             $overlappingBooking = Booking::where('pbb_vendor_id', $request->vendor_id)
-                ->where('pbb_booking_date', $request->booking_date)
-                ->whereIn('pbb_status', [0, 1])
-                ->where(function ($q) use ($request) {
-                    $q->whereBetween('pbb_booking_start_time', [$request->booking_start_time, $request->booking_end_time])
-                    ->orWhereBetween('pbb_booking_end_time', [$request->booking_start_time, $request->booking_end_time])
-                    ->orWhere(function ($q2) use ($request) {
-                        $q2->where('pbb_booking_start_time', '<=', $request->booking_start_time)
-                            ->where('pbb_booking_end_time', '>=', $request->booking_end_time);
-                    });
-                })
-                ->first();
+                                ->where('pbb_booking_date', $request->booking_date)
+                                ->whereIn('pbb_status', [0, 1])
+                                ->where(function ($q) use ($request) {
+                                    $q->where('pbb_booking_start_time', '<', $request->booking_end_time)
+                                    ->where('pbb_booking_end_time', '>', $request->booking_start_time);
+                                })
+                                ->first();
 
             if ($overlappingBooking) {
                 return response()->json([
