@@ -1222,7 +1222,7 @@ class BookingController extends Controller
                 'pbb_service_location' => $request->service_location,
                 'pbb_total_amount' => $total_amount,
                 'pbb_discounts' => 0,
-                'pbb_contact_no' => $request->booking_for_someone == 1 ? $request->someone_contact_no : $customer->customer_contact_no,
+                'pbb_contact_no' => $request->booking_for_someone == 1 ? $request->someone_contact_no : $customer->pbc_contact_no,
                 'pbb_status' => 0,
             ]);
 
