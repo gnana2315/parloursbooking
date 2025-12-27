@@ -1295,7 +1295,7 @@ class BookingController extends Controller
             // Log::info('booking_sms_result Response:', ['Response' => $booking_sms_result]);
 
             // 8️⃣ Generate WebXPay payment encryption
-            $checkout_url = 'https://webxpay.com/index.php?route=checkout/billing';
+            $checkout_url = 'https://stagingxpay.info/index.php?route=checkout/billing';
             $enc_method = 'JCs3J+6oSz4V0LgE0zi/Bg==';
             
             // Get public key from config and convert escaped newlines to actual newlines   
