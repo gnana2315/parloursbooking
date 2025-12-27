@@ -30,7 +30,7 @@ use App\Models\deviceToken;
 use App\Services\FirebaseService;
 use App\Services\OneSignalService;
 use App\Services\DialogESMSService;
-use phpseclib\Crypt\RSA;
+use phpseclib3\Crypt\RSA;
 use phpseclib3\Crypt\PublicKeyLoader;
 use App\Services\WebXPayService;
 
