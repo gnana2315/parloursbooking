@@ -64,4 +64,117 @@ class PaymentController extends Controller
             </html>
         ', 200, ['Content-Type' => 'text/html']);
     }
+
+    public function callback(Request $request)
+    {
+        try {
+            // 1️⃣ Decode POST parameters
+            $payment = base64_decode($request->input('payment'));
+            $signature = base64_decode($request->input('signature'));
+            $custom_fields = base64_decode($request->input('custom_fields'));
+
+            if (!$payment || !$signature) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Invalid payment response data'
+                ], 400);
+            }
+
+            // 2️⃣ Load WebXPay public key
+            $publicKey = config('webxpay.public_key');
+            if (!$publicKey) {
+                throw new \Exception('WebXPay public key not configured');
+            }
+
+            // Fix escaped newlines
+            $publicKey = str_replace('\n', "\n", $publicKey);
+
+            // 3️⃣ Verify signature
+            $verified = openssl_public_decrypt(
+                $signature,
+                $decryptedSignature,
+                $publicKey
+            );
+
+            if (!$verified || $decryptedSignature !== $payment) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Signature validation failed'
+                ], 400);
+            }
+
+            // 4️⃣ Parse payment response
+            // Format:
+            // order_id|order_reference|date_time|gateway|status_code|comment
+            $paymentData = explode('|', $payment);
+
+            [
+                $orderId,
+                $orderReference,
+                $transactionDate,
+                $gateway,
+                $statusCode,
+                $comment
+            ] = array_pad($paymentData, 6, null);
+
+            // 5️⃣ Decode custom fields
+            // Format: ref_no|booking_id|vendor_id|customer_id
+            $customData = explode('|', $custom_fields);
+            [
+                $bookingRefNo,
+                $bookingId,
+                $vendorId,
+                $customerId
+            ] = array_pad($customData, 4, null);
+
+            // 6️⃣ Handle payment status
+            if ($statusCode === '00') { // SUCCESS
+                // Update booking/payment tables here
+                // Example:
+                // Booking::where('pbb_id', $bookingId)->update(['pbb_status' => 1]);
+
+                // return response()->json([
+                //     'status' => true,
+                //     'message' => 'Payment successful',
+                //     'data' => [
+                //         'booking_id' => $bookingId,
+                //         'booking_ref_no' => $bookingRefNo,
+                //         'gateway' => $gateway,
+                //         'transaction_date' => $transactionDate,
+                //         'comment' => $comment,
+                //     ]
+                // ]);
+                $status = true;
+            }else{
+                $status = false;
+            }
+
+            // FAILED PAYMENT
+            // return response()->json([
+            //     'status' => false,
+            //     'message' => 'Payment failed',
+            //     'data' => [
+            //         'status_code' => $statusCode,
+            //         'comment' => $comment,
+            //     ]
+            // ], 400);
+
+
+        } catch (\Throwable $e) {
+            Log::error('WebXPay paymentResponse error', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+                
+            $status = false;
+
+            // return response()->json([
+            //     'status' => false,
+            //     'message' => 'Payment response processing failed'
+            // ], 500);
+        }
+
+        $redirectUrl = "parloursbooking://payment-status?booking_id={$bookingId}&payment_status=" . ($status ? 'success' : 'failed');
+        return redirect()->away($redirectUrl);
+    }
 }

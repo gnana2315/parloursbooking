@@ -68,6 +68,7 @@ Route::get('/run-seeder', [seedController::class, 'seedFromController']);
 Route::get('/generate-swagger', [SweggerController::class, 'generate']);
 
 Route::get('/payments/webxpay/start', [PaymentController::class, 'start']);
+Route::post('/payments/webxpay/callback', [PaymentController::class, 'callback']);
 
 Route::group(['middleware' => 'auth.check'], function () {
     Route::group(['middleware' => 'isActive'], function () {
