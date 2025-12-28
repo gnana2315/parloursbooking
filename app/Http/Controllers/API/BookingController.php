@@ -1798,4 +1798,68 @@ class BookingController extends Controller
             ]
         ], 200);
     }
+
+
+
+    /**
+ * @OA\Get(
+ *     path="/api/bookings/payment-status",
+ *     operationId="getBookingPaymentStatus",
+ *     tags={"Booking"},
+ *     summary="Get booking payment status",
+ *     description="Returns the payment status of a booking using booking ID",
+ *
+ *     @OA\Parameter(
+ *         name="booking_id",
+ *         in="query",
+ *         required=true,
+ *         description="Booking ID",
+ *         @OA\Schema(
+ *             type="integer",
+ *             example=8
+ *         )
+ *     ),
+ *
+ *     @OA\Response(
+ *         response=200,
+ *         description="Payment status retrieved successfully",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="status", type="boolean", example=true),
+ *             @OA\Property(
+ *                 property="data",
+ *                 type="object",
+ *                 @OA\Property(
+ *                     property="payment_status",
+ *                     type="integer",
+ *                     example=1,
+ *                     description="0 = Pending / Failed, 1 = Success"
+ *                 )
+ *             )
+ *         )
+ *     ),
+ *
+ *     @OA\Response(
+ *         response=404,
+ *         description="Booking not found",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="No query results for model [Booking]")
+ *         )
+ *     ),
+ *
+ *     @OA\Response(
+ *         response=500,
+ *         description="Server error"
+ *     )
+ * )
+ */
+
+    public function getBookingPaymentStatus(Request $request){
+        $id = $request->input('booking_id');
+        $booking = booking::findOrFail($id);
+
+        return response()->json([
+            'status' => true,
+            'data' => ['payment_status' => $booking->pbb_status],
+        ], 200);
+    }
 }
