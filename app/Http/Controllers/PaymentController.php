@@ -24,7 +24,7 @@ class PaymentController extends Controller
     {
         $this->smsService = $smsService;
     }
-    
+
     public function start(Request $request){
         $publickey = config('webxpay.public_key');
         $checkout_url = config('webxpay.checkout_url');
@@ -240,7 +240,7 @@ class PaymentController extends Controller
                     'pbpt_final_amount'     => $getBooking->pbb_total_amount,
                     'pbpt_platform_fee'     => $platform_fee,
                     'pbpt_vendor_amount'    => $vendor_amount,
-                    'pbpt_payment_response' => base64_decode($request), // store gateway response if online
+                    'pbpt_payment_response' => json_encode($paymentData), // store gateway response if online
                     'pbpt_payment_ref_no'   => $orderReference,
                     'pbpt_description'      => 'Payment for booking #' . $getBooking->pbb_ref_no,
                     'pbpt_status'           => 1, // 1 = success, 0 = pending, etc.
