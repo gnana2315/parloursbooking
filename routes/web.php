@@ -10,6 +10,7 @@ use App\Http\Controllers\admin\configController;
 use App\Http\Controllers\admin\vendorsController;
 use App\Http\Controllers\admin\reportsController;
 use App\Http\Controllers\admin\servicesController;
+use App\Http\Controllers\PaymentController;
 
 use App\Http\Controllers\userAdminController;
 //use App\Http\Controllers\SendMailController;
@@ -65,6 +66,8 @@ Route::get('/api/documentation/asset/{asset}', [SwaggerAssetController::class, '
 Route::get('/migrate', [MigrationController::class, 'runMigrations']);
 Route::get('/run-seeder', [seedController::class, 'seedFromController']);
 Route::get('/generate-swagger', [SweggerController::class, 'generate']);
+
+Route::get('/payments/webxpay/start', [PaymentController::class, 'start']);
 
 Route::group(['middleware' => 'auth.check'], function () {
     Route::group(['middleware' => 'isActive'], function () {

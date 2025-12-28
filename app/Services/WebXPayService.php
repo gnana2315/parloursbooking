@@ -2,8 +2,9 @@
 
 namespace App\Services;
 
-use phpseclib3\Crypt\RSA;
 use GuzzleHttp\Client;
+use phpseclib3\Crypt\RSA;
+use phpseclib3\Crypt\PublicKeyLoader;
 
 class WebXPayService
 {
@@ -72,51 +73,24 @@ class WebXPayService
     }
 
     // Generate RSA encrypted payment string
-    public function generatePaymentString(string $orderId, float $amount, string $publicKey): string
+    public function generatePaymentString(string $booking_ref_no, float $amount, string $publicKey): string
     {
-        $plaintext = "{$orderId}|{$amount}";
-        $rsa = RSA::loadPublicKey($publicKey);
-        $encrypted = $rsa->encrypt($plaintext);
-        return base64_encode($encrypted);
+        $publickey = str_replace('\n', "\n", $publickey);
+            
+        // Create plaintext: order_id|total_amount
+        $plaintext = $addbooking->pbb_ref_no . '|' . number_format($total_amount, 2, '.', '');
+        
+        // Load public key
+        $publicKey = PublicKeyLoader::load($publickey)
+            ->withPadding(RSA::ENCRYPTION_PKCS1);
+
+        // Encrypt
+        $encrypted = $publicKey->encrypt($plaintext);
+
+            
+        // Base64 encode for transmission
+        $payment = base64_encode($encrypted);
+
+        return $payment;
     }
-
-    public function PayFromSession3ds(array $payFromCardRequest, string $jwt): ?object
-    {
-        try {
-            $response = $this->client->request(
-                'POST',
-                "cards/pay/session3ds",
-                [
-                    'headers' => [
-                        'content-type' => 'application/json',
-                        'Accept' => 'application/json',
-                        'Authorization' => "Bearer $jwt",
-                    ],
-                    'body' => json_encode($payFromCardRequest),
-                ]
-            );
-
-            return json_decode($response->getBody()->getContents());
-
-        } catch (\Throwable $e) {
-            return (object)[
-                'status' => 'error',
-                'message' => $e->getMessage()
-            ];
-        }
-    }
-    
-
-    public function createSession(array $data, string $jwt): object
-    {
-            $response = $this->client->post('cards/session', [
-                'headers' => [
-                    'Content-Type' => 'application/json',
-                    'Authorization' => "Bearer $jwt",
-                ],
-                'body' => json_encode($data),
-            ]);
-
-            return json_decode((string) $response->getBody());
-        }
-    }
+}

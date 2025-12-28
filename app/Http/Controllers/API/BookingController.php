@@ -1035,40 +1035,16 @@ class BookingController extends Controller
             //         ],
             //     ],
             // ], 200);
-            return response()->make('
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <title>Redirecting to Payment...</title>
-                </head>
-                <body onload="document.forms[0].submit()">
+            return response()->json([
+                'status' => true,
+                'message' => 'Booking created. Proceed to payment.',
+                'data' => [
+                    'booking_id' => $addbooking->pbb_id,
+                    'booking_ref_no' => $addbooking->pbb_ref_no,
+                    'payment_url' => url('/payments/webxpay/start?ref=' . $addbooking->pbb_ref_no),
+                ]
+            ], 200);
 
-                <form method="POST" action="'.$checkout_url.'">
-                    <input type="hidden" name="secret_key" value="'.$secret_key.'">
-                    <input type="hidden" name="payment" value="'.$payment.'">
-                    <input type="hidden" name="process_currency" value="LKR">
-                    <input type="hidden" name="enc_method" value="'.$enc_method.'">
-                    <input type="hidden" name="custom_fields" value="'.$custom_fields.'">
-                    <input type="hidden" name="cms" value="Laravel">
-
-                    <input type="hidden" name="first_name" value="'.$customer->pbc_first_name.'">
-                    <input type="hidden" name="last_name" value="'.($customer->pbc_last_name ?? '').'">
-                    <input type="hidden" name="email" value="'.($customer->pbc_email ?? '').'">
-                    <input type="hidden" name="contact_number" value="'.$customer->pbc_contact_no.'">
-                    <input type="hidden" name="address_line_one" value="'.($customer->pbc_address ?? '').'">
-                    <input type="hidden" name="city" value="'.($customer->pbc_city ?? 'Colombo').'">
-                    <input type="hidden" name="country" value="'.($customer->pbc_country ?? 'Sri Lanka').'">
-
-                    <noscript>
-                        <button type="submit">Continue to Payment</button>
-                    </noscript>
-                </form>
-
-                <p>Redirecting to payment gateway...</p>
-
-                </body>
-                </html>
-            ', 200, ['Content-Type' => 'text/html']);
         } catch (\Throwable $e) {
             Log::error('Error in addOnlineBooking_v1: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
