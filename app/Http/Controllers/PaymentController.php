@@ -128,7 +128,8 @@ class PaymentController extends Controller
             ] = array_pad($customData, 4, null);
 
             // 6️⃣ Handle payment status
-            if ($statusCode === '00') { // SUCCESS
+            var_dump($statusCode);
+            if ($statusCode === '15') { // SUCCESS
                 // Update booking/payment tables here
                 // Example:
                 // Booking::where('pbb_id', $bookingId)->update(['pbb_status' => 1]);
@@ -144,9 +145,9 @@ class PaymentController extends Controller
                 //         'comment' => $comment,
                 //     ]
                 // ]);
-                $status = true;
-            }else{
                 $status = false;
+            }else{
+                $status = true;
             }
 
             // FAILED PAYMENT
@@ -253,7 +254,7 @@ class PaymentController extends Controller
             'pbb_status' => $pay_status,
         ]);
 
-        if($pay_status == '15'){
+        if($pay_status == '4'){
             $stat = false;
             $payment_status = 'Failed';
         }else{
