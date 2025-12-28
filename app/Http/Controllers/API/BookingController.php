@@ -855,7 +855,7 @@ class BookingController extends Controller
             //     ->first();
             $overlappingBooking = Booking::where('pbb_vendor_id', $request->vendor_id)
                                 ->where('pbb_booking_date', $request->booking_date)
-                                ->whereIn('pbb_status', [0, 1])
+                                ->whereIn('pbb_status', [1])
                                 ->where(function ($q) use ($request) {
                                     $q->where('pbb_booking_start_time', '<', $request->booking_end_time)
                                     ->where('pbb_booking_end_time', '>', $request->booking_start_time);
@@ -1226,7 +1226,7 @@ class BookingController extends Controller
             'pbb_type' => 'Manual',
             'pbb_service_location' => $request->service_location,
             'pbb_contact_no' => ($request->booking_for_someone == 1) ? $request->someone_contact_no : $customer->customer_contact_no,
-            'pbb_status' => 1
+            'pbb_status' => 0
         ]);
         Log::info('addManualBooking Response:', ['Response' => $addbooking]);
         if ($addbooking) {
@@ -1242,7 +1242,7 @@ class BookingController extends Controller
                         'pbbd_amount' => $price,
                         'pbbd_discount' => 0,
                         'pbbd_total_amount' => $price,
-                        'pbb_status' => 1
+                        'pbb_status' => 0
                     ]);
                 }
             }

@@ -147,12 +147,12 @@ class PaymentController extends Controller
 
             // 6️⃣ Handle payment status
             if ($statusCode === '15') { //Failed
-                $getBooking = booking::with(['bookingDetails'])
-                            ->where('pbb_id', $bookingId)->first();
-                if ($getBooking) {
-                    $getBooking->bookingDetails()->delete();
-                    $getBooking->delete();
-                }
+                // $getBooking = booking::with(['bookingDetails'])
+                //             ->where('pbb_id', $bookingId)->first();
+                // if ($getBooking) {
+                //     $getBooking->bookingDetails()->delete();
+                //     $getBooking->delete();
+                // }
                 $status = false;
             }else{
                 // SUCCESS
