@@ -76,7 +76,7 @@ class PaymentController extends Controller
         ', 200, ['Content-Type' => 'text/html']);
     }
 
-    public function callback(Request $request)
+    public function callback(Request $request, OneSignalService $oneSignalService)
     {
         try {
             // 1️⃣ Decode POST parameters
@@ -118,7 +118,7 @@ class PaymentController extends Controller
             // Format:
             // order_id|order_reference|date_time|gateway|status_code|comment
             $paymentData = explode('|', $payment);
-
+            Log::info('Payment from Gateway:', ['Response' => $paymentData]);
             [
                 $orderId,
                 $orderReference,
