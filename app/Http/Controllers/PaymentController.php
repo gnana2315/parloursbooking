@@ -192,14 +192,14 @@ class PaymentController extends Controller
                     ]);
                 }
 
-                $sms_customer_name = $someoneDetails->name ? $someoneDetails->name : $customer->pbc_first_name;
+                $sms_customer_name = ($someoneDetails->name != null) ? $someoneDetails->name : $customer->pbc_first_name;
                 $sms_vendor_name = $vendor->pbv_business_name;
                 $sms_booking_date = $getBooking->pbb_booking_date->format('d M Y');
                 $sms_booking_start_time = $getBooking->pbb_booking_start_time->format('H:i A');
                 $sms_booking_end_time = $getBooking->pbb_booking_end_time->format('H:i A');
                 $sms_total_amount = $getBooking->pbb_total_amount;
                 $sms_booking_ref_no = $getBooking->pbb_ref_no;
-                $sms_phone_no = $someoneDetails->contact_no ? $someoneDetails->contact_no : $customer->pbc_contact_no;
+                $sms_phone_no = ($someoneDetails->contact_no != null) ? $someoneDetails->contact_no : $customer->pbc_contact_no;
 
                 $apiKey = config('dialogesms.api_key');
                 $sender = config('dialogesms.sender');
