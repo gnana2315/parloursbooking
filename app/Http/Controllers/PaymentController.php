@@ -3,9 +3,18 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Services\WebXPayService;
-
+use App\Models\bookingDetail;
+use App\Models\paymentTransection;
+use App\Models\vendorPayouts;
+use App\Models\vendorPayoutItems;
+use App\Models\vendorPayoutHistory;
+use App\Models\User;
 use App\Models\booking;
+use App\Models\notification;
+
+use App\Services\WebXPayService;
+use App\Services\OneSignalService;
+use App\Services\DialogESMSService;
 
 class PaymentController extends Controller
 {
@@ -128,11 +137,7 @@ class PaymentController extends Controller
             ] = array_pad($customData, 4, null);
 
             // 6️⃣ Handle payment status
-            var_dump($statusCode);
-            if ($statusCode === '15') { // SUCCESS
-                // Update booking/payment tables here
-                // Example:
-                // Booking::where('pbb_id', $bookingId)->update(['pbb_status' => 1]);
+            if ($statusCode === '15') { //Failed
 
                 // return response()->json([
                 //     'status' => true,
@@ -147,6 +152,113 @@ class PaymentController extends Controller
                 // ]);
                 $status = false;
             }else{
+                // SUCCESS
+                // Update booking/payment tables here
+                // Example:
+                $getBooking = booking::with(['customer', 'vendors', 'bookingDetails'])
+                            ->where('pbb_id', $bookingId)->first();
+                $customer = $getBooking->customer;
+                $vendor = $getBooking->vendors->first();
+                $bookingDetails = $getBooking->bookingDetails;
+                $someoneDetails = json_decode($getBooking->someone_details, true);
+
+                $getBooking->update(['pbb_status' => 1]);
+
+                $notification_title = 'Booking Confirmed!';
+                $notification_message = 'Booking added successfully!. Your booking reference no:'. $bookingRefNo;
+                $booking_details_for_notification = [
+                    'booking_ref_no' => $bookingRefNo,
+                    'booking_date' => $getBooking->pbb_booking_date,
+                    'booking_start_time' => $getBooking->pbb_booking_start_time,
+                    'booking_end_time' => $getBooking->pbb_booking_end_time,
+                    'total_amount' => $getBooking->pbb_total_amount,
+                ];
+
+                $vendors_user = User::where('pbu_vid', $vendorId)->first();
+
+                $booking_notification = $oneSignalService->sendToUser(
+                    $vendors_user->pbu_id,
+                    $notification_title,
+                    $notification_message,
+                    $booking_details_for_notification
+                );
+
+                Log::info('booking_notification Response:', ['Response' => $booking_notification]);
+                if($booking_notification){
+                    notification::create([
+                        'pbn_user_id' => $customer->pbc_user_id,
+                        'pbn_type' => 'specific',
+                        'pbn_title' => $notification_title,
+                        'pbn_message' => $notification_message,
+                        'pbn_is_read' => 0,
+                    ]);
+                }
+
+                $sms_customer_name = $someoneDetails->name ? $someoneDetails->name : $customer->pbc_first_name;
+                $sms_vendor_name = $vendor->pbv_business_name;
+                $sms_booking_date = $getBooking->pbb_booking_date->format('d M Y');
+                $sms_booking_start_time = $getBooking->pbb_booking_start_time->format('H:i A');
+                $sms_booking_end_time = $getBooking->pbb_booking_end_time->format('H:i A');
+                $sms_total_amount = $getBooking->pbb_total_amount;
+                $sms_booking_ref_no = $getBooking->pbb_ref_no;
+                $sms_phone_no = $someoneDetails->contact_no ? $someoneDetails->contact_no : $customer->pbc_contact_no;
+
+                $apiKey = config('dialogesms.api_key');
+                $sender = config('dialogesms.sender');
+
+                $message = "Dear Customer,\n".
+                        "Your booking is confirmed on {$sms_booking_date} at {$sms_booking_start_time} | Ref: {$sms_booking_ref_no}. Please arrive 10 mins early.\n" .
+                        "Thank you for choosing Parlours Booking!";
+
+                // Store OTP to DB/Cache if needed here
+                //$smsEnable = filter_var($request->header('SMS_ENABLE', true), FILTER_VALIDATE_BOOLEAN);
+                //if($smsEnable){
+                    $booking_sms_result = $this->smsService->sendMessage($apiKey, [$sms_phone_no], $message, $sender);       
+                //}
+
+                Log::info('booking_sms_result Response:', ['Response' => $booking_sms_result]);
+
+                $platform_fee_percentage = 10; // example: 10% commission
+                $platform_fee = ($getBooking->pbb_total_amount * $platform_fee_percentage) / 100;
+                $vendor_amount = $getBooking->pbb_total_amount - $platform_fee;
+
+                $payment = paymentTransection::create([
+                    'pbpt_transaction_id'   => uniqid('TXN_'), // unique transaction ID
+                    'pbpt_booking_id'       => $getBooking->pbb_id,
+                    'pbpt_vendor_id'        => $vendorId,
+                    'pbpt_customer_id'      => $customerId,
+                    'pbpt_payment_method'   => 'Online', // fallback
+                    'pbpt_total_amount'     => $getBooking->pbb_total_amount,
+                    'pbpt_discount_amount'  => 0, // you can add logic if promo applied
+                    'pbpt_final_amount'     => $getBooking->pbb_total_amount,
+                    'pbpt_platform_fee'     => $platform_fee,
+                    'pbpt_vendor_amount'    => $vendor_amount,
+                    'pbpt_payment_response' => base64_decode($request), // store gateway response if online
+                    'pbpt_payment_ref_no'   => $orderReference,
+                    'pbpt_description'      => 'Payment for booking #' . $getBooking->pbb_ref_no,
+                    'pbpt_status'           => 1, // 1 = success, 0 = pending, etc.
+                    'pbpt_remarks'          => 'Auto-generated payment record'
+                ]);
+                Log::info('payment transection Response:', ['Response' => $payment]);
+                $vendorPayout = vendorPayouts::firstOrCreate(
+                    ['pbvp_vendor_id' => $vendorId],
+                    ['pbvp_total_earned' => 0, 'pbvp_total_paid' => 0, 'pbvp_total_due' => 0]
+                );
+
+                $vendorPayout->increment('pbvp_total_earned', $vendor_amount);
+                $vendorPayout->increment('pbvp_total_due', $vendor_amount);
+
+                $payoutItem = vendorPayoutItems::create([
+                    'pbvpi_payout_id'   => $vendorPayout->pbvp_id,
+                    'pbvpi_booking_id'  => $getBooking->pbb_id,
+                    'pbvpi_payment_id'  => $payment->pbpt_id,
+                    'pbvpi_amount'      => $getBooking->pbb_total_amount,
+                    'pbvpi_platform_fee'=> $platform_fee,
+                    'pbvpi_vendor_amount'=> $vendor_amount,
+                    'pbvpi_status'      => '0'
+                ]);
+                Log::info('vendor payouts Response:', ['Response' => $payoutItem]);
+
                 $status = true;
             }
 
