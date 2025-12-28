@@ -1247,7 +1247,7 @@ class BookingController extends Controller
                         'pbbd_amount' => $price,
                         'pbbd_discount' => 0,
                         'pbbd_total_amount' => $price,
-                        'pbb_status' => 0
+                        'pbb_status' => 1
                     ]);
                 }
             }

@@ -1,5 +1,7 @@
-booking_status
-1-pending
-2-upcoming
-3-completed
-0-rejected/canceled
+Booking Status
+0 - Vendor Canceled the Booking through Admin
+1 - Pending
+2 - Upcoming/Payment Completed
+3 - Service Completed
+4 - No Show (Customer not attend)
+5 - Rejected/Payment Failure

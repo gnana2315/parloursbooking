@@ -177,7 +177,7 @@ class PaymentController extends Controller
                     'pbpt_status'           => 0, // 1 = success, 0 = pending, etc.
                     'pbpt_remarks'          => 'Auto-generated payment record'
                 ]);
-                 $getBooking->update(['pbb_status' => 0]);
+                 $getBooking->update(['pbb_status' => 5]);
                 
                 $status = false;
             }else{
@@ -191,7 +191,7 @@ class PaymentController extends Controller
                 $bookingDetails = $getBooking->bookingDetails;
                 $someoneDetails = json_decode($getBooking->someone_details, true);
 
-                $getBooking->update(['pbb_status' => 3]); // 3 = Confirmed/Paid
+                $getBooking->update(['pbb_status' => 2]); // 3 = Confirmed/Paid
 
                 $notification_title = 'Booking Confirmed!';
                 $notification_message = 'Booking added successfully!. Your booking reference no:'. $bookingRefNo;
