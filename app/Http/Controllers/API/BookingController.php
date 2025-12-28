@@ -978,7 +978,90 @@ class BookingController extends Controller
             ]);
             return response()->json(['status' => false, 'message' => 'Unable to add the booking. '.$e->getMessage()], 500);
         }
-    }  
+    }
+
+    /**
+ * @OA\Post(
+ *     path="/api/bookings/payment-status",
+ *     summary="Update booking payment status",
+ *     description="Updates payment status of a booking based on payment result",
+ *     operationId="paymentStatus",
+ *     tags={"Booking"},
+ *     security={{"bearerAuth":{}}},
+ *
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(
+ *             required={"booking_id","payment_status"},
+ *             @OA\Property(
+ *                 property="booking_id",
+ *                 type="integer",
+ *                 example=123,
+ *                 description="Booking ID"
+ *             ),
+ *             @OA\Property(
+ *                 property="payment_status",
+ *                 type="string",
+ *                 example="success",
+ *                 description="Payment status (success | failed)"
+ *             )
+ *         )
+ *     ),
+ *
+ *     @OA\Response(
+ *         response=200,
+ *         description="Payment status updated successfully",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="status", type="boolean", example=true),
+ *             @OA\Property(
+ *                 property="data",
+ *                 type="object",
+ *                 @OA\Property(property="payment_status", type="string", example="Success")
+ *             )
+ *         )
+ *     ),
+ *
+ *     @OA\Response(
+ *         response=404,
+ *         description="Booking not found",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="No query results for model")
+ *         )
+ *     ),
+ *
+ *     @OA\Response(
+ *         response=401,
+ *         description="Unauthorized"
+ *     )
+ * )
+ */
+
+    public function paymentStatus(Request $request)
+    {
+        $id = $request->input('booking_id');
+        $status = $request->input('payment_status');
+        $booking = booking::findOrFail($id);
+
+        $pay_status = ($status == 'success') ? '1' : '4';
+
+        $booking_update = $booking->update([
+            'pbb_status' => $pay_status,
+        ]);
+
+        if($pay_status == '1'){
+            $stat = true;
+            $payment_status = 'Success';
+        }else{
+            $stat = false;
+            $payment_status = 'Failed';
+        }
+
+        return response()->json([
+            'status' => $stat,
+            'data' => ['payment_status' => $payment_status],
+        ]);
+    }
+
 
     /**
      * @OA\Post(
