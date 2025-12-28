@@ -1860,7 +1860,7 @@ class BookingController extends Controller
 
     public function getBookingPaymentStatus(Request $request){
         $id = $request->input('booking_id');
-        $paymentTransection = paymentTransection::findOrFail('pbpt_booking_id', $id);
+        $paymentTransection = paymentTransection::where('pbpt_booking_id', $id)->firstOrFail();
 
         return response()->json([
             'status' => true,
