@@ -56,7 +56,7 @@ Route::get('/test-s3', function () {
 });
 
 // Route::post('/send-otp', [CommonController::class, 'sendOTP']);
-Route::get('/bookings/payment-status', [BookingController::class, 'paymentStatus']);
+// Route::get('/bookings/payment-status', [BookingController::class, 'paymentStatus']);
 
 Route::middleware(['auth:sanctum', 'validate.token'])->group(function () {
     Route::get('/getUser', [AuthController::class,'getUser']);

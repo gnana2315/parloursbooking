@@ -174,7 +174,96 @@ class PaymentController extends Controller
             // ], 500);
         }
 
-        $redirectUrl = "https://api.parloursbooking.com/api/bookings/payment-status?booking_id={$bookingId}&payment_status=" . ($status ? 'success' : 'failed');
-        return redirect()->away($redirectUrl);
+        $redirectUrl = "https://api.parloursbooking.com/c/bookings/payment-status?booking_id={$bookingId}&payment_status=" . ($status ? 'success' : 'failed');
+        return redirect()->away($redirectUrl, 303);
+    }
+
+
+
+    /**
+ * @OA\Post(
+ *     path="/api/bookings/payment-status",
+ *     summary="Update booking payment status",
+ *     description="Updates payment status of a booking based on payment result",
+ *     operationId="paymentStatus",
+ *     tags={"Payment"},
+ *     security={{"bearerAuth":{}}},
+ *
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(
+ *             required={"booking_id","payment_status"},
+ *             @OA\Property(
+ *                 property="booking_id",
+ *                 type="integer",
+ *                 example=123,
+ *                 description="Booking ID"
+ *             ),
+ *             @OA\Property(
+ *                 property="payment_status",
+ *                 type="string",
+ *                 example="success",
+ *                 description="Payment status (success | failed)"
+ *             )
+ *         )
+ *     ),
+ *
+ *     @OA\Response(
+ *         response=200,
+ *         description="Payment status updated successfully",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="status", type="boolean", example=true),
+ *             @OA\Property(
+ *                 property="data",
+ *                 type="object",
+ *                 @OA\Property(property="payment_status", type="string", example="Success")
+ *             )
+ *         )
+ *     ),
+ *
+ *     @OA\Response(
+ *         response=404,
+ *         description="Booking not found",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="No query results for model")
+ *         )
+ *     ),
+ *
+ *     @OA\Response(
+ *         response=401,
+ *         description="Unauthorized"
+ *     )
+ * )
+ */
+
+    public function paymentStatus(Request $request)
+    {
+        $request->validate([
+            'booking_id' => 'required|integer',
+            'payment_status' => 'required|in:success,failed'
+        ]);
+        
+        $id = $request->input('booking_id');
+        $status = $request->input('payment_status');
+        $booking = booking::findOrFail($id);
+
+        $pay_status = ($status == 'success') ? '1' : '4';
+
+        $booking_update = $booking->update([
+            'pbb_status' => $pay_status,
+        ]);
+
+        if($pay_status == '15'){
+            $stat = false;
+            $payment_status = 'Failed';
+        }else{
+            $stat = true;
+            $payment_status = 'Success';
+        }
+
+        return response()->json([
+            'status' => $stat,
+            'data' => ['payment_status' => $payment_status],
+        ]);
     }
 }
