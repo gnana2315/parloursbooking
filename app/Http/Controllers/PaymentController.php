@@ -138,6 +138,8 @@ class PaymentController extends Controller
                 $customerId
             ] = array_pad($customData, 4, null);
 
+            Log::info('Payment Status Code:', ['Response' => $statusCode]);
+
             // 6️⃣ Handle payment status
             if ($statusCode === '15') { //Failed
 
