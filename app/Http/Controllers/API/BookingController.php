@@ -1038,6 +1038,11 @@ class BookingController extends Controller
 
     public function paymentStatus(Request $request)
     {
+        $request->validate([
+            'booking_id' => 'required|integer',
+            'payment_status' => 'required|in:success,failed'
+        ]);
+        
         $id = $request->input('booking_id');
         $status = $request->input('payment_status');
         $booking = booking::findOrFail($id);
