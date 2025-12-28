@@ -75,11 +75,11 @@ class WebXPayService
     // Generate RSA encrypted payment string
     public function generatePaymentString(string $booking_ref_no, float $amount, string $publicKey): string
     {
-        $publickey = str_replace('\n', "\n", $publickey);
+        $publickey = str_replace('\n', "\n", $publicKey);
             
         // Create plaintext: order_id|total_amount
-        $plaintext = $addbooking->pbb_ref_no . '|' . number_format($total_amount, 2, '.', '');
-        
+        $plaintext = $booking_ref_no . '|' . number_format($amount, 2, '.', '');
+
         // Load public key
         $publicKey = PublicKeyLoader::load($publickey)
             ->withPadding(RSA::ENCRYPTION_PKCS1);
