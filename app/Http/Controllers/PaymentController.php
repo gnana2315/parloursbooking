@@ -20,6 +20,11 @@ use App\Services\DialogESMSService;
 
 class PaymentController extends Controller
 {
+    public function __construct(DialogESMSService $smsService)
+    {
+        $this->smsService = $smsService;
+    }
+    
     public function start(Request $request){
         $publickey = config('webxpay.public_key');
         $checkout_url = config('webxpay.checkout_url');
