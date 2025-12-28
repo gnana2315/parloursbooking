@@ -153,6 +153,32 @@ class PaymentController extends Controller
                 //     $getBooking->bookingDetails()->delete();
                 //     $getBooking->delete();
                 // }
+                $getBooking = booking::with(['customer', 'vendors', 'bookingDetails'])
+                            ->where('pbb_id', $bookingId)->first();
+
+                $platform_fee_percentage = 10; // example: 10% commission
+                $platform_fee = ($getBooking->pbb_total_amount * $platform_fee_percentage) / 100;
+                $vendor_amount = $getBooking->pbb_total_amount - $platform_fee;
+
+                $payment = paymentTransection::create([
+                    'pbpt_transaction_id'   => uniqid('TXN_'), // unique transaction ID
+                    'pbpt_booking_id'       => $getBooking->pbb_id,
+                    'pbpt_vendor_id'        => $vendorId,
+                    'pbpt_customer_id'      => $customerId,
+                    'pbpt_payment_method'   => 'Online', // fallback
+                    'pbpt_total_amount'     => $getBooking->pbb_total_amount,
+                    'pbpt_discount_amount'  => 0, // you can add logic if promo applied
+                    'pbpt_final_amount'     => $getBooking->pbb_total_amount,
+                    'pbpt_platform_fee'     => $platform_fee,
+                    'pbpt_vendor_amount'    => $vendor_amount,
+                    'pbpt_payment_response' => json_encode($paymentData), // store gateway response if online
+                    'pbpt_payment_ref_no'   => $orderReference,
+                    'pbpt_description'      => 'Payment for booking #' . $getBooking->pbb_ref_no,
+                    'pbpt_status'           => 0, // 1 = success, 0 = pending, etc.
+                    'pbpt_remarks'          => 'Auto-generated payment record'
+                ]);
+                 $getBooking->update(['pbb_status' => 0]);
+                
                 $status = false;
             }else{
                 // SUCCESS
@@ -165,7 +191,7 @@ class PaymentController extends Controller
                 $bookingDetails = $getBooking->bookingDetails;
                 $someoneDetails = json_decode($getBooking->someone_details, true);
 
-                $getBooking->update(['pbb_status' => 1]);
+                $getBooking->update(['pbb_status' => 3]); // 3 = Confirmed/Paid
 
                 $notification_title = 'Booking Confirmed!';
                 $notification_message = 'Booking added successfully!. Your booking reference no:'. $bookingRefNo;
@@ -365,20 +391,20 @@ class PaymentController extends Controller
         
         $id = $request->input('booking_id');
         $status = $request->input('payment_status');
-        $booking = booking::findOrFail($id);
+        // $booking = booking::findOrFail($id);
 
-        $pay_status = ($status == 'success') ? '1' : '4';
+        // $pay_status = ($status == 'success') ? '2' : '0';
 
-        $booking_update = $booking->update([
-            'pbb_status' => $pay_status,
-        ]);
+        // $booking_update = $booking->update([
+        //     'pbb_status' => $pay_status,
+        // ]);
 
-        if($pay_status == '4'){
-            $stat = false;
-            $payment_status = 'Failed';
-        }else{
+        if($status == 'success'){
             $stat = true;
             $payment_status = 'Success';
+        }else{
+            $stat = false;
+            $payment_status = 'Failed';
         }
 
         return response()->json([
