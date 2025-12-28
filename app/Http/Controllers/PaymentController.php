@@ -175,7 +175,7 @@ class PaymentController extends Controller
                 $vendors_user = User::where('pbu_vid', $vendorId)->first();
 
                 $booking_notification = $oneSignalService->sendToUser(
-                    $vendors_user->pbu_id,
+                    [$vendors_user->pbu_id],
                     $notification_title,
                     $notification_message,
                     $booking_details_for_notification
