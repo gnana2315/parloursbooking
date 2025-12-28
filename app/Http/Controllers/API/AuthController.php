@@ -382,6 +382,7 @@ class AuthController extends Controller
                     'city' => 'required',
                     'dob' => 'required',
                     'gender' => 'required',
+                    'email' => 'required|email',
                     'accept_terms' => 'required',
                 ],
                 [
@@ -391,6 +392,8 @@ class AuthController extends Controller
                     'city.required' => 'Please enter your City',
                     'dob.required' => 'Please enter your Date of Birth',
                     'gender.required' => 'Please select your Gender',
+                    'email.required' => 'Please enter your Email Address',
+                    'email.email' => 'Please enter a valid Email Address',
                     'accept_terms.required' => 'Please accept the terms and conditions',
                 ]
             );
@@ -426,6 +429,7 @@ class AuthController extends Controller
                 'pbc_dob' => $request->dob,
                 'pbc_contact_no' => $user->pbu_mobileno,
                 'pbc_profile_image' => $publicPath,
+                'pbc_email' => $request->email,
                 'pbc_accept_terms' => $request->boolean('accept_terms'),
                 'pbc_status' => 1
             ]);

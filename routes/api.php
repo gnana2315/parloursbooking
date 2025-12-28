@@ -55,7 +55,6 @@ Route::get('/test-s3', function () {
     }
 });
 
-Route::post('/payment/webxpay/response', [BookingController::class, 'paymentResponse']);
 // Route::post('/send-otp', [CommonController::class, 'sendOTP']);
 
 Route::middleware(['auth:sanctum', 'validate.token'])->group(function () {
@@ -119,6 +118,7 @@ Route::middleware(['auth:sanctum', 'validate.token'])->group(function () {
     Route::get('/getBookings', [BookingController::class, 'getBookings']);
     Route::get('/bookings/{id}', [BookingController::class, 'getBookingDetailsById']);
     Route::post('/booking/mark-status', [BookingController::class, 'markBookingStatus']);
+    Route::post('/bookings/payment-status', [BookingController::class, 'paymentStatus']);
 
     //customer
     Route::get('/customer', [CustomersController::class, 'getCustomer']);
