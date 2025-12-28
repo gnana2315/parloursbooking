@@ -191,7 +191,7 @@ class PaymentController extends Controller
                 $bookingDetails = $getBooking->bookingDetails;
                 $someoneDetails = json_decode($getBooking->someone_details, true);
 
-                $getBooking->update(['pbb_status' => 2]); // 3 = Confirmed/Paid
+                $getBooking->update(['pbb_status' => 2]); // 2 = Confirmed/Paid
 
                 $notification_title = 'Booking Confirmed!';
                 $notification_message = 'Booking added successfully!. Your booking reference no:'. $bookingRefNo;
