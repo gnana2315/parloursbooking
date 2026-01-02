@@ -147,17 +147,13 @@ class PaymentController extends Controller
             Log::info('Payment Status Code:', ['Response' => $statusCode]);
 
             // 6️⃣ Handle payment status
-            if ($statusCode === '15') { //Failed
-                // $getBooking = booking::with(['bookingDetails'])
-                //             ->where('pbb_id', $bookingId)->first();
-                // if ($getBooking) {
-                //     $getBooking->bookingDetails()->delete();
-                //     $getBooking->delete();
-                // }
+            if ($statusCode === '15') {
+
+                // FAILED PAYMENT
                 $getBooking = booking::with(['customer', 'vendors', 'bookingDetails'])
                             ->where('pbb_id', $bookingId)->first();
 
-                $platform_fee_percentage = 10; // example: 10% commission
+                $platform_fee_percentage = 10;
                 $platform_fee = ($getBooking->pbb_total_amount * $platform_fee_percentage) / 100;
                 $vendor_amount = $getBooking->pbb_total_amount - $platform_fee;
 
@@ -178,7 +174,35 @@ class PaymentController extends Controller
                     'pbpt_status'           => 0, // 1 = success, 0 = pending, etc.
                     'pbpt_remarks'          => 'Auto-generated payment record'
                 ]);
-                 $getBooking->update(['pbb_status' => 5]);
+                
+                $getBooking->update(['pbb_status' => 5]);
+
+                $customer = customer::where('pbc_id', $customerId)->first();
+                if ($customer) {
+                    $failedTitle = 'Payment Failed';
+                    $failedMessage = 'Your payment for booking #' . $bookingRefNo . ' has failed. Please try again.';
+                    
+                    $customerNotification = $oneSignalService->sendToUser(
+                        $customer->pbu_id,
+                        $failedTitle,
+                        $failedMessage,
+                        [
+                            'booking_ref_no' => $bookingRefNo,
+                            'status' => 'failed',
+                            'booking_id' => $bookingId
+                        ]
+                    );
+                    
+                    if ($customerNotification) {
+                        notification::create([
+                            'pbn_user_id' => $customer->pbu_id,
+                            'pbn_type' => 'payment',
+                            'pbn_title' => $failedTitle,
+                            'pbn_message' => $failedMessage,
+                            'pbn_is_read' => 0,
+                        ]);
+                    }
+                }
                 
                 $status = false;
             }else{
@@ -194,36 +218,49 @@ class PaymentController extends Controller
 
                 $getBooking->update(['pbb_status' => 1]);
 
-                $notification_title = 'Booking Confirmed!';
-                $notification_message = 'Booking added successfully!. Your booking reference no:'. $bookingRefNo;
-                $booking_details_for_notification = [
-                    'booking_ref_no' => $bookingRefNo,
-                    'booking_date' => $getBooking->pbb_booking_date,
-                    'booking_start_time' => $getBooking->pbb_booking_start_time,
-                    'booking_end_time' => $getBooking->pbb_booking_end_time,
-                    'total_amount' => $getBooking->pbb_total_amount,
-                ];
+                $platform_fee_percentage = 10; // example: 10% commission
+                $platform_fee = ($getBooking->pbb_total_amount * $platform_fee_percentage) / 100;
+                $vendor_amount = $getBooking->pbb_total_amount - $platform_fee;
 
-                $vendors_user = User::where('pbu_vid', $vendorId)->first();
-                Log::info('Vendors User:', ['Response' => $vendors_user->pbu_id]);
-                $booking_notification = $oneSignalService->sendToUser(
-                    $vendors_user->pbu_id,
-                    $notification_title,
-                    $notification_message,
-                    $booking_details_for_notification
+                $payment = paymentTransection::create([
+                    'pbpt_transaction_id'   => uniqid('TXN_'), // unique transaction ID
+                    'pbpt_booking_id'       => $getBooking->pbb_id,
+                    'pbpt_vendor_id'        => $vendorId,
+                    'pbpt_customer_id'      => $customerId,
+                    'pbpt_payment_method'   => 'Online', // fallback
+                    'pbpt_total_amount'     => $getBooking->pbb_total_amount,
+                    'pbpt_discount_amount'  => 0, // you can add logic if promo applied
+                    'pbpt_final_amount'     => $getBooking->pbb_total_amount,
+                    'pbpt_platform_fee'     => $platform_fee,
+                    'pbpt_vendor_amount'    => $vendor_amount,
+                    'pbpt_payment_response' => json_encode($paymentData), // store gateway response if online
+                    'pbpt_payment_ref_no'   => $orderReference,
+                    'pbpt_description'      => 'Payment for booking #' . $getBooking->pbb_ref_no,
+                    'pbpt_status'           => 1, // 1 = success, 0 = pending, etc.
+                    'pbpt_remarks'          => 'Auto-generated payment record'
+                ]);
+
+                Log::info('payment transection Response:', ['Response' => $payment]);
+                $vendorPayout = vendorPayouts::firstOrCreate(
+                    ['pbvp_vendor_id' => $vendorId],
+                    ['pbvp_total_earned' => 0, 'pbvp_total_paid' => 0, 'pbvp_total_due' => 0]
                 );
 
-                Log::info('booking_notification Response:', ['Response' => $booking_notification]);
-                if($booking_notification){
-                    notification::create([
-                        'pbn_user_id' => $customer->pbc_user_id,
-                        'pbn_type' => 'specific',
-                        'pbn_title' => $notification_title,
-                        'pbn_message' => $notification_message,
-                        'pbn_is_read' => 0,
-                    ]);
-                }
+                $vendorPayout->increment('pbvp_total_earned', $vendor_amount);
+                $vendorPayout->increment('pbvp_total_due', $vendor_amount);
 
+                $payoutItem = vendorPayoutItems::create([
+                    'pbvpi_payout_id'   => $vendorPayout->pbvp_id,
+                    'pbvpi_booking_id'  => $getBooking->pbb_id,
+                    'pbvpi_payment_id'  => $payment->pbpt_id,
+                    'pbvpi_amount'      => $getBooking->pbb_total_amount,
+                    'pbvpi_platform_fee'=> $platform_fee,
+                    'pbvpi_vendor_amount'=> $vendor_amount,
+                    'pbvpi_status'      => '0'
+                ]);
+                Log::info('vendor payouts Response:', ['Response' => $payoutItem]);
+
+                //SMS
                 $sms_customer_name = !empty($someoneDetails['name'])
                                     ? $someoneDetails['name']
                                     : $customer->pbc_first_name;
@@ -252,47 +289,75 @@ class PaymentController extends Controller
 
                 Log::info('booking_sms_result Response:', ['Response' => $booking_sms_result]);
 
-                $platform_fee_percentage = 10; // example: 10% commission
-                $platform_fee = ($getBooking->pbb_total_amount * $platform_fee_percentage) / 100;
-                $vendor_amount = $getBooking->pbb_total_amount - $platform_fee;
+                // Get customer user record
+                $customerUser = User::find($customerId);
+                
+                // Send notification to CUSTOMER for successful payment
+                if ($customerUser) {
+                    $customerNotificationTitle = 'Booking Confirmed!';
+                    $customerNotificationMessage = 'Booking added successfully!. Your booking reference no:'. $bookingRefNo;
+                    $customerNotificationData = [
+                        'booking_ref_no' => $bookingRefNo,
+                        'booking_id' => $bookingId,
+                        'status' => 'confirmed',
+                        'transaction_id' => $orderReference,
+                        'amount' => $getBooking->pbb_total_amount
+                    ];
 
-                $payment = paymentTransection::create([
-                    'pbpt_transaction_id'   => uniqid('TXN_'), // unique transaction ID
-                    'pbpt_booking_id'       => $getBooking->pbb_id,
-                    'pbpt_vendor_id'        => $vendorId,
-                    'pbpt_customer_id'      => $customerId,
-                    'pbpt_payment_method'   => 'Online', // fallback
-                    'pbpt_total_amount'     => $getBooking->pbb_total_amount,
-                    'pbpt_discount_amount'  => 0, // you can add logic if promo applied
-                    'pbpt_final_amount'     => $getBooking->pbb_total_amount,
-                    'pbpt_platform_fee'     => $platform_fee,
-                    'pbpt_vendor_amount'    => $vendor_amount,
-                    'pbpt_payment_response' => json_encode($paymentData), // store gateway response if online
-                    'pbpt_payment_ref_no'   => $orderReference,
-                    'pbpt_description'      => 'Payment for booking #' . $getBooking->pbb_ref_no,
-                    'pbpt_status'           => 1, // 1 = success, 0 = pending, etc.
-                    'pbpt_remarks'          => 'Auto-generated payment record'
-                ]);
-                Log::info('payment transection Response:', ['Response' => $payment]);
-                $vendorPayout = vendorPayouts::firstOrCreate(
-                    ['pbvp_vendor_id' => $vendorId],
-                    ['pbvp_total_earned' => 0, 'pbvp_total_paid' => 0, 'pbvp_total_due' => 0]
+                    $customerNotificationResult = $oneSignalService->sendToUser(
+                        $customerUser->pbu_id,
+                        $customerNotificationTitle,
+                        $customerNotificationMessage,
+                        $customerNotificationData
+                    );
+
+                    Log::info('Customer Notification Response:', ['Response' => $customerNotificationResult]);
+                    
+                    if ($customerNotificationResult) {
+                        notification::create([
+                            'pbn_user_id' => $customerUser->pbu_id,
+                            'pbn_type' => 'booking',
+                            'pbn_title' => $customerNotificationTitle,
+                            'pbn_message' => $customerNotificationMessage,
+                            'pbn_is_read' => 0,
+                        ]);
+                    }
+                }
+
+                // Send notification to VENDOR for new booking (your existing code)
+                $vendorUser = User::where('pbu_vid', $vendorId)->first();
+                Log::info('Vendors User:', ['Response' => $vendorUser->pbu_id]);
+                
+                $vendorNotificationTitle = 'New Booking Received!';
+                $vendorNotificationMessage = 'You have received a new booking #' . $bookingRefNo;
+                $vendorNotificationData = [
+                    'booking_ref_no' => $bookingRefNo,
+                    'booking_date' => $getBooking->pbb_booking_date,
+                    'booking_start_time' => $getBooking->pbb_booking_start_time,
+                    'booking_end_time' => $getBooking->pbb_booking_end_time,
+                    'total_amount' => $getBooking->pbb_total_amount,
+                    'customer_name' => $customer->pbc_first_name,
+                    'booking_id' => $bookingId
+                ];
+
+                $vendorNotificationResult = $oneSignalService->sendToUser(
+                    $vendorUser->pbu_id,
+                    $vendorNotificationTitle,
+                    $vendorNotificationMessage,
+                    $vendorNotificationData
                 );
 
-                $vendorPayout->increment('pbvp_total_earned', $vendor_amount);
-                $vendorPayout->increment('pbvp_total_due', $vendor_amount);
-
-                $payoutItem = vendorPayoutItems::create([
-                    'pbvpi_payout_id'   => $vendorPayout->pbvp_id,
-                    'pbvpi_booking_id'  => $getBooking->pbb_id,
-                    'pbvpi_payment_id'  => $payment->pbpt_id,
-                    'pbvpi_amount'      => $getBooking->pbb_total_amount,
-                    'pbvpi_platform_fee'=> $platform_fee,
-                    'pbvpi_vendor_amount'=> $vendor_amount,
-                    'pbvpi_status'      => '0'
-                ]);
-                Log::info('vendor payouts Response:', ['Response' => $payoutItem]);
-
+                Log::info('Vendor Notification Response:', ['Response' => $vendorNotificationResult]);
+                
+                if ($vendorNotificationResult) {
+                    notification::create([
+                        'pbn_user_id' => $vendorUser->pbu_id,
+                        'pbn_type' => 'booking',
+                        'pbn_title' => $vendorNotificationTitle,
+                        'pbn_message' => $vendorNotificationMessage,
+                        'pbn_is_read' => 0,
+                    ]);
+                }
                 $status = true;
             }
 
