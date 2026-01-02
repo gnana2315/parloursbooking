@@ -128,9 +128,9 @@ class PaymentController extends Controller
                 $orderId,
                 $orderReference,
                 $transactionDate,
-                $gateway,
                 $statusCode,
-                $comment
+                $comment,
+                $gateway
             ] = array_pad($paymentData, 6, null);
 
             Log::info('Payment Data:', ['Response' => $paymentData]);
