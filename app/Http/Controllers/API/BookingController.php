@@ -178,7 +178,7 @@ class BookingController extends Controller
 
         $existingBookings = booking::where('pbb_vendor_id', $vendorId)
             ->where('pbb_booking_date', $bookingDate)
-            ->where('pbb_status', '=', 2)
+            ->where('pbb_status', '=', 1)
             ->orderBy('pbb_booking_start_time')
             ->get();
 
@@ -601,7 +601,7 @@ class BookingController extends Controller
         // ✅ Prevent overlapping bookings (for same vendor)
         $overlappingBooking = Booking::where('pbb_vendor_id', $request->vendor_id)
             ->where('pbb_booking_date', $request->booking_date)
-            ->whereIn('pbb_status', [2])
+            ->whereIn('pbb_status', [1])
             ->where(function ($q) use ($request) {
                 $q->whereBetween('pbb_booking_start_time', [$request->booking_start_time, $request->booking_end_time])
                 ->orWhereBetween('pbb_booking_end_time', [$request->booking_start_time, $request->booking_end_time])
@@ -635,7 +635,7 @@ class BookingController extends Controller
                 'pbb_total_amount' => $total_amount,
                 'pbb_discounts' => 0,
                 'pbb_contact_no' => ($request->booking_for_someone == 1) ? $request->someone_contact_no : $customer->customer_contact_no,
-                'pbb_status' => 1
+                'pbb_status' => 3
             ]);
         } catch (\Illuminate\Database\QueryException $e) {
             if ($e->errorInfo[1] == 1062) { // duplicate entry
@@ -843,7 +843,7 @@ class BookingController extends Controller
             // 4️⃣ Prevent overlapping bookings
             $overlappingBooking = Booking::where('pbb_vendor_id', $request->vendor_id)
                                 ->where('pbb_booking_date', $request->booking_date)
-                                ->whereIn('pbb_status', [2])
+                                ->whereIn('pbb_status', [1])
                                 ->where(function ($q) use ($request) {
                                     $q->where('pbb_booking_start_time', '<', $request->booking_end_time)
                                     ->where('pbb_booking_end_time', '>', $request->booking_start_time);
@@ -879,7 +879,7 @@ class BookingController extends Controller
                 'pbb_total_amount' => $total_amount,
                 'pbb_discounts' => 0,
                 'pbb_contact_no' => $request->booking_for_someone == 1 ? $request->someone_contact_no : $customer->pbc_contact_no,
-                'pbb_status' => 1,
+                'pbb_status' => 3,
             ]);
 
             // 6️⃣ Create booking details
@@ -1204,7 +1204,7 @@ class BookingController extends Controller
         // 4️⃣ Prevent overlapping bookings
         $overlappingBooking = Booking::where('pbb_vendor_id', $request->vendor_id)
                             ->where('pbb_booking_date', $request->booking_date)
-                            ->whereIn('pbb_status', [2])
+                            ->whereIn('pbb_status', [1])
                             ->where(function ($q) use ($request) {
                                 $q->where('pbb_booking_start_time', '<', $request->booking_end_time)
                                 ->where('pbb_booking_end_time', '>', $request->booking_start_time);
@@ -1231,7 +1231,7 @@ class BookingController extends Controller
             'pbb_type' => 'Manual',
             'pbb_service_location' => $request->service_location,
             'pbb_contact_no' => ($request->booking_for_someone == 1) ? $request->someone_contact_no : $customer->customer_contact_no,
-            'pbb_status' => 2
+            'pbb_status' => 1
         ]);
         Log::info('addManualBooking Response:', ['Response' => $addbooking]);
         if ($addbooking) {

@@ -142,7 +142,7 @@ class PaymentController extends Controller
                 $vendorId,
                 $customerId
             ] = array_pad($customData, 4, null);
-
+            Log::info('Custom Fields:', ['Response' => $customData]);
             Log::info('Payment Status Code:', ['Response' => $statusCode]);
 
             // 6️⃣ Handle payment status
@@ -191,7 +191,7 @@ class PaymentController extends Controller
                 $bookingDetails = $getBooking->bookingDetails;
                 $someoneDetails = json_decode($getBooking->someone_details, true);
 
-                $getBooking->update(['pbb_status' => 2]); // 2 = Confirmed/Paid
+                $getBooking->update(['pbb_status' => 1]);
 
                 $notification_title = 'Booking Confirmed!';
                 $notification_message = 'Booking added successfully!. Your booking reference no:'. $bookingRefNo;
