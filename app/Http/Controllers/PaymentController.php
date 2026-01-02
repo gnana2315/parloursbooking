@@ -133,6 +133,7 @@ class PaymentController extends Controller
                 $comment
             ] = array_pad($paymentData, 6, null);
 
+            Log::info('Payment Data:', ['Response' => $paymentData]);
             // 5️⃣ Decode custom fields
             // Format: ref_no|booking_id|vendor_id|customer_id
             $customData = explode('|', $custom_fields);
@@ -142,7 +143,7 @@ class PaymentController extends Controller
                 $vendorId,
                 $customerId
             ] = array_pad($customData, 4, null);
-            Log::info('Custom Fields:', ['Response' => $customData]);
+            
             Log::info('Payment Status Code:', ['Response' => $statusCode]);
 
             // 6️⃣ Handle payment status
