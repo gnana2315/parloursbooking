@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Carbon\Carbon;
 use App\Models\booking;
 use App\Models\notification;
+use App\Models\User;
 
 use App\Services\OneSignalService;
 use Illuminate\Support\Facades\Log;
@@ -57,15 +58,16 @@ class SendBookingReminders extends Command
 
             $vendor = $booking->vendors->first();
             $customer = $booking->customer;
+            $getUser = User::where('pbu_vid', $vendor->pbv_id)->first();
             $vendorName = $booking->vendors->first()?->pbv_business_name ?? 'N/A';
-            $vendorContactNo = $booking->vendors->first()?->pbv_contact_number ?? 'N/A';
+            $vendorContactNo = $booking->vendors->first()?->pbv_contact_number ? $booking->vendors->first()?->pbv_contact_number : $getUser?->pbu_mobileno ?? 'N/A';
 
             Log::info("Preparing to send reminder for booking ID: {$booking->pbb_id} to customer user ID: {$customer->pbc_user_id}"); 
             // 🔔 Push Notification
             $customerReminderNotification = $oneSignalService->sendToUser(
                 $customer->pbc_user_id,
                 '⏰ Booking Reminder',
-                "Gentle Reminder: Gentle reminder: Your appointment today at {$booking->pbb_booking_start_time->format('h:i A')} with {$vendorName}. For assistance, please contact the parlour at {$vendorContactNo}.",
+                "Gentle Reminder: Your appointment today at {$booking->pbb_booking_start_time->format('h:i A')} with {$vendorName}. For assistance, please contact the parlour at {$vendorContactNo}.",
                 [
                     'booking_id' => $booking->pbb_id,
                     'booking_ref_no' => $booking->pbb_ref_no,
@@ -81,7 +83,7 @@ class SendBookingReminders extends Command
                     'pbn_user_id' => $customer->pbc_user_id,
                     'pbn_type' => 'reminder',
                     'pbn_title' => 'Booking Reminder',
-                    'pbn_message' => "Gentle Reminder: Gentle reminder: Your appointment today at {$booking->pbb_booking_start_time->format('h:i A')} with {$vendorName}. For assistance, please contact the parlour at {$vendorContactNo}.",
+                    'pbn_message' => "Gentle Reminder: Your appointment today at {$booking->pbb_booking_start_time->format('h:i A')} with {$vendorName}. For assistance, please contact the parlour at {$vendorContactNo}.",
                 ]);
 
                 $this->info("Reminder sent for booking ID: {$booking->pbb_id}");
