@@ -46,6 +46,12 @@ class SendBookingReminders extends Command
             ])
             ->get();
 
+        if ($bookings->isEmpty()) {
+            $this->info('No bookings found for reminders at this time.');
+            Log::info('Booking reminder command triggered at ' . now() . ' - No bookings to process.');
+            return Command::SUCCESS;
+        }
+
         foreach ($bookings as $booking) {
 
             $vendor = $booking->vendors->first();
