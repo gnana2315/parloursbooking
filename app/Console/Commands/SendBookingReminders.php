@@ -44,15 +44,8 @@ class SendBookingReminders extends Command
             ", [
                 $now->copy()->addHours($durationVariable),
                 $now->copy()->addHours($durationVariable)->addMinutes(1)
-            ]);
-            //->get();
-        $sql = $bookings->toSql();        // prints SQL with placeholders
-        $bindings = $bookings->getBindings(); // prints the actual values
-        $bookings = $bookings->get();
-
-        Log::info('Booking Reminder Command: SQL Query - ' . $sql);
-        Log::info('Booking Reminder Command: Bindings - ' . implode(', ', $bindings));
-        Log::info('Booking Reminder Command: Found ' . $bookings->count() . ' bookings to process.');
+            ])
+            ->get();
 
         if ($bookings->isEmpty()) {
             $this->info('No bookings found for reminders at this time.');
@@ -67,6 +60,7 @@ class SendBookingReminders extends Command
             $vendorName = $booking->vendors->first()?->pbv_business_name ?? 'N/A';
             $vendorContactNo = $booking->vendors->first()?->pbv_contact_number ?? 'N/A';
 
+            Log::info("Preparing to send reminder for booking ID: {$booking->pbb_id} to customer user ID: {$customer->pbc_user_id}"); 
             // 🔔 Push Notification
             $customerReminderNotification = $oneSignalService->sendToUser(
                 $customer->pbc_user_id,
