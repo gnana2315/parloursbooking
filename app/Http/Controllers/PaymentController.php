@@ -13,6 +13,7 @@ use App\Models\vendorPayoutHistory;
 use App\Models\User;
 use App\Models\booking;
 use App\Models\notification;
+use App\Models\customer;
 
 use App\Services\WebXPayService;
 use App\Services\OneSignalService;
