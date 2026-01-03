@@ -46,6 +46,11 @@ class SendBookingReminders extends Command
                 $now->copy()->addHours($durationVariable)->addMinutes(1)
             ])
             ->get();
+        $sql = $bookings->toSql();        // prints SQL with placeholders
+        $bindings = $bookings->getBindings(); // prints the actual values
+
+        Log::info('Booking Reminder Command: SQL Query - ' . $sql);
+        Log::info('Booking Reminder Command: Bindings - ' . implode(', ', $bindings));
         Log::info('Booking Reminder Command: Found ' . $bookings->count() . ' bookings to process.');
 
         if ($bookings->isEmpty()) {
