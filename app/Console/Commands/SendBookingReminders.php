@@ -60,7 +60,7 @@ class SendBookingReminders extends Command
             $customer = $booking->customer;
             $getUser = User::where('pbu_vid', $vendor->pbv_id)->first();
             $vendorName = $booking->vendors->first()?->pbv_business_name ?? 'N/A';
-            $vendorContactNo = $booking->vendors->first()?->pbv_contact_number ? $booking->vendors->first()?->pbv_contact_number : $getUser?->pbu_mobileno ?? 'N/A';
+            $vendorContactNo = $booking->vendors->first()?->pbv_contactno ? $booking->vendors->first()?->pbv_contactno : $getUser?->pbu_mobileno ?? 'N/A';
 
             Log::info("Preparing to send reminder for booking ID: {$booking->pbb_id} to customer user ID: {$customer->pbc_user_id}"); 
             // 🔔 Push Notification
