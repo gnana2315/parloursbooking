@@ -5,6 +5,8 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Carbon\Carbon;
 use App\Models\booking;
+use App\Models\notification;
+
 use App\Services\OneSignalService;
 use Illuminate\Support\Facades\Log;
 
@@ -30,6 +32,7 @@ class SendBookingReminders extends Command
     public function handle(OneSignalService $oneSignalService)
     {
         $now = Carbon::now();
+        $durationVariable = 3;
 
         // 🔔 Send reminder 30 minutes before booking
         $bookings = booking::with(['customer', 'vendors'])
@@ -39,10 +42,8 @@ class SendBookingReminders extends Command
                 TIMESTAMP(pbb_booking_date, pbb_booking_start_time)
                 BETWEEN ? AND ?
             ", [
-                // $now->copy()->addMinutes(29),
-                // $now->copy()->addMinutes(30)
-                $now,
-                $now->copy()->addHours(24)
+                $now->copy()->addHours($durationVariable),
+                $now->copy()->addHours($durationVariable)->addMinutes(1)
             ])
             ->get();
 
@@ -56,25 +57,39 @@ class SendBookingReminders extends Command
 
             $vendor = $booking->vendors->first();
             $customer = $booking->customer;
+            $vendorName = $booking->vendors->first()?->pbv_business_name ?? 'N/A';
+            $vendorContactNo = $booking->vendors->first()?->pbv_contact_number ?? 'N/A';
 
             // 🔔 Push Notification
-            $oneSignalService->sendToUser(
+            $customerReminderNotification = $oneSignalService->sendToUser(
                 $customer->pbc_user_id,
                 '⏰ Booking Reminder',
-                "Reminder: Your appointment is at {$booking->pbb_booking_start_time->format('h:i A')}. Your Booking Reference No is {$booking->pbb_ref_no}.",
+                "Gentle Reminder: Gentle reminder: Your appointment today at {$booking->pbb_booking_start_time->format('h:i A')} with {$vendorName}. For assistance, please contact the parlour at {$vendorContactNo}.",
                 [
                     'booking_id' => $booking->pbb_id,
                     'booking_ref_no' => $booking->pbb_ref_no,
                 ]
             );
 
-            // ✅ Mark reminder sent
-            $booking->update(['pbb_reminder_sent' => 1]);
+            if ($customerReminderNotification) {
+                // ✅ Mark reminder sent
+                $booking->update(['pbb_reminder_sent' => 1]);
 
-            $this->info("Reminder sent for booking ID: {$booking->pbb_id}");
-            Log::info("Booking reminder command triggered at " . now());
+                // 📲 Log notification
+                notification::create([
+                    'pbn_user_id' => $customer->pbc_user_id,
+                    'pbn_type' => 'reminder',
+                    'pbn_title' => 'Booking Reminder',
+                    'pbn_message' => "Gentle Reminder: Gentle reminder: Your appointment today at {$booking->pbb_booking_start_time->format('h:i A')} with {$vendorName}. For assistance, please contact the parlour at {$vendorContactNo}.",
+                ]);
+
+                $this->info("Reminder sent for booking ID: {$booking->pbb_id}");
+                Log::info("Booking reminder command triggered at " . now());
+            }else{
+                Log::error("Failed to send reminder notification for booking ID: {$booking->pbb_id}");
+                continue; // Skip to next booking if notification fails
+            }
         }
-
         return Command::SUCCESS;
     }
 }
