@@ -38,8 +38,10 @@ class SendBookingReminders extends Command
                 TIMESTAMP(pbb_booking_date, pbb_booking_start_time)
                 BETWEEN ? AND ?
             ", [
-                $now->copy()->addMinutes(29),
-                $now->copy()->addMinutes(30)
+                // $now->copy()->addMinutes(29),
+                // $now->copy()->addMinutes(30)
+                $now,
+                $now->copy()->addHours(24)
             ])
             ->get();
 
