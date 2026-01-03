@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Carbon\Carbon;
 use App\Models\booking;
 use App\Services\OneSignalService;
+use Illuminate\Support\Facades\Log;
 
 class SendBookingReminders extends Command
 {
