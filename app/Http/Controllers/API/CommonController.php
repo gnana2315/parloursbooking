@@ -1328,6 +1328,8 @@ class CommonController extends Controller
             $request->title,
             $request->message
         );
+
+        Log::info('Test Notification Response:', ['Response' => $notification]);
         
         if(!$notification){
             $status = false;

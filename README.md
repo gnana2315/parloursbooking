@@ -1,5 +1,5 @@
 Booking Status
-0 - Vendor Canceled the Booking through Admin
+0 - Vendor/Customer Canceled the Booking through Admin
 1 - Upcoming/Payment Completed
 2 - Service Completed
 3 - Pending

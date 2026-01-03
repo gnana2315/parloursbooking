@@ -1338,7 +1338,7 @@ class BookingController extends Controller
      * )
     */
 
-    public function markBookingStatus(Request $request){
+    public function markBookingStatus(Request $request,  OneSignalService $oneSignalService){
         Log::info('Mark Booking Status Requests:', ['Requests' => $request->all()]);
         $user = auth()->user();
 
@@ -1364,9 +1364,44 @@ class BookingController extends Controller
         $booking->pbb_status = $request->booking_status; // Assuming 3 is the status code for completed bookings
         $booking->save();
 
+        if($request->booking_status == 4){
+            // If booking is marked as 'No Customer', initiate notification.
+            $customerUser = User::find($booking->pbb_customer_id);
+                
+            // Send notification to CUSTOMER for successful payment
+            if ($customerUser) {
+                $customerNotificationTitle = 'Booking Cancelled!';
+                $customerNotificationMessage = 'Booking Cancelled due to your absense. Your booking reference no: '. $booking->pbb_ref_no;
+                $customerNotificationData = [
+                    'booking_ref_no' => $booking->pbb_ref_no,
+                    'booking_id' => $booking->pbb_id,
+                    'status' => $booking->pbb_status,
+                    'transaction_id' => $booking->pbb_ref_no,
+                    'amount' => $booking->pbb_total_amount
+                ];
+
+                $customerNotificationResult = $oneSignalService->sendToUser(
+                    $customerUser->pbu_id,
+                    $customerNotificationTitle,
+                    $customerNotificationMessage,
+                    $customerNotificationData
+                );
+                    
+                if ($customerNotificationResult) {
+                    notification::create([
+                        'pbn_user_id' => $customerUser->pbu_id,
+                        'pbn_type' => 'Booking Cancelled',
+                        'pbn_title' => $customerNotificationTitle,
+                        'pbn_message' => $customerNotificationMessage,
+                        'pbn_is_read' => 0,
+                    ]);
+                }
+            }
+        }
+
         return response()->json([
             'status' => true,
-            'message' => 'Booking marked as completed successfully',
+            'message' => 'Booking status marked successfully',
         ], 200);
     }
 
