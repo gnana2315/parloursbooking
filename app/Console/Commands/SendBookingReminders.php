@@ -46,6 +46,7 @@ class SendBookingReminders extends Command
                 $now->copy()->addHours($durationVariable)->addMinutes(1)
             ])
             ->get();
+        Log::info('Booking Reminder Command: Found ' . $bookings->count() . ' bookings to process.');
 
         if ($bookings->isEmpty()) {
             $this->info('No bookings found for reminders at this time.');
