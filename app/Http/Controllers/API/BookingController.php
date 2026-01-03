@@ -1390,7 +1390,7 @@ class BookingController extends Controller
                     
                 if ($customerNotificationResult) {
                     notification::create([
-                        'pbn_user_id' => $customerUser->pbu_id,
+                        'pbn_user_id' => $customerUser->pbc_user_id,
                         'pbn_type' => 'Booking Cancelled',
                         'pbn_title' => $customerNotificationTitle,
                         'pbn_message' => $customerNotificationMessage,
