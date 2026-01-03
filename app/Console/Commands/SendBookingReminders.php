@@ -67,7 +67,7 @@ class SendBookingReminders extends Command
             $customerReminderNotification = $oneSignalService->sendToUser(
                 $customer->pbc_user_id,
                 '⏰ Booking Reminder',
-                "Gentle Reminder: Your appointment today at {$booking->pbb_booking_start_time->format('h:i A')} with {$vendorName}. For assistance, please contact the parlour at {$vendorContactNo}.",
+                "Your appointment today at {$booking->pbb_booking_start_time->format('h:i A')} with {$vendorName}. For assistance, please contact the parlour at {$vendorContactNo}.",
                 [
                     'booking_id' => $booking->pbb_id,
                     'booking_ref_no' => $booking->pbb_ref_no,
@@ -83,7 +83,7 @@ class SendBookingReminders extends Command
                     'pbn_user_id' => $customer->pbc_user_id,
                     'pbn_type' => 'reminder',
                     'pbn_title' => 'Booking Reminder',
-                    'pbn_message' => "Gentle Reminder: Your appointment today at {$booking->pbb_booking_start_time->format('h:i A')} with {$vendorName}. For assistance, please contact the parlour at {$vendorContactNo}.",
+                    'pbn_message' => "Your appointment today at {$booking->pbb_booking_start_time->format('h:i A')} with {$vendorName}. For assistance, please contact the parlour at {$vendorContactNo}.",
                 ]);
 
                 $this->info("Reminder sent for booking ID: {$booking->pbb_id}");
