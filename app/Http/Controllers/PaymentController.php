@@ -195,7 +195,7 @@ class PaymentController extends Controller
                     
                     if ($customerNotification) {
                         notification::create([
-                            'pbn_user_id' => $customer->pbu_id,
+                            'pbn_user_id' => $customer->pbc_customer_id,
                             'pbn_type' => 'payment',
                             'pbn_title' => $failedTitle,
                             'pbn_message' => $failedMessage,
