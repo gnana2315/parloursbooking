@@ -183,7 +183,7 @@ class PaymentController extends Controller
                     $failedMessage = 'Your payment for booking #' . $bookingRefNo . ' has failed. Please try again.';
                     
                     $customerNotification = $oneSignalService->sendToUser(
-                        $customer->pbu_id,
+                        $customer->pbc_user_id,
                         $failedTitle,
                         $failedMessage,
                         [
@@ -195,7 +195,7 @@ class PaymentController extends Controller
                     
                     if ($customerNotification) {
                         notification::create([
-                            'pbn_user_id' => $customer->pbc_customer_id,
+                            'pbn_user_id' => $customer->pbc_user_id,
                             'pbn_type' => 'payment',
                             'pbn_title' => $failedTitle,
                             'pbn_message' => $failedMessage,
@@ -290,7 +290,7 @@ class PaymentController extends Controller
                 Log::info('booking_sms_result Response:', ['Response' => $booking_sms_result]);
 
                 // Get customer user record
-                $customerUser = User::find($customerId);
+                $customerUser = customer::find($customerId);
                 
                 // Send notification to CUSTOMER for successful payment
                 if ($customerUser) {
@@ -305,7 +305,7 @@ class PaymentController extends Controller
                     ];
 
                     $customerNotificationResult = $oneSignalService->sendToUser(
-                        $customerUser->pbu_id,
+                        $customerUser->pbc_user_id,
                         $customerNotificationTitle,
                         $customerNotificationMessage,
                         $customerNotificationData
@@ -315,7 +315,7 @@ class PaymentController extends Controller
                     
                     if ($customerNotificationResult) {
                         notification::create([
-                            'pbn_user_id' => $customerUser->pbu_id,
+                            'pbn_user_id' => $customerUser->pbc_user_id,
                             'pbn_type' => 'booking',
                             'pbn_title' => $customerNotificationTitle,
                             'pbn_message' => $customerNotificationMessage,
