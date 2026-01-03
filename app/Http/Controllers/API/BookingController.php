@@ -1366,8 +1366,9 @@ class BookingController extends Controller
 
         if($request->booking_status == 4){
             // If booking is marked as 'No Customer', initiate notification.
-            $customerUser = User::find($booking->pbb_customer_id);
-                
+            $customerUser = customer::find($booking->pbb_customer_id);
+            
+            Log::info('Customer User Details:', ['CustomerUser' => $customerUser]);
             // Send notification to CUSTOMER for successful payment
             if ($customerUser) {
                 $customerNotificationTitle = 'Booking Cancelled!';
@@ -1381,7 +1382,7 @@ class BookingController extends Controller
                 ];
 
                 $customerNotificationResult = $oneSignalService->sendToUser(
-                    $customerUser->pbu_id,
+                    $customerUser->pbc_user_id,
                     $customerNotificationTitle,
                     $customerNotificationMessage,
                     $customerNotificationData
