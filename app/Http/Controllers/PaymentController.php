@@ -387,7 +387,7 @@ class PaymentController extends Controller
             // ], 500);
         }
 
-        $redirectUrl = "https://api.parloursbooking.com/c/bookings/payment-status?booking_id={$bookingRefNo}&payment_status=" . ($status ? 'success' : 'failed');
+        $redirectUrl = "https://api.parloursbooking.com/c/bookings/payment-status?booking_id={$bookingId}&payment_status=" . ($status ? 'success' : 'failed');
         return redirect()->away($redirectUrl, 303);
     }
 
