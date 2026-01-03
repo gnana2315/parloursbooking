@@ -65,6 +65,7 @@ class SendBookingReminders extends Command
             $booking->update(['pbb_reminder_sent' => 1]);
 
             $this->info("Reminder sent for booking ID: {$booking->pbb_id}");
+            Log::info("Booking reminder command triggered at " . now());
         }
 
         return Command::SUCCESS;
