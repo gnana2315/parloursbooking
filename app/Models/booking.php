@@ -44,7 +44,8 @@ class booking extends Model
         'created_at',
         'updated_at',
         'deleted_at',
-        'pbb_remarks'
+        'pbb_remarks',
+        'pbb_reminder_sent'
     ];
 
     protected $casts = [
