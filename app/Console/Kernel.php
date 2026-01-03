@@ -13,7 +13,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('bookings:send-reminders')
-             ->everyMinute()
+             ->everyHour()
              ->onOneServer()
              ->withoutOverlapping();
     }
