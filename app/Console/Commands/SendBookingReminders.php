@@ -14,7 +14,7 @@ class SendBookingReminders extends Command
      *
      * @var string
      */
-    protected $signature = 'app:send-booking-reminders';
+    protected $signature = 'bookings:send-reminders';
 
     /**
      * The console command description.

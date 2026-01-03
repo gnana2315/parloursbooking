@@ -12,7 +12,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('app:send-booking-reminders')
+        $schedule->command('bookings:send-reminders')
              ->everyMinute()
              ->onOneServer()
              ->withoutOverlapping();
