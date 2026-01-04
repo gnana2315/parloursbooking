@@ -20,7 +20,7 @@ use App\Models\booking;
 use App\Models\vendorPayouts;
 use App\Models\vendorPayoutItems;
 
-use Illuminate\Support\Facades\Validator;
+use Validator;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -30,7 +30,6 @@ use Illuminate\Support\Facades\File;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
-
 
 class VendorController extends Controller
 {   
@@ -193,61 +192,30 @@ class VendorController extends Controller
             return response()->json(['message' => 'Invalid vendor type'], 400);
         }
         
-        // if(empty($request->email)){
-        //     Log::warning('Step 3.3: Email is empty', ['request_data' => $request->all()]);
-        //     return response()->json(['message' => 'Email is required'], 400);
-        // }else{
-        //     if($vendor->pbv_email && $vendor->pbv_email == $request->email){
-        //         Log::warning('Step 3.4: Email mismatch', [
-        //             'vendor_email' => $vendor->pbv_email,
-        //             'request_email' => $request->email
-        //         ]);
-        //         return response()->json(['message' => 'Email already exists'], 400);
-        //     }
-        // }
-
-        // $lat = trim($request->latitude);
-        // $lng = trim($request->longatitude);
-
-        // if ($lat === '' || $lng === '' || floatval($lat) == 0.0 || floatval($lng) == 0.0) {
-        //     Log::warning('Step 3.5: Invalid location coordinates', [
-        //         'latitude' => $request->latitude,
-        //         'longatitude' => $request->longatitude
-        //     ]);
-        //     return response()->json(['message' => 'Location is required'], 400);
-        // }
-        Log::info('Step 4: Starting validation...');
-        $validator = Validator::make(
-            $request->all(),
-            [
-                'business_name' => 'required',
-                'address' => 'required',
-                'city_id' => 'required',
-                'longatitude' => 'required',
-                'latitude' => 'required',
-                'email' => 'required|email|unique:vendor,pbv_email',
-                'contact_no' => 'required|unique:vendor,pbv_contactno'
-            ],
-            [
-                'business_name.required' => 'Parlour name is required 1',
-                'address.required' => 'Address is required',
-                'city_id.required' => 'City is required',
-                'longatitude.required' => 'Location is required',
-                'latitude.required' => 'Location is required',
-                'email.required' => 'Email is required',
-                'email.email' => 'Email must be a valid email address',
-                'email.unique' => 'Email already exists',
-                'contact_no.required' => 'Contact No is required',
-                'contact_no.unique' => 'Contact No already exists'
-            ]
-        );
-
-        Log::info('Validation:', ['Validation' => $validator]);
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => $validator->errors()->first()
-            ], 400);
+        if(empty($request->email)){
+            Log::warning('Step 3.3: Email is empty', ['request_data' => $request->all()]);
+            return response()->json(['message' => 'Email is required'], 400);
+        }else{
+            if($vendor->pbv_email && $vendor->pbv_email == $request->email){
+                Log::warning('Step 3.4: Email mismatch', [
+                    'vendor_email' => $vendor->pbv_email,
+                    'request_email' => $request->email
+                ]);
+                return response()->json(['message' => 'Email already exists'], 400);
+            }
         }
+
+        $lat = trim($request->latitude);
+        $lng = trim($request->longatitude);
+
+        if ($lat === '' || $lng === '' || floatval($lat) == 0.0 || floatval($lng) == 0.0) {
+            Log::warning('Step 3.5: Invalid location coordinates', [
+                'latitude' => $request->latitude,
+                'longatitude' => $request->longatitude
+            ]);
+            return response()->json(['message' => 'Location is required'], 400);
+        }
+        Log::info('Step 4: Starting validation...');
         // $request->validate(
         //     [
         //         'business_name' => 'required',
@@ -255,8 +223,7 @@ class VendorController extends Controller
         //         'city_id' => 'required',
         //         'longatitude' => 'required',
         //         'latitude' => 'required',
-        //         'email' => 'required|email|unique:vendor,pbv_email',
-        //         'contact_no' => 'required|unique:vendor,pbv_contactno'
+        //         'email' => 'email|unique:vendor,pbv_email',
         //     ],
         //     [
         //         'business_name.required' => 'Parlour name is required',
@@ -264,46 +231,43 @@ class VendorController extends Controller
         //         'city_id.required' => 'City is required',
         //         'longatitude.required' => 'Location is required',
         //         'latitude.required' => 'Location is required',
-        //         'email.required' => 'Email is required',
         //         'email.email' => 'Email must be a valid email address',
-        //         'email.unique' => 'Email already exists',
-        //         'contact_no.required' => 'Contact No is required',
-        //         'contact_no.unique' => 'Contact No already exists'
+        //         'email.unique' => 'Email already exists'
         //     ]
         // );
-        // try {
-        //     $validated = $request->validate(
-        //         [
-        //             'business_name' => 'required',
-        //             'address' => 'required',
-        //             'city_id' => 'required',
-        //             'longatitude' => 'required',
-        //             'latitude' => 'required',
-        //             'email' => 'required|email|unique:vendor,pbv_email',
-        //             'contact_no' => 'required|unique:vendor,pbv_contactno'
-        //         ],                
-        //         [
-        //             'business_name.required' => 'Parlour name is required',
-        //             'address.required' => 'Address is required',
-        //             'city_id.required' => 'City is required',
-        //             'longatitude.required' => 'Location is required',
-        //             'latitude.required' => 'Location is required',
-        //             'email.required' => 'Email is required',
-        //             'email.email' => 'Email must be a valid email address',
-        //             'email.unique' => 'Email already exists',
-        //             'contact_no.required' => 'Contact No is required',
-        //             'contact_no.unique' => 'Contact No already exists'
-        //         ]
-        //     );
-        //     Log::info('Step 4.1: Validation successful', ['validated_data' => $validated]);
-        // } catch (ValidationException $e) {
-        //     $firstError = collect($e->errors())->flatten()->first();
-        //     Log::error('Step 4.2: Validation failed', ['error' => $firstError]);
-        //     return response()->json([
-        //         'message' => $firstError,
-        //         'data' => $user
-        //     ], 500);
-        // }
+        try {
+            $validated = $request->validate(
+                [
+                    'business_name' => 'required',
+                    'address' => 'required',
+                    'city_id' => 'required',
+                    'longatitude' => 'required',
+                    'latitude' => 'required',
+                    'email' => 'required|email|unique:vendor,pbv_email',
+                    'contact_no' => 'required|unique:vendor,pbv_contactno'
+                ],                
+                [
+                    'business_name.required' => 'Parlour name is required',
+                    'address.required' => 'Address is required',
+                    'city_id.required' => 'City is required',
+                    'longatitude.required' => 'Location is required',
+                    'latitude.required' => 'Location is required',
+                    'email.required' => 'Email is required',
+                    'email.email' => 'Email must be a valid email address',
+                    'email.unique' => 'Email already exists',
+                    'contact_no.required' => 'Contact No is required',
+                    'contact_no.unique' => 'Contact No already exists'
+                ]
+            );
+            Log::info('Step 4.1: Validation successful', ['validated_data' => $validated]);
+        } catch (ValidationException $e) {
+            $firstError = collect($e->errors())->flatten()->first();
+            Log::error('Step 4.2: Validation failed', ['error' => $firstError]);
+            return response()->json([
+                'message' => $firstError,
+                'data' => $user
+            ], 500);
+        }
 
         Log::info('Step 5: Attempting vendor update...');
         $vendorsUpdate = $vendor->update([ 
@@ -410,59 +374,53 @@ class VendorController extends Controller
         if ($vendor->pbv_vendortype != '2') {
             return response()->json(['message' => 'Invalid vendor type'], 400);
         }
+        
+        if(empty($request->email)){
+            Log::warning('Step 3.3: Email is empty', ['request_data' => $request->all()]);
+            return response()->json(['message' => 'Email is required'], 400);
+        }else{
+            if($vendor->pbv_email && $vendor->pbv_email == $request->email){
+                Log::warning('Step 3.4: Email mismatch', [
+                    'vendor_email' => $vendor->pbv_email,
+                    'request_email' => $request->email
+                ]);
+                return response()->json(['message' => 'Email already exists'], 400);
+            }
+        }
 
-        // $request->validate(
-        //     [
-        //         'address' => 'required',
-        //         'city_id' => 'required',
-        //         'service_area' => 'required',
-        //         'email' => 'required|email|unique:vendor,pbv_email',
-        //         'contact_no' => 'required|unique:vendor,pbv_contactno',
-        //         'nic_no' => 'required',
-        //     ],
-        //     [
-        //         'address.required' => 'Address is required',
-        //         'city_id.required' => 'City is required',
-        //         'service_area.required' => 'Service area is required',
-        //         'email.email' => 'Email must be a valid email address',
-        //         'email.required' => 'Email is required',
-        //         'email.unique' => 'Email already exists',
-        //         'contact_no.required' => 'Contact No is required',
-        //         'contact_no.unique' => 'Contact No already exists',
-        //         'nic_no.required' => 'NIC No is required',
-        //     ]
-        // );
-        $validator = Validator::make(
-            $request->all(),
+        $lat = trim($request->latitude);
+        $lng = trim($request->longatitude);
+
+        if ($lat === '' || $lng === '' || floatval($lat) == 0.0 || floatval($lng) == 0.0) {
+            Log::warning('Step 3.5: Invalid location coordinates', [
+                'latitude' => $request->latitude,
+                'longatitude' => $request->longatitude
+            ]);
+            return response()->json(['message' => 'Location is required'], 400);
+        }
+        Log::info('Step 4: Starting validation...');
+
+        $request->validate(
             [
-                'business_name' => 'required',
                 'address' => 'required',
                 'city_id' => 'required',
-                'longatitude' => 'required',
-                'latitude' => 'required',
+                'service_area' => 'required',
                 'email' => 'required|email|unique:vendor,pbv_email',
-                'contact_no' => 'required|unique:vendor,pbv_contactno'
+                'contact_no' => 'required|unique:vendor,pbv_contactno',
+                'nic_no' => 'required',
             ],
             [
-                'business_name.required' => 'Parlour name is required',
                 'address.required' => 'Address is required',
                 'city_id.required' => 'City is required',
-                'longatitude.required' => 'Location is required',
-                'latitude.required' => 'Location is required',
-                'email.required' => 'Email is required',
+                'service_area.required' => 'Service area is required',
                 'email.email' => 'Email must be a valid email address',
+                'email.required' => 'Email is required',
                 'email.unique' => 'Email already exists',
                 'contact_no.required' => 'Contact No is required',
-                'contact_no.unique' => 'Contact No already exists'
+                'contact_no.unique' => 'Contact No already exists',
+                'nic_no.required' => 'NIC No is required',
             ]
         );
-
-        if ($validator->fails()) {
-            Log::info('Validation failed:', ['errors' => $validator->errors()]);
-            return response()->json([
-                'message' => $validator->errors()->first()
-            ], 400);
-        }
 
         $therapist_name = $user->pbu_first_name . ' ' .$user->pbu_last_name;
         $vendorsUpdate = $vendor->update([ 
@@ -2608,7 +2566,6 @@ class VendorController extends Controller
         $allHaveValues = collect($vendorInfoFields)->every(function ($field) use ($vendor) {
             return !is_null($vendor->$field);
         });
-
         
         // $documents = vendorDocuments::where('pbvd_vendor_id', $vendor->pbv_id)
         //     ->whereIn('pbvd_required_document_id', $documentIds)
