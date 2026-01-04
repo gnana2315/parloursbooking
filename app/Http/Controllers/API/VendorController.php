@@ -2605,9 +2605,14 @@ class VendorController extends Controller
             return response()->json(['message' => 'Invalid vendor type'], 400);
         }
 
-        $allHaveValues = collect($vendorInfoFields)->every(function ($field) use ($vendor) {
-            return !is_null($vendor->$field);
-        });
+        // $allHaveValues = collect($vendorInfoFields)->every(function ($field) use ($vendor) {
+        //     return !is_null($vendor->$field);
+        // });
+
+        $allHaveValues = collect($vendorInfoFields)->filter(function ($field) use ($vendor) {
+            return !isset($vendor->$field) || trim($vendor->$field) === '';
+        })->values();
+
         
         // $documents = vendorDocuments::where('pbvd_vendor_id', $vendor->pbv_id)
         //     ->whereIn('pbvd_required_document_id', $documentIds)
