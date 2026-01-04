@@ -20,7 +20,7 @@ use App\Models\booking;
 use App\Models\vendorPayouts;
 use App\Models\vendorPayoutItems;
 
-use Validator;
+use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -241,6 +241,8 @@ class VendorController extends Controller
                 'contact_no.unique' => 'Contact No already exists'
             ]
         );
+
+        Log::info('Validation:', ['Validation' => $validator]);
         if ($validator->fails()) {
             return response()->json([
                 'message' => $validator->errors()->first()
@@ -454,8 +456,6 @@ class VendorController extends Controller
                 'contact_no.unique' => 'Contact No already exists'
             ]
         );
-
-        
 
         if ($validator->fails()) {
             Log::info('Validation failed:', ['errors' => $validator->errors()]);
