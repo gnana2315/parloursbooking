@@ -33,19 +33,25 @@ class SendBookingReminders extends Command
     public function handle(OneSignalService $oneSignalService)
     {
         $now = Carbon::now();
+        $start = Carbon::today()->startOfDay();   // 00:00:00
+        $end = Carbon::today()->endOfDay();     // 23:59:59
         $durationVariable = 3;
 
         // 🔔 Send reminder 30 minutes before booking
         $bookings = booking::with(['customer', 'vendors'])
             ->where('pbb_status', 1) // confirmed
             ->where('pbb_reminder_sent', 0)
-            ->whereRaw("
-                TIMESTAMP(pbb_booking_date, pbb_booking_start_time)
-                BETWEEN ? AND ?
-            ", [
-                $now->copy()->addHours($durationVariable),
-                $now->copy()->addHours($durationVariable)->addMinutes(1)
-            ])
+            // ->whereRaw("
+            //     TIMESTAMP(pbb_booking_date, pbb_booking_start_time)
+            //     BETWEEN ? AND ?
+            // ", [
+            //     $now->copy()->addHours($durationVariable),
+            //     $now->copy()->addHours($durationVariable)->addMinutes(1)
+            // ])
+            ->whereRaw(
+                "TIMESTAMP(pbb_booking_date, pbb_booking_start_time) BETWEEN ? AND ?",
+                [$start, $end]
+            )
             ->get();
 
         if ($bookings->isEmpty()) {
