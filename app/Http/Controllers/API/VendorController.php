@@ -229,7 +229,7 @@ class VendorController extends Controller
                 'contact_no' => 'required|unique:vendor,pbv_contactno'
             ],
             [
-                'business_name.required' => 'Parlour name is required',
+                'business_name.required' => 'Parlour name is required 1',
                 'address.required' => 'Address is required',
                 'city_id.required' => 'City is required',
                 'longatitude.required' => 'Location is required',
