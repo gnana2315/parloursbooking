@@ -455,7 +455,7 @@ class VendorController extends Controller
             ]
         );
 
-        Log::info('Validation:', ['Validation' => $validator]);
+        
 
         if ($validator->fails()) {
             Log::info('Validation failed:', ['errors' => $validator->errors()]);
