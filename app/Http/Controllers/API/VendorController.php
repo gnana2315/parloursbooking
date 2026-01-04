@@ -454,7 +454,11 @@ class VendorController extends Controller
                 'contact_no.unique' => 'Contact No already exists'
             ]
         );
+
+        Log::info('Validation:', ['Validation' => $validator]);
+
         if ($validator->fails()) {
+            Log::info('Validation failed:', ['errors' => $validator->errors()]);
             return response()->json([
                 'message' => $validator->errors()->first()
             ], 400);
