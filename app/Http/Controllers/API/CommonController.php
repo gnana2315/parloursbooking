@@ -330,12 +330,12 @@ class CommonController extends Controller
         $perPage = $request->get('per_page', 15);
         $vendors = $query->paginate($perPage);
 
-        Log::info('searchVendors Results:', ['Results' => $vendors]);
+        Log::info('searchVendors Results:', ['Results' => $vendors->items()]);
         
         if(!empty($vendors)){
             return response()->json([
                 'success' => true,
-                'data' => $vendors
+                'data' => $vendors->items()
             ], 200);
         }else{
             return response()->json([
