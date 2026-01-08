@@ -329,6 +329,8 @@ class CommonController extends Controller
         $query->where('pbv_status', 2); 
         $perPage = $request->get('per_page', 15);
         $vendors = $query->paginate($perPage);
+
+        Log::info('searchVendors Results:', ['Results' => $vendors]);
         
         if(!empty($vendors)){
             return response()->json([
