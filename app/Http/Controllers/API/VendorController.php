@@ -215,6 +215,35 @@ class VendorController extends Controller
             ]);
             return response()->json(['message' => 'Location is required'], 400);
         }
+
+        $contact_no = $request->contact_no;
+        if(empty($contact_no)){
+            Log::info('Step 3.6: Contact No is empty, using user mobile no', ['contact_no' => $contact_no]);
+            return response()->json(['message' => 'Contact No is required'], 400);
+        }else{
+            if($vendor->pbv_contactno && $vendor->pbv_contactno == $request->contact_no){
+                Log::warning('Step 3.4: Contact No mismatch', [
+                    'vendor_contactno' => $vendor->pbv_contactno,
+                    'request_contact_no' => $request->contact_no
+                ]);
+                return response()->json(['message' => 'Contact No already exists'], 400);
+            }
+        }
+
+        $br_no = $request->br_no;
+        if(empty($br_no)){
+            Log::info('Step 3.7: BR No is empty', ['br_no' => $br_no]);
+            return response()->json(['message' => 'BR No is required'], 400);
+        }else{
+            if($vendor->pbv_brno && $vendor->pbv_brno == $request->br_no){
+                Log::warning('Step 3.8: BR No mismatch', [
+                    'vendor_brno' => $vendor->pbv_brno,
+                    'request_br_no' => $request->br_no
+                ]);
+                return response()->json(['message' => 'BR No already exists'], 400);
+            }
+        }
+
         Log::info('Step 4: Starting validation...');
         // $request->validate(
         //     [
@@ -244,7 +273,8 @@ class VendorController extends Controller
                     'longatitude' => 'required',
                     'latitude' => 'required',
                     'email' => 'required|email|unique:vendor,pbv_email',
-                    'contact_no' => 'required|unique:vendor,pbv_contactno'
+                    'contact_no' => 'required|unique:vendor,pbv_contactno',
+                    'br_no' => 'required|unique:vendor,pbv_brno'
                 ],                
                 [
                     'business_name.required' => 'Parlour name is required',
@@ -256,7 +286,9 @@ class VendorController extends Controller
                     'email.email' => 'Email must be a valid email address',
                     'email.unique' => 'Email already exists',
                     'contact_no.required' => 'Contact No is required',
-                    'contact_no.unique' => 'Contact No already exists'
+                    'contact_no.unique' => 'Contact No already exists',
+                    'br_no.required' => 'BR No is required',
+                    'br_no.unique' => 'BR No already exists'
                 ]
             );
             Log::info('Step 4.1: Validation successful', ['validated_data' => $validated]);
