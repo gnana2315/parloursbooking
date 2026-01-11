@@ -15,7 +15,9 @@ class Kernel extends ConsoleKernel
         $schedule->command('bookings:send-reminders')
              ->dailyAt('00:01')
              ->onOneServer()
-             ->withoutOverlapping();
+             ->withoutOverlapping()
+            ->runInBackground()
+            ->appendOutputTo(storage_path('logs/reminder.log'));
     }
 
     /**
