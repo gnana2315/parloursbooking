@@ -79,6 +79,7 @@ class SendBookingReminders extends Command
                     'booking_ref_no' => $booking->pbb_ref_no,
                 ]
             );
+            Log::info("OneSignal response for booking ID: {$booking->pbb_id}: " . json_encode($customerReminderNotification));
 
             if ($customerReminderNotification) {
                 // ✅ Mark reminder sent
