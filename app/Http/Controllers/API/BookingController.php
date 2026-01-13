@@ -1738,6 +1738,7 @@ class BookingController extends Controller
             'deleted_at' => $bookings->deleted_at,
             'pbb_remarks' => $bookings->pbb_remarks,
             'pbbd_total_amount' => $bookings->bookingDetails->sum('pbbd_amount'),
+            'pbb_vendor_id' => $bookings->pbb_vendor_id,
             'services' => $bookings->bookingDetails->map(function ($detail) {
                 return [
                     'pbbd_id' => $detail->pbbd_id,
