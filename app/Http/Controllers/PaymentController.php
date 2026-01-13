@@ -282,7 +282,7 @@ class PaymentController extends Controller
 
                 $message = "Dear Customer,\n".
                         "Your booking is confirmed on {$sms_booking_date} at {$sms_booking_start_time} | Ref: {$sms_booking_ref_no}. Please arrive 10 mins early.\n" .
-                        "Location: <a href='{$google_url}'>{$google_url}</a>\n" .
+                        "Location: {$google_url}\n" .
                         "Thank you for choosing Parlours Booking!";
 
                 // Store OTP to DB/Cache if needed here
@@ -305,16 +305,14 @@ class PaymentController extends Controller
                         'booking_id' => $bookingId,
                         'status' => 'confirmed',
                         'transaction_id' => $orderReference,
-                        'amount' => $getBooking->pbb_total_amount,
-                        'map_url' => $google_url
+                        'amount' => $getBooking->pbb_total_amount
                     ];
 
                     $customerNotificationResult = $oneSignalService->sendToUser(
                         $customerUser->pbc_user_id,
                         $customerNotificationTitle,
                         $customerNotificationMessage,
-                        $customerNotificationData,
-                        $google_url
+                        $customerNotificationData
                     );
 
                     Log::info('Customer Notification Response:', ['Response' => $customerNotificationResult]);
@@ -487,7 +485,7 @@ class PaymentController extends Controller
 
     private function googleMapUrl($lat, $lng)
     {
-        $url = "https://maps.app.goo.gl/?q={$lat},{$lng}";
+        $url = "https://www.google.com/maps/search/?api=1&query={$lat},{$lng}";
         return $url;
     }
 }
