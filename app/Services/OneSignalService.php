@@ -28,13 +28,14 @@ class OneSignalService
         ]);
     }
 
-    public function sendToUser($userID, $title, $message, $customData = [])
+    public function sendToUser($userID, $title, $message, $customData = [], $url = null)
     {
         $payload = [
             'app_id' => env('ONESIGNAL_APP_ID'),
             'include_external_user_ids' => [(string) $userID], // ⚡ use external ID here
             'headings' => ['en' => $title],
             'contents' => ['en' => $message],
+            'url' => $url,
             'channel_for_external_user_ids' => 'push', // ensures it targets push notifications
         ];
 

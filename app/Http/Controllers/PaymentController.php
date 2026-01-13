@@ -299,20 +299,22 @@ class PaymentController extends Controller
                 // Send notification to CUSTOMER for successful payment
                 if ($customerUser) {
                     $customerNotificationTitle = 'Booking Confirmed!';
-                    $customerNotificationMessage = 'Booking added successfully!. <br>Your booking reference no:'. $bookingRefNo. 'Location: <a href='."$google_url".'>'.$google_url.'</a>';
+                    $customerNotificationMessage = 'Booking added successfully!. Your booking reference no:'. $bookingRefNo;
                     $customerNotificationData = [
                         'booking_ref_no' => $bookingRefNo,
                         'booking_id' => $bookingId,
                         'status' => 'confirmed',
                         'transaction_id' => $orderReference,
-                        'amount' => $getBooking->pbb_total_amount
+                        'amount' => $getBooking->pbb_total_amount,
+                        'map_url' => $google_url
                     ];
 
                     $customerNotificationResult = $oneSignalService->sendToUser(
                         $customerUser->pbc_user_id,
                         $customerNotificationTitle,
                         $customerNotificationMessage,
-                        $customerNotificationData
+                        $customerNotificationData,
+                        $google_url
                     );
 
                     Log::info('Customer Notification Response:', ['Response' => $customerNotificationResult]);
