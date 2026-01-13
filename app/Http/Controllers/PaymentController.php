@@ -275,11 +275,14 @@ class PaymentController extends Controller
                                 ? $someoneDetails['contact_no']
                                 : $customer->pbc_contact_no;
 
+                $google_url = $this->googleMapUrl($vendor->pbv_longatitude, $vendor->pbv_latitude);
+
                 $apiKey = config('dialogesms.api_key');
                 $sender = config('dialogesms.sender');
 
                 $message = "Dear Customer,\n".
                         "Your booking is confirmed on {$sms_booking_date} at {$sms_booking_start_time} | Ref: {$sms_booking_ref_no}. Please arrive 10 mins early.\n" .
+                        "Location: <a href='{$google_url}'>{$google_url}</a>\n" .
                         "Thank you for choosing Parlours Booking!";
 
                 // Store OTP to DB/Cache if needed here
@@ -296,7 +299,7 @@ class PaymentController extends Controller
                 // Send notification to CUSTOMER for successful payment
                 if ($customerUser) {
                     $customerNotificationTitle = 'Booking Confirmed!';
-                    $customerNotificationMessage = 'Booking added successfully!. Your booking reference no:'. $bookingRefNo;
+                    $customerNotificationMessage = 'Booking added successfully!.\nYour booking reference no:'. $bookingRefNo. '\nLocation: <a href=\'{$google_url}\'>{$google_url}</a>';
                     $customerNotificationData = [
                         'booking_ref_no' => $bookingRefNo,
                         'booking_id' => $bookingId,
@@ -478,5 +481,11 @@ class PaymentController extends Controller
             'status' => $stat,
             'data' => ['payment_status' => $payment_status],
         ]);
+    }
+
+    private function googleMapUrl($lat, $lng)
+    {
+        $url = "https://maps.app.goo.gl/?q={$lat},{$lng}";
+        return $url;
     }
 }
