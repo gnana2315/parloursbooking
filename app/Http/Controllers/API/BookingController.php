@@ -1501,7 +1501,7 @@ class BookingController extends Controller
 
         $bookings = booking::where('pbb_vendor_id', $vendor->pbv_id)
             ->with(['customer', 'bookingDetails.services' ])
-            ->orderBy('pbb_booking_date', 'asc')
+            ->orderBy('pbb_booking_date', 'desc')
             ->get();
 
         if ($bookings->isEmpty()) {
