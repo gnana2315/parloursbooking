@@ -276,6 +276,7 @@ class CustomersController extends Controller
                 'booking_end_time' => $booking->pbb_booking_end_time ? $booking->pbb_booking_end_time->format('H:i:s') : null,
                 'total_amount' => $total,
                 'status' => $booking->pbb_status,
+                'vendor_id' => $booking->pbb_vendor_id,
                 'services' => $booking->bookingDetails->map(function ($detail) {
                     return [
                         'service_name' => $detail->services->pbs_name ?? null,
