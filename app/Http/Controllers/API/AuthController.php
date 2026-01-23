@@ -789,7 +789,7 @@ class AuthController extends Controller
         if(!$user){
             return response()->json([
                 'message' => 'There are no account in this mobile no. Please try again',
-                'data' => null,
+                'data' => 0,
             ], 201);
         }
 
