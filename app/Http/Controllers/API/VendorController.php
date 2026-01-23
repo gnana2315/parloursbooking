@@ -1415,7 +1415,7 @@ class VendorController extends Controller
                 'pbvsc_full_day_closed' => $special_close['full_day_closed'],
                 'pbvsc_from_time' => ($special_close['full_day_closed'] == 0) ? $special_close['from_time'] : null,
                 'pbvsc_to_time' => ($special_close['full_day_closed'] == 0) ? $special_close['to_time'] : null,
-                'pbvsc_status' => 0
+                'pbvsc_status' => 1
             ]);
         }
 

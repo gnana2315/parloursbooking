@@ -137,6 +137,33 @@ class BookingController extends Controller
             ], 400);
         }
 
+        //Check Special Closes
+        $specialClose = vendorSpecialCloses::where('pbvsc_vendor_id', $vendorId)
+                        ->whereDate('pbvsc_day', $bookingDate)
+                        ->where('pbvsc_status', 1)
+                        ->first();
+
+        if ($specialClose && $specialClose->pbvsc_full_day_closed) {
+            Log::info('Vendor fully closed (special close)', ['date' => $bookingDate]);
+
+            return response()->json([
+                'status' => false,
+                'message' => 'Vendor is closed on selected date',
+                'data' => []
+            ], 200);
+        }
+
+        $specialCloseFrom = null;
+        $specialCloseTo = null;
+
+        if ($specialClose && !$specialClose->pbvsc_full_day_closed) {
+            $specialCloseFrom = Carbon::createFromTimeString($specialClose->pbvsc_from_time)
+                ->setDateFrom(Carbon::parse($bookingDate));
+
+            $specialCloseTo = Carbon::createFromTimeString($specialClose->pbvsc_to_time)
+                ->setDateFrom(Carbon::parse($bookingDate));
+        }
+
         // Get vendor's standard availability
         $availability = vendorStandardAvailability::where('pbvsa_vendor_id', $vendorId)
             ->where('pbvsa_day', date('l', strtotime($bookingDate)))
@@ -221,11 +248,31 @@ class BookingController extends Controller
                 $startTime = $slot['start'];
                 $endTime = $slot['end'];
 
+                // while ($startTime->copy()->addMinutes($serviceDuration)->lte($endTime)) {
+                //     $finalSlots[] = [
+                //         'start' => $startTime->format('H:i:s'),
+                //         'end' => (clone $startTime)->addMinutes($serviceDuration)->format('H:i:s'),
+                //     ];
+                //     $startTime->addMinutes($serviceDuration);
+                // }
                 while ($startTime->copy()->addMinutes($serviceDuration)->lte($endTime)) {
+
+                    $slotStart = clone $startTime;
+                    $slotEnd   = (clone $startTime)->addMinutes($serviceDuration);
+
+                    // 🚫 Skip slot if overlaps with special close
+                    if ($specialCloseFrom && $specialCloseTo) {
+                        if ($slotStart->lt($specialCloseTo) && $slotEnd->gt($specialCloseFrom)) {
+                            $startTime->addMinutes($serviceDuration);
+                            continue;
+                        }
+                    }
+
                     $finalSlots[] = [
-                        'start' => $startTime->format('H:i:s'),
-                        'end' => (clone $startTime)->addMinutes($serviceDuration)->format('H:i:s'),
+                        'start' => $slotStart->format('H:i:s'),
+                        'end'   => $slotEnd->format('H:i:s'),
                     ];
+
                     $startTime->addMinutes($serviceDuration);
                 }
             }
