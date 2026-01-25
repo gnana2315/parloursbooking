@@ -149,7 +149,7 @@ class BookingController extends Controller
 
             return response()->json([
                 'status' => false,
-                'message' => 'Vendor is closed on selected date',
+                'message' => 'Vendor is closed on selected date for special reason',
                 'data' => []
             ], 200);
         }
