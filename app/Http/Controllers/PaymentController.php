@@ -247,6 +247,8 @@ class PaymentController extends Controller
                     ['pbvp_total_earned' => 0, 'pbvp_total_paid' => 0, 'pbvp_total_due' => 0]
                 );
 
+                Log::info('vendor payouts Response:', ['Response' => $vendorPayout]);
+
                 $vendorPayout->increment('pbvp_total_earned', $vendor_amount);
                 $vendorPayout->increment('pbvp_total_due', $vendor_amount);
 
