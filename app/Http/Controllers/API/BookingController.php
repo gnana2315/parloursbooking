@@ -214,9 +214,20 @@ class BookingController extends Controller
 
         if ($existingBookings->isEmpty()) {
             while ($currentStart->copy()->addMinutes($serviceDuration)->lte($closeTime)) {
+                $slotStart = clone $currentStart;
+                $slotEnd = (clone $currentStart)->addMinutes($serviceDuration);
+
+                // 🚫 Skip slot if overlaps with special close
+                if ($specialCloseFrom && $specialCloseTo) {
+                    if ($slotStart->lt($specialCloseTo) && $slotEnd->gt($specialCloseFrom)) {
+                        $currentStart->addMinutes($serviceDuration);
+                        continue;
+                    }
+                }
+
                 $finalSlots[] = [
-                    'start' => $currentStart->format('H:i:s'),
-                    'end' => (clone $currentStart)->addMinutes($serviceDuration)->format('H:i:s'),
+                    'start' => $slotStart->format('H:i:s'),
+                    'end' => $slotEnd->format('H:i:s'),
                 ];
                 $currentStart->addMinutes($serviceDuration);
             }
@@ -263,8 +274,8 @@ class BookingController extends Controller
 
                     // 🚫 Skip slot if overlaps with special close
                     if ($specialCloseFrom && $specialCloseTo) {
-                        if ($slotStart->lt($specialCloseFrom) && $slotEnd->gt($specialCloseTo)) {
-                            $startTime = clone $specialCloseTo;
+                        if ($slotStart->lt($specialCloseTo) && $slotEnd->gt($specialCloseFrom)) {
+                            $startTime->addMinutes($serviceDuration);
                             continue;
                         }
                     }
