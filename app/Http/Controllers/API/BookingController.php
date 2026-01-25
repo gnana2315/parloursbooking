@@ -1470,14 +1470,14 @@ class BookingController extends Controller
         // ✅ Prevent completing booking before end time (only check for status 3 = Completed)
         if ($request->booking_status == 3) {
             // Safely parse booking date and time
-            $bookingDate = $booking->pbb_booking_date instanceof Carbon
-                ? $booking->pbb_booking_date->format('Y-m-d')
-                : Carbon::parse($booking->pbb_booking_date)->format('Y-m-d');
-            
-            $bookingEndTime = trim((string)$booking->pbb_booking_end_time);
-            $bookingEndTime = substr($bookingEndTime, 0, 8); // Get only HH:MM:SS
-            
-            $bookingEndDateTime = Carbon::createFromFormat('Y-m-d H:i:s', $bookingDate . ' ' . $bookingEndTime);
+            $bookingDate = Carbon::parse($booking->pbb_booking_date)->format('Y-m-d');
+            $bookingEndTime = Carbon::parse($booking->pbb_booking_end_time)->format('H:i:s');
+
+            $bookingEndDateTime = Carbon::createFromFormat(
+                'Y-m-d H:i:s',
+                "$bookingDate $bookingEndTime"
+            );
+
             
             if (Carbon::now()->lt($bookingEndDateTime)) {
                 Log::info('Attempt to complete booking before end time:', [
