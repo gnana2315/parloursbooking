@@ -1431,6 +1431,21 @@ class BookingController extends Controller
             ], 404);
         }
 
+        // ✅ Prevent completing booking before end time
+        if ($request->booking_status == 1) { // 1 = Completed
+            $bookingEndDateTime = Carbon::createFromFormat(
+                'Y-m-d H:i:s',
+                $booking->pbb_booking_date . ' ' . $booking->pbb_booking_end_time
+            );
+            
+            if (Carbon::now()->lt($bookingEndDateTime)) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Cannot complete booking before the service end time (' . $bookingEndDateTime->format('Y-m-d H:i:s') . ')',
+                ], 400);
+            }
+        }
+
         if($request->booking_status == 4){
             // If booking is marked as 'No Customer', initiate notification.
             $customerUser = customer::find($booking->pbb_customer_id);
