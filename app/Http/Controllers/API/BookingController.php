@@ -137,14 +137,16 @@ class BookingController extends Controller
             ], 400);
         }
 
-        //Check Special Closes
-        $specialClose = vendorSpecialCloses::where('pbvsc_vendor_id', $vendorId)
+        // Check Special Closes (Multiple)
+        $specialCloses = vendorSpecialCloses::where('pbvsc_vendor_id', $vendorId)
                         ->whereDate('pbvsc_day', $bookingDate)
                         ->where('pbvsc_status', 1)
-                        ->first();
-        Log::info('Vendor Special Close:', ['data' => $specialClose]);
+                        ->get();
+        Log::info('Vendor Special Closes:', ['data' => $specialCloses]);
 
-        if ($specialClose && $specialClose->pbvsc_full_day_closed) {
+        // Check if any special close is a full day closure
+        $hasFullDayClose = $specialCloses->contains('pbvsc_full_day_closed', 1);
+        if ($hasFullDayClose) {
             Log::info('Vendor fully closed (special close)', ['date' => $bookingDate]);
 
             return response()->json([
@@ -154,15 +156,17 @@ class BookingController extends Controller
             ], 200);
         }
 
-        $specialCloseFrom = null;
-        $specialCloseTo = null;
-
-        if ($specialClose && !$specialClose->pbvsc_full_day_closed) {
-            $specialCloseFrom = Carbon::createFromTimeString($specialClose->pbvsc_from_time)
-                ->setDateFrom(Carbon::parse($bookingDate));
-
-            $specialCloseTo = Carbon::createFromTimeString($specialClose->pbvsc_to_time)
-                ->setDateFrom(Carbon::parse($bookingDate));
+        // Get all partial special close times
+        $specialClosePeriods = [];
+        foreach ($specialCloses as $close) {
+            if (!$close->pbvsc_full_day_closed) {
+                $specialClosePeriods[] = [
+                    'from' => Carbon::createFromTimeString($close->pbvsc_from_time)
+                        ->setDateFrom(Carbon::parse($bookingDate)),
+                    'to' => Carbon::createFromTimeString($close->pbvsc_to_time)
+                        ->setDateFrom(Carbon::parse($bookingDate)),
+                ];
+            }
         }
 
         // Get vendor's standard availability
@@ -212,17 +216,25 @@ class BookingController extends Controller
 
         $currentStart = clone $openTime;
 
+        // Helper function to check if slot overlaps with any special close
+        $slotOverlapsWithSpecialClose = function($slotStart, $slotEnd, $closePeriods) {
+            foreach ($closePeriods as $period) {
+                if ($slotStart->lt($period['to']) && $slotEnd->gt($period['from'])) {
+                    return true;
+                }
+            }
+            return false;
+        };
+
         if ($existingBookings->isEmpty()) {
             while ($currentStart->copy()->addMinutes($serviceDuration)->lte($closeTime)) {
                 $slotStart = clone $currentStart;
                 $slotEnd = (clone $currentStart)->addMinutes($serviceDuration);
 
-                // 🚫 Skip slot if overlaps with special close
-                if ($specialCloseFrom && $specialCloseTo) {
-                    if ($slotStart->lt($specialCloseTo) && $slotEnd->gt($specialCloseFrom)) {
-                        $currentStart->addMinutes($serviceDuration);
-                        continue;
-                    }
+                // 🚫 Skip slot if overlaps with any special close
+                if ($slotOverlapsWithSpecialClose($slotStart, $slotEnd, $specialClosePeriods)) {
+                    $currentStart->addMinutes($serviceDuration);
+                    continue;
                 }
 
                 $finalSlots[] = [
@@ -272,12 +284,10 @@ class BookingController extends Controller
                     $slotStart = clone $startTime;
                     $slotEnd   = (clone $startTime)->addMinutes($serviceDuration);
 
-                    // 🚫 Skip slot if overlaps with special close
-                    if ($specialCloseFrom && $specialCloseTo) {
-                        if ($slotStart->lt($specialCloseTo) && $slotEnd->gt($specialCloseFrom)) {
-                            $startTime->addMinutes($serviceDuration);
-                            continue;
-                        }
+                    // 🚫 Skip slot if overlaps with any special close
+                    if ($slotOverlapsWithSpecialClose($slotStart, $slotEnd, $specialClosePeriods)) {
+                        $startTime->addMinutes($serviceDuration);
+                        continue;
                     }
 
                     $finalSlots[] = [

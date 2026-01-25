@@ -1370,8 +1370,8 @@ class VendorController extends Controller
         foreach($request->all() as $special_close){
             $day = Carbon::parse($special_close['day'])->toDateString();;
             $fullDayClosed = $special_close['full_day_closed'];
-            $fromTime = $fullDayClosed ? '00:00:00' : $special_close['from_time'] . ':00';
-            $toTime = $fullDayClosed ? '23:59:59' : $special_close['to_time'] . ':00';
+            $fromTime = $fullDayClosed ? '00:00:00' : $special_close['from_time'];
+            $toTime = $fullDayClosed ? '23:59:59' : $special_close['to_time'];
 
             Log::info('Checking Booking Conflicts:', [
                 'vendor_id' => $vendor->pbv_id,
@@ -1407,6 +1407,26 @@ class VendorController extends Controller
                 return response()->json([
                     'message' => 'Cannot close this time. Bookings already exist on this day.'
                 ], 500);
+            }
+
+            // Check for duplicate special closing
+            $duplicateQuery = vendorSpecialCloses::where('pbvsc_vendor_id', $vendor->pbv_id)
+                ->where('pbvsc_day', $special_close['day']);
+
+            if ($special_close['full_day_closed']) {
+                // For full day closings, just check if any full day closing exists for that day
+                $duplicateQuery->where('pbvsc_full_day_closed', 1);
+            } else {
+                // For partial closings, check if same time slot already exists
+                $duplicateQuery->where('pbvsc_full_day_closed', 0)
+                    ->where('pbvsc_from_time', $special_close['from_time'])
+                    ->where('pbvsc_to_time', $special_close['to_time']);
+            }
+
+            if ($duplicateQuery->exists()) {
+                return response()->json([
+                    'message' => 'Special closing already exists for this date and time.'
+                ], 422);
             }
 
             vendorSpecialCloses::create([
