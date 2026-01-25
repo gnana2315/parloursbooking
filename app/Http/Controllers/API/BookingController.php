@@ -1467,18 +1467,39 @@ class BookingController extends Controller
             }
         }
 
-        // ✅ Prevent completing booking before end time
-        $bookingEndDateTime = Carbon::createFromFormat(
-            'Y-m-d H:i:s',
-            $booking->pbb_booking_date . ' ' . $booking->pbb_booking_end_time
-        );
-
-        if (Carbon::now()->lt($bookingEndDateTime)) {
-            Log::info('Attempt to complete booking before end time:', ['CurrentTime' => Carbon::now(), 'BookingEndTime' => $bookingEndDateTime]);
-            return response()->json([
-                'status' => false,
-                'message' => 'Cannot complete booking before the service end time (' . $bookingEndDateTime->format('Y-m-d H:i:s') . ')',
-            ], 400);
+        // ✅ Prevent completing booking before end time (only check for status 3 = Completed)
+        if ($request->booking_status == 3) {
+            try {
+                // Safely parse booking date and time
+                $bookingDate = $booking->pbb_booking_date instanceof Carbon
+                    ? $booking->pbb_booking_date->format('Y-m-d')
+                    : Carbon::parse($booking->pbb_booking_date)->format('Y-m-d');
+                
+                $bookingEndTime = trim((string)$booking->pbb_booking_end_time);
+                $bookingEndTime = substr($bookingEndTime, 0, 8); // Get only HH:MM:SS
+                
+                $bookingEndDateTime = Carbon::createFromFormat('Y-m-d H:i:s', $bookingDate . ' ' . $bookingEndTime);
+                
+                if (Carbon::now()->lt($bookingEndDateTime)) {
+                    Log::info('Attempt to complete booking before end time:', [
+                        'CurrentTime' => Carbon::now(),
+                        'BookingEndTime' => $bookingEndDateTime
+                    ]);
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Cannot complete booking before the service end time (' . $bookingEndDateTime->format('Y-m-d H:i:s') . ')',
+                    ], 400);
+                }
+            } catch (\Exception $e) {
+                Log::error('Error parsing booking end time:', [
+                    'booking_id' => $booking->pbb_id,
+                    'error' => $e->getMessage(),
+                    'booking_date' => $booking->pbb_booking_date,
+                    'booking_end_time' => $booking->pbb_booking_end_time
+                ]);
+                // If parsing fails, allow the completion to proceed
+                // Log the error but don't block the operation
+            }
         }
 
         $booking->pbb_status = $request->booking_status; // Assuming 3 is the status code for completed bookings
