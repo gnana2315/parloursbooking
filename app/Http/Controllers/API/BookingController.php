@@ -1469,69 +1469,57 @@ class BookingController extends Controller
 
         // ✅ Prevent completing booking before end time (only check for status 3 = Completed)
         if ($request->booking_status == 3) {
-            try {
-                // Safely parse booking date and time
-                $bookingDate = $booking->pbb_booking_date instanceof Carbon
-                    ? $booking->pbb_booking_date->format('Y-m-d')
-                    : Carbon::parse($booking->pbb_booking_date)->format('Y-m-d');
-                
-                $bookingEndTime = trim((string)$booking->pbb_booking_end_time);
-                $bookingEndTime = substr($bookingEndTime, 0, 8); // Get only HH:MM:SS
-                
-                $bookingEndDateTime = Carbon::createFromFormat('Y-m-d H:i:s', $bookingDate . ' ' . $bookingEndTime);
-                
-                if (Carbon::now()->lt($bookingEndDateTime)) {
-                    Log::info('Attempt to complete booking before end time:', [
-                        'CurrentTime' => Carbon::now(),
-                        'BookingEndTime' => $bookingEndDateTime
-                    ]);
-                    return response()->json([
-                        'status' => false,
-                        'message' => 'Cannot complete booking before the service end time (' . $bookingEndDateTime->format('Y-m-d H:i:s') . ')',
-                    ], 400);
-                }
-            } catch (\Exception $e) {
-                Log::error('Error parsing booking end time:', [
-                    'booking_id' => $booking->pbb_id,
-                    'error' => $e->getMessage(),
-                    'booking_date' => $booking->pbb_booking_date,
-                    'booking_end_time' => $booking->pbb_booking_end_time
+            // Safely parse booking date and time
+            $bookingDate = $booking->pbb_booking_date instanceof Carbon
+                ? $booking->pbb_booking_date->format('Y-m-d')
+                : Carbon::parse($booking->pbb_booking_date)->format('Y-m-d');
+            
+            $bookingEndTime = trim((string)$booking->pbb_booking_end_time);
+            $bookingEndTime = substr($bookingEndTime, 0, 8); // Get only HH:MM:SS
+            
+            $bookingEndDateTime = Carbon::createFromFormat('Y-m-d H:i:s', $bookingDate . ' ' . $bookingEndTime);
+            
+            if (Carbon::now()->lt($bookingEndDateTime)) {
+                Log::info('Attempt to complete booking before end time:', [
+                    'CurrentTime' => Carbon::now(),
+                    'BookingEndTime' => $bookingEndDateTime
                 ]);
-                // If parsing fails, allow the completion to proceed
-                // Log the error but don't block the operation
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Cannot complete booking before the service end time (' . $bookingEndDateTime->format('Y-m-d H:i:s') . ')',
+                ], 400);
+            }else{
+                // $booking->pbb_status = $request->booking_status; // Assuming 3 is the status code for completed bookings
+                // $booking->save();
+
+                // $payment = $booking->paymentTransections->first();
+                // $vendorPayout = vendorPayouts::firstOrCreate(
+                //     ['pbvp_vendor_id' => $booking->pbb_vendor_id],
+                //     ['pbvp_total_earned' => 0, 'pbvp_total_paid' => 0, 'pbvp_total_due' => 0]
+                // );
+
+                // Log::info('vendor payouts Response:', ['Response' => $vendorPayout]);
+
+                // $vendorPayout->increment('pbvp_total_earned', $payment->pbpt_vendor_amount);
+                // $vendorPayout->increment('pbvp_total_due', $payment->pbpt_vendor_amount);
+
+                // $payoutItem = vendorPayoutItems::create([
+                //     'pbvpi_payout_id'   => $vendorPayout->pbvp_id,
+                //     'pbvpi_booking_id'  => $booking->pbb_id,
+                //     'pbvpi_payment_id'  => $payment->pbpt_id,
+                //     'pbvpi_amount'      => $booking->pbb_total_amount,
+                //     'pbvpi_platform_fee'=> $payment->pbpt_platform_fee,
+                //     'pbvpi_vendor_amount'=> $payment->pbpt_vendor_amount,
+                //     'pbvpi_status'      => '0'
+                // ]);
+                // Log::info('vendor payouts Response:', ['Response' => $payoutItem]);
+
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Booking status marked successfully',
+                ], 200);
             }
         }
-
-        $booking->pbb_status = $request->booking_status; // Assuming 3 is the status code for completed bookings
-        $booking->save();
-
-        $payment = $booking->paymentTransections->first();
-        $vendorPayout = vendorPayouts::firstOrCreate(
-            ['pbvp_vendor_id' => $booking->pbb_vendor_id],
-            ['pbvp_total_earned' => 0, 'pbvp_total_paid' => 0, 'pbvp_total_due' => 0]
-        );
-
-        Log::info('vendor payouts Response:', ['Response' => $vendorPayout]);
-
-        $vendorPayout->increment('pbvp_total_earned', $payment->pbpt_vendor_amount);
-        $vendorPayout->increment('pbvp_total_due', $payment->pbpt_vendor_amount);
-
-        $payoutItem = vendorPayoutItems::create([
-            'pbvpi_payout_id'   => $vendorPayout->pbvp_id,
-            'pbvpi_booking_id'  => $booking->pbb_id,
-            'pbvpi_payment_id'  => $payment->pbpt_id,
-            'pbvpi_amount'      => $booking->pbb_total_amount,
-            'pbvpi_platform_fee'=> $payment->pbpt_platform_fee,
-            'pbvpi_vendor_amount'=> $payment->pbpt_vendor_amount,
-            'pbvpi_status'      => '0'
-        ]);
-        Log::info('vendor payouts Response:', ['Response' => $payoutItem]);
-
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Booking status marked successfully',
-        ], 200);
     }
 
     /**
