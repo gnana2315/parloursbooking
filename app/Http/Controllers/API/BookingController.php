@@ -165,6 +165,10 @@ class BookingController extends Controller
                 ->setDateFrom(Carbon::parse($bookingDate));
         }
 
+        Log::info('Day from PHP:', [
+            'day' => date('l', strtotime($bookingDate))
+        ]);
+
         // Get vendor's standard availability
         $availability = vendorStandardAvailability::where('pbvsa_vendor_id', $vendorId)
             ->where('pbvsa_day', date('l', strtotime($bookingDate)))
