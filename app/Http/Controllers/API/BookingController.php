@@ -1445,8 +1445,8 @@ class BookingController extends Controller
             }
         }
 
-        // $booking->pbb_status = $request->booking_status; // Assuming 3 is the status code for completed bookings
-        // $booking->save();
+        $booking->pbb_status = $request->booking_status; // Assuming 3 is the status code for completed bookings
+        $booking->save();
 
         $payment = $booking->paymentTransections->first();
         $vendorPayout = vendorPayouts::firstOrCreate(
