@@ -263,7 +263,7 @@ class BookingController extends Controller
 
                     // 🚫 Skip slot if overlaps with special close
                     if ($specialCloseFrom && $specialCloseTo) {
-                        if ($slotStart->lt($specialCloseTo) && $slotEnd->gt($specialCloseFrom)) {
+                        if ($slotStart->lt($specialCloseFrom) && $slotEnd->gt($specialCloseTo)) {
                             $startTime = clone $specialCloseTo;
                             continue;
                         }
