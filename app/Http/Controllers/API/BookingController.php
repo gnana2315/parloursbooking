@@ -142,6 +142,7 @@ class BookingController extends Controller
                         ->whereDate('pbvsc_day', $bookingDate)
                         ->where('pbvsc_status', 1)
                         ->first();
+        Log::info('Vendor Special Close:', ['data' => $specialClose]);
 
         if ($specialClose && $specialClose->pbvsc_full_day_closed) {
             Log::info('Vendor fully closed (special close)', ['date' => $bookingDate]);
