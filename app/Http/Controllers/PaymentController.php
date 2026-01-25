@@ -242,26 +242,26 @@ class PaymentController extends Controller
                 ]);
 
                 Log::info('payment transection Response:', ['Response' => $payment]);
-                $vendorPayout = vendorPayouts::firstOrCreate(
-                    ['pbvp_vendor_id' => $vendorId],
-                    ['pbvp_total_earned' => 0, 'pbvp_total_paid' => 0, 'pbvp_total_due' => 0]
-                );
+                // $vendorPayout = vendorPayouts::firstOrCreate(
+                //     ['pbvp_vendor_id' => $vendorId],
+                //     ['pbvp_total_earned' => 0, 'pbvp_total_paid' => 0, 'pbvp_total_due' => 0]
+                // );
 
-                Log::info('vendor payouts Response:', ['Response' => $vendorPayout]);
+                // Log::info('vendor payouts Response:', ['Response' => $vendorPayout]);
 
-                $vendorPayout->increment('pbvp_total_earned', $vendor_amount);
-                $vendorPayout->increment('pbvp_total_due', $vendor_amount);
+                // $vendorPayout->increment('pbvp_total_earned', $vendor_amount);
+                // $vendorPayout->increment('pbvp_total_due', $vendor_amount);
 
-                $payoutItem = vendorPayoutItems::create([
-                    'pbvpi_payout_id'   => $vendorPayout->pbvp_id,
-                    'pbvpi_booking_id'  => $getBooking->pbb_id,
-                    'pbvpi_payment_id'  => $payment->pbpt_id,
-                    'pbvpi_amount'      => $getBooking->pbb_total_amount,
-                    'pbvpi_platform_fee'=> $platform_fee,
-                    'pbvpi_vendor_amount'=> $vendor_amount,
-                    'pbvpi_status'      => '0'
-                ]);
-                Log::info('vendor payouts Response:', ['Response' => $payoutItem]);
+                // $payoutItem = vendorPayoutItems::create([
+                //     'pbvpi_payout_id'   => $vendorPayout->pbvp_id,
+                //     'pbvpi_booking_id'  => $getBooking->pbb_id,
+                //     'pbvpi_payment_id'  => $payment->pbpt_id,
+                //     'pbvpi_amount'      => $getBooking->pbb_total_amount,
+                //     'pbvpi_platform_fee'=> $platform_fee,
+                //     'pbvpi_vendor_amount'=> $vendor_amount,
+                //     'pbvpi_status'      => '0'
+                // ]);
+                // Log::info('vendor payouts Response:', ['Response' => $payoutItem]);
 
                 //SMS
                 $sms_customer_name = !empty($someoneDetails['name'])

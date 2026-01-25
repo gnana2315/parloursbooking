@@ -5,6 +5,7 @@ use App\Models\bookingDetail;
 use App\Models\vendors;
 use App\Models\customer;
 use App\Models\ratings;
+use App\Models\paymentTransection;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -69,5 +70,9 @@ class booking extends Model
     
     public function ratings(){
         return $this->hasMany(ratings::class, 'pbr_booking_id', 'pbb_id');
+    }
+
+    public function paymentTransections(){
+        return $this->hasOne(paymentTransection::class, 'pbt_booking_id', 'pbb_id');
     }
 }
