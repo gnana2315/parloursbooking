@@ -73,6 +73,6 @@ class booking extends Model
     }
 
     public function paymentTransections(){
-        return $this->hasOne(paymentTransection::class, 'pbt_booking_id', 'pbb_id');
+        return $this->hasOne(paymentTransection::class, 'pbpt_booking_id', 'pbb_id');
     }
 }
