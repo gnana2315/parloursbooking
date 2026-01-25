@@ -165,10 +165,6 @@ class BookingController extends Controller
                 ->setDateFrom(Carbon::parse($bookingDate));
         }
 
-        Log::info('Day from PHP:', [
-            'day' => date('l', strtotime($bookingDate))
-        ]);
-
         // Get vendor's standard availability
         $availability = vendorStandardAvailability::where('pbvsa_vendor_id', $vendorId)
             ->where('pbvsa_day', date('l', strtotime($bookingDate)))
@@ -268,7 +264,7 @@ class BookingController extends Controller
                     // 🚫 Skip slot if overlaps with special close
                     if ($specialCloseFrom && $specialCloseTo) {
                         if ($slotStart->lt($specialCloseTo) && $slotEnd->gt($specialCloseFrom)) {
-                            $startTime->addMinutes($serviceDuration);
+                            $startTime = clone $specialCloseTo;
                             continue;
                         }
                     }
