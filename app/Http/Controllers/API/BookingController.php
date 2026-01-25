@@ -1401,10 +1401,7 @@ class BookingController extends Controller
         );
 
         $booking = booking::with('paymentTransections')->find($request->booking_id);
-        var_dump('<pre>');
-        var_dump($booking);
-        var_dump('</pre>');
-        die();
+        
         if (!$booking) {
             return response()->json([
                 'status' => false,
@@ -1448,9 +1445,10 @@ class BookingController extends Controller
             }
         }
 
-        $booking->pbb_status = $request->booking_status; // Assuming 3 is the status code for completed bookings
-        $booking->save();
+        // $booking->pbb_status = $request->booking_status; // Assuming 3 is the status code for completed bookings
+        // $booking->save();
 
+        $payment = $booking->paymentTransections->first();
         $vendorPayout = vendorPayouts::firstOrCreate(
             ['pbvp_vendor_id' => $booking->pbb_vendor_id],
             ['pbvp_total_earned' => 0, 'pbvp_total_paid' => 0, 'pbvp_total_due' => 0]
@@ -1458,16 +1456,16 @@ class BookingController extends Controller
 
         Log::info('vendor payouts Response:', ['Response' => $vendorPayout]);
 
-        $vendorPayout->increment('pbvp_total_earned', $vendor_amount);
-        $vendorPayout->increment('pbvp_total_due', $vendor_amount);
+        $vendorPayout->increment('pbvp_total_earned', $payment->pbpt_vendor_amount);
+        $vendorPayout->increment('pbvp_total_due', $payment->pbpt_vendor_amount);
 
         $payoutItem = vendorPayoutItems::create([
             'pbvpi_payout_id'   => $vendorPayout->pbvp_id,
-            'pbvpi_booking_id'  => $getBooking->pbb_id,
+            'pbvpi_booking_id'  => $booking->pbb_id,
             'pbvpi_payment_id'  => $payment->pbpt_id,
-            'pbvpi_amount'      => $getBooking->pbb_total_amount,
-            'pbvpi_platform_fee'=> $platform_fee,
-            'pbvpi_vendor_amount'=> $vendor_amount,
+            'pbvpi_amount'      => $booking->pbb_total_amount,
+            'pbvpi_platform_fee'=> $payment->pbpt_platform_fee,
+            'pbvpi_vendor_amount'=> $payment->pbpt_vendor_amount,
             'pbvpi_status'      => '0'
         ]);
         Log::info('vendor payouts Response:', ['Response' => $payoutItem]);
