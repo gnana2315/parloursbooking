@@ -622,22 +622,22 @@ class AuthController extends Controller
         
         Log::info('User login final data Response:', ['Response' => $finalData]);
         
-        $notification_title = 'Welcome!';
-        $notification_message = 'Login Successfully!';
-        $custom_data = [
-            'user_name' => $user->pbu_name,
-            'login_time' => Carbon::now()->toDateTimeString(),
-        ];
+        // $notification_title = 'Welcome!';
+        // $notification_message = 'Login Successfully!';
+        // $custom_data = [
+        //     'user_name' => $user->pbu_name,
+        //     'login_time' => Carbon::now()->toDateTimeString(),
+        // ];
 
-        $oneSignalService->sendToUser($user->pbu_id, $notification_title, $notification_message, $custom_data, $custom_data);
+        // $oneSignalService->sendToUser($user->pbu_id, $notification_title, $notification_message, $custom_data, $custom_data);
 
-        notification::create([
-            'pbn_user_id' => $user->pbu_id,
-            'pbn_type' => 'specific',
-            'pbn_title' => $notification_title,
-            'pbn_message' => $notification_message,
-            'pbn_is_read' => 0,
-        ]);
+        // notification::create([
+        //     'pbn_user_id' => $user->pbu_id,
+        //     'pbn_type' => 'specific',
+        //     'pbn_title' => $notification_title,
+        //     'pbn_message' => $notification_message,
+        //     'pbn_is_read' => 0,
+        // ]);
 
         $token_text = $user->pbu_id.'_user_login_session';
         $token = $user->createToken($token_text)->plainTextToken;

@@ -2111,39 +2111,7 @@ class VendorController extends Controller
                     'status' => $isPaid ? 'Paid' : 'Unpaid',
                 ];
             })->toArray();
-        
-        // $allEarnings = [
-        //     [
-        //         'date' => now()->format('Y-m-d'),
-        //         'booking_ref_no' => 'PBV-123456',
-        //         'amount' => 15000.00,
-        //         'status' => 'Paid',
-        //     ],
-        //     [
-        //         'date' => now()->format('Y-m-d'),
-        //         'booking_ref_no' => 'PBV-4646',
-        //         'amount' => 7000.00,
-        //         'status' => 'Unpaid',
-        //     ],
-        //     [
-        //         'date' => now()->format('Y-m-d'),
-        //         'booking_ref_no' => 'PBV-7890',
-        //         'amount' => 12000.00,
-        //         'status' => 'Unpaid',
-        //     ],
-        //     [
-        //         'date' => now()->format('Y-m-d'),
-        //         'booking_ref_no' => 'PBV-4567',
-        //         'amount' => 8000.00,
-        //         'status' => 'Paid',
-        //     ],
-        //     [
-        //         'date' => now()->format('Y-m-d'),
-        //         'booking_ref_no' => 'PBV-8901',
-        //         'amount' => 5000.00,
-        //         'status' => 'Paid',
-        //     ]
-        // ];
+            
         Log::info('allEarnings Response:', ['Response' => $allEarnings]);
 
         return response()->json([
