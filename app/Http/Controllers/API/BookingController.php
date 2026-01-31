@@ -1486,6 +1486,7 @@ class BookingController extends Controller
                 return response()->json([
                     'status' => false,
                     'message' => 'Cannot complete booking before the service end time (' . $bookingEndDateTime->format('Y-m-d H:i:s') . ')',
+                    'data' => []
                 ], 404);
             }else{
                 $booking->pbb_status = $request->booking_status; // Assuming 3 is the status code for completed bookings
