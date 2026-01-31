@@ -1270,6 +1270,7 @@ class CommonController extends Controller
         // $bookingsCount = 23;
 
         $earnedAmount = booking::where('pbb_vendor_id', $vendor->pbv_id)
+            ->where('pbb_status', '3')
             ->sum('pbb_total_amount');
 
         // $earnedAmount = 1575;
