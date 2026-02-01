@@ -1467,8 +1467,8 @@ class BookingController extends Controller
             }
         }
 
-        // ✅ Prevent completing booking before end time (only check for status 3 = Completed)
-        if ($request->booking_status == 3) {
+        // ✅ Prevent completing booking before end time (only check for status 2 = Completed)
+        if ($request->booking_status == 2) {
             // Safely parse booking date and time
             $bookingDate = Carbon::parse($booking->pbb_booking_date)->format('Y-m-d');
             $bookingEndTime = Carbon::parse($booking->pbb_booking_end_time)->format('H:i:s');
@@ -1488,7 +1488,7 @@ class BookingController extends Controller
                     'message' => 'Cannot complete booking before the service end time (' . $bookingEndDateTime->format('Y-m-d H:i:s') . ')'
                 ], 403);
             }else{
-                $booking->pbb_status = $request->booking_status; // Assuming 3 is the status code for completed bookings
+                $booking->pbb_status = $request->booking_status; // Assuming 2 is the status code for completed bookings
                 $booking->save();
 
                 $payment = $booking->paymentTransections->first();
