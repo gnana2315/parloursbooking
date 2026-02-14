@@ -666,7 +666,7 @@ class BookingController extends Controller
                 ], 409);
             }
 
-            $pbb_ref_no = 'PBA_' . date('YmdHis') . '_' . substr(uniqid(), -5);
+            $pbb_ref_no = 'PBA_' . substr(uniqid(), -5);
 
             // 5️⃣ Create booking
             $addbooking = Booking::create([
@@ -1029,7 +1029,7 @@ class BookingController extends Controller
             ], 409);
         }
 
-        $pbb_ref_no = 'PBW_' . date('YmdHis') . '_' . substr(uniqid(), -5);
+        $pbb_ref_no = 'PBW_' . substr(uniqid(), -5);
 
         $addbooking = Booking::create([
             'pbb_vendor_id' => $vendor->pbv_id,
