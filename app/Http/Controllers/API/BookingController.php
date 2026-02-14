@@ -38,7 +38,7 @@ class BookingController extends Controller
 {
     public function __construct(DialogESMSService $smsService)
     {
-        $this->smsService = $smsService;
+        //$this->smsService = $smsService;
     }
     /**
      * @OA\Get(
@@ -601,266 +601,6 @@ class BookingController extends Controller
  * )
  */
 
-    public function addOnlineBooking(Request $request, OneSignalService $oneSignalService){
-        Log::info('addOnlineBooking Requests:', ['Requests' => $request->all()]);
-        $user = auth()->user();
-
-        $request->validate(
-            [
-                'vendor_id' => 'required',
-                'booking_details.*.service_id' => 'required|integer',
-                'booking_date' => 'required',
-                'booking_start_time' => 'required|date_format:H:i:s',
-                'booking_end_time' => 'required|date_format:H:i:s',
-                'service_location' => 'required',
-            ],
-            [
-                'vendor_id.required' => 'Vendor ID is required',
-                'booking_details.*.service_id.required' => 'Service ID is required',
-                'booking_details.*.service_id.integer' => 'Service ID must be an integer',
-                'booking_date.required' => 'Booking date is required',
-                'booking_start_time.required' => 'Booking start time is required',
-                'booking_end_time.required' => 'Booking end time is required',
-                'service_location.required' => 'Service location is required',
-            ]
-        );
-
-        $vendor = vendors::find($request->vendor_id);
-        if (!$vendor) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Vendor not found',
-            ], 404);
-        }
-
-        $customer = customer::where('pbc_user_id', $user->pbu_id)->first();
-        if (!$customer) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Customer not found',
-            ], 404);
-        }
-
-        $booking_details_generated = [
-            'name' => $request->someone_name,
-            'contact_no' => $request->someone_contact_no,
-            'age' => $request->age,
-            'gender' => $request->gender,
-            'address' => $request->address,
-        ];
-
-        $booking_details = $request->booking_details;
-        $total_amount = 0.00;
-        $total_duration = 0; // in minutes
-
-        foreach ($booking_details as $value) {
-            $service = services::where('pbs_id', $value['service_id'])->first();
-            if ($service) {
-                $price = floatval(str_replace(',', '', $service->pbs_price));
-                $total_amount += $price;
-                $total_duration += $service->pbs_duration; // ✅ add service duration (minutes)
-            }
-        }
-
-        // ✅ Convert total duration to HH:MM:SS
-        $hours = floor($total_duration / 60);
-        $remainingMinutes = $total_duration % 60;
-        $duration = sprintf('%02d:%02d:00', $hours, $remainingMinutes);
-
-        // ✅ Prevent overlapping bookings (for same vendor)
-        $overlappingBooking = Booking::where('pbb_vendor_id', $request->vendor_id)
-            ->where('pbb_booking_date', $request->booking_date)
-            ->whereIn('pbb_status', [1])
-            ->where(function ($q) use ($request) {
-                $q->whereBetween('pbb_booking_start_time', [$request->booking_start_time, $request->booking_end_time])
-                ->orWhereBetween('pbb_booking_end_time', [$request->booking_start_time, $request->booking_end_time])
-                ->orWhere(function ($q2) use ($request) {
-                    $q2->where('pbb_booking_start_time', '<=', $request->booking_start_time)
-                        ->where('pbb_booking_end_time', '>=', $request->booking_end_time);
-                });
-            })
-            ->first();
-
-        if ($overlappingBooking) {
-            return response()->json([
-                'status' => false,
-                'message' => 'The selected time slot is already booked by another customer.('.$overlappingBooking->pbb_ref_no.')',
-            ], 409);
-        }
-
-        try {
-            $addbooking = Booking::create([
-                'pbb_vendor_id' => $request->vendor_id,
-                'pbb_customer_id' => $customer->pbc_id,
-                'pbb_promo_id' => $request->promocode_id,
-                'pbb_booking_details' => json_encode($booking_details_generated),
-                'pbb_booking_date' => $request->booking_date,
-                'pbb_booking_duration' => $duration,
-                'pbb_booking_start_time' => $request->booking_start_time,
-                'pbb_booking_end_time' => $request->booking_end_time,
-                'pbb_ref_no' => uniqid('BOONOLKIINNEG_'),
-                'pbb_type' => 'Online',
-                'pbb_service_location' => $request->service_location,
-                'pbb_total_amount' => $total_amount,
-                'pbb_discounts' => 0,
-                'pbb_contact_no' => ($request->booking_for_someone == 1) ? $request->someone_contact_no : $customer->customer_contact_no,
-                'pbb_status' => 3
-            ]);
-        } catch (\Illuminate\Database\QueryException $e) {
-            if ($e->errorInfo[1] == 1062) { // duplicate entry
-                return response()->json([
-                    'status' => false,
-                    'message' => 'This booking already exists or was just created.',
-                ], 409);
-            }
-            throw $e;
-        }        
-        Log::info('addOnlineBooking Response:', ['Response' => $addbooking]);
-        if ($addbooking) {
-            
-            foreach ($booking_details as $value) {
-                $service = services::where('pbs_id', $value['service_id'])->first();
-                $price = floatval(str_replace(',', '', $service->pbs_price));
-                if ($service) {
-                    bookingDetail::create([
-                        'pbbd_booking_id' => $addbooking->pbb_id,
-                        'pbbd_service_id' => $value['service_id'],
-                        'pbbd_employee_id' => null,
-                        'pbbd_promo_id' => null,
-                        'pbbd_amount' => $price,
-                        'pbbd_discount' => 0,
-                        'pbbd_total_amount' => $price,
-                        'pbb_status' => 1
-                    ]);
-                }
-            }
-
-            $vendors_user_id = User::where('pbu_vid', $request->vendor_id)->first();
-            
-            if(empty($vendors_user_id)){
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Vendor User Not Found',
-                ], 404);
-            }
-            // $checkUserDeviceToken = deviceToken::where('pbdt_user_id', $vendors_user_id->pbu_id)->first();
-            $notification_title = 'Booking Confirmed!';
-            $notification_message = 'Booking added successfully!. Your booking reference no:'. $addbooking->pbb_ref_no;
-            $booking_details_for_notification = [
-                'booking_ref_no' => $addbooking->pbb_ref_no,
-                'booking_date' => $addbooking->pbb_booking_date,
-                'booking_start_time' => $addbooking->pbb_booking_start_time,
-                'booking_end_time' => $addbooking->pbb_booking_end_time,
-                'total_amount' => $addbooking->pbb_total_amount,
-            ];
-            Log::info('vendors_user_id Response:', ['Response' => $vendors_user_id->pbu_id]);
-            $booking_notification = $oneSignalService->sendToUser($vendors_user_id->pbu_id, $notification_title, $notification_message, $booking_details_for_notification);
-            Log::info('booking_notification Response:', ['Response' => $booking_notification]);
-            if($booking_notification){
-                notification::create([
-                    'pbn_user_id' => $user->pbu_id,
-                    'pbn_type' => 'specific',
-                    'pbn_title' => $notification_title,
-                    'pbn_message' => $notification_message,
-                    'pbn_is_read' => 0,
-                ]);
-            }
-
-            $sms_customer_name = $request->someone_name ? $request->someone_name : $customer->pbc_first_name;
-            $sms_vendor_name = $vendor->pbv_business_name;
-            $sms_booking_date = $addbooking->pbb_booking_date->format('d M Y');
-            $sms_booking_start_time = $addbooking->pbb_booking_start_time->format('H:i A');
-            $sms_booking_end_time = $addbooking->pbb_booking_end_time->format('H:i A');
-            $sms_total_amount = $addbooking->pbb_total_amount;
-            $sms_booking_ref_no = $addbooking->pbb_ref_no;
-            $sms_phone_no = $request->phone_no ? $request->phone_no : $customer->pbc_contact_no;
-
-            $apiKey = config('dialogesms.api_key');
-            $sender = config('dialogesms.sender');
-            // $message = "Hello {$sms_customer_name}, your booking at {$sms_vendor_name} has been confirmed!\n\n" .
-            //             "Date: {$sms_booking_date}\n" .
-            //             "Time: {$sms_booking_start_time} - {$sms_booking_end_time}\n" .
-            //             "Total Amount: {$sms_total_amount}\n" .
-            //             "Booking Ref: {$sms_booking_ref_no}\n\n" .
-            //             "Thank you for choosing Parlours Booking!";
-            
-            $message = "Dear Customer,\n".
-                        "Your booking is confirmed on {$sms_booking_date} at {$sms_booking_start_time} | Ref: {$sms_booking_ref_no}. Please arrive 10 mins early.\n" .
-                        "Thank you for choosing Parlours Booking!";
-
-            // Store OTP to DB/Cache if needed here
-            //$smsEnable = filter_var($request->header('SMS_ENABLE', true), FILTER_VALIDATE_BOOLEAN);
-            //if($smsEnable){
-                $booking_sms_result = $this->smsService->sendMessage($apiKey, [$sms_phone_no], $message, $sender);       
-            //}
-            Log::info('booking_sms_result Response:', ['Response' => $booking_sms_result]);
-            // ✅ Add Payment Transaction
-            $platform_fee_percentage = 10; // example: 10% commission
-            $platform_fee = ($total_amount * $platform_fee_percentage) / 100;
-            $vendor_amount = $total_amount - $platform_fee;
-
-            $payment = paymentTransection::create([
-                'pbpt_transaction_id'   => uniqid('TXN_'), // unique transaction ID
-                'pbpt_booking_id'       => $addbooking->pbb_id,
-                'pbpt_vendor_id'        => $request->vendor_id,
-                'pbpt_customer_id'      => $customer->pbc_id,
-                'pbpt_payment_method'   => 'Online', // fallback
-                'pbpt_total_amount'     => $total_amount,
-                'pbpt_discount_amount'  => 0, // you can add logic if promo applied
-                'pbpt_final_amount'     => $total_amount,
-                'pbpt_platform_fee'     => $platform_fee,
-                'pbpt_vendor_amount'    => $vendor_amount,
-                'pbpt_payment_response' => null, // store gateway response if online
-                'pbpt_payment_ref_no'   => uniqid('PAYREF_'),
-                'pbpt_description'      => 'Payment for booking #' . $addbooking->pbb_ref_no,
-                'pbpt_status'           => 1, // 1 = success, 0 = pending, etc.
-                'pbpt_remarks'          => 'Auto-generated payment record'
-            ]);
-            Log::info('payment transection Response:', ['Response' => $payment]);
-            $vendorPayout = vendorPayouts::firstOrCreate(
-                ['pbvp_vendor_id' => $request->vendor_id],
-                ['pbvp_total_earned' => 0, 'pbvp_total_paid' => 0, 'pbvp_total_due' => 0]
-            );
-
-            $vendorPayout->increment('pbvp_total_earned', $vendor_amount);
-            $vendorPayout->increment('pbvp_total_due', $vendor_amount);
-
-            $payoutItem = vendorPayoutItems::create([
-                'pbvpi_payout_id'   => $vendorPayout->pbvp_id,
-                'pbvpi_booking_id'  => $addbooking->pbb_id,
-                'pbvpi_payment_id'  => $payment->pbpt_id,
-                'pbvpi_amount'      => $total_amount,
-                'pbvpi_platform_fee'=> $platform_fee,
-                'pbvpi_vendor_amount'=> $vendor_amount,
-                'pbvpi_status'      => '0'
-            ]);
-            Log::info('vendor payouts Response:', ['Response' => $payoutItem]);
-            return response()->json([
-                'status' => true,
-                'message' => 'Booking added successfully',
-                'data' => [
-                    'booking_id' => $addbooking->pbb_id,
-                    'booking_ref_no' => $addbooking->pbb_ref_no,
-                    'vendor_id' => $addbooking->pbb_vendor_id,
-                    'total_amount' => $total_amount,
-                ]
-            ], 200);
-        }
-
-        // vendorPayoutHistory::create([
-        //     'pbvph_vendor_id' => $request->vendor_id,
-        //     'pbvph_amount' => $vendor_amount,
-        //     'pbvph_method' => 'system',
-        //     'pbvph_reference' => $payment->pbpt_transaction_id,
-        //     'pbvph_description' => 'Booking #' . $addbooking->pbb_ref_no . ' recorded as pending payout',
-        //     'pbvph_status' => '0'
-        // ]);
-
-        return response()->json([
-            'message' => "Unable to add the booking now. Please try again later",
-        ], 500);       
-    }
-
     public function addOnlineBooking_v1(
         Request $request,
         OneSignalService $oneSignalService,
@@ -1299,7 +1039,7 @@ class BookingController extends Controller
             'pbb_ref_no' => uniqid('BMOAONKUIANLG_'),
             'pbb_type' => 'Manual',
             'pbb_service_location' => $request->service_location,
-            'pbb_contact_no' => ($request->booking_for_someone == 1) ? $request->someone_contact_no : $customer->customer_contact_no,
+            'pbb_contact_no' => ($request->booking_for_someone == 1) ? $request->someone_contact_no : '-',
             'pbb_status' => 1
         ]);
         Log::info('addManualBooking Response:', ['Response' => $addbooking]);
@@ -1464,6 +1204,17 @@ class BookingController extends Controller
                         'pbn_is_read' => 0,
                     ]);
                 }
+
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Booking status marked as DNA',
+                ], 200);
+            } else {
+                Log::warning('Customer user not found for booking marked as No Customer:', ['BookingID' => $booking->pbb_id]);
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Booking marked as No Customer, but customer details not found for notification',
+                ], 200);
             }
         }
 
@@ -1906,7 +1657,7 @@ class BookingController extends Controller
         $totalSelectedAmount = $selectedItems->sum('pbvpi_vendor_amount');
 
         // ✅ Validation: the amount paid must not exceed due total
-        if ($amountToPay > $vendorPayout->pbvp_total_due) {
+        if ($amountToPay > $payouts->pbvp_total_due) {
             return response()->json(['message' => 'Paying amount exceeds total due'], 422);
         }
 
@@ -1916,7 +1667,7 @@ class BookingController extends Controller
 
         if ($amountToPay > 0) {
             $payoutHistory = vendorPayoutHistory::create([
-                'pbvph_vendor_id' => $vendorId,
+                'pbvph_vendor_id' => $vendor->pbv_id,
                 'pbvph_amount' => $amountToPay,
                 'pbvph_method' => $payment_moethod,
                 'pbvph_reference' => 'PAYOUT_' . uniqid(),
@@ -1925,8 +1676,8 @@ class BookingController extends Controller
             ]);
 
             // Update vendor payout totals
-            $vendorPayout->increment('pbvp_total_paid', $amountToPay);
-            $vendorPayout->decrement('pbvp_total_due', $amountToPay);
+            $payouts->increment('pbvp_total_paid', $amountToPay);
+            $payouts->decrement('pbvp_total_due', $amountToPay);
 
             // Mark related payout items as paid
             vendorPayoutItems::whereIn('pbvpi_id', $selectedItemIds)
