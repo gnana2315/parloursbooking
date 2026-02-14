@@ -263,7 +263,9 @@ class CustomersController extends Controller
             ], 404);
         }
 
-        $bookings = $customer->bookings()->with(['vendors','bookingDetails.services'])->get();
+        $bookings = $customer->bookings()->with(['vendors','bookingDetails.services'])
+                    ->where('pbb_status', '!=', 3) // Exclude Pending/unpaid booking
+                    ->get();
         
         $bookingsWithTotal = $bookings->map(function ($booking) {
             $total = $booking->bookingDetails->sum('pbbd_total_amount');
