@@ -1274,6 +1274,7 @@ class CommonController extends Controller
 
         $earnedAmount = booking::where('pbb_vendor_id', $vendor->pbv_id)
             ->where('pbb_status', '2')
+            ->where('pbb_type', 'Online')
             ->sum('pbb_total_amount');
 
         // $earnedAmount = 1575;

@@ -1440,7 +1440,7 @@ class VendorController extends Controller
         }
 
         return response()->json([
-            'message' => 'Vendor Special Closes requested successfully! We will confirm after validate with your exisiting bookings.'
+            'message' => 'Vendor Special Closes added successfully! Customer cannot book during these times.'
         ], 200);
     }
 
