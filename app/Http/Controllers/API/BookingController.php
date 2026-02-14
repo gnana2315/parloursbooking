@@ -1365,8 +1365,9 @@ class BookingController extends Controller
             return response()->json(['message' => 'Your Profile is not verified'], 403);
         }
 
-        $bookings = booking::where('pbb_vendor_id', $vendor->pbv_id)
-            ->with(['customer', 'bookingDetails.services' ])
+        $bookings = booking::with(['customer', 'bookingDetails.services' ])
+            ->where('pbb_vendor_id', $vendor->pbv_id)
+            ->where('pbb_status', '!=', 3) // Exclude Pending/unpaid booking
             ->orderBy('pbb_booking_date', 'desc')
             ->get();
 
