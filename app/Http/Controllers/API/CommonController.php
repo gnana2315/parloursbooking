@@ -1267,6 +1267,7 @@ class CommonController extends Controller
         }
 
         $bookingsCount = booking::where('pbb_vendor_id', $vendor->pbv_id)
+                                ->where('pbb_type', 'Online')
                                 ->where('pbb_status', '2')
                                 ->count();
         // $bookingsCount = 23;
