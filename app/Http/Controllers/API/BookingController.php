@@ -1172,49 +1172,69 @@ class BookingController extends Controller
         }
 
         if($request->booking_status == 4){
-            // If booking is marked as 'No Customer', initiate notification.
-            $customerUser = customer::find($booking->pbb_customer_id);
+            // Safely parse booking date and time
+            $bookingDate = Carbon::parse($booking->pbb_booking_date)->format('Y-m-d');
+            $bookingEndTime = Carbon::parse($booking->pbb_booking_end_time)->format('H:i:s');
+
+            $bookingEndDateTime = Carbon::createFromFormat(
+                'Y-m-d H:i:s',
+                "$bookingDate $bookingEndTime"
+            );
             
-            Log::info('Customer User Details:', ['CustomerUser' => $customerUser]);
-            // Send notification to CUSTOMER for successful payment
-            if ($customerUser) {
-                $customerNotificationTitle = 'Booking Cancelled!';
-                $customerNotificationMessage = 'Booking Cancelled due to your absense. Your booking reference no: '. $booking->pbb_ref_no;
-                $customerNotificationData = [
-                    'booking_ref_no' => $booking->pbb_ref_no,
-                    'booking_id' => $booking->pbb_id,
-                    'status' => $booking->pbb_status,
-                    'transaction_id' => $booking->pbb_ref_no,
-                    'amount' => $booking->pbb_total_amount
-                ];
-
-                $customerNotificationResult = $oneSignalService->sendToUser(
-                    $customerUser->pbc_user_id,
-                    $customerNotificationTitle,
-                    $customerNotificationMessage,
-                    $customerNotificationData
-                );
-                    
-                if ($customerNotificationResult) {
-                    notification::create([
-                        'pbn_user_id' => $customerUser->pbc_user_id,
-                        'pbn_type' => 'Booking Cancelled',
-                        'pbn_title' => $customerNotificationTitle,
-                        'pbn_message' => $customerNotificationMessage,
-                        'pbn_is_read' => 0,
-                    ]);
-                }
-
-                return response()->json([
-                    'status' => true,
-                    'message' => 'Booking status marked as DNA',
-                ], 200);
-            } else {
-                Log::warning('Customer user not found for booking marked as No Customer:', ['BookingID' => $booking->pbb_id]);
+            if (Carbon::now()->lt($bookingEndDateTime)) {
+                Log::info('Attempt to DNA booking before end time:', [
+                    'CurrentTime' => Carbon::now(),
+                    'BookingEndTime' => $bookingEndDateTime
+                ]);
                 return response()->json([
                     'status' => false,
-                    'message' => 'Booking marked as No Customer, but customer details not found for notification',
-                ], 200);
+                    'message' => 'Cannot DNA booking before the service end time (' . $bookingEndDateTime->format('Y-m-d H:i:s') . ')'
+                ], 403);
+            }else{
+                // If booking is marked as 'No Customer', initiate notification.
+                $customerUser = customer::find($booking->pbb_customer_id);
+                
+                Log::info('Customer User Details:', ['CustomerUser' => $customerUser]);
+                // Send notification to CUSTOMER for successful payment
+                if ($customerUser) {
+                    $customerNotificationTitle = 'Booking Cancelled!';
+                    $customerNotificationMessage = 'Booking Cancelled due to your absense. Your booking reference no: '. $booking->pbb_ref_no;
+                    $customerNotificationData = [
+                        'booking_ref_no' => $booking->pbb_ref_no,
+                        'booking_id' => $booking->pbb_id,
+                        'status' => $booking->pbb_status,
+                        'transaction_id' => $booking->pbb_ref_no,
+                        'amount' => $booking->pbb_total_amount
+                    ];
+
+                    $customerNotificationResult = $oneSignalService->sendToUser(
+                        $customerUser->pbc_user_id,
+                        $customerNotificationTitle,
+                        $customerNotificationMessage,
+                        $customerNotificationData
+                    );
+                        
+                    if ($customerNotificationResult) {
+                        notification::create([
+                            'pbn_user_id' => $customerUser->pbc_user_id,
+                            'pbn_type' => 'Booking Cancelled',
+                            'pbn_title' => $customerNotificationTitle,
+                            'pbn_message' => $customerNotificationMessage,
+                            'pbn_is_read' => 0,
+                        ]);
+                    }
+
+                    return response()->json([
+                        'status' => true,
+                        'message' => 'Booking status marked as DNA',
+                    ], 200);
+                } else {
+                    Log::warning('Customer user not found for booking marked as No Customer:', ['BookingID' => $booking->pbb_id]);
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Booking marked as No Customer, but customer details not found for notification',
+                    ], 200);
+                }
             }
         }
 
