@@ -666,7 +666,7 @@ class BookingController extends Controller
                 ], 409);
             }
 
-            $pbb_ref_no = 'PBA-' . date('ymdHis');
+            $pbb_ref_no = uniqid(date('ymdHis'));
 
             // 5️⃣ Create booking
             $addbooking = Booking::create([
@@ -1029,7 +1029,7 @@ class BookingController extends Controller
             ], 409);
         }
 
-        $pbb_ref_no = '_PBW-' . date('ymdHis');
+        $pbb_ref_no = uniqid(date('ymdHis'));
 
         $addbooking = Booking::create([
             'pbb_vendor_id' => $vendor->pbv_id,
