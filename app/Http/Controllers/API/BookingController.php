@@ -666,6 +666,8 @@ class BookingController extends Controller
                 ], 409);
             }
 
+            $pbb_ref_no = 'PBA_' . date('YmdHis') . '_' . substr(uniqid(), -5);
+
             // 5️⃣ Create booking
             $addbooking = Booking::create([
                 'pbb_vendor_id' => $vendor->pbv_id,
@@ -682,7 +684,7 @@ class BookingController extends Controller
                 'pbb_booking_duration' => $duration,
                 'pbb_booking_start_time' => $request->booking_start_time,
                 'pbb_booking_end_time' => $request->booking_end_time,
-                'pbb_ref_no' => uniqid('BOONOLKIINNEG_'),
+                'pbb_ref_no' => $pbb_ref_no,
                 'pbb_type' => 'Online',
                 'pbb_service_location' => $request->service_location,
                 'pbb_total_amount' => $total_amount,
@@ -1027,6 +1029,8 @@ class BookingController extends Controller
             ], 409);
         }
 
+        $pbb_ref_no = 'PBW_' . date('YmdHis') . '_' . substr(uniqid(), -5);
+
         $addbooking = Booking::create([
             'pbb_vendor_id' => $vendor->pbv_id,
             'pbb_customer_id' => null,
@@ -1036,7 +1040,7 @@ class BookingController extends Controller
             'pbb_booking_duration' => $duration,
             'pbb_booking_start_time' => $request->booking_start_time,
             'pbb_booking_end_time' => $request->booking_end_time,
-            'pbb_ref_no' => uniqid('BMOAONKUIANLG_'),
+            'pbb_ref_no' => $pbb_ref_no,
             'pbb_type' => 'Manual',
             'pbb_service_location' => $request->service_location,
             'pbb_contact_no' => ($request->booking_for_someone == 1) ? $request->someone_contact_no : '-',
