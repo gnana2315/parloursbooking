@@ -1985,45 +1985,6 @@ class VendorController extends Controller
                 ];
             })->toArray();
 
-        // $earnings = bookings::where('pbv_vendor_id', $vendor->pbv_id)
-        //     ->whereBetween('pb_bk_date', [$startOfWeek, $endOfWeek])
-        //     ->sum('pb_bk_total');
-
-        // return response()->json([
-        //     'success' => true,
-        //     'data' => [
-        //         'earnings' => $earnings,
-        //         'week_start' => $startOfWeek->format('Y-m-d'),
-        //         'week_end' => $endOfWeek->format('Y-m-d')
-        //     ]
-        // ], 200);
-        // $payouts = [
-        //     [
-        //         'date' => now()->format('Y-m-d'),
-        //         'booking_ref_no' => 'PBV-123456',
-        //         'amount' => 15000.00
-        //     ],
-        //     [
-        //         'date' => now()->format('Y-m-d'),
-        //         'booking_ref_no' => 'PBV-4646',
-        //         'amount' => 7000.00
-        //     ],
-        //     [
-        //         'date' => now()->format('Y-m-d'),
-        //         'booking_ref_no' => 'PBV-7890',
-        //         'amount' => 12000.00
-        //     ],
-        //     [
-        //         'date' => now()->format('Y-m-d'),
-        //         'booking_ref_no' => 'PBV-4567',
-        //         'amount' => 8000.00
-        //     ],
-        //     [
-        //         'date' => now()->format('Y-m-d'),
-        //         'booking_ref_no' => 'PBV-8901',
-        //         'amount' => 5000.00
-        //     ]
-        // ];
         Log::info('payouts Response:', ['Response' => $payouts]);
         return response()->json([
             'success' => true,
@@ -2073,6 +2034,7 @@ class VendorController extends Controller
 
         $allEarnings = paymentTransection::with(['booking','payoutItems'])
             ->where('pbpt_vendor_id', $vendor->pbv_id)
+            ->where('pbb_status', 2)
             ->get()
             ->map(function ($transaction) {                
                 $totalAmount = $transaction->payoutItems->sum('pbvpi_vendor_amount');
