@@ -184,65 +184,65 @@ class VendorController extends Controller
             return response()->json(['message' => 'Vendor not found'], 404);
         }
         
-        if ($vendor->pbv_vendortype != '1') {
-            Log::warning('Step 3.2: Invalid vendor type', [
-                'vendor_id' => $vendor->pbv_id,
-                'pbv_vendortype' => $vendor->pbv_vendortype
-            ]);
-            return response()->json(['message' => 'Invalid vendor type'], 400);
-        }
+        // if ($vendor->pbv_vendortype != '1') {
+        //     Log::warning('Step 3.2: Invalid vendor type', [
+        //         'vendor_id' => $vendor->pbv_id,
+        //         'pbv_vendortype' => $vendor->pbv_vendortype
+        //     ]);
+        //     return response()->json(['message' => 'Invalid vendor type'], 400);
+        // }
         
-        if(empty($request->email)){
-            Log::warning('Step 3.3: Email is empty', ['request_data' => $request->all()]);
-            return response()->json(['message' => 'Email is required'], 400);
-        }else{
-            if($vendor->pbv_email && $vendor->pbv_email == $request->email){
-                Log::warning('Step 3.4: Email mismatch', [
-                    'vendor_email' => $vendor->pbv_email,
-                    'request_email' => $request->email
-                ]);
-                return response()->json(['message' => 'Email already exists'], 400);
-            }
-        }
+        // if(empty($request->email)){
+        //     Log::warning('Step 3.3: Email is empty', ['request_data' => $request->all()]);
+        //     return response()->json(['message' => 'Email is required'], 400);
+        // }else{
+        //     if($vendor->pbv_email && $vendor->pbv_email == $request->email){
+        //         Log::warning('Step 3.4: Email mismatch', [
+        //             'vendor_email' => $vendor->pbv_email,
+        //             'request_email' => $request->email
+        //         ]);
+        //         return response()->json(['message' => 'Email already exists'], 400);
+        //     }
+        // }
 
-        $lat = trim($request->latitude);
-        $lng = trim($request->longatitude);
+        // $lat = trim($request->latitude);
+        // $lng = trim($request->longatitude);
 
-        if ($lat === '' || $lng === '' || floatval($lat) == 0.0 || floatval($lng) == 0.0) {
-            Log::warning('Step 3.5: Invalid location coordinates', [
-                'latitude' => $request->latitude,
-                'longatitude' => $request->longatitude
-            ]);
-            return response()->json(['message' => 'Location is required'], 404);
-        }
+        // if ($lat === '' || $lng === '' || floatval($lat) == 0.0 || floatval($lng) == 0.0) {
+        //     Log::warning('Step 3.5: Invalid location coordinates', [
+        //         'latitude' => $request->latitude,
+        //         'longatitude' => $request->longatitude
+        //     ]);
+        //     return response()->json(['message' => 'Location is required'], 404);
+        // }
 
-        $contact_no = $request->contact_no;
-        if(empty($contact_no)){
-            Log::info('Step 3.6: Contact No is empty, using user mobile no', ['contact_no' => $contact_no]);
-            return response()->json(['message' => 'Contact No is required'], 400);
-        }else{
-            if($vendor->pbv_contactno && $vendor->pbv_contactno == $request->contact_no){
-                Log::warning('Step 3.4: Contact No mismatch', [
-                    'vendor_contactno' => $vendor->pbv_contactno,
-                    'request_contact_no' => $request->contact_no
-                ]);
-                return response()->json(['message' => 'Contact No already exists'], 400);
-            }
-        }
+        // $contact_no = $request->contact_no;
+        // if(empty($contact_no)){
+        //     Log::info('Step 3.6: Contact No is empty, using user mobile no', ['contact_no' => $contact_no]);
+        //     return response()->json(['message' => 'Contact No is required'], 400);
+        // }else{
+        //     if($vendor->pbv_contactno && $vendor->pbv_contactno == $request->contact_no){
+        //         Log::warning('Step 3.4: Contact No mismatch', [
+        //             'vendor_contactno' => $vendor->pbv_contactno,
+        //             'request_contact_no' => $request->contact_no
+        //         ]);
+        //         return response()->json(['message' => 'Contact No already exists'], 400);
+        //     }
+        // }
 
-        $br_no = $request->br_no;
-        if(empty($br_no)){
-            Log::info('Step 3.7: BR No is empty', ['br_no' => $br_no]);
-            return response()->json(['message' => 'BR No is required'], 400);
-        }else{
-            if($vendor->pbv_brno && $vendor->pbv_brno == $request->br_no){
-                Log::warning('Step 3.8: BR No mismatch', [
-                    'vendor_brno' => $vendor->pbv_brno,
-                    'request_br_no' => $request->br_no
-                ]);
-                return response()->json(['message' => 'BR No already exists'], 400);
-            }
-        }
+        // $br_no = $request->br_no;
+        // if(empty($br_no)){
+        //     Log::info('Step 3.7: BR No is empty', ['br_no' => $br_no]);
+        //     return response()->json(['message' => 'BR No is required'], 400);
+        // }else{
+        //     if($vendor->pbv_brno && $vendor->pbv_brno == $request->br_no){
+        //         Log::warning('Step 3.8: BR No mismatch', [
+        //             'vendor_brno' => $vendor->pbv_brno,
+        //             'request_br_no' => $request->br_no
+        //         ]);
+        //         return response()->json(['message' => 'BR No already exists'], 400);
+        //     }
+        // }
 
         Log::info('Step 4: Starting validation...');
         // $request->validate(
