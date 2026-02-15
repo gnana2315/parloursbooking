@@ -1892,12 +1892,22 @@ class VendorController extends Controller
         $endOfWeek = now()->endOfWeek()->toDateString();;
 
         Log::info('startOfWeek Response:', ['startOfWeek' => $startOfWeek, 'endOfWeek' => $endOfWeek]);
-        $earnings = paymentTransection::with(['booking'])
-            ->where('pbpt_vendor_id', $vendor->pbv_id)
-            ->whereHas('booking', function ($q) use ($startOfWeek, $endOfWeek) {
-                $q->whereBetween('pbb_booking_date', [$startOfWeek, $endOfWeek]);
-            })
-            ->get();
+        // $earnings = paymentTransection::with(['booking'])
+        //     ->where('pbpt_vendor_id', $vendor->pbv_id)
+        //     ->whereHas('booking', function ($q) use ($startOfWeek, $endOfWeek) {
+        //         $q->whereBetween('pbb_booking_date', [$startOfWeek, $endOfWeek]);
+        //     })
+        //     ->get();
+        $start = now()->startOfWeek()->toDateString();
+$end = now()->endOfWeek()->toDateString();
+
+$earnings = paymentTransection::with(['booking'])
+    ->where('pbpt_vendor_id', $vendor->pbv_id)
+    ->whereHas('booking', function ($q) use ($start, $end) {
+        $q->whereBetween('pbb_booking_date', [$start, $end]);
+    })
+    ->get();
+
 
         // $earnings = paymentTransection::with(['booking'])
         //     ->where('pbpt_vendor_id', $vendor->pbv_id)
