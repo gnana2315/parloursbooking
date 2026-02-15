@@ -119,6 +119,7 @@ Route::middleware(['auth:sanctum', 'validate.token'])->group(function () {
     Route::get('/bookings/{id}', [BookingController::class, 'getBookingDetailsById']);
     Route::post('/booking/mark-status', [BookingController::class, 'markBookingStatus']);
     Route::get('/booking/payment-status', [BookingController::class, 'getBookingPaymentStatus']);
+    Route::get('/vendorPayouts', [BookingController::class, 'vendorPayouts']);
 
     //customer
     Route::get('/customer', [CustomersController::class, 'getCustomer']);
