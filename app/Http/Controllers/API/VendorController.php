@@ -1891,7 +1891,7 @@ class VendorController extends Controller
         $startOfWeek = now()->startOfWeek();
         $endOfWeek = now()->endOfWeek();
 
-        $earnings = paymentTransection::with(['booking','payoutItems'])
+        $earnings = paymentTransection::with(['booking'])
             ->where('pbpt_vendor_id', $vendor->pbv_id)
             ->whereHas('booking', function ($q) use ($startOfWeek, $endOfWeek) {
                 $q->whereBetween('pbb_booking_date', [$startOfWeek, $endOfWeek]);
