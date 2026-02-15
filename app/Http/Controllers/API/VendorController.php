@@ -1976,6 +1976,9 @@ class VendorController extends Controller
             ->whereHas('payoutItems', function ($query) {
                 $query->where('pbvpi_status', 1);
             })
+            ->whereHas('booking', function ($query) {
+                $query->where('pbb_status', 2);
+            })
             ->get()
             ->map(function ($transaction) {
                 return [
