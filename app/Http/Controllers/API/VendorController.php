@@ -1888,8 +1888,8 @@ class VendorController extends Controller
             return response()->json(['message' => 'Vendor not found'], 404);
         }
         Log::info('getThisWeekEarningsByVendor Vendor Response:', ['Response' => $vendor]);
-        $startOfWeek = now()->startOfWeek();
-        $endOfWeek = now()->endOfWeek();
+        $startOfWeek = now()->startOfWeek()->toDateString();;
+        $endOfWeek = now()->endOfWeek()->toDateString();;
 
         Log::info('startOfWeek Response:', ['startOfWeek' => $startOfWeek, 'endOfWeek' => $endOfWeek]);
         $earnings = paymentTransection::with(['booking'])
