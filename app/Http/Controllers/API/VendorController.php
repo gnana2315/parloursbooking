@@ -2034,7 +2034,9 @@ class VendorController extends Controller
 
         $allEarnings = paymentTransection::with(['booking','payoutItems'])
             ->where('pbpt_vendor_id', $vendor->pbv_id)
-            ->where('pbb_status', 2)
+            ->whereHas('booking', function ($q) {
+                $q->where('pbb_status', 2); 
+            })
             ->get()
             ->map(function ($transaction) {                
                 $totalAmount = $transaction->payoutItems->sum('pbvpi_vendor_amount');
