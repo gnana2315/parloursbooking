@@ -294,7 +294,7 @@ class VendorController extends Controller
             Log::info('Step 4.1: Validation successful', ['validated_data' => $validated]);
         } catch (ValidationException $e) {
             $firstError = collect($e->errors())->flatten()->first();
-            Log::error('Step 4.2: Validation failed', ['error' => $firstError]);
+            Log::error('Step 4.2: Validation failed', ['message' => $firstError]);
             return response()->json([
                 'message' => $firstError,
                 'data' => $user
