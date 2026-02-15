@@ -1893,7 +1893,7 @@ class VendorController extends Controller
 
         Log::info('startOfWeek Response:', ['startOfWeek' => $startOfWeek, 'endOfWeek' => $endOfWeek]);
 
-        $earnings = paymentTransection::with(['booking'])
+        $earnings = paymentTransection::with(['booking', 'payoutItems'])
             ->where('pbpt_vendor_id', $vendor->pbv_id)
             ->whereHas('booking', function ($q) use ($startOfWeek, $endOfWeek) {
                 $q->whereBetween('pbb_booking_date', [$startOfWeek, $endOfWeek]);
@@ -1903,16 +1903,10 @@ class VendorController extends Controller
                 // $totalAmount = $transaction->payoutItems->sum('pbvpi_vendor_amount');
                 // $isPaid = $transaction->payoutItems->every(fn($item) => $item->pbvpi_status == 1);
                 $status = '';
-                if($transaction->pbpt_status == 0){
+                if($transaction->pbvpi_status == 0){
                     $status = 'Unpaid';
-                }else if($transaction->pbpt_status == 1){
-                    $status = 'Paid';
-                }else if($transaction->pbpt_status == 2){
-                    $status = 'Refunded';
-                }else if($transaction->pbpt_status == 3){
-                    $status = 'Declined';
                 }else{
-                    $status = 'Unknown';
+                    $status = 'Paid';
                 }
 
                 return [
