@@ -1887,7 +1887,7 @@ class VendorController extends Controller
         if (!$vendor) {
             return response()->json(['message' => 'Vendor not found'], 404);
         }
-
+        Log::info('getThisWeekEarningsByVendor Vendor Response:', ['Response' => $vendor]);
         $startOfWeek = now()->startOfWeek();
         $endOfWeek = now()->endOfWeek();
 
