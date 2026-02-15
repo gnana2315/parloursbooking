@@ -2035,21 +2035,32 @@ class VendorController extends Controller
             return response()->json(['message' => 'Vendor not found'], 404);
         }
 
-        $allEarnings = paymentTransection::with(['booking','payoutItems'])
+        $allEarnings = paymentTransection::with(['booking']) //,'payoutItems'
             ->where('pbpt_vendor_id', $vendor->pbv_id)
             ->whereHas('booking', function ($q) {
                 $q->where('pbb_status', 2); 
             })
             ->get()
             ->map(function ($transaction) {                
-                $totalAmount = $transaction->payoutItems->sum('pbvpi_vendor_amount');
-                $isPaid = $transaction->payoutItems->every(fn($item) => $item->pbvpi_status == 1);
-
+                // $totalAmount = $transaction->payoutItems->sum('pbvpi_vendor_amount');
+                // $isPaid = $transaction->payoutItems->every(fn($item) => $item->pbvpi_status == 1);
+                $status = '';
+                if($transaction->pbpt_status == 0){
+                    $status = 'Unpaid';
+                }else if($transaction->pbpt_status == 1){
+                    $status = 'Paid';
+                }else if($transaction->pbpt_status == 2){
+                    $status = 'Refunded';
+                }else if($transaction->pbpt_status == 3){
+                    $status = 'Declined';
+                }else{
+                    $status = 'Unknown';
+                }
                 return [
                     'date' => $transaction->created_at->format('Y-m-d'),
-                    'booking_ref_no' => $transaction->booking->pbb_ref_no ?? null,
-                    'amount' => $totalAmount,
-                    'status' => $isPaid ? 'Paid' : 'Unpaid',
+                    'booking_ref_no' => $transaction->booking->pbb_ref_no,
+                    'amount' => $transaction->pbpt_total_amount,
+                    'status' => $status,
                 ];
             })->toArray();
             
