@@ -1893,9 +1893,9 @@ class VendorController extends Controller
 
         $earnings = paymentTransection::with(['booking','payoutItems'])
             ->where('pbpt_vendor_id', $vendor->pbv_id)
-            ->whereHas('booking', function ($q) use ($startOfWeek, $endOfWeek) {
-                $q->whereBetween('pbb_booking_date', [$startOfWeek, $endOfWeek]);
-            })
+            // ->whereHas('booking', function ($q) use ($startOfWeek, $endOfWeek) {
+            //     $q->whereBetween('pbb_booking_date', [$startOfWeek, $endOfWeek]);
+            // })
             ->get()
             ->map(function ($transaction) {
                 $totalAmount = $transaction->payoutItems->sum('pbvpi_vendor_amount');
@@ -1909,46 +1909,6 @@ class VendorController extends Controller
                 ];
             })->toArray();
 
-        // return response()->json([
-        //     'success' => true,
-        //     'data' => [
-        //         'earnings' => $earnings,
-        //         'week_start' => $startOfWeek->format('Y-m-d'),
-        //         'week_end' => $endOfWeek->format('Y-m-d')
-        //     ]
-        // ], 200);
-        // $earnings = [
-        //     [
-        //         'date' => now()->format('Y-m-d'),
-        //         'booking_ref_no' => 'PBV-123456',
-        //         'amount' => 15000.00,
-        //         'status' => 'Completed',
-        //     ],
-        //     [
-        //         'date' => now()->format('Y-m-d'),
-        //         'booking_ref_no' => 'PBV-4646',
-        //         'amount' => 7000.00,
-        //         'status' => 'Completed',
-        //     ],
-        //     [
-        //         'date' => now()->format('Y-m-d'),
-        //         'booking_ref_no' => 'PBV-7890',
-        //         'amount' => 12000.00,
-        //         'status' => 'Completed',
-        //     ],
-        //     [
-        //         'date' => now()->format('Y-m-d'),
-        //         'booking_ref_no' => 'PBV-4567',
-        //         'amount' => 8000.00,
-        //         'status' => 'Completed',
-        //     ],
-        //     [
-        //         'date' => now()->format('Y-m-d'),
-        //         'booking_ref_no' => 'PBV-8901',
-        //         'amount' => 5000.00,
-        //         'status' => 'Completed',
-        //     ]
-        // ];
         Log::info('getThisWeekEarningsByVendor Response:', ['Response' => $earnings]);
         return response()->json([
             'success' => true,
