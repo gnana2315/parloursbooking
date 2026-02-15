@@ -1918,7 +1918,7 @@ class VendorController extends Controller
                 return [
                     'date' => $transaction->created_at->format('Y-m-d'),
                     'booking_ref_no' => $transaction->booking->pbb_ref_no,
-                    'amount' => $transaction->pbpt_total_amount,
+                    'amount' => number_format($transaction->pbpt_total_amount, 2, '.', ''),
                     'status' => $status,
                 ];
             })->toArray();
@@ -1984,7 +1984,7 @@ class VendorController extends Controller
                 return [
                     'date' => $transaction->created_at->format('Y-m-d'),
                     'booking_ref_no' => $transaction->booking->pbb_ref_no,
-                    'amount' => $transaction->payoutItems->pbvpi_vendor_amount,
+                    'amount' => number_format($transaction->payoutItems->pbvpi_vendor_amount, 2, '.', ''),
                 ];
             })->toArray();
 
@@ -2059,7 +2059,7 @@ class VendorController extends Controller
                 return [
                     'date' => $transaction->created_at->format('Y-m-d'),
                     'booking_ref_no' => $transaction->booking->pbb_ref_no,
-                    'amount' => $transaction->pbpt_vendor_amount,
+                    'amount' => number_format($transaction->pbpt_vendor_amount, 2, '.', ''),
                     'status' => $status,
                 ];
             })->toArray();
@@ -2220,37 +2220,10 @@ class VendorController extends Controller
                 return [
                     'date' => $transaction->created_at->format('Y-m-d'),
                     'booking_ref_no' => $transaction->booking->pbb_ref_no,
-                    'amount' => $transaction->payoutItems->pbvpi_vendor_amount,
+                    'amount' => number_format($transaction->payoutItems->pbvpi_vendor_amount, 2, '.', ''),
                 ];
             })->toArray();
-        
-        // $toBePaidList = [
-        //     [
-        //         'date' => now()->format('Y-m-d'),
-        //         'booking_ref_no' => 'PBV-123456',
-        //         'amount' => 1500.00,
-        //     ],
-        //     [
-        //         'date' => now()->format('Y-m-d'),
-        //         'booking_ref_no' => 'PBV-4646',
-        //         'amount' => 700.00,
-        //     ],
-        //     [
-        //         'date' => now()->format('Y-m-d'),
-        //         'booking_ref_no' => 'PBV-7890',
-        //         'amount' => 1200.00,
-        //     ],
-        //     [
-        //         'date' => now()->format('Y-m-d'),
-        //         'booking_ref_no' => 'PBV-4567',
-        //         'amount' => 800.00,
-        //     ],
-        //     [
-        //         'date' => now()->format('Y-m-d'),
-        //         'booking_ref_no' => 'PBV-8901',
-        //         'amount' => 500.00,
-        //     ]
-        // ];
+
         Log::info('toBePaidList Response:', ['Response' => $toBePaidList]);
 
         return response()->json([
