@@ -1891,35 +1891,43 @@ class VendorController extends Controller
         $startOfWeek = now()->startOfWeek();
         $endOfWeek = now()->endOfWeek();
 
+        Log::info('startOfWeek Response:', ['startOfWeek' => $startOfWeek, 'endOfWeek' => $endOfWeek]);
         $earnings = paymentTransection::with(['booking'])
             ->where('pbpt_vendor_id', $vendor->pbv_id)
             ->whereHas('booking', function ($q) use ($startOfWeek, $endOfWeek) {
                 $q->whereBetween('pbb_booking_date', [$startOfWeek, $endOfWeek]);
             })
-            ->get()
-            ->map(function ($transaction) {
-                // $totalAmount = $transaction->payoutItems->sum('pbvpi_vendor_amount');
-                // $isPaid = $transaction->payoutItems->every(fn($item) => $item->pbvpi_status == 1);
-                $status = '';
-                if($transaction->pbpt_status == 0){
-                    $status = 'Unpaid';
-                }else if($transaction->pbpt_status == 1){
-                    $status = 'Paid';
-                }else if($transaction->pbpt_status == 2){
-                    $status = 'Refunded';
-                }else if($transaction->pbpt_status == 3){
-                    $status = 'Declined';
-                }else{
-                    $status = 'Unknown';
-                }
+            ->get();
 
-                return [
-                    'date' => $transaction->created_at->format('Y-m-d'),
-                    'booking_ref_no' => $transaction->booking->pbb_ref_no,
-                    'amount' => $transaction->pbpt_total_amount,
-                    'status' => $status,
-                ];
-            })->toArray();
+        // $earnings = paymentTransection::with(['booking'])
+        //     ->where('pbpt_vendor_id', $vendor->pbv_id)
+        //     ->whereHas('booking', function ($q) use ($startOfWeek, $endOfWeek) {
+        //         $q->whereBetween('pbb_booking_date', [$startOfWeek, $endOfWeek]);
+        //     })
+        //     ->get()
+        //     ->map(function ($transaction) {
+        //         // $totalAmount = $transaction->payoutItems->sum('pbvpi_vendor_amount');
+        //         // $isPaid = $transaction->payoutItems->every(fn($item) => $item->pbvpi_status == 1);
+        //         $status = '';
+        //         if($transaction->pbpt_status == 0){
+        //             $status = 'Unpaid';
+        //         }else if($transaction->pbpt_status == 1){
+        //             $status = 'Paid';
+        //         }else if($transaction->pbpt_status == 2){
+        //             $status = 'Refunded';
+        //         }else if($transaction->pbpt_status == 3){
+        //             $status = 'Declined';
+        //         }else{
+        //             $status = 'Unknown';
+        //         }
+
+        //         return [
+        //             'date' => $transaction->created_at->format('Y-m-d'),
+        //             'booking_ref_no' => $transaction->booking->pbb_ref_no,
+        //             'amount' => $transaction->pbpt_total_amount,
+        //             'status' => $status,
+        //         ];
+        //     })->toArray();
 
         Log::info('getThisWeekEarningsByVendor Response:', ['Response' => $earnings]);
         return response()->json([
