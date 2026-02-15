@@ -213,7 +213,7 @@ class VendorController extends Controller
                 'latitude' => $request->latitude,
                 'longatitude' => $request->longatitude
             ]);
-            return response()->json(['message' => 'Location is required'], 400);
+            return response()->json(['message' => 'Location is required'], 404);
         }
 
         $contact_no = $request->contact_no;
