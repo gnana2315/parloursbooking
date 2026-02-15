@@ -1893,9 +1893,9 @@ class VendorController extends Controller
 
         $earnings = paymentTransection::with(['booking','payoutItems'])
             ->where('pbpt_vendor_id', $vendor->pbv_id)
-            // ->whereHas('booking', function ($q) use ($startOfWeek, $endOfWeek) {
-            //     $q->whereBetween('pbb_booking_date', [$startOfWeek, $endOfWeek]);
-            // })
+            ->whereHas('booking', function ($q) use ($startOfWeek, $endOfWeek) {
+                $q->whereBetween('pbb_booking_date', [$startOfWeek, $endOfWeek]);
+            })
             ->get()
             ->map(function ($transaction) {
                 $totalAmount = $transaction->payoutItems->sum('pbvpi_vendor_amount');

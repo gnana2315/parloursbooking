@@ -1733,8 +1733,6 @@ class BookingController extends Controller
         ], 200);
     }
 
-
-
     /**
  * @OA\Get(
  *     path="/api/bookings/payment-status",
