@@ -1693,6 +1693,7 @@ class BookingController extends Controller
         if ($amountToPay > 0) {
             $payoutHistory = vendorPayoutHistory::create([
                 'pbvph_vendor_id' => $vendor->pbv_id,
+                'pbvph_payout_id' => $payouts->pbvp_id,
                 'pbvph_amount' => $amountToPay,
                 'pbvph_method' => $payment_moethod,
                 'pbvph_reference' => 'PAYOUT_' . uniqid(),
