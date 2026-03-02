@@ -1959,6 +1959,7 @@ class VendorController extends Controller
  * )
  */
     public function getPayoutHistoryByVendor(){
+        Log::info('getPayoutHistoryByVendor Requests');
         $user = auth()->user();
         $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
         if (!$vendor) {
@@ -1978,7 +1979,12 @@ class VendorController extends Controller
                 return [
                     'date' => $transaction->created_at->format('Y-m-d'),
                     'booking_ref_no' => $transaction->booking->pbb_ref_no,
-                    'amount' => number_format($transaction->payoutItems->pbvpi_vendor_amount, 2, '.', ''),
+                    'amount' => number_format(
+                        $transaction->payoutItems->sum('pbvpi_vendor_amount'),
+                        2,
+                        '.',
+                        ''
+                    ),
                 ];
             })->toArray();
 
