@@ -2041,11 +2041,9 @@ class VendorController extends Controller
                 $q->where('pbb_status', 2); 
             })
             ->get()
-            ->map(function ($transaction) {                
-                // $totalAmount = $transaction->payoutItems->sum('pbvpi_vendor_amount');
-                // $isPaid = $transaction->payoutItems->every(fn($item) => $item->pbvpi_status == 1);
+            ->map(function ($transaction) {
                 $status = '';
-                if($transaction->pbvpi_status == 0){
+                if($transaction->payoutItems->pbvpi_status == 0){
                     $status = 'Unpaid';
                 }else{
                     $status = 'Paid';
