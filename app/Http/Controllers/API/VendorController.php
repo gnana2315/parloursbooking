@@ -2042,12 +2042,9 @@ class VendorController extends Controller
             })
             ->get()
             ->map(function ($transaction) {
-                $status = '';
-                if($transaction->payoutItems->pbvpi_status == 0){
-                    $status = 'Unpaid';
-                }else{
-                    $status = 'Paid';
-                }
+                $status = $transaction->payoutItems->contains('pbvpi_status', 0)
+                            ? 'Unpaid'
+                            : 'Paid';
                 return [
                     'date' => $transaction->created_at->format('Y-m-d'),
                     'booking_ref_no' => $transaction->booking->pbb_ref_no,
