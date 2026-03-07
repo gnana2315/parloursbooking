@@ -1562,6 +1562,7 @@ class VendorController extends Controller
                 'service_duration' => 'required',
                 'service_image' => 'mimes:jpg,jpeg,png|max:2048',
                 'service_price' => 'required|numeric',
+                'service_employees_count' => 'nullable|numeric',
             ],
             [
                 'service_type.required' => 'Service type is required',
@@ -1573,6 +1574,7 @@ class VendorController extends Controller
                 'service_image.max' => 'Service image may not be greater than 2MB',
                 'service_price.required' => 'Service price is required',
                 'service_price.numeric' => 'Service price must be a number',
+                'service_employees_count.numeric' => 'Service employees count must be a number',
             ]
         );        
         
@@ -1613,7 +1615,7 @@ class VendorController extends Controller
             'pbs_duration_cetegory' => '0',
             'pbs_image' => $publicPath,
             'pbs_price' => $request->service_price,
-            'pbs_employees' => null,
+            'pbs_employees' => $request->service_employees_count ?? 0,
             'pbs_status' => 0
         ]);
         
