@@ -9,6 +9,7 @@ use App\Models\vendors;
 use Validator;
 
 use App\Http\Controllers\Controller;
+use App\Models\vendorDocuments;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
@@ -195,6 +196,13 @@ class CustomersController extends Controller
         $vendors = vendors::whereIn('pbv_id', $favourites)
                     ->where('pbv_status', 2)
                     ->get();
+
+        $vendors_documents = vendorDocuments::whereIn('pbvd_vendor_id', $favourites)
+                            ->where('pbvd_status', 3)
+                            ->get();
+
+        $vendors->pbv_images = $vendors_documents->where('pbvd_required_document_id', 7)->pluck('pbvd_document_url')->toArray();
+        $vendors->pbv_logo_image = $vendors_documents->where('pbvd_required_document_id', 6)->pluck('pbvd_document_url')->first();
 
         Log::info('getCustomerFavourites Response:', ['Response' => $vendors]);
         return response()->json([
