@@ -29,4 +29,9 @@ class serviceType extends Model
         'updated_at',
         'deleted_at',
     ];
+
+    public function services()
+    {
+        return $this->hasMany(services::class, 'pbs_service_type', 'pbst_id');
+    }
 }

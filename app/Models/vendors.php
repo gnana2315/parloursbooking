@@ -9,6 +9,8 @@ use App\Models\vendorConfig;
 use App\Models\cities;
 use App\Models\booking;
 use App\Models\ratings;
+use App\Models\vendorType;
+use App\Models\serviceFor;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -62,9 +64,9 @@ class vendors extends Model
         'pbv_therapist_service_area' => 'array'
     ];
 
-    public function User()
+    public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->hasOne(User::class, 'pbu_vid', 'pbv_id');
     }
 
     public function services()
@@ -75,6 +77,11 @@ class vendors extends Model
     public function vendorDocuments()
     {
         return $this->hasMany(vendorDocuments::class, 'pbvd_vendor_id', 'pbv_id');
+    }
+
+    public function bankInfo()
+    {
+        return $this->hasMany(vendorBankInfo:: class, 'pbvb_id', 'pbv_id');
     }
 
     public function availability()
@@ -98,5 +105,13 @@ class vendors extends Model
 
     public function ratings(){
         return $this->hasMany(ratings::class, 'pbr_vendor_id', 'pbv_id');
+    }
+
+    public function vendorType(){
+        return $this->belongsTo(vendorType::class, 'pbv_vendortype', 'pbvt_id');
+    }
+
+    public function serviceFor(){
+        return $this->belongsTo(serviceFor::class, 'pbv_servicefor', 'pbsf_id');
     }
 }

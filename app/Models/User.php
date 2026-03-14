@@ -2,6 +2,7 @@
 
 namespace App\Models;
 use App\Models\vendors;
+use App\Models\AuditLog;
 
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -84,6 +85,11 @@ class User extends Authenticatable
     }
 
     public function vendors(){
-        return $this->hasMany(vendors::class, 'pbv_id', 'pbu_vid');
+        return $this->belongsTo(vendors::class, 'pbu_vid', 'pbv_id');
+    }
+
+    public function auditLogs()
+    {
+        return $this->hasMany(AuditLog::class, 'user_id', 'pbu_id');
     }
 }

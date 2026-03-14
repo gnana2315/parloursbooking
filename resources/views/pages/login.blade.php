@@ -18,14 +18,14 @@
                             <p>{{ $message }}</p>
                         </div>
                     @endif
-                    <form action="/userloging" method="POST" enctype="multipart/form-data">
+                    <form action="/auth/login" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="form_section_title"><h3>System Login</h3></div>
                         <div class="row">
                             <div class="col-lg-6 col-md-6 col-xl-6">
                             <div class="form-group">
-                                    <label for="pbu_email">Email</label>
-                                    <input type="email" name="pbu_email" id="pbu_email" class="form-control">
+                                    <label for="email">Email</label>
+                                    <input type="email" name="email" id="email" class="form-control">
                                 </div>
                             </div>
                             <div class="col-lg-6 col-md-6 col-xl-6">

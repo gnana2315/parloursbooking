@@ -1,13 +1,14 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Usercontroller;
 use App\Http\Controllers\homeController;
 
 use App\Http\Controllers\adminController;
 use App\Http\Controllers\superAdminController;
 use App\Http\Controllers\admin\configController;
-use App\Http\Controllers\admin\vendorsController;
+use App\Http\Controllers\admin\VendorsController;
 use App\Http\Controllers\admin\reportsController;
 use App\Http\Controllers\admin\servicesController;
 use App\Http\Controllers\PaymentController;
@@ -60,6 +61,8 @@ Route::get('/vendorRegistration', function () {
     return View::make('pages.vendorsRegistration');
 });
 
+Route::post('/auth/login', [AuthController::class, 'login'])->name('login');
+
 
 Route::get('/api/documentation/asset/{asset}', [SwaggerAssetController::class, 'asset']);
 
@@ -94,24 +97,30 @@ Route::group(['middleware' => 'auth.check'], function () {
             Route::post('/updateSEO', [configController::class, 'updateSEOWords']);
             Route::get('/delete_seo/{id}', [configController::class, 'deleteSEO']);
 
-            Route::get('/vendor', [vendorsController::class, 'index']);
-            Route::get('/vendorlist', [vendorsController::class, 'getAllVendorsList']);
-            Route::get('/viewVendor/{id}', [vendorsController::class, 'viewVendor']);
-            Route::post('/vendor/activate', [vendorsController::class, 'activate_vendor']);
+            Route::get('/vendorlist', [VendorsController::class, 'index'])->name('vendor.list');
+            // Route::get('/vendorlist', [VendorsController::class, 'getAllVendorsList']);
+            Route::get('/viewVendor/{id}', [VendorsController::class, 'viewVendor'])->name('vendor.view');
+            Route::post('/vendor/activate', [VendorsController::class, 'activate_vendor'])->name('vendor.activate');
+            Route::post('/vendor/update-status', [VendorsController::class, 'updateStatus'])->name('vendor.updateStatus');
+            Route::post('/vendor/update-service-for', [VendorsController::class, 'updateServiceFor'])->name('vendor.updateServiceFor');
+            Route::post('/vendor/bank/status/update', [VendorsController::class, 'updateBankStatus'])->name('vendor.bank.status.update');
+            Route::post('/vendor/bank/update', [VendorsController::class, 'updateBankInfo'])->name('vendor.bank.update');
+            Route::get('/vendor/document/approve', [VendorsController::class, 'approveDocument'])->name('vendor.document.approve');
+            Route::post('/vendor/document/reject', [VendorsController::class, 'rejectDocument'])->name('vendor.document.reject');
 
             Route::get('/reports', [reportsController::class, 'index']);
         });
-        Route::group(['middleware' => 'isSuperAdmin'], function () {
-            Route::get('/superdashboard', [superAdminController::class, 'index']);
+        // Route::group(['middleware' => 'isSuperAdmin'], function () {
+        //     Route::get('/superdashboard', [superAdminController::class, 'index']);
 
-            // Route::get('/serviceCategoriesView', [configController::class, 'viewServiceCategories']);
+        //     // Route::get('/serviceCategoriesView', [configController::class, 'viewServiceCategories']);
 
-            Route::get('/vendors', [vendorsController::class, 'index']);
-            Route::get('/vendorlist', [vendorsController::class, 'getAllVendorsList']);
-            Route::get('/viewVendor/{id}', [vendorsController::class, 'viewVendor']);
+        //     Route::get('/vendors', [VendorsController::class, 'index']);
+        //     Route::get('/vendorlist', [VendorsController::class, 'getAllVendorsList']);
+        //     Route::get('/viewVendor/{id}', [VendorsController::class, 'viewVendor']);
 
-            Route::get('/reports', [reportsController::class, 'index']);
-        });
+        //     Route::get('/reports', [reportsController::class, 'index']);
+        // });
         Route::group(['middleware' => 'isUser'], function () {
             Route::get('/userdashboard', [userAdminController::class, 'index']);
 

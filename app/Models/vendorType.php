@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+use App\Models\vendors;
+
 class vendorType extends Model
 {
     use HasFactory;
@@ -30,4 +32,8 @@ class vendorType extends Model
         'updated_at',
         'deleted_at',
     ];
+
+    public function vendors(){
+        return $this->hasMany(vendors::class, 'pbv_vendortype', 'pbvt_id');
+    }
 }

@@ -5,6 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+use App\Models\vendors;
+use App\Models\banks;
+
 class vendorBankInfo extends Model
 {
     use HasFactory;
@@ -34,4 +37,14 @@ class vendorBankInfo extends Model
         'updated_at',
         'deleted_at',
     ];
+
+    public function vendor()
+    {
+        return $this->belongsTo(vendors::class, 'pbvb_vendorid', 'pbv_id');
+    }
+
+    public function bank()
+    {
+        return $this->belongsTo(banks::class, 'pbvb_bankname', 'pbb_id');
+    }
 }

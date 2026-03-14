@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+use App\Models\vendors;
+
 class serviceFor extends Model
 {
     use HasFactory;
@@ -30,4 +32,13 @@ class serviceFor extends Model
         'updated_at',
         'deleted_at',
     ];
+
+    public function vendors(){
+        return $this->hasMany(vendors::class, 'pbv_servicefor', 'pbsf_id');
+    }
+
+    public function services()
+    {
+        return $this->hasMany(services::class, 'pbs_service_for', 'pbsf_id');
+    }
 }

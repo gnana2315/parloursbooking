@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+use App\Models\vendors;
+
 class vendorDocuments extends Model
 {
     use HasFactory;
@@ -25,7 +27,13 @@ class vendorDocuments extends Model
         'pbvd_document_name',
         'pbvd_document_url',
         'pbvd_document_status',
+        'pbvd_document_extra',
         'created_at',
         'updated_at'
     ];
+
+    public function vendor()
+    {
+        return $this->belongsTo(vendors::class, 'pbvd_vendor_id', 'pbv_id');
+    }
 }

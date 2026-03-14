@@ -26,3 +26,5 @@
 <script src="{{ URL::asset('admin/plugins/jquery/jquery.js') }}"></script>
 <!-- jQuery UI 1.11.4 -->
 <script src="{{ URL::asset('admin/plugins/jquery-ui/jquery-ui.min.js') }}"></script>
+<!-- Sweet Alert -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
