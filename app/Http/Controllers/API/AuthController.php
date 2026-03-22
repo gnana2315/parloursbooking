@@ -314,6 +314,7 @@ class AuthController extends Controller
                     'gender' => 'required',
                     'vendor_type' => 'required',
                     'accept_terms' => 'required',
+                    'email' => 'email|unique:users,pbu_email',
                 ],
                 [
                     'first_name.required' => 'Please enter your First Name',
@@ -324,6 +325,8 @@ class AuthController extends Controller
                     'gender.required' => 'Please select your Gender',
                     'vendor_type.required' => 'Please select your Vendor Type',
                     'accept_terms.required' => 'Please accept the terms and conditions',
+                    'email.email' => 'Please enter a valid Email Address',
+                    'email.unique' => 'Email Address already in use. Please use another email.',
                 ]
             );
 
@@ -335,6 +338,7 @@ class AuthController extends Controller
                 'pbu_city' => $request->city,
                 'pbu_gender' => $request->gender,
                 'pbu_dob' => $request->dob,
+                'pbu_email' => $request->email,
             ]);
 
             $publicPath = '';
