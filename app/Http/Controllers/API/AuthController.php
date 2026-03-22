@@ -91,9 +91,9 @@ class AuthController extends Controller
             ],
             [
                 'user_type.required' => 'User Type undefined',
-                'phone_no.required' => 'Invalid Phone Number.',
-                'phone_no.min' => 'Invalid Phone Number. Phone Number Must have 10 Digits',
-                'phone_no.unique' => 'Phone Number Already Registered. Please use forgot password or contact our hotline.',
+                'phone_no.required' => 'Please enter valid Phone Number.',
+                'phone_no.min' => 'Please enter valid Phone Number. Phone Number Must have 10 Digits',
+                'phone_no.unique' => 'Your phone number already Registered. Please use forgot password or contact our hotline.',
             ]
         );
 
@@ -224,7 +224,7 @@ class AuthController extends Controller
         if ($user->pbu_verification_token === $request->verification_code) {
             if (Carbon::now()->gt($user->pbu_verification_token_expires_at)) {
                 return response()->json([
-                    'message' => 'Verification code has expired. Please request a new one',
+                    'message' => 'Your verification code has expired. Please request a new one',
                 ], 422);
             }
 
@@ -246,7 +246,7 @@ class AuthController extends Controller
             ]);
         }else{
             return response()->json([
-                'message' => 'Invalid verification code',
+                'message' => 'Please enter valid verification code',
             ], 422);
         }        
     }
@@ -326,8 +326,7 @@ class AuthController extends Controller
                     'vendor_type.required' => 'Please select your Vendor Type',
                     'accept_terms.required' => 'Please accept the terms and conditions',
                     'email.email' => 'Please enter a valid Email Address',
-                    'email.unique' => 'Email Address already in use. Please use another email.',
-                ]
+                    'email.unique' => 'Your email is already in use. Please use another email.',                ]
             );
 
             $user->update([

@@ -277,18 +277,18 @@ class VendorController extends Controller
                     'br_no' => 'required|unique:vendor,pbv_brno'
                 ],                
                 [
-                    'business_name.required' => 'Parlour name is required',
-                    'address.required' => 'Address is required',
-                    'city_id.required' => 'City is required',
-                    'longatitude.required' => 'Location is required',
-                    'latitude.required' => 'Location is required',
-                    'email.required' => 'Email is required',
+                    'business_name.required' => 'Please enter your Business Name',
+                    'address.required' => 'Please enter your Business Address',
+                    'city_id.required' => 'Please enter your Business City',
+                    'longatitude.required' => 'Please pick your Business Location on the map',
+                    'latitude.required' => 'Please pick your Business Location on the map',
+                    'email.required' => 'Please enter your Business Email',
                     'email.email' => 'Email must be a valid email address',
-                    'email.unique' => 'Email already exists',
-                    'contact_no.required' => 'Contact No is required',
-                    'contact_no.unique' => 'Contact No already exists',
-                    'br_no.required' => 'BR No is required',
-                    'br_no.unique' => 'BR No already exists'
+                    'email.unique' => 'Your email is already in use. Please use another email.',
+                    'contact_no.required' => 'Please enter your Business Contact No',
+                    'contact_no.unique' => 'Your contact number is already in use. Please use another number.',
+                    'br_no.required' => 'Please enter your Business BR No',
+                    'br_no.unique' => 'Your BR No is already in use. Please use another number.'
                 ]
             );
             Log::info('Step 4.1: Validation successful', ['validated_data' => $validated]);
@@ -442,15 +442,15 @@ class VendorController extends Controller
                 'nic_no' => 'required',
             ],
             [
-                'address.required' => 'Address is required',
-                'city_id.required' => 'City is required',
-                'service_area.required' => 'Service area is required',
+                'address.required' => 'Please enter your Business Address is required',
+                'city_id.required' => 'Please enter your Business City',
+                'service_area.required' => 'Please enter your Service area',
                 'email.email' => 'Email must be a valid email address',
-                'email.required' => 'Email is required',
-                'email.unique' => 'Email already exists',
-                'contact_no.required' => 'Contact No is required',
-                'contact_no.unique' => 'Contact No already exists',
-                'nic_no.required' => 'NIC No is required',
+                'email.required' => 'Please enter your Business Email',
+                'email.unique' => 'Your email is already in use. Please use another email.',
+                'contact_no.required' => 'Please enter your Business Contact No',
+                'contact_no.unique' => 'Your contact number is already in use. Please use another number.',
+                'nic_no.required' => 'Please enter your Business NIC No',
             ]
         );
 
