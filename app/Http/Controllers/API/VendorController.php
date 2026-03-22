@@ -284,9 +284,9 @@ class VendorController extends Controller
                     'latitude.required' => 'Please pick your Business Location on the map',
                     'email.required' => 'Please enter your Business Email',
                     'email.email' => 'Email must be a valid email address',
-                    'email.unique' => 'Email is already in use. Please try another.',
+                    'email.unique' => 'Email already in use. Please try another.',
                     'contact_no.required' => 'Please enter your Business Contact No',
-                    'contact_no.unique' => 'Contact number is already in use. Please try another.',
+                    'contact_no.unique' => 'Contact number already in use. Please try another.',
                     'br_no.required' => 'Please enter your Business BR No',
                     'br_no.unique' => 'Your BR No is already in use. Please use another number.'
                 ]
@@ -447,9 +447,9 @@ class VendorController extends Controller
                 'service_area.required' => 'Please enter your Service area',
                 'email.email' => 'Email must be a valid email address',
                 'email.required' => 'Please enter your Business Email',
-                'email.unique' => 'Email is already in use. Please try another.',
+                'email.unique' => 'Email already in use. Please try another.',
                 'contact_no.required' => 'Please enter your Business Contact No',
-                'contact_no.unique' => 'Contact number is already in use. Please try another.',
+                'contact_no.unique' => 'Contact number already in use. Please try another.',
                 'nic_no.required' => 'Please enter your Business NIC No',
             ]
         );
