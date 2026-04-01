@@ -67,7 +67,8 @@ class VendorsController extends Controller
                     'serviceFor'    // Service for each service
                 ]);
             },
-            'availability'
+            'availability',
+            'specialCloses'
         ])->where('pbv_id', $id)->first();
         $banklist = banks::where('pbb_status', 1)->orderBy('pbb_name')->get();
         $requiredDocuments = requiredDocument::where('pbrd_vendor_type', $vendor->pbv_vendortype)

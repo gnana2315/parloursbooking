@@ -114,4 +114,9 @@ class vendors extends Model
     public function serviceFor(){
         return $this->belongsTo(serviceFor::class, 'pbv_servicefor', 'pbsf_id');
     }
+
+    public function specialCloses()
+    {
+        return $this->hasMany(vendorSpecialCloses::class, 'pbvsc_vendor_id', 'pbv_id');
+    }
 }

@@ -165,6 +165,7 @@
                                 <li class="nav-item"><a class="nav-link active" href="#attachments" data-toggle="tab">Attachments</a></li>
                                 <li class="nav-item"><a class="nav-link" href="#services" data-toggle="tab">Services</a></li>
                                 <li class="nav-item"><a class="nav-link" href="#standard-availability" data-toggle="tab">Standard Availability</a></li>
+                                <li class="nav-item"><a class="nav-link" href="#special-closes" data-toggle="tab">Special Closes</a></li>
                                 <!--li class="nav-item"><a class="nav-link" href="#activity" data-toggle="tab" data-value="{{ $vendor->pbv_uid }}" id="activity_logs">Activity</a></li>
                                 <li class="nav-item"><a class="nav-link" href="#timeline" data-toggle="tab">Timeline</a></li>
                                 <li class="nav-item"><a class="nav-link" href="#settings" data-toggle="tab">Settings</a></li-->
@@ -393,7 +394,44 @@
                                             </table>
                                         </div>
                                     </div>
-
+                                </div>
+                                <div class="tab-pane" id="special-closes">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h3 class="card-title">Vendor's Special Closes</h3>
+                                        </div>
+                                        <div class="card-body">
+                                            <table id="specialClosesTable" class="table table-bordered table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>From Date</th>
+                                                        <th>To Date</th>
+                                                        <th>From Time</th>
+                                                        <th>To Time</th>
+                                                        <th>Full Day Closed</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach($vendor->specialCloses as $close)
+                                                        <tr>
+                                                            <td>{{ date('Y-m-d', strtotime($close->pbvsc_from_date)) }}</td>
+                                                            <td>{{ date('Y-m-d', strtotime($close->pbvsc_to_date)) }}</td>
+                                                            <td>{{ date('H:i A', strtotime($close->pbvsc_from_time)) }}</td>
+                                                            <td>{{ date('H:i A', strtotime($close->pbvsc_to_time)) }}</td>
+                                                            <td>
+                                                                @if($close->pbvsc_full_day_closed)
+                                                                    <span class="badge badge-danger">Yes</span>
+                                                                @else
+                                                                    <span class="badge badge-success">No</span>
+                                                                @endif
+                                                            </td>
+                                                        </tr>
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
                                 <!--div class="tab-pane" id="activity">
                                     <div class="post">
                                         <div class="user-block">

@@ -36,4 +36,9 @@ class vendorSpecialCloses extends Model
         'pbvsc_to_time' => 'datetime:H:i',
         'pbvsc_full_day_closed' => 'boolean',
     ];
+
+    public function vendor()
+    {
+        return $this->belongsTo(vendors::class, 'pbvsc_vendor_id', 'pbv_id');
+    }
 }
