@@ -334,11 +334,18 @@
                                                                 @endif
                                                             </td>
                                                             <td>
-                                                                <button class="btn btn-warning edit-service"
-                                                                    data-service-id="{{ $service->pbs_id }}">
-                                                                    <i class="fas fa-pen "></i> Edit
-                                                                </button>
-                                                                <button class="btn btn-danger btn-sm delete-service-btn" data-service-id="{{ $service->pbs_id }}"><i class="fas fa-trash"></i> Delete</button>
+                                                                @if($service->pbs_status == 1)
+                                                                    <button class="btn btn-warning edit-service"
+                                                                        data-service-id="{{ $service->pbs_id }}">
+                                                                        <i class="fas fa-pen "></i> Edit
+                                                                    </button>
+                                                                    <button class="btn btn-danger btn-sm delete-service-btn" data-service-id="{{ $service->pbs_id }}"><i class="fas fa-trash"></i> Delete</button>
+                                                                @else
+                                                                    <button class="btn btn-success activate-service"
+                                                                        data-service-id="{{ $service->pbs_id }}">
+                                                                        <i class="fas fa-pen "></i> Activate
+                                                                    </button>
+                                                                @endif
                                                             </td>
                                                         </tr>                         
                                                     @endforeach
@@ -1015,8 +1022,92 @@
                 }
             });
         });
+
+        $('.delete-service-btn').on('click', function() {
+            var serviceId = $(this).data('service-id');
+            var $button = $(this);
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You are about to delete this service.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '{{ route("vendor.service.delete") }}',
+                        type: 'POST',
+                        data: {
+                            service_id: serviceId,
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                Swal.fire(
+                                    'Deleted!',
+                                    response.message,
+                                    'success'
+                                );
+                                $button.closest('.service-item').remove();
+                            } else {
+                                Swal.fire(
+                                    'Error!',
+                                    response.message,
+                                    'error'
+                                );
+                            }
+                        },
+                        error: function() {
+                            Swal.fire(
+                                'Error!',
+                                'An error occurred while deleting the service.',
+                                'error'
+                            );
+                        }
+                    });
+                }
+            });
+        });
+
+        $('.activate-service').on('click', function() {
+            var serviceId = $(this).data('service-id');
+            $.ajax({
+                url: '{{ route("vendor.service.activate") }}',
+                type: 'POST',
+                data: {
+                    service_id: serviceId,
+                    _token: '{{ csrf_token() }}'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        Swal.fire(
+                            'Activated!',
+                            response.message,
+                            'success'
+                        );
+                        location.reload();
+                    } else {
+                        Swal.fire(
+                            'Error!',
+                            response.message,
+                            'error'
+                        );
+                    }
+                },
+                error: function() {
+                    Swal.fire(
+                        'Error!',
+                        'An error occurred while activating the service.',
+                        'error'
+                    );
+                }
+            });
+        });
     });
-    
+
     function updateBankStatus(bankInfoId, isChecked) {
         // Convert boolean to integer (1 for active, 0 for inactive)
         const status = isChecked ? 1 : 0;

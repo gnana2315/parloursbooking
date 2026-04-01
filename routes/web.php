@@ -110,6 +110,8 @@ Route::group(['middleware' => 'auth.check'], function () {
             Route::post('/vendor/document/upload', [VendorsController::class, 'documentUpload'])->name('vendor.document.upload');
             Route::get('/vendor/service/getVendorServiceById', [VendorsController::class, 'getVendorServiceById'])->name('vendor.service.get');
             Route::post('/vendor/service/update', [VendorsController::class, 'updateVendorService'])->name('vendor.service.update');
+            Route::post('/vendor/service/delete', [VendorsController::class, 'deleteVendorService'])->name('vendor.service.delete');
+            Route::post('/vendor/service/activate', [VendorsController::class, 'activateVendorService'])->name('vendor.service.activate');
 
             Route::get('/reports', [reportsController::class, 'index']);
         });

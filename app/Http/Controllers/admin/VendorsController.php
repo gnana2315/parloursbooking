@@ -707,4 +707,78 @@ class VendorsController extends Controller
         //     'message' => 'Failed to save service'
         // ], 500);
     }
+
+    public function deleteVendorService(Request $request)
+    {
+        $user = auth()->user();
+
+        $request->validate([
+            'service_id' => 'required|integer|exists:services,pbs_id',
+        ]);
+
+        $service = services::find($request->service_id);
+
+        if (!$service) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Service not found'
+            ], 404);
+        }
+
+        $old_service = $service->replicate();
+        $service->pbs_status = 2; 
+
+        if($service->save()) {
+            $log_message = 'Deleted service (ID: ' . $service->pbs_id . ')';
+            if (isset($this->auditLogService)) {
+                $this->auditLogService->log($log_message, $user, ['deleted_service_info' => $old_service], []);
+            }
+            return response()->json([
+                'success' => true,
+                'message' => 'Service deleted successfully'
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to delete service'
+        ], 500);
+    }
+
+    public function activateVendorService(Request $request)
+    {
+        $user = auth()->user();
+
+        $request->validate([
+            'service_id' => 'required|integer|exists:services,pbs_id',
+        ]);
+
+        $service = services::find($request->service_id);
+
+        if (!$service) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Service not found'
+            ], 404);
+        }
+
+        $old_service = $service->replicate();
+        $service->pbs_status = 1; 
+
+        if($service->save()) {
+            $log_message = 'Activated service (ID: ' . $service->pbs_id . ')';
+            if (isset($this->auditLogService)) {
+                $this->auditLogService->log($log_message, $user, ['old_service_info' => $old_service], ['new_service_info' => $service]);
+            }
+            return response()->json([
+                'success' => true,
+                'message' => 'Service activated successfully'
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to activate service'
+        ], 500);
+    }
 }
