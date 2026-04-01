@@ -334,9 +334,10 @@
                                                                 @endif
                                                             </td>
                                                             <td>
-                                                                <a href="#" class="btn btn-primary btn-sm">
+                                                                <button class="btn btn-warning edit-service"
+                                                                    data-service-id="{{ $service->pbs_id }}">
                                                                     <i class="fas fa-pen "></i> Edit
-                                                                </a>
+                                                                </button>
                                                                 <button class="btn btn-danger btn-sm delete-service-btn" data-service-id="{{ $service->pbs_id }}"><i class="fas fa-trash"></i> Delete</button>
                                                             </td>
                                                         </tr>                         
@@ -649,6 +650,103 @@
                     </div>
                 </div>
             </div>
+
+            <!--Vendor Service Update-->
+            <div class="modal fade" id="editServiceModal" tabindex="-1" role="dialog" aria-labelledby="editServiceModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editServiceModalLabel">Edit Service</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <form id="editServiceForm" method="POST" action="{{ route('vendor.service.update') ?? '/vendor/service/update' }}" autocomplete="off">
+                            @csrf
+                            <div class="modal-body">
+                                <input type="hidden" name="vendor_id" id="vendor_id" value="{{ $vendor->pbv_id ?? '' }}">
+                                <input type="hidden" name="edit_service_id" id="edit_service_id">
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="service_for">Service For</label>
+                                            <select class="form-control" id="service_for" name="service_for" required>
+                                                <option value="">Select Service For</option>
+                                                @foreach($serviceForList as $serviceFor)
+                                                <option value="{{ $serviceFor->pbsf_id }}">
+                                                    {{ $serviceFor->pbsf_name }}
+                                                </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="service_type">Service Type</label>
+                                            <select class="form-control" id="service_type" name="service_type" required>
+                                                <option value="">Select Service Type</option>
+                                                @foreach($serviceTypeList as $serviceType)
+                                                <option value="{{ $serviceType->pbst_id }}">
+                                                    {{ $serviceType->pbst_name }}
+                                                </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="service_name">Service Name</label>
+                                            <input type="text" class="form-control" id="service_name" name="service_name" 
+                                                value="" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="staff_count">Eligible Staff Count</label>
+                                            <input type="text" class="form-control" id="staff_count" name="staff_count" 
+                                                value="" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="service_description">Service Description</label>
+                                            <input type="text" class="form-control" id="service_description" name="service_description" 
+                                                value="" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="service_duration">Duration</label>
+                                            <input type="text" class="form-control" id="service_duration" name="service_duration" 
+                                                value="" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="service_price">Price</label>
+                                            <input type="text" class="form-control" id="service_price" name="service_price" 
+                                                value="" required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary" id="saveServiceBtn">Save Changes</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
     <!--?php } ?-->
@@ -849,7 +947,76 @@
             $('#rejectForm')[0].reset();
             $('#rejection_reason').removeClass('is-invalid');
         });
+
+        //edit service modal population
+        $('.edit-service').on('click', function() {
+            var serviceId = $(this).data('service-id');
+            $.ajax({
+                url: '{{ route("vendor.service.get") }}',
+                type: 'GET',
+                data: {
+                    service_id: serviceId
+                },
+                success: function(response) {
+                    if (response.success) {
+                        var service = response.data;
+                        $('#editServiceForm #edit_service_id').val(service.pbs_id);
+                        $('#editServiceForm #service_for').val(service.pbs_service_for);
+                        $('#editServiceForm #service_type').val(service.pbs_service_type);
+                        $('#editServiceForm #service_name').val(service.pbs_name);
+                        $('#editServiceForm #staff_count').val(service.pbs_employees ? service.pbs_employees : 0);
+                        $('#editServiceForm #service_description').val(service.pbs_description);
+                        $('#editServiceForm #service_duration').val(service.pbs_duration);
+                        $('#editServiceForm #service_price').val(service.pbs_price);
+                        
+                        $('#editServiceModal').modal('show');
+                    } else {
+                        Swal.fire('Error!', response.message, 'error');
+                    }
+                },
+                error: function() {
+                    Swal.fire('Error!', 'An error occurred while fetching service details.', 'error');
+                }
+            });
+        });
+
+        $('.saveServiceBtn').on('click', function(e) {
+            e.preventDefault();
+
+            $.ajax({
+                url: $('#editServiceForm').attr('action'),
+                type: 'POST',
+                data: $('#editServiceForm').serialize(),
+                success: function(response) {
+                    if (response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success!',
+                            text: response.message,
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                        
+                        $('#editServiceModal').modal('hide');
+                        
+                        setTimeout(function() {
+                            location.reload();
+                        }, 2000);
+                    } else {
+                        Swal.fire('Error!', response.message, 'error');
+                    }
+                },
+                error: function(xhr) {
+                    let message = 'An error occurred while updating the service.';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        message = xhr.responseJSON.message;
+                    }
+                    Swal.fire('Error!', message, 'error');
+                }
+            });
+        });
     });
+    
     function updateBankStatus(bankInfoId, isChecked) {
         // Convert boolean to integer (1 for active, 0 for inactive)
         const status = isChecked ? 1 : 0;

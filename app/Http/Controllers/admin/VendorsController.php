@@ -10,7 +10,8 @@ use App\Models\vendorBankInfo;
 use App\Models\vendorStandardAvailability;;
 use App\Models\services;
 use App\Services\AuditLogService;
-use App\Models\ServiceFor;
+use App\Models\serviceFor;
+use App\Models\serviceType;
 use App\Models\banks;
 
 use App\Http\Controllers\Controller;
@@ -41,7 +42,7 @@ class VendorsController extends Controller
     {
         $user = auth()->user();
         $vendors = $this->getAllVendorsList();
-        $serviceForList = ServiceFor::where('pbsf_status', 1)->orderBy('pbsf_name')->get();
+        $serviceForList = serviceFor::where('pbsf_status', 1)->orderBy('pbsf_name')->get();
 
         return view('pages.admin.vendors', compact('vendors', 'serviceForList'));
     }
@@ -71,6 +72,8 @@ class VendorsController extends Controller
         $requiredDocuments = requiredDocument::where('pbrd_vendor_type', $vendor->pbv_vendortype)
                             ->orderBy('pbrd_id')
                             ->get();
+        $serviceForList = serviceFor::where('pbsf_status', 1)->orderBy('pbsf_name')->get();
+        $serviceTypeList = serviceType::where('pbst_status', 1)->orderBy('pbst_name')->get();
         // user log record
         if (!$vendor) {
             $log_message = 'Vendor not found (ID: '.$id.')';
@@ -83,7 +86,9 @@ class VendorsController extends Controller
             return view('pages.admin.viewvendors')->with([
                 'vendor' => $vendor,
                 'banklist' => $banklist,
-                'requiredDocuments' => $requiredDocuments
+                'requiredDocuments' => $requiredDocuments,
+                'serviceForList' => $serviceForList,
+                'serviceTypeList' => $serviceTypeList
             ]);
         }
     }
@@ -570,5 +575,136 @@ class VendorsController extends Controller
 
         return redirect()->route('vendor.view', ['id' => $request->vendor_id])
             ->with('success', 'Document uploaded successfully');
+    }
+
+    public function getVendorServiceById(Request $request){
+        $user = auth()->user();
+
+        $request->validate([
+            'service_id' => 'required|integer|exists:services,pbs_id',
+        ]);
+
+        $service = services::with(['serviceType', 'serviceFor'])->find($request->service_id);
+
+        if (!$service) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Service not found'
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $service
+        ]);
+    }
+
+    public function updateVendorService(Request $request)
+    {
+        $user = auth()->user();
+
+        $request->validate(
+            [
+                'edit_service_id' => 'nullable|integer|exists:services,pbs_id',
+                'service_for' => 'required|integer|exists:service_for,pbsf_id',
+                'service_type' => 'required|integer|exists:servicetype,pbst_id',
+                'service_name' => 'required|string|max:255',
+                'staff_count' => 'nullable|integer|min:0',
+                'service_description' => 'nullable|string',
+                'service_duration' => 'nullable|integer|min:0',
+                'service_price' => 'nullable|numeric|min:0',
+            ],
+            [
+                'edit_service_id.integer' => 'Service ID must be an integer',
+                'edit_service_id.exists' => 'Service not found',
+                'service_for.required' => 'Service For is required',
+                'service_for.integer' => 'Service For must be an integer',
+                'service_for.exists' => 'Service For not found',
+                'service_type.required' => 'Service Type is required',
+                'service_type.integer' => 'Service Type must be an integer',
+                'service_type.exists' => 'Service Type not found',
+                'service_name.required' => 'Service Name is required',
+                'service_name.string' => 'Service Name must be a string',
+                'service_name.max' => 'Service Name cannot exceed 255 characters',
+                'staff_count.integer' => 'Staff Count must be an integer',
+                'staff_count.min' => 'Staff Count cannot be negative',
+                'service_description.string' => 'Service Description must be a string',
+                'service_duration.integer' => 'Service Duration must be an integer',
+                'service_duration.min' => 'Service Duration cannot be negative',
+                'service_price.numeric' => 'Service Price must be a number',
+                'service_price.min' => 'Service Price cannot be negative',
+            ]
+        );
+
+        // 🔹 Check if updating or creating
+        if ($request->edit_service_id) {
+
+            // ✅ UPDATE
+            $service = services::find($request->edit_service_id);
+
+            if (!$service) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Service not found'
+                ], 404);
+            }
+
+            $old_service = $service->replicate();
+
+        } else {
+
+            // ✅ CREATE
+            $service = new services();
+            $old_service = null;
+        }
+
+        // 🔹 Assign values
+        $service->pbs_service_for = $request->service_for;
+        $service->pbs_service_type = $request->service_type;
+        $service->pbs_name = $request->service_name;
+        $service->pbs_employees = $request->staff_count;
+        $service->pbs_description = $request->service_description;
+        $service->pbs_duration = $request->service_duration;
+        $service->pbs_duration_cetegory = 0;
+        $service->pbs_price = $request->service_price;
+
+        // ⚠️ IMPORTANT (for new service)
+        if (!$request->edit_service_id) {
+            $service->pbs_vendor_id = $request->vendor_id; // adjust if needed
+            $service->pbs_status = 1; // default status (e.g. pending)
+        }
+
+        if ($service->save()) {
+
+            $log_message = $request->edit_service_id
+                ? 'Updated service (ID: ' . $service->pbs_id . ')'
+                : 'Created new service (ID: ' . $service->pbs_id . ')';
+
+            if (isset($this->auditLogService)) {
+                $this->auditLogService->log(
+                    $log_message,
+                    $user,
+                    ['old_service_info' => $old_service],
+                    ['new_service_info' => $service]
+                );
+            }
+            return redirect()->route('vendor.view', ['id' => $request->vendor_id])
+            ->with('success', $request->edit_service_id
+                    ? 'Service updated successfully'
+                    : 'Service created successfully');
+            // return response()->json([
+            //     'success' => true,
+            //     'message' => $request->edit_service_id
+            //         ? 'Service updated successfully'
+            //         : 'Service created successfully'
+            // ]);
+        }
+
+        return redirect()->route('vendor.view', ['id' => $request->vendor_id])
+            ->with('success', 'Failed to save service');
+        // return response()->json([
+        //     'success' => false,
+        //     'message' => 'Failed to save service'
+        // ], 500);
     }
 }

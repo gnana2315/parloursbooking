@@ -108,6 +108,8 @@ Route::group(['middleware' => 'auth.check'], function () {
             Route::get('/vendor/document/approve', [VendorsController::class, 'approveDocument'])->name('vendor.document.approve');
             Route::post('/vendor/document/reject', [VendorsController::class, 'rejectDocument'])->name('vendor.document.reject');
             Route::post('/vendor/document/upload', [VendorsController::class, 'documentUpload'])->name('vendor.document.upload');
+            Route::get('/vendor/service/getVendorServiceById', [VendorsController::class, 'getVendorServiceById'])->name('vendor.service.get');
+            Route::post('/vendor/service/update', [VendorsController::class, 'updateVendorService'])->name('vendor.service.update');
 
             Route::get('/reports', [reportsController::class, 'index']);
         });
