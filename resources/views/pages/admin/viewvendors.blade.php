@@ -66,7 +66,7 @@
                             <div class="text-center">
                                 <img class="profile-user-img img-fluid img-circle" src="<?= $logoPath; ?>" alt="User profile picture">
                             </div>
-                            <h3 class="profile-username text-center">{{ $vendor->pbv_business_name }}</h3>
+                            <h3 class="profile-username text-center">{{ $vendor->pbv_business_name ? $vendor->pbv_business_name : 'N/A' }}</h3>
                             <p class="text-muted text-center">{{ $vendor->pbv_brno }}</p>
                             <!--ul class="list-group list-group-unbordered mb-3">
                                 <li class="list-group-item">
@@ -153,7 +153,7 @@
                                     </div>
                                 @endforeach
                             @else
-                                    <p>Bank Info is Empty</p>
+                                <p>Bank Info is Empty</p>
                             @endif
                         </div>
                     </div>
@@ -172,196 +172,132 @@
                         <div class="card-body">
                             <div class="tab-content">
                                 <div class="active tab-pane" id="attachments">
-                                    <div class="post clearfix">
-                                        <div class="user-block">
-                                            <span class="username">
-                                                <a href="#">{{ $vendor->pbv_business_name }}</a>
-                                            </span>
-                                            <span class="description">
-                                                {{ $vendor->created_at }}
-                                                <?php
-                                                    if($diff->y > 0){
-                                                        echo " - ".$diff->y." Years Ago";
-                                                    }elseif($diff->m > 0){                                                        
-                                                        echo " - ".$diff->m." Months Ago";
-                                                    }elseif($diff->d > 0){                                                        
-                                                        echo " - ".$diff->d." Days Ago";
-                                                    }elseif($diff->h > 0){                                                        
-                                                        echo " - ".$diff->h." Hours Ago";
-                                                    }elseif($diff->i > 0){                                                        
-                                                        echo " - ".$diff->i." Mintues Ago";
-                                                    }elseif($diff->s > 0){                                                        
-                                                        echo " - ".$diff->s." Seconds Ago";
-                                                    }
-                                                ?>
-                                            </span>                                            
-                                        </div>
-                                        <div>
-                                            <h5>Parlours Certificate</h5>
-                                            @if($vendor->pbv_status != 2)
-                                            <button class="btn btn-success approve-btn" data-document-id="{{ $parlours_certificate_id }}"><i class="fas fa-check"></i> Approve</button>
-                                            <button class="btn btn-danger reject-btn" data-document-id="{{ $parlours_certificate_id }}"><i class="fas fa-xmark"></i> Reject</button>
-                                            @else
-                                                @if($parlours_certification_status == 3)
-                                                    <span class="badge badge-success">Approved</span>
-                                                @endif
-                                            @endif
-                                            <embed src="{{ $parlour_certificate_url }}" width="100%" height="420px" />
-                                        </div>
-                                        <!--form class="form-horizontal">
-                                            <div class="input-group input-group-sm mb-0">
-                                                <input class="form-control form-control-sm" placeholder="Response">
-                                                <div class="input-group-append">
-                                                    <button type="submit" class="btn btn-danger">Send</button>
-                                                </div>
+                                    @php                                        
+                                        // Status text helper
+                                        function getStatusBadge($status){
+                                            switch($status){
+                                                case 1: return '<span class="badge badge-info">Under Review</span>';
+                                                case 2: return '<span class="badge badge-warning">Pending</span>';
+                                                case 3: return '<span class="badge badge-success">Approved</span>';
+                                                case 4: return '<span class="badge badge-danger">Rejected</span>';
+                                                default: return '';
+                                            }
+                                        }
+                                    @endphp
+                                    @foreach($requiredDocuments as $doc)
+
+                                        @php
+                                            $document = collect($vendor->vendorDocuments)
+                                                        ->where('pbvd_required_document_id', $doc->pbrd_id);
+
+                                            // If single file
+                                            if($doc->pbrd_is_single){
+                                                $document = $document->first();
+                                            }
+
+                                        @endphp
+
+                                        <div class="post clearfix">
+                                            <div class="user-block">
+                                                <span class="username">
+                                                    <a href="#">{{ $vendor->pbv_business_name ? $vendor->pbv_business_name : 'N/A' }}</a>
+                                                </span>
+                                                <span class="description">
+                                                    {{ $vendor->created_at }}
+                                                </span>
                                             </div>
-                                        </form-->
-                                    </div>
-                                    <div class="post clearfix">
-                                        <div class="user-block">
-                                            <span class="username">
-                                                <a href="#">{{ $vendor->pbv_business_name }}</a>
-                                            </span>
-                                            <span class="description">
-                                                {{ $vendor->created_at }}
-                                                <?php
-                                                    if($diff->y > 0){
-                                                        echo " - ".$diff->y." Years Ago";
-                                                    }elseif($diff->m > 0){                                                        
-                                                        echo " - ".$diff->m." Months Ago";
-                                                    }elseif($diff->d > 0){                                                        
-                                                        echo " - ".$diff->d." Days Ago";
-                                                    }elseif($diff->h > 0){                                                        
-                                                        echo " - ".$diff->h." Hours Ago";
-                                                    }elseif($diff->i > 0){                                                        
-                                                        echo " - ".$diff->i." Mintues Ago";
-                                                    }elseif($diff->s > 0){                                                        
-                                                        echo " - ".$diff->s." Seconds Ago";
-                                                    }
-                                                ?>
-                                            </span>                                            
-                                        </div>
-                                        <div>
-                                            <h5>Business Registration Certificate</h5>
-                                            @if($vendor->pbv_status != 2)
-                                            <button class="btn btn-success approve-btn" data-document-id="{{ $br_doc_id }}"><i class="fas fa-check"></i> Approve</button>
-                                            <button class="btn btn-danger reject-btn" data-document-id="{{ $br_doc_id }}"><i class="fas fa-xmark"></i> Reject</button>
-                                            @else
-                                                @if($br_doc_status == 3)
-                                                    <span class="badge badge-success">Approved</span>
-                                                @endif
-                                            @endif
-                                            <embed src="{{ $br_doc_url }}" width="100%" height="420px" />
-                                        </div>
-                                        <!--form class="form-horizontal">
-                                            <div class="input-group input-group-sm mb-0">
-                                                <input class="form-control form-control-sm" placeholder="Response">
-                                                <div class="input-group-append">
-                                                    <button type="submit" class="btn btn-danger">Send</button>
-                                                </div>
-                                            </div>
-                                        </form-->
-                                    </div>
-                                    <div class="post clearfix">
-                                        <div class="user-block">
-                                            <span class="username">
-                                                <a href="#">{{ $vendor->pbv_business_name }}</a>
-                                            </span>
-                                            <span class="description">
-                                                {{ $vendor->created_at }}
-                                                <?php
-                                                    if($diff->y > 0){
-                                                        echo " - ".$diff->y." Years Ago";
-                                                    }elseif($diff->m > 0){                                                        
-                                                        echo " - ".$diff->m." Months Ago";
-                                                    }elseif($diff->d > 0){                                                        
-                                                        echo " - ".$diff->d." Days Ago";
-                                                    }elseif($diff->h > 0){                                                        
-                                                        echo " - ".$diff->h." Hours Ago";
-                                                    }elseif($diff->i > 0){                                                        
-                                                        echo " - ".$diff->i." Mintues Ago";
-                                                    }elseif($diff->s > 0){                                                        
-                                                        echo " - ".$diff->s." Seconds Ago";
-                                                    }
-                                                ?>
-                                            </span>                                            
-                                        </div>
-                                        <div>
-                                            <h5>Owners Front NIC</h5>
-                                            @if($vendor->pbv_status != 2)
-                                            <button class="btn btn-success approve-btn" data-document-id="{{ $owners_front_nic_id }}"><i class="fas fa-check"></i> Approve</button>
-                                            <button class="btn btn-danger reject-btn" data-document-id="{{ $owners_front_nic_id }}"><i class="fas fa-xmark"></i> Reject</button>
-                                            @else
-                                                @if($owners_front_nic_status == 3)
-                                                    <span class="badge badge-success">Approved</span>
-                                                @endif
-                                            @endif
-                                            <embed src="{{ $owners_front_nic_url }}" width="100%" height="420px" />
-                                        </div>
-                                        <div>
-                                            <h5>Owners Back NIC</h5>
-                                            @if($vendor->pbv_status != 2)
-                                            <button class="btn btn-success approve-btn" data-document-id="{{ $owners_back_nic_id }}"><i class="fas fa-check"></i> Approve</button>
-                                            <button class="btn btn-danger reject-btn" data-document-id="{{ $owners_back_nic_id }}"><i class="fas fa-xmark"></i> Reject</button>
-                                            @else
-                                                @if($owners_back_nic_status == 3)
-                                                    <span class="badge badge-success">Approved</span>
-                                                @endif
-                                            @endif
-                                            <embed src="{{ $owners_back_nic_url }}" width="100%" height="420px" />
-                                        </div>
-                                        <!--form class="form-horizontal">
-                                            <div class="input-group input-group-sm mb-0">
-                                                <input class="form-control form-control-sm" placeholder="Response">
-                                                <div class="input-group-append">
-                                                    <button type="submit" class="btn btn-danger">Send</button>
-                                                </div>
-                                            </div>
-                                        </form-->
-                                        <div>
-                                            <h5>Vendor Photos Gallery</h5>
-    
-                                            @if(count($vendorPhotoDocument) > 0)
-                                                <div class="row">
-                                                    @foreach($vendorPhotoDocument as $index => $photo)
-                                                        <div class="col-md-3 col-sm-4 col-6 mb-3">
-                                                            <div class="position-relative">
-                                                                <a href="{{ $photo['pbvd_document_url'] }}" 
-                                                                data-lightbox="vendor-gallery" 
-                                                                data-title="Photo {{ $index + 1 }}">
-                                                                    <img src="{{ $photo['pbvd_document_url'] }}" 
-                                                                        class="img-fluid rounded" 
-                                                                        alt="Vendor Photo {{ $index + 1 }}"
-                                                                        style="height: 150px; width: 100%; object-fit: cover;">
-                                                                </a>
-                                                                
-                                                                @if($vendor->pbv_status != 2)
-                                                                    <div class="mt-2">
-                                                                        <button class="btn btn-success btn-sm approve-photo-btn w-100 approve-btn" 
-                                                                                data-document-id="{{ $photo['pbvd_id'] }}">
-                                                                            <i class="fas fa-check"></i> Approve
+
+                                            <div>
+                                                <h5>{{ $doc->pbrd_label }}</h5>
+
+                                                {{-- SINGLE DOCUMENT --}}
+                                                @if($doc->pbrd_is_single)
+
+                                                    @if($document)
+
+                                                        {!! getStatusBadge($document->pbvd_document_status) !!} - {{ $document->pbvd_document_status == 4 ? $document->pbvd_document_extra : '' }}
+                                                        <br>
+                                                        <br>
+                                                        @if(in_array($document->pbvd_document_status, [1, 2, 4]) && $vendor->pbv_status != 2)
+                                                            <button class="btn btn-success approve-btn"
+                                                                data-document-id="{{ $document->pbvd_id }}">
+                                                                Approve
+                                                            </button>
+
+                                                            <button class="btn btn-danger reject-btn"
+                                                                data-document-id="{{ $document->pbvd_id }}">
+                                                                Reject
+                                                            </button>
+                                                        @endif
+
+                                                        <embed src="{{ $document->pbvd_document_url }}" width="100%" height="420px" />
+
+                                                    @else
+                                                        <div class="alert alert-warning">No document uploaded</div>
+                                                        @if($vendor->pbv_status != 2)
+                                                            <form action="{{ route('vendor.document.upload') }}" method="POST" enctype="multipart/form-data">
+                                                                @csrf
+                                                                <input type="hidden" name="vendor_id" value="{{ $vendor->pbv_id }}">
+                                                                <input type="hidden" name="document_type_id" value="{{ $doc->pbrd_id }}">
+
+                                                                <input type="file" name="document" class="form-control mb-2" required>
+
+                                                                <button type="submit" class="btn btn-primary btn-sm">
+                                                                    Upload Document
+                                                                </button>
+                                                            </form>
+                                                        @endif
+                                                    @endif
+
+                                                {{-- MULTIPLE DOCUMENTS (like gallery) --}}
+                                                @else
+
+                                                    @if($document->count() > 0)
+                                                        <div class="row">
+                                                            @foreach($document as $file)
+                                                                <div class="col-md-3 mb-3">
+                                                                    <img src="{{ $file->pbvd_document_url }}"
+                                                                        class="img-fluid rounded"
+                                                                        style="height:150px;object-fit:cover;">
+
+                                                                    {!! getStatusBadge($file->pbvd_document_status) !!} - {{ $file->pbvd_document_status == 4 ? $file->pbvd_document_extra : '' }}
+                                                                    <br>
+                                                                    <br>
+                                                                    @if(in_array($file->pbvd_document_status, [1, 2, 4]) && $vendor->pbv_status != 2)
+                                                                        <button class="btn btn-success btn-sm approve-btn w-100 mt-1"
+                                                                            data-document-id="{{ $file->pbvd_id }}">
+                                                                            Approve
                                                                         </button>
-                                                                        <button class="btn btn-danger btn-sm reject-photo-btn w-100 mt-1 reject-btn" 
-                                                                                data-document-id="{{ $photo['pbvd_id'] }}">
-                                                                            <i class="fas fa-xmark"></i> Reject
+
+                                                                        <button class="btn btn-danger btn-sm reject-btn w-100 mt-1"
+                                                                            data-document-id="{{ $file->pbvd_id }}">
+                                                                            Reject
                                                                         </button>
-                                                                    </div>
-                                                                @else
-                                                                    @if($photo['pbvd_document_status'] == 3)
-                                                                        <span class="badge badge-success position-absolute top-0 end-0 m-2">Approved</span>
                                                                     @endif
-                                                                @endif
-                                                            </div>
+                                                                </div>
+                                                            @endforeach
                                                         </div>
-                                                    @endforeach
-                                                </div>
-                                            @else
-                                                <div class="alert alert-info">
-                                                    No vendor photos available.
-                                                </div>
-                                            @endif
+                                                    @else
+                                                        <div class="alert alert-info">No files uploaded</div>
+                                                        @if($vendor->pbv_status != 2)
+                                                            <form action="{{ route('vendor.document.upload') }}" method="POST" enctype="multipart/form-data">
+                                                                @csrf
+                                                                <input type="hidden" name="vendor_id" value="{{ $vendor->pbv_id }}">
+                                                                <input type="hidden" name="document_type_id" value="{{ $doc->pbrd_id }}">
+
+                                                                <input type="file" name="documents[]" multiple class="form-control mb-2" required>
+
+                                                                <button type="submit" class="btn btn-primary btn-sm">
+                                                                    Upload Files
+                                                                </button>
+                                                            </form>
+                                                        @endif
+                                                    @endif
+                                                @endif
+                                            </div>
                                         </div>
-                                    </div>
+
+                                    @endforeach
                                 </div>
                                 <div class="tab-pane" id="services">
                                     <div class="card">
@@ -641,7 +577,7 @@
                                             <label for="bank_name">Bank Name</label>
                                             <select class="form-control" id="bank_name" name="bank_name" required>
                                                 <option value="">Select Bank</option>
-                                                @foreach($vendor->banklist as $bank)
+                                                @foreach($banklist as $bank)
                                                 <option value="{{ $bank->pbb_id }}" {{ ($vendor->bankInfo->first()->pbvb_bankname ?? '') == $bank->pbb_id ? 'selected' : '' }}>
                                                     {{ $bank->pbb_name }}
                                                 </option>

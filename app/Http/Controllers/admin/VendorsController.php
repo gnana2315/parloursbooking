@@ -17,6 +17,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use PDF;
 use Mail;
+use Illuminate\Support\Facades\Storage;
 //use App\Mail\vendorRegistrationMail;
 //use App\Notifications\VerifyEmailNotification;
 
@@ -53,7 +54,7 @@ class VendorsController extends Controller
 
     public function viewVendor($id)
     {
-        $data = vendors::with([
+        $vendor = vendors::with([
             'vendorType',
             'serviceFor',
             'User',
@@ -66,25 +67,24 @@ class VendorsController extends Controller
                 ]);
             }
         ])->where('pbv_id', $id)->first();
-        $data['banklist'] = banks::where('pbb_status', 1)->orderBy('pbb_name')->get();
-        // $data = $this->vendors->select('vendor.*', 'servicecategory.pbsc_id','servicecategory.pbsc_name','persons.*','users.pbu_id')
-        //                     ->join('servicecategory', 'servicecategory.pbsc_id', '=', 'vendor.pbv_servicetype')
-        //                     ->join('persons', 'persons.pbv_id', '=', 'vendor.pbv_id')
-        //                     ->join('users', 'users.pbu_personid', '=', 'persons.pbp_id')
-        //                     ->where('vendor.pbv_id', '=', $id)
-        //                     ->limit(1)
-        //                     ->get();
-        // dd($data);
+        $banklist = banks::where('pbb_status', 1)->orderBy('pbb_name')->get();
+        $requiredDocuments = requiredDocument::where('pbrd_vendor_type', $vendor->pbv_vendortype)
+                            ->orderBy('pbrd_id')
+                            ->get();
         // user log record
-        if (!$data) {
+        if (!$vendor) {
             $log_message = 'Vendor not found (ID: '.$id.')';
-            $this->auditLogService->log($log_message, $data, [], []);
+            $this->auditLogService->log($log_message, $vendor, [], []);
             return response()->json(['success' => false, 'message' => 'Vendor not found'], 404);
         }else{
-            $log_message = 'Vendor data retrieved successfully (ID: '.$data->pbv_id.')';
-            $this->auditLogService->log($log_message, $data, [], []);
-            
-            return view('pages.admin.viewvendors')->with('vendor', $data);
+            $log_message = 'Vendor data retrieved successfully (ID: '.$vendor->pbv_id.')';
+            $this->auditLogService->log($log_message, $vendor, [], []);
+            // dd($vendor);
+            return view('pages.admin.viewvendors')->with([
+                'vendor' => $vendor,
+                'banklist' => $banklist,
+                'requiredDocuments' => $requiredDocuments
+            ]);
         }
     }
 
@@ -196,11 +196,15 @@ class VendorsController extends Controller
         $allDocumentsUploaded = empty($documentIds)
                                 ? true
                                 : !array_diff($documentIds, $uploadedIds);
+        
+        $approvedIds = $documents->where('pbvd_document_status', 4)->pluck('pbvd_required_document_id')->toArray();
 
-        if (!$allDocumentsUploaded) {
-            $log_message = 'Required documents are missing (ID: '.$request->vendor_id.')';
+        $allApproved = empty($documentIds) ? true : !array_diff($documentIds, $approvedIds);
+
+        if (!$allDocumentsUploaded || !$allApproved) {
+            $log_message = 'Required documents are missing or not approved (ID: '.$request->vendor_id.')';
             $this->auditLogService->log($log_message, $user, ['pbv_status' => $vendor_old_status], ['pbv_status' => $request->status]);
-            return response()->json(['success' => false, 'message' => 'Required documents are missing'], 400);
+            return response()->json(['success' => false, 'message' => 'Required documents are missing or not approved'], 400);
         }
 
         // Check bank details
@@ -212,10 +216,10 @@ class VendorsController extends Controller
                                 && !empty($bankDetails->pbvb_branch)
                                 && !empty($bankDetails->pbvb_accountno);
         
-        if (!$allBankDetailsFilled) {
-            $log_message = 'Bank details are incomplete (ID: '.$request->vendor_id.')';
+        if (!$allBankDetailsFilled || $bankDetails->pbvb_status != 1) {
+            $log_message = 'Bank details are incomplete or not approved (ID: '.$request->vendor_id.')';
             $this->auditLogService->log($log_message, $user, ['pbv_status' => $vendor_old_status], ['pbv_status' => $request->status]);
-            return response()->json(['success' => false, 'message' => 'Bank details are incomplete'], 400);
+            return response()->json(['success' => false, 'message' => 'Bank details are incomplete or not approved'], 400);
         }
         
         // Check standard availability for weekdays
@@ -497,5 +501,74 @@ class VendorsController extends Controller
             'message' => 'Document rejected successfully',
             'status' => $request->status
         ]);
+    }
+
+    public function documentUpload(Request $request)
+    {
+        $user = auth()->user();
+        $request->validate(
+            [
+                'vendor_id' => 'required|exists:vendor,pbv_id',
+                'document_type_id' => 'required|integer|exists:required_document,pbrd_id',
+                'document' => 'nullable|file|mimes:pdf,jpeg,png,jpg',
+                'documents.*' => 'nullable|file|mimes:pdf,jpeg,png,jpg',
+            ],
+            [
+                'vendor_id.required' => 'Vendor ID is required',
+                'vendor_id.exists' => 'Vendor not found',
+                'document_type_id.required' => 'Document type is required',
+                'document_type_id.integer' => 'Document type ID must be an integer',
+                'document_type_id.exists' => 'Document type not found',
+                'document.file' => 'The uploaded file must be a valid file',
+                'document.mimes' => 'The uploaded file must be a PDF, JPEG, PNG',
+                'documents.*.file' => 'Each uploaded file must be a valid file',
+                'documents.*.mimes' => 'Each uploaded file must be a PDF, JPEG, PNG',
+            ]
+        );
+
+        $vendor = vendors::where('pbv_id', $request->vendor_id)->first();
+
+        if ($request->hasFile('document')) {
+            $file = $request->file('document');
+            $filename = time().'_'.$file->getClientOriginalName();
+
+            // store file (change 'public' to 's3' if using AWS S3)
+            $filePath = $file->storeAs('uploads/vendors/'.$vendor->pbv_id, $filename, 'public');
+            // full url for access (public disk: storage/app/public/uploads/...)
+            $fileUrl = Storage::disk('public')->url($filePath);
+
+            vendorDocuments::create([
+                'pbvd_vendor_id' => $request->vendor_id,
+                'pbvd_required_document_id' => $request->document_type_id,
+                'pbvd_document_name' => $filename,
+                'pbvd_document_url' => $fileUrl,
+                'pbvd_document_status' => '1',
+            ]);
+        }
+
+        if ($request->hasFile('documents')) {
+            foreach ($request->file('documents') as $file) {
+                $filename = time() . '_' . $file->getClientOriginalName();
+
+                $filePath = $file->storeAs('uploads/vendors/' . $vendor->pbv_id, $filename, 'public');
+                $fileUrl = Storage::disk('public')->url($filePath);
+
+                vendorDocuments::create([
+                    'pbvd_vendor_id' => $request->vendor_id,
+                    'pbvd_required_document_id' => $request->document_type_id,
+                    'pbvd_document_name' => $filename,
+                    'pbvd_document_url' => $fileUrl,
+                    'pbvd_document_status' => '1',
+                ]);
+            }
+        }
+        
+        $log_message = 'Uploaded document for vendor ID: ' . $request->vendor_id;
+        if (isset($this->auditLogService)) {
+            $this->auditLogService->log($log_message, $user, [], ['pbvd_document_path' => ""]);
+        }
+
+        return redirect()->route('vendor.view', ['id' => $request->vendor_id])
+            ->with('success', 'Document uploaded successfully');
     }
 }

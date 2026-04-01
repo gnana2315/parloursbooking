@@ -107,6 +107,7 @@ Route::group(['middleware' => 'auth.check'], function () {
             Route::post('/vendor/bank/update', [VendorsController::class, 'updateBankInfo'])->name('vendor.bank.update');
             Route::get('/vendor/document/approve', [VendorsController::class, 'approveDocument'])->name('vendor.document.approve');
             Route::post('/vendor/document/reject', [VendorsController::class, 'rejectDocument'])->name('vendor.document.reject');
+            Route::post('/vendor/document/upload', [VendorsController::class, 'documentUpload'])->name('vendor.document.upload');
 
             Route::get('/reports', [reportsController::class, 'index']);
         });
