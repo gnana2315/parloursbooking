@@ -164,6 +164,7 @@
                             <ul class="nav nav-pills">
                                 <li class="nav-item"><a class="nav-link active" href="#attachments" data-toggle="tab">Attachments</a></li>
                                 <li class="nav-item"><a class="nav-link" href="#services" data-toggle="tab">Services</a></li>
+                                <li class="nav-item"><a class="nav-link" href="#standard-availability" data-toggle="tab">Standard Availability</a></li>
                                 <!--li class="nav-item"><a class="nav-link" href="#activity" data-toggle="tab" data-value="{{ $vendor->pbv_uid }}" id="activity_logs">Activity</a></li>
                                 <li class="nav-item"><a class="nav-link" href="#timeline" data-toggle="tab">Timeline</a></li>
                                 <li class="nav-item"><a class="nav-link" href="#settings" data-toggle="tab">Settings</a></li-->
@@ -354,6 +355,45 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="tab-pane" id="standard-availability">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h3 class="card-title">Vendor's Standard Availability</h3>
+                                        </div>
+                                        <div class="card-body">
+                                            <table id="availabilityTable" class="table table-bordered table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Day</th>
+                                                        <th>Opening Time</th>
+                                                        <th>Closing Time</th>
+                                                        <th>Status</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach($vendor->availability as $availability)
+                                                        <tr>
+                                                            <td>{{ $availability->pbvsa_day }}</td>
+                                                            <td>
+                                                                {{ date('H:i A', strtotime($availability->pbvsa_start_time)) }}
+                                                            </td>
+                                                            <td>
+                                                                {{ date('H:i A', strtotime($availability->pbvsa_end_time)) }}
+                                                            </td>
+                                                            <td>
+                                                                @if($availability->pbvsa_is_open == 1)
+                                                                    <span class="badge badge-success">Open</span>
+                                                                @else
+                                                                    <span class="badge badge-danger">Closed</span>
+                                                                @endif
+                                                            </td>
+                                                        </tr>
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
                                 <!--div class="tab-pane" id="activity">
                                     <div class="post">
                                         <div class="user-block">
