@@ -160,13 +160,26 @@ class PaymentController extends Controller
             $vendor_amount = $getBooking->pbb_total_amount - $platform_fee;
 
             $promocode_discount_type = optional($getBooking->promoCode)->pbpc_discount_type;
-            $promocode_value = optional($getBooking->promoCode)->pbpc_discount;
+            $promocode_value = optional($getBooking->promoCode)->pbpc_value;
+            $promocode_vendor_share = optional($getBooking->promoCode)->pbpc_vendor_share;
+            $promocode_platform_share = optional($getBooking->promoCode)->pbpc_platform_share;
             $discount_amount = 0;
+            $platform_discount_amount = 0;
 
-            if($promocode_discount_type === 'percentage') {
-                $discount_amount = ($getBooking->pbb_total_amount * $promocode_value) / 100;
-            } elseif ($promocode_discount_type === 'fixed') {
-                $discount_amount = $promocode_value;
+            if($promocode_value != 0.00){
+                if($promocode_discount_type === 'percentage') {
+                    $discount_amount = ($getBooking->pbb_total_amount * $promocode_value) / 100;
+                } elseif ($promocode_discount_type === 'fixed') {
+                    $discount_amount = $promocode_value;
+                }
+            }else{
+                if($promocode_discount_type === 'percentage') {
+                    $discount_amount = ($getBooking->pbb_total_amount * $promocode_vendor_share) / 100;
+                    $platform_discount_amount = ($getBooking->pbb_total_amount * $promocode_platform_share) / 100;
+                } elseif ($promocode_discount_type === 'fixed') {
+                    $discount_amount = $promocode_vendor_share;
+                    $platform_discount_amount = $promocode_platform_share;
+                }
             }
 
             // 6️⃣ Handle payment status
@@ -180,6 +193,7 @@ class PaymentController extends Controller
                     'pbpt_payment_method'   => 'Online', // fallback
                     'pbpt_total_amount'     => $getBooking->pbb_total_amount,
                     'pbpt_discount_amount'  => $discount_amount, // you can add logic if promo applied
+                    'pbpt_platform_discount_amount' => $platform_discount_amount,
                     'pbpt_final_amount'     => $getBooking->pbb_total_amount,
                     'pbpt_platform_fee'     => $platform_fee,
                     'pbpt_vendor_amount'    => $vendor_amount,
@@ -230,7 +244,8 @@ class PaymentController extends Controller
                     'pbpt_customer_id'      => $customerId,
                     'pbpt_payment_method'   => 'Online', // fallback
                     'pbpt_total_amount'     => $getBooking->pbb_total_amount,
-                    'pbpt_discount_amount'  => $orderReference, // you can add logic if promo applied
+                    'pbpt_discount_amount'  => $discount_amount, // you can add logic if promo applied
+                    'pbpt_platform_discount_amount' => $platform_discount_amount,
                     'pbpt_final_amount'     => $getBooking->pbb_total_amount,
                     'pbpt_platform_fee'     => $platform_fee,
                     'pbpt_vendor_amount'    => $vendor_amount,

@@ -5,6 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+use App\Models\booking;
+use App\Models\customer;
+use App\Models\vendors;
+use App\Models\vendorPayoutItems;
+
 class paymentTransection extends Model
 {
     use HasFactory;
@@ -26,6 +31,7 @@ class paymentTransection extends Model
         'pbpt_payment_method',
         'pbpt_total_amount',
         'pbpt_discount_amount',
+        'pbpt_platform_discount_amount',
         'pbpt_final_amount',
         'pbpt_platform_fee',
         'pbpt_vendor_amount',

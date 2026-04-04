@@ -42,6 +42,8 @@ class promoCode extends Model
         'updated_at',
         'deleted_at',
         'pbpc_promo_types',
+        'pbpc_vendor_share',
+        'pbpc_platform_share',
     ];
 
     protected $casts = [
