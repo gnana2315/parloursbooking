@@ -146,18 +146,32 @@ class PaymentController extends Controller
             ] = array_pad($customData, 4, null);
             
             Log::info('Payment Status Code:', ['Response' => $statusCode]);
+                
+            $getBooking = booking::with(['customer', 'vendors', 'bookingDetails', 'promoCode'])
+                        ->where('pbb_id', $bookingId)->first();
+
+            $customer = $getBooking->customer;
+            $vendor = $getBooking->vendors->first();
+            $bookingDetails = $getBooking->bookingDetails;
+            $someoneDetails = json_decode($getBooking->someone_details, true);
+
+            $platform_fee_percentage = 10;
+            $platform_fee = ($getBooking->pbb_total_amount * $platform_fee_percentage) / 100;
+            $vendor_amount = $getBooking->pbb_total_amount - $platform_fee;
+
+            $promocode_discount_type = optional($getBooking->promoCode)->pbpc_discount_type;
+            $promocode_value = optional($getBooking->promoCode)->pbpc_discount;
+            $discount_amount = 0;
+
+            if($promocode_discount_type === 'percentage') {
+                $discount_amount = ($getBooking->pbb_total_amount * $promocode_value) / 100;
+            } elseif ($promocode_discount_type === 'fixed') {
+                $discount_amount = $promocode_value;
+            }
 
             // 6️⃣ Handle payment status
             if ($statusCode === '15') {
-
                 // FAILED PAYMENT
-                $getBooking = booking::with(['customer', 'vendors', 'bookingDetails'])
-                            ->where('pbb_id', $bookingId)->first();
-
-                $platform_fee_percentage = 10;
-                $platform_fee = ($getBooking->pbb_total_amount * $platform_fee_percentage) / 100;
-                $vendor_amount = $getBooking->pbb_total_amount - $platform_fee;
-
                 $payment = paymentTransection::create([
                     'pbpt_transaction_id'   => uniqid('TXN_'), // unique transaction ID
                     'pbpt_booking_id'       => $getBooking->pbb_id,
@@ -165,7 +179,7 @@ class PaymentController extends Controller
                     'pbpt_customer_id'      => $customerId,
                     'pbpt_payment_method'   => 'Online', // fallback
                     'pbpt_total_amount'     => $getBooking->pbb_total_amount,
-                    'pbpt_discount_amount'  => 0, // you can add logic if promo applied
+                    'pbpt_discount_amount'  => $discount_amount, // you can add logic if promo applied
                     'pbpt_final_amount'     => $getBooking->pbb_total_amount,
                     'pbpt_platform_fee'     => $platform_fee,
                     'pbpt_vendor_amount'    => $vendor_amount,
@@ -209,20 +223,6 @@ class PaymentController extends Controller
             }else{
                 // SUCCESS
                 // Update booking/payment tables here
-                // Example:
-                $getBooking = booking::with(['customer', 'vendors', 'bookingDetails'])
-                            ->where('pbb_id', $bookingId)->first();
-                $customer = $getBooking->customer;
-                $vendor = $getBooking->vendors->first();
-                $bookingDetails = $getBooking->bookingDetails;
-                $someoneDetails = json_decode($getBooking->someone_details, true);
-
-                $getBooking->update(['pbb_status' => 1]);
-
-                $platform_fee_percentage = 10; // example: 10% commission
-                $platform_fee = ($getBooking->pbb_total_amount * $platform_fee_percentage) / 100;
-                $vendor_amount = $getBooking->pbb_total_amount - $platform_fee;
-
                 $payment = paymentTransection::create([
                     'pbpt_transaction_id'   => uniqid('TXN_'), // unique transaction ID
                     'pbpt_booking_id'       => $getBooking->pbb_id,
@@ -230,7 +230,7 @@ class PaymentController extends Controller
                     'pbpt_customer_id'      => $customerId,
                     'pbpt_payment_method'   => 'Online', // fallback
                     'pbpt_total_amount'     => $getBooking->pbb_total_amount,
-                    'pbpt_discount_amount'  => 0, // you can add logic if promo applied
+                    'pbpt_discount_amount'  => $orderReference, // you can add logic if promo applied
                     'pbpt_final_amount'     => $getBooking->pbb_total_amount,
                     'pbpt_platform_fee'     => $platform_fee,
                     'pbpt_vendor_amount'    => $vendor_amount,
@@ -241,27 +241,9 @@ class PaymentController extends Controller
                     'pbpt_remarks'          => 'Auto-generated payment record'
                 ]);
 
+                $getBooking->update(['pbb_status' => 1]);
+
                 Log::info('payment transection Response:', ['Response' => $payment]);
-                // $vendorPayout = vendorPayouts::firstOrCreate(
-                //     ['pbvp_vendor_id' => $vendorId],
-                //     ['pbvp_total_earned' => 0, 'pbvp_total_paid' => 0, 'pbvp_total_due' => 0]
-                // );
-
-                // Log::info('vendor payouts Response:', ['Response' => $vendorPayout]);
-
-                // $vendorPayout->increment('pbvp_total_earned', $vendor_amount);
-                // $vendorPayout->increment('pbvp_total_due', $vendor_amount);
-
-                // $payoutItem = vendorPayoutItems::create([
-                //     'pbvpi_payout_id'   => $vendorPayout->pbvp_id,
-                //     'pbvpi_booking_id'  => $getBooking->pbb_id,
-                //     'pbvpi_payment_id'  => $payment->pbpt_id,
-                //     'pbvpi_amount'      => $getBooking->pbb_total_amount,
-                //     'pbvpi_platform_fee'=> $platform_fee,
-                //     'pbvpi_vendor_amount'=> $vendor_amount,
-                //     'pbvpi_status'      => '0'
-                // ]);
-                // Log::info('vendor payouts Response:', ['Response' => $payoutItem]);
 
                 //SMS
                 $sms_customer_name = !empty($someoneDetails['name'])

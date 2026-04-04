@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+use App\Models\booking;
+
 class promoCode extends Model
 {
     use HasFactory;
@@ -47,4 +49,8 @@ class promoCode extends Model
         'pbpc_service_ids' => 'array',
         'pbpc_vendor_service_map' => 'array',
     ];
+
+    public function bookings() {
+        return $this->hasMany(booking::class, 'pbpc_id', 'pbb_promo_id');
+    }
 }

@@ -6,6 +6,7 @@ use App\Models\vendors;
 use App\Models\customer;
 use App\Models\ratings;
 use App\Models\paymentTransection;
+use App\Models\promoCode;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -74,5 +75,9 @@ class booking extends Model
 
     public function paymentTransections(){
         return $this->hasOne(paymentTransection::class, 'pbpt_booking_id', 'pbb_id');
+    }
+
+    public function promoCode() {
+        return $this->belongsTo(promoCode::class, 'pbb_promo_id', 'pbpc_id');
     }
 }
