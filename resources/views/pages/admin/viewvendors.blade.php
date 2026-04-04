@@ -369,6 +369,7 @@
                                                         <th>Opening Time</th>
                                                         <th>Closing Time</th>
                                                         <th>Status</th>
+                                                        <th>Action</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -386,6 +387,17 @@
                                                                     <span class="badge badge-success">Open</span>
                                                                 @else
                                                                     <span class="badge badge-danger">Closed</span>
+                                                                @endif
+                                                            </td>
+                                                            <td>
+                                                                @if($availability->pbvsa_status == 1)
+                                                                    <button type="button" class="btn btn-success vsa_status" title="Allow Edit" data-availability-id="{{ $availability->pbvsa_id }}" value="0">
+                                                                        <i class="fas fa-power-off"></i>                                                                         
+                                                                    </button>
+                                                                @else
+                                                                    <button type="button" class="btn btn-danger vsa_status" title="Disallow Edit" data-availability-id="{{ $availability->pbvsa_id }}" value="1">
+                                                                        <i class="fas fa-power-off"></i>                                                                       
+                                                                    </button>
                                                                 @endif
                                                             </td>
                                                         </tr>
@@ -1065,6 +1077,7 @@
             });
         });
 
+        // Add services
         $('.saveServiceBtn').on('click', function(e) {
             e.preventDefault();
 
@@ -1101,6 +1114,7 @@
             });
         });
 
+        // Delete service
         $('.delete-service-btn').on('click', function() {
             var serviceId = $(this).data('service-id');
             var $button = $(this);
@@ -1150,6 +1164,7 @@
             });
         });
 
+        // Activate service
         $('.activate-service').on('click', function() {
             var serviceId = $(this).data('service-id');
             $.ajax({
@@ -1184,8 +1199,47 @@
                 }
             });
         });
+
+        $('.vsa_status').on('click', function() {
+            var vsa_id = $(this).data('availability-id');
+            var vsa_value = $(this).val();
+
+            $.ajax({
+                url: '{{ route("vendor.availability.changeStatus") }}',
+                type: 'POST',
+                data: {
+                    vsa_id: vsa_id,
+                    vsa_value: vsa_value,
+                    _token: "{{ csrf_token() }}"
+                },
+                success: function(response) {
+                    if (response.success) {
+                        Swal.fire(
+                            vsa_value ? 'Availability Edit disabled successfully!' : 'Availability Edit enabled successfully!',
+                            response.message,
+                            'success'
+                        );
+                        location.reload();
+                    } else {
+                        Swal.fire(
+                            'Error!',
+                            response.message,
+                            'error'
+                        );
+                    }
+                },
+                error: function() {
+                    Swal.fire(
+                        'Error!',
+                        'An error occurred while allow/disallow to edit Availability',
+                        'error'
+                    );
+                }
+            });
+        });
     });
 
+    //Update bank status
     function updateBankStatus(bankInfoId, isChecked) {
         // Convert boolean to integer (1 for active, 0 for inactive)
         const status = isChecked ? 1 : 0;

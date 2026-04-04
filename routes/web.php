@@ -112,6 +112,7 @@ Route::group(['middleware' => 'auth.check'], function () {
             Route::post('/vendor/service/update', [VendorsController::class, 'updateVendorService'])->name('vendor.service.update');
             Route::post('/vendor/service/delete', [VendorsController::class, 'deleteVendorService'])->name('vendor.service.delete');
             Route::post('/vendor/service/activate', [VendorsController::class, 'activateVendorService'])->name('vendor.service.activate');
+            Route::post('/vendor/availability/changeStatus', [VendorsController::class, 'changeVendorAvailabilityStatus'])->name('vendor.availability.changeStatus');
 
             Route::get('/reports', [reportsController::class, 'index']);
         });

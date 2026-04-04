@@ -783,4 +783,42 @@ class VendorsController extends Controller
             'message' => 'Failed to activate service'
         ], 500);
     }
+
+    public function changeVendorAvailabilityStatus(Request $request){
+        $user = auth()->user();
+
+        $request->validate([
+            'vsa_id' => 'required|integer|exists:vendor_standard_availability,pbvsa_id',
+            'vsa_value' => 'required|integer'
+        ]);
+
+        $availability = vendorStandardAvailability::find($request->vsa_id);
+
+        if(!$availability){
+            return response()->json([
+                'success' => false,
+                'message' => 'Availability not found'
+            ], 404);
+        }
+
+        $old_availability = $availability->replicate();
+        $availability->pbvsa_status = $request->vsa_value; 
+
+        if($availability->save()) {
+            $log_message = 'Availability status edited (ID: ' . $availability->pbvsa_id . ')';
+            if (isset($this->auditLogService)) {
+                $this->auditLogService->log($log_message, $user, ['old_availability_info' => $old_availability], ['new_availability_info' => $availability]);
+            }
+            return response()->json([
+                'success' => true,
+                'message' => 'Availability status edited successfully'
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to edit availability status'
+        ], 500);
+
+    }
 }
