@@ -626,7 +626,7 @@ class BookingController extends Controller
                 return response()->json(['status' => false, 'message' => 'Vendor not found'], 404);
             }
 
-            $customer = customer::where('pbc_user_id', $user->pbu_id)->first();
+            $customer = customer::where('pbc_user_id', $user->pbu_id)->first(); 
             if (!$customer) {
                 return response()->json(['status' => false, 'message' => 'Customer not found'], 404);
             }
@@ -666,7 +666,7 @@ class BookingController extends Controller
                 ], 409);
             }
 
-            $pbb_ref_no = uniqid('_', date('ymdHis'));
+            $pbb_ref_no = 'PBB_' . substr(microtime(true) * 10000, -5);
 
             // 5️⃣ Create booking
             $addbooking = Booking::create([
@@ -1029,7 +1029,7 @@ class BookingController extends Controller
             ], 409);
         }
 
-        $pbb_ref_no = uniqid('_', date('ymdHis'));
+        $pbb_ref_no = 'PBB_' . substr(microtime(true) * 10000, -5);
 
         $addbooking = Booking::create([
             'pbb_vendor_id' => $vendor->pbv_id,
