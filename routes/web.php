@@ -7,11 +7,13 @@ use App\Http\Controllers\homeController;
 
 use App\Http\Controllers\adminController;
 use App\Http\Controllers\superAdminController;
+use App\Http\Controllers\PaymentController;
+
 use App\Http\Controllers\admin\configController;
 use App\Http\Controllers\admin\VendorsController;
 use App\Http\Controllers\admin\reportsController;
 use App\Http\Controllers\admin\servicesController;
-use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\admin\paymentsController;
 
 use App\Http\Controllers\userAdminController;
 //use App\Http\Controllers\SendMailController;
@@ -114,6 +116,8 @@ Route::group(['middleware' => 'auth.check'], function () {
             Route::post('/vendor/service/activate', [VendorsController::class, 'activateVendorService'])->name('vendor.service.activate');
             Route::post('/vendor/availability/changeStatus', [VendorsController::class, 'changeVendorAvailabilityStatus'])->name('vendor.availability.changeStatus');
 
+            Route::get('/paymentTransections', [paymentsController::class, 'paymentTransectionList'])->name('payment.transections');
+            Route::get('/payouts', [paymentsController::class, 'payoutsList'])->name('payouts.list');
             Route::get('/reports', [reportsController::class, 'index']);
         });
         // Route::group(['middleware' => 'isSuperAdmin'], function () {

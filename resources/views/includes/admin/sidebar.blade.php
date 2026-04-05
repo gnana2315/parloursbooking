@@ -47,6 +47,26 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-money-bill-wave"></i>
+                        <p>Payments</p><i class="fas fa-angle-down right"></i></p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{{ route('payment.transections') }}" class="nav-link">
+                                <i class="nav-icon fas fa-cash-register"></i>
+                                <p>Payment Transactions</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('payouts.list') }}" class="nav-link">
+                                <i class="nav-icon fas fa-money-check"></i>
+                                <p>Payouts</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item">
                     <a href="/reports" class="nav-link">
                         <i class="nav-icon fas fa-copy"></i>
                         <p>Reports</p>
