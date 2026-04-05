@@ -188,8 +188,8 @@ class PaymentController extends Controller
                 $payment = paymentTransection::create([
                     'pbpt_transaction_id'   => uniqid('TXN_'), // unique transaction ID
                     'pbpt_booking_id'       => $getBooking->pbb_id,
-                    'pbpt_vendor_id'        => $vendorId,
-                    'pbpt_customer_id'      => $customerId,
+                    'pbpt_vendor_id'        => $getBooking->pbb_vendor_id,
+                    'pbpt_customer_id'      => $getBooking->pbb_customer_id,
                     'pbpt_payment_method'   => 'Online', // fallback
                     'pbpt_total_amount'     => $getBooking->pbb_total_amount,
                     'pbpt_discount_amount'  => $discount_amount, // you can add logic if promo applied
@@ -240,8 +240,8 @@ class PaymentController extends Controller
                 $payment = paymentTransection::create([
                     'pbpt_transaction_id'   => uniqid('TXN_'), // unique transaction ID
                     'pbpt_booking_id'       => $getBooking->pbb_id,
-                    'pbpt_vendor_id'        => $vendorId,
-                    'pbpt_customer_id'      => $customerId,
+                    'pbpt_vendor_id'        => $getBooking->pbb_vendor_id,
+                    'pbpt_customer_id'      => $getBooking->pbb_customer_id,
                     'pbpt_payment_method'   => 'Online', // fallback
                     'pbpt_total_amount'     => $getBooking->pbb_total_amount,
                     'pbpt_discount_amount'  => $discount_amount, // you can add logic if promo applied
@@ -293,7 +293,7 @@ class PaymentController extends Controller
                 Log::info('booking_sms_result Response:', ['Response' => $booking_sms_result]);
 
                 // Get customer user record
-                $customerUser = customer::find($customerId);
+                $customerUser = customer::find($getBooking->pbb_customer_id);
                 
                 // Send notification to CUSTOMER for successful payment
                 if ($customerUser) {
@@ -328,7 +328,7 @@ class PaymentController extends Controller
                 }
 
                 // Send notification to VENDOR for new booking (your existing code)
-                $vendorUser = User::where('pbu_vid', $vendorId)->first();
+                $vendorUser = User::where('pbu_vid', $getBooking->pbb_vendor_id)->first();
                 Log::info('Vendors User:', ['Response' => $vendorUser->pbu_id]);
                 
                 $vendorNotificationTitle = 'New Booking Received!';
