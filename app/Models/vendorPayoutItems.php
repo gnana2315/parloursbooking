@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\booking;
 use App\Models\paymentTransection;
 use App\Models\vendorPayouts;
+use App\Models\vendorPayoutHistory;
+use App\Models\vendors;
 
 class vendorPayoutItems extends Model
 {
@@ -25,6 +27,7 @@ class vendorPayoutItems extends Model
         'pbvpi_payout_id',
         'pbvpi_booking_id',
         'pbvpi_payment_id',
+        'pbvpi_vendor_id',
         'pbvpi_amount',
         'pbvpi_platform_fee',
         'pbvpi_vendor_amount',
@@ -44,5 +47,13 @@ class vendorPayoutItems extends Model
 
     public function payout(){
         return $this->belongsTo(vendorPayouts::class, 'pbvpi_payout_id');
+    }
+
+    public function payoutHistory(){
+        return $this->belongsTo(vendorPayoutHistory::class, 'pbvpi_payout_history_id');
+    }
+
+    public function vendor(){
+        return $this->belongsTo(vendors::class, 'pbvpi_vendor_id');
     }
 }

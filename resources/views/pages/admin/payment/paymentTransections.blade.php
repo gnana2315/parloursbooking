@@ -67,7 +67,6 @@
                                             <td>{{ 'Rs. ' . number_format($transection->pbpt_vendor_amount, 2) }}</td>
                                             <td>
                                                 <button class="btn btn-warning" title="Account Summary"><i class="fa fa-clipboard-list"></i></button>
-                                                <button class="btn btn-success" title="Make Payment"><i class="fa fa-money-bill"></i></button>
                                             </td>
                                         </tr>
                                     @endforeach

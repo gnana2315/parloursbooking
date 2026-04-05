@@ -11,6 +11,8 @@ use App\Models\booking;
 use App\Models\ratings;
 use App\Models\vendorType;
 use App\Models\serviceFor;
+use App\Models\vendorSpecialCloses;
+use App\Models\vendorPayoutItems;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -118,5 +120,10 @@ class vendors extends Model
     public function specialCloses()
     {
         return $this->hasMany(vendorSpecialCloses::class, 'pbvsc_vendor_id', 'pbv_id');
+    }
+
+    public function vendorPayoutItems()
+    {
+        return $this->hasMany(vendorPayoutItems::class, 'pbvpi_vendor_id', 'pbv_id');
     }
 }

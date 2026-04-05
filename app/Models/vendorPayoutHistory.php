@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\vendors;
 use App\Models\vendorPayouts;
+use App\Models\vendorPayoutItems;
 
 class vendorPayoutHistory extends Model
 {
@@ -38,5 +39,9 @@ class vendorPayoutHistory extends Model
 
     public function payout(){
         return $this->belongsTo(vendorPayouts::class, 'pbvph_payout_id');
+    }
+
+    public function payoutItems(){
+        return $this->hasMany(vendorPayoutItems::class, 'pbvpi_payout_history_id', 'pbvph_id');
     }
 }
