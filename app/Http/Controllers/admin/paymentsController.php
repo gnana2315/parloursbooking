@@ -28,7 +28,7 @@ class paymentsController extends Controller
 
     public function payoutsHistoryByVendor($vendorId)
     {
-        $payoutHistory = vendorPayoutHistory::with('vendorPayout', 'vendor')->where('pbvph_vendor_id', $vendorId)->get();
+        $payoutHistory = vendorPayoutHistory::with('payout', 'vendors')->where('pbvph_vendor_id', $vendorId)->get();
         return view('pages.admin.payment.payoutHistory', compact('payoutHistory'));
     }
 

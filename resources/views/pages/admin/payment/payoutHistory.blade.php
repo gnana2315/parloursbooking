@@ -11,7 +11,7 @@
         @forelse($payoutHistory as $history)
             <tr>
                 <td>{{ $history->pbvph_reference }} <span class="badge badge-info"> {{ $history->pbvph_payment_method }}</span></td>
-                <td>{{ date('Y-m-d', $history->created_at) }}</td>
+                <td>{{ $history->created_at->format('Y-m-d') }}</td>
                 <td>{{ 'Rs. ' . number_format($history->pbvph_amount, 2) }}</td>
                 <td>{{ $history->pbvph_description }}</td>
             </tr>
@@ -27,7 +27,7 @@
         $("#payoutHistoryTable").DataTable({
             "responsive": true,
             "lengthChange": false,
-            "autoWidth": true,
+            "autoWidth": false,
             "paging": true, 
             "buttons": ["csv", "excel", "pdf", "print"]
         }).buttons().container().appendTo('#payoutHistoryTable_wrapper .col-md-6:eq(0)');
