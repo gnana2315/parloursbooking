@@ -1195,6 +1195,19 @@ class BookingController extends Controller
                     'message' => 'Cannot DNA booking before the service end time (' . $bookingEndDateTime->format('Y-m-d H:i:s') . ')'
                 ], 403);
             }else{
+                if($booking->pbb_status == 2){
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Cannot mark booking as No Customer as it is already marked as Completed'
+                    ], 403);
+                }
+
+                if($booking->pbb_status == 4){
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Booking is already marked as Customer did not attened'
+                    ], 403);
+                }
 
                 $booking->pbb_status = $request->booking_status; // Assuming 4 is the status code for DNA bookings
                 $booking->save();
@@ -1266,6 +1279,19 @@ class BookingController extends Controller
                     'message' => 'Cannot complete booking before the service end time (' . $bookingEndDateTime->format('Y-m-d H:i:s') . ')'
                 ], 403);
             }else{
+                if($booking->pbb_status == 2){
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Cannot mark booking as No Customer as it is already marked as Completed'
+                    ], 403);
+                }
+
+                if($booking->pbb_status == 4){
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Booking is already marked as Customer did not attened'
+                    ], 403);
+                }
                 $booking->pbb_status = $request->booking_status; // Assuming 2 is the status code for completed bookings
                 $booking->save();
 
