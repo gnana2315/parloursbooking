@@ -1192,7 +1192,7 @@ class BookingController extends Controller
                 ]);
                 return response()->json([
                     'status' => false,
-                    'message' => 'Cannot DNA booking before the service end time (' . $bookingEndDateTime->format('Y-m-d H:i:s') . ')'
+                    'message' => 'Cannot mark before service time (' . $bookingEndDateTime->format('Y-m-d H:i:s') . ')'
                 ], 403);
             }else{
                 if($booking->pbb_status == 2){
@@ -1276,7 +1276,7 @@ class BookingController extends Controller
                 ]);
                 return response()->json([
                     'status' => false,
-                    'message' => 'Cannot complete booking before the service end time (' . $bookingEndDateTime->format('Y-m-d H:i:s') . ')'
+                    'message' => 'Cannot mark before the service end time (' . $bookingEndDateTime->format('Y-m-d H:i:s') . ')'
                 ], 403);
             }else{
                 if($booking->pbb_status == 2){
