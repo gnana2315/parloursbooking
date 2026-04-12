@@ -298,7 +298,7 @@ class PaymentController extends Controller
                 // Send notification to CUSTOMER for successful payment
                 if ($customerUser) {
                     $customerNotificationTitle = 'Booking Confirmed!';
-                    $customerNotificationMessage = 'Booking added successfully!. Your booking reference no:'. $bookingRefNo;
+                    $customerNotificationMessage = 'Booking added successfully!. Your booking reference no: '. $bookingRefNo;
                     $customerNotificationData = [
                         'booking_ref_no' => $bookingRefNo,
                         'booking_id' => $bookingId,
