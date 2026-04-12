@@ -964,7 +964,8 @@ class AuthController extends Controller
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
+        $vendor = vendors::with('city')->where('pbv_id', $user->pbu_vid)->first();
+        $vendor->pbv_city = $vendor->city ? $vendor->city->pbc_cityname : null;
         if(!$vendor){
             return response()->json(['message' => 'Vendor not found'], 404);
         }
