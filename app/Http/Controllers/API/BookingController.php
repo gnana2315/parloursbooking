@@ -1195,6 +1195,9 @@ class BookingController extends Controller
                     'message' => 'Cannot DNA booking before the service end time (' . $bookingEndDateTime->format('Y-m-d H:i:s') . ')'
                 ], 403);
             }else{
+
+                $booking->pbb_status = $request->booking_status; // Assuming 4 is the status code for DNA bookings
+                $booking->save();
                 // If booking is marked as 'No Customer', initiate notification.
                 $customerUser = customer::find($booking->pbb_customer_id);
                 
