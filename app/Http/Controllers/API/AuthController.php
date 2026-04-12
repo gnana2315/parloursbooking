@@ -903,7 +903,7 @@ class AuthController extends Controller
         $userDetails = null;
         if($user->pbu_usertype == '1'){
             $userDetails = vendors::with('city')->where('pbv_id', $user->pbu_vid)->first();
-            $userDetails->pbv_city = $userDetails->city ? $userDetails->city->name : null;
+            $userDetails->pbv_city = $userDetails->city ? $userDetails->city->pbc_cityname : null;
         }else if($user->pbu_usertype == '2'){            
             $userDetails = customer::where('pbc_user_id', $user->pbu_id)->first();
         }        
