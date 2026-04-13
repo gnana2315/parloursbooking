@@ -220,18 +220,21 @@
                                                         {!! getStatusBadge($document->pbvd_document_status) !!} - {{ $document->pbvd_document_status == 4 ? $document->pbvd_document_extra : '' }}
                                                         <br>
                                                         <br>
-                                                        @if(in_array($document->pbvd_document_status, [1, 2, 4]) && $vendor->pbv_status != 2)
-                                                            <button class="btn btn-success approve-btn"
-                                                                data-document-id="{{ $document->pbvd_id }}">
-                                                                Approve
-                                                            </button>
+                                                        @if($vendor->pbv_status != 2)                                                        
+                                                            @if(in_array($document->pbvd_document_status, [1, 2, 4]))
+                                                                <button class="btn btn-success approve-btn"
+                                                                    data-document-id="{{ $document->pbvd_id }}">
+                                                                    Approve
+                                                                </button>
+                                                            @endif
 
-                                                            <button class="btn btn-danger reject-btn"
-                                                                data-document-id="{{ $document->pbvd_id }}">
-                                                                Reject
-                                                            </button>
+                                                            @if(in_array($document->pbvd_document_status, [3]))
+                                                                <button class="btn btn-danger reject-btn"
+                                                                    data-document-id="{{ $document->pbvd_id }}">
+                                                                    Reject
+                                                                </button>
+                                                            @endif
                                                         @endif
-
                                                         <embed src="{{ $document->pbvd_document_url }}" width="100%" height="420px" />
 
                                                     @else
@@ -265,14 +268,15 @@
                                                                     {!! getStatusBadge($file->pbvd_document_status) !!} - {{ $file->pbvd_document_status == 4 ? $file->pbvd_document_extra : '' }}
                                                                     <br>
                                                                     <br>
-                                                                    <!-- @if(in_array($file->pbvd_document_status, [1, 2, 4]) && $vendor->pbv_status != 2) -->
                                                                     @if($vendor->pbv_status != 2)
                                                                         @if(in_array($file->pbvd_document_status, [1, 2, 4]))
                                                                             <button class="btn btn-success btn-sm approve-btn w-100 mt-1"
                                                                                 data-document-id="{{ $file->pbvd_id }}">
                                                                                 Approve
                                                                             </button>
-                                                                        @else
+                                                                        @endif
+
+                                                                        @if(in_array($file->pbvd_document_status, [3]))
                                                                             <button class="btn btn-danger btn-sm reject-btn w-100 mt-1"
                                                                                 data-document-id="{{ $file->pbvd_id }}">
                                                                                 Reject
