@@ -320,7 +320,7 @@
                                                         <th>Service Name</th>
                                                         <th>Price</th>
                                                         <th>Duration</th>
-                                                        <th>Employes</th>
+                                                        <th>Employees</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
                                                     </tr>
@@ -334,7 +334,7 @@
                                                             </td>
                                                             <td>{{ $service->pbs_price }}</td>
                                                             <td>{{ $service->pbs_duration }} mins</td>
-                                                            <td>{{ ($service->pbs_employes) ? $service->pbs_employes : 'N/A' }}</td>
+                                                            <td>{{ ($service->pbs_employees) ? $service->pbs_employees : 'N/A' }}</td>
                                                             <td>
                                                                 @if($service->pbs_status == 1)
                                                                     <span class="badge badge-success">Active</span>
@@ -867,7 +867,7 @@
 
         // Or for better UX, add a cursor pointer style
         $('embed').css('cursor', 'pointer');
-        
+
         $('#activity_logs').click(function(e){
             $vuid = $(this).data('value');
             $.ajax({
