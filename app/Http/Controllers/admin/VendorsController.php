@@ -203,7 +203,7 @@ class VendorsController extends Controller
         $allDocumentsUploaded = empty($documentIds)
                                 ? true
                                 : !array_diff($documentIds, $uploadedIds);
-        
+        var_dump("Documents: " . $documents);
         $approvedIds = $documents->where('pbvd_document_status', 3)->pluck('pbvd_required_document_id')->toArray();
         var_dump("Document IDs: " . implode(", ", $documentIds));
         var_dump("Approved Document IDs: " . implode(", ", $approvedIds));
