@@ -197,7 +197,7 @@ class VendorsController extends Controller
         $documents = vendorDocuments::where('pbvd_vendor_id', $vendor->pbv_id)
                                     ->whereIn('pbvd_required_document_id', $documentIds)
                                     ->get(['pbvd_required_document_id', 'updated_at']);
-
+        dd($documents->toArray());
         $uploadedIds = $documents->pluck('pbvd_required_document_id')->toArray();
 
         $allDocumentsUploaded = empty($documentIds)
