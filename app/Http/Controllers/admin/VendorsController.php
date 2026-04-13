@@ -204,7 +204,7 @@ class VendorsController extends Controller
                                 ? true
                                 : !array_diff($documentIds, $uploadedIds);
         
-        $approvedIds = $documents->where('pbvd_document_status', 4)->pluck('pbvd_required_document_id')->toArray();
+        $approvedIds = $documents->where('pbvd_document_status', 3)->pluck('pbvd_required_document_id')->toArray();
 
         $allApproved = empty($documentIds) ? true : !array_diff($documentIds, $approvedIds);
 
