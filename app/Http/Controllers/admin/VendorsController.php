@@ -203,14 +203,11 @@ class VendorsController extends Controller
         $allDocumentsUploaded = empty($documentIds)
                                 ? true
                                 : !array_diff($documentIds, $uploadedIds);
-        var_dump("Documents: " . $documents);
+        
         $approvedIds = $documents->where('pbvd_document_status', 3)->pluck('pbvd_required_document_id')->toArray();
-        var_dump("Document IDs: " . implode(", ", $documentIds));
-        var_dump("Approved Document IDs: " . implode(", ", $approvedIds));
+        
         $allApproved = empty($documentIds) ? true : !array_diff($documentIds, $approvedIds);
 
-        var_dump("All Documents Uploaded: " . ($allDocumentsUploaded ? "Yes" : "No"));
-        var_dump("All Documents Approved: " . ($allApproved ? "Yes" : "No"));
         if (!$allDocumentsUploaded || !$allApproved) {
             $log_message = 'Required documents are missing or not approved (ID: '.$request->vendor_id.')';
             $this->auditLogService->log($log_message, $user, ['pbv_status' => $vendor_old_status], ['pbv_status' => $request->status]);
