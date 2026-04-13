@@ -5,6 +5,7 @@
             <th>Date</th>
             <th>Amount</th>
             <th>Description</th>
+            <th>Payout Receipt</th>
         </tr>
     </thead>
     <tbody>
@@ -14,10 +15,15 @@
                 <td>{{ $history->created_at->format('Y-m-d') }}</td>
                 <td>{{ 'Rs. ' . number_format($history->pbvph_amount, 2) }}</td>
                 <td>{{ $history->pbvph_description }}</td>
+                <td>
+                    <a href="{{ route('payouts.receipt', $history->pbvph_id) }}" target="_blank" class="btn btn-sm btn-primary">
+                        <i class="fas fa-file-invoice"></i> View Receipt
+                    </a>
+                </td>
             </tr>
         @empty
             <tr>
-                <td colspan="4">No payout history found</td>
+                <td colspan="5">No payout history found</td>
             </tr>
         @endforelse
     </tbody>

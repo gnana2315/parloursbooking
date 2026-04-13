@@ -120,6 +120,8 @@ Route::group(['middleware' => 'auth.check'], function () {
             Route::get('/payouts', [paymentsController::class, 'payoutsList'])->name('payouts.list');
             Route::get('/payouts/history/{vendorId}', [paymentsController::class, 'payoutsHistoryByVendor'])->name('payouts.history');
             Route::get('/payouts/make/{vendorId}', [paymentsController::class, 'makePayoutView'])->name('payouts.make');
+            Route::post('/payouts/process', [paymentsController::class, 'processPayout'])->name('payouts.process');
+            Route::get('/payouts/receipt/{payoutHistoryId}', [paymentsController::class, 'viewPayoutReceipt'])->name('payouts.receipt');
             Route::get('/reports', [reportsController::class, 'index']);
         });
         // Route::group(['middleware' => 'isSuperAdmin'], function () {

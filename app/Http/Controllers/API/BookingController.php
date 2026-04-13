@@ -1310,6 +1310,7 @@ class BookingController extends Controller
                     'pbvpi_payout_id'   => $vendorPayout->pbvp_id,
                     'pbvpi_booking_id'  => $booking->pbb_id,
                     'pbvpi_payment_id'  => $payment->pbpt_id,
+                    'pbvpi_vendor_id'   => $booking->pbb_vendor_id,
                     'pbvpi_amount'      => $booking->pbb_total_amount,
                     'pbvpi_platform_fee'=> $payment->pbpt_platform_fee,
                     'pbvpi_vendor_amount'=> $payment->pbpt_vendor_amount,

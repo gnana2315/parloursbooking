@@ -38,7 +38,7 @@
                                 </thead>
                                 <tbody>
                                     @foreach($payouts as $payout)
-                                        <tr id="payout-{{ $payout->pbv_id }}">
+                                        <tr id="payout-{{ $payout->vendors->pbv_id }}">
                                             <td>
                                                 {{ $payout->vendors->pbv_business_name }}
                                             </td>
@@ -120,7 +120,6 @@
 
         $('.make_payout').on('click', function() {
             var vendorId = $(this).data('vendor-id');
-
             $.ajax({
                 url: '{{ route("payouts.make", "") }}/' + vendorId, 
                 method: 'GET',
