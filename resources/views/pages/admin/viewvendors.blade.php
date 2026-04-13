@@ -265,16 +265,19 @@
                                                                     {!! getStatusBadge($file->pbvd_document_status) !!} - {{ $file->pbvd_document_status == 4 ? $file->pbvd_document_extra : '' }}
                                                                     <br>
                                                                     <br>
-                                                                    @if(in_array($file->pbvd_document_status, [1, 2, 4]) && $vendor->pbv_status != 2)
-                                                                        <button class="btn btn-success btn-sm approve-btn w-100 mt-1"
-                                                                            data-document-id="{{ $file->pbvd_id }}">
-                                                                            Approve
-                                                                        </button>
-
-                                                                        <button class="btn btn-danger btn-sm reject-btn w-100 mt-1"
-                                                                            data-document-id="{{ $file->pbvd_id }}">
-                                                                            Reject
-                                                                        </button>
+                                                                    <!-- @if(in_array($file->pbvd_document_status, [1, 2, 4]) && $vendor->pbv_status != 2) -->
+                                                                    @if($vendor->pbv_status != 2)
+                                                                        @if(in_array($file->pbvd_document_status, [1, 2, 4]))
+                                                                            <button class="btn btn-success btn-sm approve-btn w-100 mt-1"
+                                                                                data-document-id="{{ $file->pbvd_id }}">
+                                                                                Approve
+                                                                            </button>
+                                                                        @else
+                                                                            <button class="btn btn-danger btn-sm reject-btn w-100 mt-1"
+                                                                                data-document-id="{{ $file->pbvd_id }}">
+                                                                                Reject
+                                                                            </button>
+                                                                        @endif
                                                                     @endif
                                                                 </div>
                                                             @endforeach
