@@ -857,6 +857,17 @@
 </div>
 <script>
     $(document).ready(function(){
+        // Add click event to open embedded document in new tab
+        $(document).on('click', 'embed', function() {
+            var documentUrl = $(this).attr('src');
+            if (documentUrl) {
+                window.open(documentUrl, '_blank');
+            }
+        });
+
+        // Or for better UX, add a cursor pointer style
+        $('embed').css('cursor', 'pointer');
+        
         $('#activity_logs').click(function(e){
             $vuid = $(this).data('value');
             $.ajax({
@@ -1183,12 +1194,16 @@
                 },
                 success: function(response) {
                     if (response.success) {
+                        localStorage.setItem('activeTab', 'services');
                         Swal.fire(
                             'Activated!',
                             response.message,
                             'success'
-                        );
-                        location.reload();
+                        ).then(() => {
+                            // Switch to services tab and reload
+                            //activateTabAndReload('services');
+                            location.reload();
+                        });
                     } else {
                         Swal.fire(
                             'Error!',
@@ -1206,6 +1221,20 @@
                 }
             });
         });
+
+        var activeTab = localStorage.getItem('activeTab');
+        if (activeTab) {
+            // Remove active class from all tabs and panes
+            $('.nav-pills .nav-link').removeClass('active');
+            $('.tab-pane').removeClass('active');
+            
+            // Activate the stored tab
+            $(`.nav-pills .nav-link[href="#${activeTab}"]`).addClass('active');
+            $(`#${activeTab}`).addClass('active');
+            
+            // Clear the stored preference
+            localStorage.removeItem('activeTab');
+        }
 
         $('.vsa_status').on('click', function() {
             var vsa_id = $(this).data('availability-id');
