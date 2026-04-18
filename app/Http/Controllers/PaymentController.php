@@ -144,7 +144,7 @@ class PaymentController extends Controller
                 $vendorId,
                 $customerId
             ] = array_pad($customData, 4, null);
-            
+            Log::info('Custom Fields:', ['Response' => $customData]);
             Log::info('Payment Status Code:', ['Response' => $statusCode]);
                 
             $getBooking = booking::with(['customer', 'vendors', 'bookingDetails', 'promoCode'])
