@@ -1296,7 +1296,7 @@ class BookingController extends Controller
                 $booking->pbb_status = $request->booking_status; // Assuming 2 is the status code for completed bookings
                 $booking->save();
 
-                $payment = $booking->paymentTransections->get();
+                $payment = paymentTransection::where('pbpt_booking_id', $request->booking_id);
                 Log::info("Payment Details:", [$payment]);
                 $vendorPayout = vendorPayouts::firstOrCreate(
                     ['pbvp_vendor_id' => $booking->pbb_vendor_id],
