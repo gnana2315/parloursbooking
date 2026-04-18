@@ -149,7 +149,7 @@ class PaymentController extends Controller
                 
             $getBooking = booking::with(['customer', 'vendors', 'bookingDetails', 'promoCode'])
                         ->where('pbb_id', $bookingId)->first();
-
+            Log::info('Booking Details:', ['Response' => $getBooking]);
             $customer = $getBooking->customer;
             $vendor = $getBooking->vendors->first();
             $bookingDetails = $getBooking->bookingDetails;
@@ -158,6 +158,9 @@ class PaymentController extends Controller
             $platform_fee_percentage = 10;
             $platform_fee = ($getBooking->pbb_total_amount * $platform_fee_percentage) / 100;
             $vendor_amount = $getBooking->pbb_total_amount - $platform_fee;
+            Log::info("pbb_total_amount: ", $getBooking->pbb_total_amount);
+            Log::info("platform_fee: ", $platform_fee);
+            Log::info("vendor_amount: ", $vendor_amount);
 
             $promocode_discount_type = optional($getBooking->promoCode)->pbpc_discount_type;
             $promocode_value = optional($getBooking->promoCode)->pbpc_value;
