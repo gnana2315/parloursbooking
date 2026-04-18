@@ -1174,7 +1174,8 @@ class BookingController extends Controller
                 'message' => 'Booking not found',
             ], 404);
         }
-        Log::info("Booking: ", $booking);
+        Log::info("Booking: ", [$booking]
+    );
         if($request->booking_status == 4){
             // Safely parse booking date and time
             $bookingDate = Carbon::parse($booking->pbb_booking_date)->format('Y-m-d');
@@ -1296,7 +1297,7 @@ class BookingController extends Controller
                 $booking->save();
 
                 $payment = $booking->paymentTransections->first();
-                Log::info("Payment Details:", $payment);
+                Log::info("Payment Details:", [$payment]);
                 $vendorPayout = vendorPayouts::firstOrCreate(
                     ['pbvp_vendor_id' => $booking->pbb_vendor_id],
                     ['pbvp_total_earned' => 0, 'pbvp_total_paid' => 0, 'pbvp_total_due' => 0]
