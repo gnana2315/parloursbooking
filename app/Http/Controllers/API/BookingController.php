@@ -1174,8 +1174,17 @@ class BookingController extends Controller
                 'message' => 'Booking not found',
             ], 404);
         }
-        Log::info("Booking: ", [$booking]
-    );
+        Log::info("Booking: ", [$booking]);
+
+        $paymentTransaction = $booking->paymentTransections;
+        if (!$paymentTransaction) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Payment transaction not found',
+            ], 404);
+        }
+        Log::info("paymentTransaction: ", [$paymentTransaction]);
+
         if($request->booking_status == 4){
             // Safely parse booking date and time
             $bookingDate = Carbon::parse($booking->pbb_booking_date)->format('Y-m-d');
@@ -1296,8 +1305,6 @@ class BookingController extends Controller
                 $booking->pbb_status = $request->booking_status; // Assuming 2 is the status code for completed bookings
                 $booking->save();
 
-                $payment = paymentTransection::where('pbpt_booking_id', $request->booking_id);
-                Log::info("Payment Details:", [$payment]);
                 $vendorPayout = vendorPayouts::firstOrCreate(
                     ['pbvp_vendor_id' => $booking->pbb_vendor_id],
                     ['pbvp_total_earned' => 0, 'pbvp_total_paid' => 0, 'pbvp_total_due' => 0]
@@ -1305,17 +1312,17 @@ class BookingController extends Controller
 
                 Log::info('vendor payouts Response:', ['Response' => $vendorPayout]);
 
-                $vendorPayout->increment('pbvp_total_earned', $payment->pbpt_vendor_amount);
-                $vendorPayout->increment('pbvp_total_due', $payment->pbpt_vendor_amount);
+                $vendorPayout->increment('pbvp_total_earned', $paymentTransaction->pbpt_vendor_amount);
+                $vendorPayout->increment('pbvp_total_due', $paymentTransaction->pbpt_vendor_amount);
 
                 $payoutItem = vendorPayoutItems::create([
                     'pbvpi_payout_id'   => $vendorPayout->pbvp_id,
-                    'pbvpi_booking_id'  => $payment->pbpt_booking_id,
-                    'pbvpi_payment_id'  => $payment->pbpt_id,
-                    'pbvpi_vendor_id'   => $payment->pbpt_vendor_id,
-                    'pbvpi_amount'      => $payment->pbpt_total_amount,
-                    'pbvpi_platform_fee'=> $payment->pbpt_platform_fee,
-                    'pbvpi_vendor_amount'=> $payment->pbpt_vendor_amount,
+                    'pbvpi_booking_id'  => $paymentTransaction->pbpt_booking_id,
+                    'pbvpi_payment_id'  => $paymentTransaction->pbpt_id,
+                    'pbvpi_vendor_id'   => $paymentTransaction->pbpt_vendor_id,
+                    'pbvpi_amount'      => $paymentTransaction->pbpt_total_amount,
+                    'pbvpi_platform_fee'=> $paymentTransaction->pbpt_platform_fee,
+                    'pbvpi_vendor_amount'=> $paymentTransaction->pbpt_vendor_amount,
                     'pbvpi_status'      => '0'
                 ]);
                 Log::info('vendor payout Item Response:', ['Response' => $payoutItem]);
