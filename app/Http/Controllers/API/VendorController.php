@@ -1918,7 +1918,7 @@ class VendorController extends Controller
                 return [
                     'date' => $transaction->created_at->format('Y-m-d'),
                     'booking_ref_no' => $transaction->booking->pbb_ref_no,
-                    'amount' => number_format($transaction->pbpt_total_amount, 2, '.', ''),
+                    'amount' => number_format($transaction->pbpt_vendor_amount, 2, '.', ''),
                     'status' => $status,
                 ];
             })->toArray();
