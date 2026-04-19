@@ -1176,14 +1176,16 @@ class BookingController extends Controller
         }
         Log::info("Booking: ", [$booking]);
 
-        $paymentTransaction = $booking->paymentTransections;
-        if (!$paymentTransaction) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Payment transaction not found',
-            ], 404);
+        if($booking->pbb_type == 'Online'){
+            $paymentTransaction = $booking->paymentTransections;
+            if (!$paymentTransaction) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Payment transaction not found',
+                ], 404);
+            }
+            Log::info("paymentTransaction: ", [$paymentTransaction]);
         }
-        Log::info("paymentTransaction: ", [$paymentTransaction]);
 
         if($request->booking_status == 4){
             // Safely parse booking date and time
