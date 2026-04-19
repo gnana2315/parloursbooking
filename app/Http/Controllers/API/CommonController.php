@@ -1280,10 +1280,17 @@ class CommonController extends Controller
                                 ->count();
         // $bookingsCount = 23;
 
-        $earnedAmount = booking::with('paymentTransection')->where('pbb_vendor_id', $vendor->pbv_id)
-            ->where('pbb_status', '2')
-            ->where('pbb_type', 'Online')
-            ->whereBetween('pbb_booking_date', [$startOfWeek, $endOfWeek])
+        // $earnedAmount = booking::with('paymentTransection')->where('pbb_vendor_id', $vendor->pbv_id)
+        //     ->where('pbb_status', '2')
+        //     ->where('pbb_type', 'Online')
+        //     ->whereBetween('pbb_booking_date', [$startOfWeek, $endOfWeek])
+        //     ->sum('pbpt_vendor_amount');
+        $earnedAmount = PaymentTransection::whereHas('booking', function($query) use ($vendor, $startOfWeek, $endOfWeek) {
+            $query->where('pbb_vendor_id', $vendor->pbv_id)
+                ->where('pbb_status', '2')
+                ->where('pbb_type', 'Online')
+                ->whereBetween('pbb_booking_date', [$startOfWeek, $endOfWeek]);
+            })
             ->sum('pbpt_vendor_amount');
 
         // $earnedAmount = 1575;
