@@ -20,6 +20,7 @@ use App\Models\notification;
 use App\Models\vendorPayouts;
 use App\Services\DialogESMSService;
 use App\Services\OneSignalService;
+use App\Models\vendorPayoutHistory;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
@@ -1266,21 +1267,32 @@ class CommonController extends Controller
             ], 404);
         }
 
+        $startOfWeek = now()->startOfWeek();
+        $endOfWeek = now()->endOfWeek(); 
+
+        $lastStartofWeek = now()->subWeek()->startOfWeek();
+        $lastEndOfWeek = now()->subWeek()->endOfWeek();
+
         $bookingsCount = booking::where('pbb_vendor_id', $vendor->pbv_id)
                                 ->where('pbb_type', 'Online')
                                 ->where('pbb_status', '2')
+                                ->whereBetween('pbb_booking_date', [$startOfWeek, $endOfWeek])
                                 ->count();
         // $bookingsCount = 23;
 
-        $earnedAmount = booking::where('pbb_vendor_id', $vendor->pbv_id)
+        $earnedAmount = booking::with('paymentTransection')->where('pbb_vendor_id', $vendor->pbv_id)
             ->where('pbb_status', '2')
             ->where('pbb_type', 'Online')
-            ->sum('pbb_total_amount');
+            ->whereBetween('pbb_booking_date', [$startOfWeek, $endOfWeek])
+            ->sum('pbpt_vendor_amount');
 
         // $earnedAmount = 1575;
         $earnedAmount_formatted_currency = number_format($earnedAmount, 2, '.', ',');
 
-        $paidAmount = vendorPayouts::where('pbvp_vendor_id', $vendor->pbv_id)->sum('pbvp_total_paid');
+        // $paidAmount = vendorPayouts::where('pbvp_vendor_id', $vendor->pbv_id)->sum('pbvp_total_paid');
+        $paidAmount = vendorPayoutHistory::where('pbvph_vendor_id', $vendor->pbv_id)
+                    ->whereBetween('created_at', [$lastStartofWeek, $lastEndOfWeek])
+                    ->sum('pbvph_amount');
 
         // $paidAmount = 645;
         // if($paidAmount->isEmpty()){
