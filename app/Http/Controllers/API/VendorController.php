@@ -1891,16 +1891,19 @@ class VendorController extends Controller
             return response()->json(['message' => 'Vendor not found'], 404);
         }
         Log::info('getThisWeekEarningsByVendor Vendor Response:', ['Response' => $vendor]);
-        $startOfWeek = now()->startOfWeek()->toDateString();;
-        $endOfWeek = now()->endOfWeek()->toDateString();;
+        // $startOfWeek = now()->startOfWeek()->toDateString();;
+        // $endOfWeek = now()->endOfWeek()->toDateString();;
 
-        Log::info('startOfWeek Response:', ['startOfWeek' => $startOfWeek, 'endOfWeek' => $endOfWeek]);
+        // Log::info('startOfWeek Response:', ['startOfWeek' => $startOfWeek, 'endOfWeek' => $endOfWeek]);
 
         $earnings = paymentTransection::with(['booking', 'payoutItems'])
             ->where('pbpt_vendor_id', $vendor->pbv_id)
-            ->whereHas('booking', function ($q) use ($startOfWeek, $endOfWeek) {
-                $q->whereBetween('pbb_booking_date', [$startOfWeek, $endOfWeek]);
-            })
+            // ->whereHas('booking', function ($q) use ($startOfWeek, $endOfWeek) {
+            //     $q->whereBetween('pbb_booking_date', [$startOfWeek, $endOfWeek]);
+            // })
+            ->whereHas('booking', function ($q) {
+                $q->where('pbb_status', 2);
+            }   )
             ->get()
             ->map(function ($transaction) {
                 // $totalAmount = $transaction->payoutItems->sum('pbvpi_vendor_amount');
