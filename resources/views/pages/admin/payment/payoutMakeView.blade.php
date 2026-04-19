@@ -13,7 +13,7 @@
                 <td><input type="checkbox" class="payout-item-checkbox" data-amount="{{ $item->pbvpi_amount }}" data-id="{{ $item->pbvpi_id }}"></td>
                 <td>{{ $item->booking->pbb_ref_no }}</td>
                 <td>{{ $item->payment->pbpt_payment_ref_no   }}</td>
-                <td>{{ 'Rs. ' . number_format($item->pbvpi_amount, 2) }}</td>
+                <td>{{ 'Rs. ' . number_format($item->pbvpi_vendor_amount, 2) }}</td>
             </tr>
         @empty
             <tr>
