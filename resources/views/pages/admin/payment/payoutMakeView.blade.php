@@ -10,7 +10,7 @@
     <tbody>
         @forelse($vendorPayoutItems as $item)
             <tr id="payout-item-{{ $item->pbvpi_id }}">
-                <td><input type="checkbox" class="payout-item-checkbox" data-amount="{{ $item->pbvpi_amount }}" data-id="{{ $item->pbvpi_id }}"></td>
+                <td><input type="checkbox" class="payout-item-checkbox" data-amount="{{ $item->pbvpi_vendor_amount }}" data-id="{{ $item->pbvpi_id }}"></td>
                 <td>{{ $item->booking->pbb_ref_no }}</td>
                 <td>{{ $item->payment->pbpt_payment_ref_no   }}</td>
                 <td>{{ 'Rs. ' . number_format($item->pbvpi_vendor_amount, 2) }}</td>
