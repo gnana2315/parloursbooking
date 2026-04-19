@@ -1221,48 +1221,56 @@ class BookingController extends Controller
 
                 $booking->pbb_status = $request->booking_status; // Assuming 4 is the status code for DNA bookings
                 $booking->save();
-                // If booking is marked as 'No Customer', initiate notification.
-                $customerUser = customer::find($booking->pbb_customer_id);
-                
-                Log::info('Customer User Details:', ['CustomerUser' => $customerUser]);
-                // Send notification to CUSTOMER for successful payment
-                if ($customerUser) {
-                    $customerNotificationTitle = 'Booking Cancelled!';
-                    $customerNotificationMessage = 'Booking Cancelled due to your absense. Your booking reference no: '. $booking->pbb_ref_no;
-                    $customerNotificationData = [
-                        'booking_ref_no' => $booking->pbb_ref_no,
-                        'booking_id' => $booking->pbb_id,
-                        'status' => $booking->pbb_status,
-                        'transaction_id' => $booking->pbb_ref_no,
-                        'amount' => $booking->pbb_total_amount
-                    ];
 
-                    $customerNotificationResult = $oneSignalService->sendToUser(
-                        $customerUser->pbc_user_id,
-                        $customerNotificationTitle,
-                        $customerNotificationMessage,
-                        $customerNotificationData
-                    );
-                        
-                    if ($customerNotificationResult) {
-                        notification::create([
-                            'pbn_user_id' => $customerUser->pbc_user_id,
-                            'pbn_type' => 'Booking Cancelled',
-                            'pbn_title' => $customerNotificationTitle,
-                            'pbn_message' => $customerNotificationMessage,
-                            'pbn_is_read' => 0,
-                        ]);
+                if($booking->pbb_type == 'Online'){
+                    // If booking is marked as 'No Customer', initiate notification.
+                    $customerUser = customer::find($booking->pbb_customer_id);
+                    
+                    Log::info('Customer User Details:', ['CustomerUser' => $customerUser]);
+                    // Send notification to CUSTOMER for successful payment
+                    if ($customerUser) {
+                        $customerNotificationTitle = 'Booking Cancelled!';
+                        $customerNotificationMessage = 'Booking Cancelled due to your absense. Your booking reference no: '. $booking->pbb_ref_no;
+                        $customerNotificationData = [
+                            'booking_ref_no' => $booking->pbb_ref_no,
+                            'booking_id' => $booking->pbb_id,
+                            'status' => $booking->pbb_status,
+                            'transaction_id' => $booking->pbb_ref_no,
+                            'amount' => $booking->pbb_total_amount
+                        ];
+
+                        $customerNotificationResult = $oneSignalService->sendToUser(
+                            $customerUser->pbc_user_id,
+                            $customerNotificationTitle,
+                            $customerNotificationMessage,
+                            $customerNotificationData
+                        );
+                            
+                        if ($customerNotificationResult) {
+                            notification::create([
+                                'pbn_user_id' => $customerUser->pbc_user_id,
+                                'pbn_type' => 'Booking Cancelled',
+                                'pbn_title' => $customerNotificationTitle,
+                                'pbn_message' => $customerNotificationMessage,
+                                'pbn_is_read' => 0,
+                            ]);
+                        }
+
+                        return response()->json([
+                            'status' => true,
+                            'message' => 'Booking status marked as DNA',
+                        ], 200);
+                    } else {
+                        Log::warning('Customer user not found for booking marked as No Customer:', ['BookingID' => $booking->pbb_id]);
+                        return response()->json([
+                            'status' => false,
+                            'message' => 'Booking marked as No Customer, but customer details not found for notification',
+                        ], 200);
                     }
-
+                }else{
                     return response()->json([
                         'status' => true,
-                        'message' => 'Booking status marked as DNA',
-                    ], 200);
-                } else {
-                    Log::warning('Customer user not found for booking marked as No Customer:', ['BookingID' => $booking->pbb_id]);
-                    return response()->json([
-                        'status' => false,
-                        'message' => 'Booking marked as No Customer, but customer details not found for notification',
+                        'message' => 'Booking status marked as No Customer',
                     ], 200);
                 }
             }
@@ -1305,32 +1313,40 @@ class BookingController extends Controller
                 $booking->pbb_status = $request->booking_status; // Assuming 2 is the status code for completed bookings
                 $booking->save();
 
-                $vendorPayout = vendorPayouts::firstOrCreate(
-                    ['pbvp_vendor_id' => $booking->pbb_vendor_id],
-                    ['pbvp_total_earned' => 0, 'pbvp_total_paid' => 0, 'pbvp_total_due' => 0]
-                );
+                if($booking->pbb_type == 'Online'){
+                    // If booking is marked as completed, initiate payout process.
+                    $vendorPayout = vendorPayouts::firstOrCreate(
+                        ['pbvp_vendor_id' => $booking->pbb_vendor_id],
+                        ['pbvp_total_earned' => 0, 'pbvp_total_paid' => 0, 'pbvp_total_due' => 0]
+                    );
 
-                Log::info('vendor payouts Response:', ['Response' => $vendorPayout]);
+                    Log::info('vendor payouts Response:', ['Response' => $vendorPayout]);
 
-                $vendorPayout->increment('pbvp_total_earned', $paymentTransaction->pbpt_vendor_amount);
-                $vendorPayout->increment('pbvp_total_due', $paymentTransaction->pbpt_vendor_amount);
+                    $vendorPayout->increment('pbvp_total_earned', $paymentTransaction->pbpt_vendor_amount);
+                    $vendorPayout->increment('pbvp_total_due', $paymentTransaction->pbpt_vendor_amount);
 
-                $payoutItem = vendorPayoutItems::create([
-                    'pbvpi_payout_id'   => $vendorPayout->pbvp_id,
-                    'pbvpi_booking_id'  => $paymentTransaction->pbpt_booking_id,
-                    'pbvpi_payment_id'  => $paymentTransaction->pbpt_id,
-                    'pbvpi_vendor_id'   => $paymentTransaction->pbpt_vendor_id,
-                    'pbvpi_amount'      => $paymentTransaction->pbpt_total_amount,
-                    'pbvpi_platform_fee'=> $paymentTransaction->pbpt_platform_fee,
-                    'pbvpi_vendor_amount'=> $paymentTransaction->pbpt_vendor_amount,
-                    'pbvpi_status'      => '0'
-                ]);
-                Log::info('vendor payout Item Response:', ['Response' => $payoutItem]);
+                    $payoutItem = vendorPayoutItems::create([
+                        'pbvpi_payout_id'   => $vendorPayout->pbvp_id,
+                        'pbvpi_booking_id'  => $paymentTransaction->pbpt_booking_id,
+                        'pbvpi_payment_id'  => $paymentTransaction->pbpt_id,
+                        'pbvpi_vendor_id'   => $paymentTransaction->pbpt_vendor_id,
+                        'pbvpi_amount'      => $paymentTransaction->pbpt_total_amount,
+                        'pbvpi_platform_fee'=> $paymentTransaction->pbpt_platform_fee,
+                        'pbvpi_vendor_amount'=> $paymentTransaction->pbpt_vendor_amount,
+                        'pbvpi_status'      => '0'
+                    ]);
+                    Log::info('vendor payout Item Response:', ['Response' => $payoutItem]);
 
-                return response()->json([
-                    'status' => true,
-                    'message' => 'Booking status marked successfully',
-                ], 200);
+                    return response()->json([
+                        'status' => true,
+                        'message' => 'Booking status marked successfully',
+                    ], 200);
+                }else{
+                    return response()->json([
+                        'status' => true,
+                        'message' => 'Booking status marked successfully',
+                    ], 200);
+                }
             }
         }
     }
