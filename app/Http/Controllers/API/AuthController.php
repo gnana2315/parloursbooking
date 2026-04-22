@@ -965,7 +965,7 @@ class AuthController extends Controller
         }
 
         $vendor = vendors::with('city')->where('pbv_id', $user->pbu_vid)->first();
-        $vendor->pbv_city = $vendor->city ? $vendor->city->pbc_cityname : null;
+        //$vendor->pbv_city = $vendor->city ? $vendor->city->pbc_cityname : null;
         if(!$vendor){
             return response()->json(['message' => 'Vendor not found'], 404);
         }
