@@ -1909,7 +1909,7 @@ class VendorController extends Controller
                 // $totalAmount = $transaction->payoutItems->sum('pbvpi_vendor_amount');
                 // $isPaid = $transaction->payoutItems->every(fn($item) => $item->pbvpi_status == 1);
                 $status = '';
-                if($transaction->pbvpi_status == 0){
+                if($transaction->payoutItems->pbvpi_status == 0){
                     $status = 'Unpaid';
                 }else{
                     $status = 'Paid';
