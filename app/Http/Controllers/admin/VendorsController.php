@@ -420,7 +420,7 @@ class VendorsController extends Controller
             ], 404);
         }
 
-        $document_old_status = $document->pbvd_status;
+        $document_old_status = $document->pbvd_document_status;
         $vendor_status = $document->vendor->pbv_status;
 
         if($vendor_status == 2){
@@ -445,7 +445,7 @@ class VendorsController extends Controller
         $log_message = 'Approved document for vendor ID: ' . $document->pbvd_vendor_id;
 
         if (isset($this->auditLogService)) {
-            $this->auditLogService->log($log_message, $user, ['pbvd_status' => $document_old_status], ['pbvd_status' => $request->status]);
+            $this->auditLogService->log($log_message, $user, ['pbvd_document_status' => $document_old_status], ['pbvd_document_status' => $request->status]);
         }
 
         return response()->json([
@@ -474,7 +474,7 @@ class VendorsController extends Controller
             ], 404);
         }
 
-        $document_old_status = $document->pbvd_status;
+        $document_old_status = $document->pbvd_document_status;
         $vendor_status = $document->vendor->pbv_status;
 
         if($vendor_status == 2){
@@ -500,7 +500,7 @@ class VendorsController extends Controller
         $log_message = 'Rejected document for vendor ID: ' . $document->pbvd_vendor_id;
 
         if (isset($this->auditLogService)) {
-            $this->auditLogService->log($log_message, $user, ['pbvd_status' => $document_old_status], ['pbvd_status' => $request->status, 'rejection_reason' => $request->rejection_reason]);
+            $this->auditLogService->log($log_message, $user, ['pbvd_document_status' => $document_old_status], ['pbvd_document_status' => $request->status, 'rejection_reason' => $request->rejection_reason]);
         }
 
         return response()->json([
