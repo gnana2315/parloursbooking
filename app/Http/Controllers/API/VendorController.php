@@ -1905,10 +1905,15 @@ class VendorController extends Controller
             ->map(function ($transaction) {
                 Log::info('Transeaction Response:', ['Response' => $transaction]);
                 $status = 'Unpaid';
-                if($transaction->payout_items->pbvpi_status == 1){
-                    $status = 'Paid';
-                }else{
-                    $status = 'Unpaid';
+                
+                // Check if payoutItems exists and is not empty
+                if ($transaction->payoutItems && $transaction->payoutItems->isNotEmpty()) {
+                    // Get the first payout item (or check all)
+                    $payoutItem = $transaction->payoutItems->first();
+                    
+                    if ($payoutItem && $payoutItem->pbvpi_status == 1) {
+                        $status = 'Paid';
+                    }
                 }
 
                 return [
