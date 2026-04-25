@@ -1907,6 +1907,8 @@ class VendorController extends Controller
                 $status = 'Unpaid';
                 if($transaction->payout_items->pbvpi_status == 1){
                     $status = 'Paid';
+                }else{
+                    $status = 'Unpaid';
                 }
 
                 return [
