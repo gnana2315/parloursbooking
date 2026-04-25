@@ -1905,7 +1905,7 @@ class VendorController extends Controller
             ->map(function ($transaction) {
                 Log::info('Transeaction Response:', ['Response' => $transaction]);
                 $status = 'Unpaid';
-                if($transaction->pbvpi_status == 1){
+                if($transaction->payout_items->pbvpi_status == 1){
                     $status = 'Paid';
                 }
 
