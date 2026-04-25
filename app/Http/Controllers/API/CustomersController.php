@@ -198,7 +198,7 @@ class CustomersController extends Controller
                     ->get();
 
         $vendors_documents = vendorDocuments::whereIn('pbvd_vendor_id', $favourites)
-                            ->where('pbvd_status', 3)
+                            ->where('pbvd_document_status', 3)
                             ->get();
 
         $vendors->pbv_images = $vendors_documents->where('pbvd_required_document_id', 7)->pluck('pbvd_document_url')->toArray();
