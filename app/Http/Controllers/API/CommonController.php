@@ -557,13 +557,34 @@ class CommonController extends Controller
      */
     public function getServicesByVendor($vendor_id){
         Log::info('getServicesByVendor Requests:', ['vendor_id' => $vendor_id]);
-        $services = services::join('service_for', 'service_for.pbsf_id', '=', 'services.pbs_service_for')
-                    ->join('servicetype', 'servicetype.pbst_id', '=', 'services.pbs_service_type')      
-                    ->where([
-                        ['pbs_status', '=', 1],
-                        ['pbs_vendor_id', '=', $vendor_id],
-                    ])        
-                    ->get();
+        $user = auth()->user();
+
+        if(!$user){
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 401);
+        }
+
+        if($user->pbu_usertype == '1'){
+            $services = services::join('service_for', 'service_for.pbsf_id', '=', 'services.pbs_service_for')
+                ->join('servicetype', 'servicetype.pbst_id', '=', 'services.pbs_service_type')      
+                ->where([
+                    ['pbs_vendor_id', '=', $vendor_id],
+                ])        
+                ->get();
+        }
+
+        if($user->pbu_usertype == '2') {
+            $services = services::join('service_for', 'service_for.pbsf_id', '=', 'services.pbs_service_for')
+                ->join('servicetype', 'servicetype.pbst_id', '=', 'services.pbs_service_type')      
+                ->where([
+                    ['pbs_status', '=', 1],
+                    ['pbs_vendor_id', '=', $vendor_id],
+                ])        
+                ->get();
+        }
+        
         if ($services->isEmpty()) {
             return response()->json([
                 'success' => false,
