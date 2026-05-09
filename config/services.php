@@ -34,6 +34,10 @@ return [
     'onesignal' => [
         'app_id' => env('ONESIGNAL_APP_ID'),
         'api_key' => env('ONESIGNAL_API_KEY'),
+        'customer_app_id' => env('ONESIGNAL_CUSTOMER_APP_ID'),
+        'customer_api_key' => env('ONESIGNAL_CUSTOMER_API_KEY'),
+        'vendor_app_id' => env('ONESIGNAL_VENDOR_APP_ID'),
+        'vendor_api_key' => env('ONESIGNAL_VENDOR_API_KEY'),
     ],
 
     'webxpay' => [

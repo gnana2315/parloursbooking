@@ -8,11 +8,19 @@ class OneSignalService
 {
     protected $appId;
     protected $apiKey;
+    protected $customerAppId;
+    protected $customerApiKey;
+    protected $vendorAppId;
+    protected $vendorApiKey;
 
     public function __construct()
     {
         $this->appId = config('services.onesignal.app_id');
         $this->apiKey = config('services.onesignal.api_key');
+        $this->customerAppId = config('services.onesignal.customer_app_id');
+        $this->customerApiKey = config('services.onesignal.customer_api_key');
+        $this->vendorAppId = config('services.onesignal.vendor_app_id');
+        $this->vendorApiKey = config('services.onesignal.vendor_api_key');
     }
 
     public function sendToAll($title, $message)
@@ -31,7 +39,7 @@ class OneSignalService
     public function sendToCustomer($userID, $title, $message, $customData = [])
     {
         $payload = [
-            'app_id' => env('ONESIGNAL_CUSTOMER_APP_ID'),
+            'app_id' => $this->customerAppId,
             'include_external_user_ids' => [(string) $userID], // ⚡ use external ID here
             'headings' => ['en' => $title],
             'contents' => ['en' => $message],
@@ -45,7 +53,7 @@ class OneSignalService
         }
 
         $response = Http::withHeaders([
-            'Authorization' => 'Basic ' . env('ONESIGNAL_CUSTOMER_API_KEY'),
+            'Authorization' => 'Basic ' . $this->customerApiKey,
             'Content-Type' => 'application/json'
         ])->post('https://onesignal.com/api/v1/notifications', $payload);
         Log::info('OneSignal Customer Response:', ['Response' => $response->json()]);
@@ -55,7 +63,7 @@ class OneSignalService
     public function sendToVendor($userID, $title, $message, $customData = [])
     {
         $payload = [
-            'app_id' => env('ONESIGNAL_VENDOR_APP_ID'),
+            'app_id' => $this->vendorAppId,
             'include_external_user_ids' => [(string) $userID], // ⚡ use external ID here
             'headings' => ['en' => $title],
             'contents' => ['en' => $message],
@@ -69,7 +77,7 @@ class OneSignalService
         }
 
         $response = Http::withHeaders([
-            'Authorization' => 'Basic ' . env('ONESIGNAL_VENDOR_API_KEY'),
+            'Authorization' => 'Basic ' . $this->vendorApiKey,
             'Content-Type' => 'application/json'
         ])->post('https://onesignal.com/api/v1/notifications', $payload);
         Log::info('OneSignal Vendor Response:', ['Response' => $response->json()]);
