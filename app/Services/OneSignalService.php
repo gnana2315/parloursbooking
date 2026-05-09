@@ -21,6 +21,12 @@ class OneSignalService
         $this->customerApiKey = config('services.onesignal.customer_api_key');
         $this->vendorAppId = config('services.onesignal.vendor_app_id');
         $this->vendorApiKey = config('services.onesignal.vendor_api_key');
+
+        Log::info('OneSignal Config Values', [
+            'customer_app_id_from_config' => $this->customerAppId,
+            'vendor_app_id_from_config' => $this->vendorAppId,
+            'all_services_onesignal' => config('services.onesignal')
+        ]);
     }
 
     public function sendToAll($title, $message)
