@@ -37,6 +37,7 @@ class OneSignalService
             'contents' => ['en' => $message],
             'channel_for_external_user_ids' => 'push', // ensures it targets push notifications
         ];
+        Log::info('OneSignal Customer Payload:', ['Payload' => $payload]);
 
         // Add custom data if provided
         if (!empty($customData)) {
@@ -60,6 +61,7 @@ class OneSignalService
             'contents' => ['en' => $message],
             'channel_for_external_user_ids' => 'push', // ensures it targets push notifications
         ];
+        Log::info('OneSignal Vendor Payload:', ['Payload' => $payload]);
 
         // Add custom data if provided
         if (!empty($customData)) {

@@ -1241,7 +1241,7 @@ class BookingController extends Controller
                             'amount' => $booking->pbb_total_amount
                         ];
 
-                        $customerNotificationResult = $oneSignalService->sendToUser(
+                        $customerNotificationResult = $oneSignalService->sendToCustomer(
                             $customerUser->pbc_user_id,
                             $customerNotificationTitle,
                             $customerNotificationMessage,
