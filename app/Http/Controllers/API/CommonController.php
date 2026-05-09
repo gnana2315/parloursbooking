@@ -566,25 +566,16 @@ class CommonController extends Controller
             ], 401);
         }
 
-        if($user->pbu_usertype == '1'){
-            $services = services::join('service_for', 'service_for.pbsf_id', '=', 'services.pbs_service_for')
-                ->join('servicetype', 'servicetype.pbst_id', '=', 'services.pbs_service_type')      
-                ->where([
-                    ['pbs_vendor_id', '=', $vendor_id],
-                ])        
-                ->get();
-        }
+        $query = services::join('service_for', 'service_for.pbsf_id', '=', 'services.pbs_service_for')
+            ->join('servicetype', 'servicetype.pbst_id', '=', 'services.pbs_service_type')      
+            ->where('pbs_vendor_id', '=', $vendor_id);
 
         if($user->pbu_usertype == '2') {
-            $services = services::join('service_for', 'service_for.pbsf_id', '=', 'services.pbs_service_for')
-                ->join('servicetype', 'servicetype.pbst_id', '=', 'services.pbs_service_type')      
-                ->where([
-                    ['pbs_status', '=', 1],
-                    ['pbs_vendor_id', '=', $vendor_id],
-                ])        
-                ->get();
+            $services = $query->where('pbs_status', 1)->get();
+        }else {
+            $services = $query->get();
         }
-        
+
         if ($services->isEmpty()) {
             return response()->json([
                 'success' => false,
