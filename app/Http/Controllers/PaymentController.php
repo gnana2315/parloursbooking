@@ -307,7 +307,7 @@ class PaymentController extends Controller
                         'amount' => $getBooking->pbb_total_amount
                     ];
 
-                    $customerNotificationResult = $oneSignalService->sendToUser(
+                    $customerNotificationResult = $oneSignalService->sendToCustomer(
                         $customerUser->pbc_user_id,
                         $customerNotificationTitle,
                         $customerNotificationMessage,
@@ -343,7 +343,7 @@ class PaymentController extends Controller
                     'booking_id' => $bookingId
                 ];
 
-                $vendorNotificationResult = $oneSignalService->sendToUser(
+                $vendorNotificationResult = $oneSignalService->sendToVendor(
                     $vendorUser->pbu_id,
                     $vendorNotificationTitle,
                     $vendorNotificationMessage,

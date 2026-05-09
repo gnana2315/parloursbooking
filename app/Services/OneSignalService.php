@@ -28,10 +28,10 @@ class OneSignalService
         ]);
     }
 
-    public function sendToUser($userID, $title, $message, $customData = [])
+    public function sendToCustomer($userID, $title, $message, $customData = [])
     {
         $payload = [
-            'app_id' => env('ONESIGNAL_APP_ID'),
+            'app_id' => env('ONESIGNAL_CUSTOMER_APP_ID'),
             'include_external_user_ids' => [(string) $userID], // ⚡ use external ID here
             'headings' => ['en' => $title],
             'contents' => ['en' => $message],
@@ -44,10 +44,33 @@ class OneSignalService
         }
 
         $response = Http::withHeaders([
-            'Authorization' => 'Basic ' . env('ONESIGNAL_API_KEY'),
+            'Authorization' => 'Basic ' . env('ONESIGNAL_CUSTOMER_API_KEY'),
             'Content-Type' => 'application/json'
         ])->post('https://onesignal.com/api/v1/notifications', $payload);
-        Log::info('OneSignal Response:', ['Response' => $response->json()]);
+        Log::info('OneSignal Customer Response:', ['Response' => $response->json()]);
+        return $response;
+    }
+
+    public function sendToVendor($userID, $title, $message, $customData = [])
+    {
+        $payload = [
+            'app_id' => env('ONESIGNAL_VENDOR_APP_ID'),
+            'include_external_user_ids' => [(string) $userID], // ⚡ use external ID here
+            'headings' => ['en' => $title],
+            'contents' => ['en' => $message],
+            'channel_for_external_user_ids' => 'push', // ensures it targets push notifications
+        ];
+
+        // Add custom data if provided
+        if (!empty($customData)) {
+            $payload['custom_data'] = $customData;
+        }
+
+        $response = Http::withHeaders([
+            'Authorization' => 'Basic ' . env('ONESIGNAL_VENDOR_API_KEY'),
+            'Content-Type' => 'application/json'
+        ])->post('https://onesignal.com/api/v1/notifications', $payload);
+        Log::info('OneSignal Vendor Response:', ['Response' => $response->json()]);
         return $response;
     }
     
