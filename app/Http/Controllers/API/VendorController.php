@@ -1340,225 +1340,85 @@ class VendorController extends Controller
      * )
      */
 
-    // public function addVendorServices(Request $request){
-    //     Log::info('addVendorServices Requests:', ['Requests' => $request->all()]);
-    //     $user = auth()->user();
-    //     $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
-    //     if (!$vendor) {
-    //         return response()->json(['message' => 'Vendor not found'], 404);
-    //     }
-    //     $service_image_path = '';
-    //     $service_image_filename = '';
-    //     $request->validate(
-    //         [
-    //             'service_type' => 'required',
-    //             'service_for' => 'required',
-    //             'service_name' => 'required',
-    //             'service_description' => 'required',
-    //             'service_duration' => 'required',
-    //             'service_image' => 'required|mimes:jpg,jpeg,png|max:2048',
-    //             'service_price' => 'required|numeric',
-    //             'service_employees_count' => 'nullable|numeric',
-    //         ],
-    //         [
-    //             'service_type.required' => 'Service type is required',
-    //             'service_for.required' => 'Service for is required',
-    //             'service_name.required' => 'Service name is required',
-    //             'service_description.required' => 'Service description is required',
-    //             'service_duration.required' => 'Service duration is required',
-    //             'service_image.required' => 'Please upload a service image',
-    //             'service_image.mimes' => 'Service image must be a file of type: jpg, jpeg, png',
-    //             'service_image.max' => 'Service image may not be greater than 2MB',
-    //             'service_price.required' => 'Service price is required',
-    //             'service_price.numeric' => 'Service price must be a number',
-    //             'service_employees_count.numeric' => 'Service employees count must be a number',
-    //         ]
-    //     );        
-        
-    //     if ($request->hasFile('service_image')) {
-    //         $service_image_file = $request->file('service_image');
-    //         $folder = 'uploads/services/' . $vendor->pbv_id;
-    //         $folderPath = public_path($folder);
-
-    //         // Create the folder if it doesn't exist
-    //         if (!File::exists($folderPath)) {
-    //             File::makeDirectory($folderPath, 0755, true);
-    //         }
-
-    //         $service_image_filename = $vendor->pbv_business_name . '_' . time() . '_service.' . $service_image_file->getClientOriginalExtension();
-    //         $service_image_file->move($folderPath, $service_image_filename);
-
-    //         // Generate public URL path
-    //         $publicPath = url($folder . '/' . $service_image_filename);
-
-    //         // Save public URL in DB
-    //         $request->merge(['service_image' => $publicPath]);
-    //     } 
-
-    //     $added_vendor_service = services::create([
-    //         'pbs_vendor_id' => $vendor->pbv_id,
-    //         'pbs_service_type' => $request->service_type,
-    //         'pbs_service_for' => $request->service_for,
-    //         'pbs_name' => $request->service_name,
-    //         'pbs_description' => $request->service_description,
-    //         'pbs_duration' => $request->service_duration,
-    //         'pbs_duration_cetegory' => '0',
-    //         'pbs_image' => $publicPath,
-    //         'pbs_price' => $request->service_price,
-    //         'pbs_employees' => $request->service_employees_count ?? 0,
-    //         'pbs_status' => 0
-    //     ]);
-        
-    //     if($added_vendor_service){
-    //         $message = 'Vendor Service updated successfully';
-    //         $status = 200;
-    //     }else{
-    //         $message = 'Vendor Service failed to update';
-    //         $status = 500;
-    //     }
-
-    //     return response()->json([
-    //         'message' => $message
-    //     ], $status);
-    // }
-    public function addVendorServices(Request $request)
-    {
+    public function addVendorServices(Request $request){
         Log::info('addVendorServices Requests:', ['Requests' => $request->all()]);
-        
         $user = auth()->user();
         $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
-        
         if (!$vendor) {
             return response()->json(['message' => 'Vendor not found'], 404);
         }
+        $service_image_path = '';
+        $service_image_filename = '';
+        $request->validate(
+            [
+                'service_type' => 'required',
+                'service_for' => 'required',
+                'service_name' => 'required',
+                'service_description' => 'required',
+                'service_duration' => 'required',
+                'service_image' => 'required|mimes:jpg,jpeg,png|max:2048',
+                'service_price' => 'required|numeric',
+                'service_employees_count' => 'nullable|numeric',
+            ],
+            [
+                'service_type.required' => 'Service type is required',
+                'service_for.required' => 'Service for is required',
+                'service_name.required' => 'Service name is required',
+                'service_description.required' => 'Service description is required',
+                'service_duration.required' => 'Service duration is required',
+                'service_image.required' => 'Please upload a service image',
+                'service_image.mimes' => 'Service image must be a file of type: jpg, jpeg, png',
+                'service_image.max' => 'Service image may not be greater than 2MB',
+                'service_price.required' => 'Service price is required',
+                'service_price.numeric' => 'Service price must be a number',
+                'service_employees_count.numeric' => 'Service employees count must be a number',
+            ]
+        );        
         
-        // Check if this is an update request (has service_id parameter)
-        $isUpdate = $request->has('service_id') && !empty($request->service_id);
-        
-        // Validation rules
-        $validationRules = [
-            'service_type' => 'required',
-            'service_for' => 'required',
-            'service_name' => 'required',
-            'service_description' => 'required',
-            'service_duration' => 'required',
-            'service_price' => 'required|numeric',
-            'service_employees_count' => 'nullable|numeric',
-        ];
-        
-        // Make service_image optional for update
-        if (!$isUpdate) {
-            $validationRules['service_image'] = 'required|mimes:jpg,jpeg,png|max:2048';
-        } else {
-            $validationRules['service_image'] = 'nullable|mimes:jpg,jpeg,png|max:2048';
-        }
-        
-        $validationMessages = [
-            'service_type.required' => 'Service type is required',
-            'service_for.required' => 'Service for is required',
-            'service_name.required' => 'Service name is required',
-            'service_description.required' => 'Service description is required',
-            'service_duration.required' => 'Service duration is required',
-            'service_image.required' => 'Please upload a service image',
-            'service_image.mimes' => 'Service image must be a file of type: jpg, jpeg, png',
-            'service_image.max' => 'Service image may not be greater than 2MB',
-            'service_price.required' => 'Service price is required',
-            'service_price.numeric' => 'Service price must be a number',
-            'service_employees_count.numeric' => 'Service employees count must be a number',
-        ];
-        
-        $request->validate($validationRules, $validationMessages);
-        
-        // Handle image upload
-        $publicPath = null;
         if ($request->hasFile('service_image')) {
             $service_image_file = $request->file('service_image');
             $folder = 'uploads/services/' . $vendor->pbv_id;
             $folderPath = public_path($folder);
-            
+
             // Create the folder if it doesn't exist
             if (!File::exists($folderPath)) {
                 File::makeDirectory($folderPath, 0755, true);
             }
-            
+
             $service_image_filename = $vendor->pbv_business_name . '_' . time() . '_service.' . $service_image_file->getClientOriginalExtension();
             $service_image_file->move($folderPath, $service_image_filename);
-            
+
             // Generate public URL path
             $publicPath = url($folder . '/' . $service_image_filename);
-        }
+
+            // Save public URL in DB
+            $request->merge(['service_image' => $publicPath]);
+        } 
+
+        $added_vendor_service = services::create([
+            'pbs_vendor_id' => $vendor->pbv_id,
+            'pbs_service_type' => $request->service_type,
+            'pbs_service_for' => $request->service_for,
+            'pbs_name' => $request->service_name,
+            'pbs_description' => $request->service_description,
+            'pbs_duration' => $request->service_duration,
+            'pbs_duration_cetegory' => '0',
+            'pbs_image' => $publicPath,
+            'pbs_price' => $request->service_price,
+            'pbs_employees' => $request->service_employees_count ?? 0,
+            'pbs_status' => 0
+        ]);
         
-        if ($isUpdate) {
-            // UPDATE existing service
-            $service = services::where('pbs_vendor_id', $vendor->pbv_id)
-                ->where('pbs_id', $request->service_id)
-                ->first();
-            
-            if (!$service) {
-                return response()->json(['message' => 'Service not found or you do not have permission to update it'], 404);
-            }
-            
-            // Prepare update data
-            $updateData = [
-                'pbs_service_type' => $request->service_type,
-                'pbs_service_for' => $request->service_for,
-                'pbs_name' => $request->service_name,
-                'pbs_description' => $request->service_description,
-                'pbs_duration' => $request->service_duration,
-                'pbs_price' => $request->service_price,
-                'pbs_employees' => $request->service_employees_count ?? 0,
-            ];
-            
-            // Update image only if a new one was uploaded
-            if ($publicPath) {
-                // Delete old image file if it exists
-                if ($service->pbs_image) {
-                    $oldImagePath = parse_url($service->pbs_image, PHP_URL_PATH);
-                    $oldImageFullPath = public_path($oldImagePath);
-                    if (File::exists($oldImageFullPath)) {
-                        File::delete($oldImageFullPath);
-                    }
-                }
-                $updateData['pbs_image'] = $publicPath;
-            }
-            
-            $updated_service = $service->update($updateData);
-            
-            if ($updated_service) {
-                $message = 'Vendor service updated successfully';
-                $status = 200;
-            } else {
-                $message = 'Vendor service failed to update';
-                $status = 500;
-            }
-        } else {
-            // CREATE new service
-            $added_vendor_service = services::create([
-                'pbs_vendor_id' => $vendor->pbv_id,
-                'pbs_service_type' => $request->service_type,
-                'pbs_service_for' => $request->service_for,
-                'pbs_name' => $request->service_name,
-                'pbs_description' => $request->service_description,
-                'pbs_duration' => $request->service_duration,
-                'pbs_duration_cetegory' => '0',
-                'pbs_image' => $publicPath, // Note: $publicPath will be null if no image, but it's required for create
-                'pbs_price' => $request->service_price,
-                'pbs_employees' => $request->service_employees_count ?? 0,
-                'pbs_status' => 0
-            ]);
-            
-            if ($added_vendor_service) {
-                $message = 'Vendor service added successfully';
-                $status = 200;
-            } else {
-                $message = 'Vendor service failed to add';
-                $status = 500;
-            }
+        if($added_vendor_service){
+            $message = 'Vendor Service updated successfully';
+            $status = 200;
+        }else{
+            $message = 'Vendor Service failed to update';
+            $status = 500;
         }
-        
+
         return response()->json([
-            'message' => $message,
-            'data' => $isUpdate ? ($updated_service ? $service->fresh() : null) : ($added_vendor_service ?? null)
+            'message' => $message
         ], $status);
     }
 
