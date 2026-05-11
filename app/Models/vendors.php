@@ -83,7 +83,7 @@ class vendors extends Model
 
     public function bankInfo()
     {
-        return $this->hasMany(vendorBankInfo:: class, 'pbvb_id', 'pbv_id');
+        return $this->hasMany(vendorBankInfo:: class, 'pbvb_vendorid', 'pbv_id');
     }
 
     public function availability()
