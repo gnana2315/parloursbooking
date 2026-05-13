@@ -1286,23 +1286,23 @@ class CommonController extends Controller
         $lastStartofWeek = now()->subWeek()->startOfWeek();
         $lastEndOfWeek = now()->subWeek()->endOfWeek();
 
-        // $bookingsCount = booking::where('pbb_vendor_id', $vendor->pbv_id)
-        //                         ->where('pbb_type', 'Online')
-        //                         ->whereIn('pbb_status', ['2', '4'])
-        //                         ->whereBetween('pbb_booking_date', [$startOfWeek, $endOfWeek])
-        //                         ->count();
-        $bookingsCount = vendorPayoutItems::whereHas('booking', function($query) use ($vendor, $startOfWeek, $endOfWeek) {
-            $query->where('pbb_vendor_id', $vendor->pbv_id)
-                ->whereIn('pbb_status', ['2', '4'])
-                ->where('pbb_type', 'Online');
-                // ->whereBetween('pbb_booking_date', [$startOfWeek, $endOfWeek]);
-            })
-            ->where('pbvpi_status', '!=', '1')
-            ->count();
+        $bookingsCount = booking::where('pbb_vendor_id', $vendor->pbv_id)
+                                ->where('pbb_type', 'Online')
+                                ->whereIn('pbb_status', ['2', '4'])
+                                ->whereBetween('pbb_booking_date', [$startOfWeek, $endOfWeek])
+                                ->count();
+        // $bookingsCount = vendorPayoutItems::whereHas('booking', function($query) use ($vendor, $startOfWeek, $endOfWeek) {
+        //     $query->where('pbb_vendor_id', $vendor->pbv_id)
+        //         ->whereIn('pbb_status', ['2', '4'])
+        //         ->where('pbb_type', 'Online');
+        //         // ->whereBetween('pbb_booking_date', [$startOfWeek, $endOfWeek]);
+        //     })
+        //     ->where('pbvpi_status', '!=', '1')
+        //     ->count();
 
         $earnedAmount = PaymentTransection::whereHas('booking', function($query) use ($vendor, $startOfWeek, $endOfWeek) {
             $query->where('pbb_vendor_id', $vendor->pbv_id)
-                ->where('pbb_status', '2')
+                ->whereIn('pbb_status', ['2','4'])
                 ->where('pbb_type', 'Online')
                 ->whereBetween('pbb_booking_date', [$startOfWeek, $endOfWeek]);
             })
