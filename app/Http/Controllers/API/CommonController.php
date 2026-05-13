@@ -1279,15 +1279,15 @@ class CommonController extends Controller
             ], 404);
         }
 
-        $startOfWeek = now()->startOfWeek();
-        $endOfWeek = now()->endOfWeek(); 
+        $startOfWeek = now()->startOfWeek(Carbon::SUNDAY);
+        $endOfWeek = now()->endOfWeek(Carbon::SATURDAY);
 
         $lastStartofWeek = now()->subWeek()->startOfWeek();
         $lastEndOfWeek = now()->subWeek()->endOfWeek();
 
         $bookingsCount = booking::where('pbb_vendor_id', $vendor->pbv_id)
                                 ->where('pbb_type', 'Online')
-                                ->where('pbb_status', '2')
+                                ->whereIn('pbb_status', ['2', '4'])
                                 ->whereBetween('pbb_booking_date', [$startOfWeek, $endOfWeek])
                                 ->count();
         // $bookingsCount = 23;
