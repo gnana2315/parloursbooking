@@ -1349,7 +1349,7 @@ class CommonController extends Controller
         return response()->json([
             'success' => true,
             'data' => [
-                'bookingsCount' => $displayRange . ' : ' .$bookingsCount,
+                'bookingsCount' => $bookingsCount,
                 'earnedAmount' => $earnedAmount_formatted_currency,
                 'paidAmount' => $paidAmount,
                 'pendingAmount' => $pendingAmount
