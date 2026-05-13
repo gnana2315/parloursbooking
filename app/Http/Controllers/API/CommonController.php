@@ -18,9 +18,10 @@ use App\Models\booking;
 use App\Models\paymentTransection;
 use App\Models\notification;
 use App\Models\vendorPayouts;
+use App\Models\vendorPayoutItems;
+use App\Models\vendorPayoutHistory;
 use App\Services\DialogESMSService;
 use App\Services\OneSignalService;
-use App\Models\vendorPayoutHistory;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
@@ -1285,18 +1286,20 @@ class CommonController extends Controller
         $lastStartofWeek = now()->subWeek()->startOfWeek();
         $lastEndOfWeek = now()->subWeek()->endOfWeek();
 
-        $bookingsCount = booking::where('pbb_vendor_id', $vendor->pbv_id)
-                                ->where('pbb_type', 'Online')
-                                ->whereIn('pbb_status', ['2', '4'])
-                                ->whereBetween('pbb_booking_date', [$startOfWeek, $endOfWeek])
-                                ->count();
-        // $bookingsCount = 23;
+        // $bookingsCount = booking::where('pbb_vendor_id', $vendor->pbv_id)
+        //                         ->where('pbb_type', 'Online')
+        //                         ->whereIn('pbb_status', ['2', '4'])
+        //                         ->whereBetween('pbb_booking_date', [$startOfWeek, $endOfWeek])
+        //                         ->count();
+        $bookingsCount = vendorPayoutItems::whereHas('booking', function($query) use ($vendor, $startOfWeek, $endOfWeek) {
+            $query->where('pbb_vendor_id', $vendor->pbv_id)
+                ->whereIn('pbb_status', ['2', '4'])
+                ->where('pbb_type', 'Online');
+                // ->whereBetween('pbb_booking_date', [$startOfWeek, $endOfWeek]);
+            })
+            ->where('pbvpi_status', '!=', '1')
+            ->count();
 
-        // $earnedAmount = booking::with('paymentTransection')->where('pbb_vendor_id', $vendor->pbv_id)
-        //     ->where('pbb_status', '2')
-        //     ->where('pbb_type', 'Online')
-        //     ->whereBetween('pbb_booking_date', [$startOfWeek, $endOfWeek])
-        //     ->sum('pbpt_vendor_amount');
         $earnedAmount = PaymentTransection::whereHas('booking', function($query) use ($vendor, $startOfWeek, $endOfWeek) {
             $query->where('pbb_vendor_id', $vendor->pbv_id)
                 ->where('pbb_status', '2')
