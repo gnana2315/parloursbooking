@@ -1337,10 +1337,10 @@ class CommonController extends Controller
             $pendingAmountEndOfWeek = $today->copy()->subWeek()->endOfWeek(Carbon::SATURDAY);
         }
 
-        $pendingAmount = vendorPayouts::where('pbvp_vendor_id', $vendor->pbv_id)
+        $pendingAmount = vendorPayoutItems::where('pbvpi_vendor_id', $vendor->pbv_id)
                         ->whereBetween('created_at', [$pendingAmountStartOfWeek, $pendingAmountEndOfWeek])
-                        ->where('pbvpi_status', 1)
-                        ->sum('pbvp_total_due');
+                        ->where('pbvpi_status', 0)
+                        ->sum('pbvpi_vendor_amount');
 
         // $pendingAmount = 930;
         // $pendingAmount_formatted_currency = number_format(($pendingAmount->pbvp_total_due != null) ? $pendingAmount->pbvp_total_due : 0, 2, '.', ',');
