@@ -1330,14 +1330,6 @@ class CommonController extends Controller
                     ->whereBetween('created_at', [$lastStartofWeek, $lastEndOfWeek])
                     ->sum('pbvph_amount');
 
-        // $paidAmount = 645;
-        // if($paidAmount->isEmpty()){
-        //     $paidAmount_formatted_currency = '0.00';
-        // }else{
-        //     // $paidAmount_formatted_currency = number_format($paidAmount->pbvp_total_paid, 2, '.', ',');
-        //     $paidAmount_formatted_currency = $paidAmount->pbvp_total_paid;
-        // }
-
         $pendingAmount = vendorPayouts::where('pbvp_vendor_id', $vendor->pbv_id)->sum('pbvp_total_due');
 
         // $pendingAmount = 930;
