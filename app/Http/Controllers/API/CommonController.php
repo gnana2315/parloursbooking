@@ -1280,25 +1280,39 @@ class CommonController extends Controller
             ], 404);
         }
 
-        $startOfWeek = now()->startOfWeek(Carbon::SUNDAY);
-        $endOfWeek = now()->endOfWeek(Carbon::SATURDAY);
+        // $startOfWeek = now()->startOfWeek(Carbon::SUNDAY);
+        // $endOfWeek = now()->endOfWeek(Carbon::SATURDAY);
 
         $lastStartofWeek = now()->subWeek()->startOfWeek();
         $lastEndOfWeek = now()->subWeek()->endOfWeek();
 
+        // $bookingsCount = booking::where('pbb_vendor_id', $vendor->pbv_id)
+        //                         ->where('pbb_type', 'Online')
+        //                         ->whereIn('pbb_status', ['2', '4'])
+        //                         ->whereBetween('pbb_booking_date', [$startOfWeek, $endOfWeek])
+        //                         ->count();
+        $today = now();
+        $startOfWeek = null;
+        $endOfWeek = null;
+        $displayRange = '';
+
+        // On Monday, show previous week's data (Sunday to Saturday of last week)
+        if ($today->dayOfWeek == Carbon::MONDAY) {
+            $startOfWeek = $today->copy()->subWeek()->startOfWeek(Carbon::SUNDAY);
+            $endOfWeek = $today->copy()->subWeek()->endOfWeek(Carbon::SATURDAY);
+            $displayRange = $startOfWeek->format('M d') . ' - ' . $endOfWeek->format('M d, Y');
+        } else {
+            // Tuesday to Sunday: show current week's data
+            $startOfWeek = $today->copy()->startOfWeek(Carbon::SUNDAY);
+            $endOfWeek = $today->copy()->endOfWeek(Carbon::SATURDAY);
+            $displayRange = $startOfWeek->format('M d') . ' - ' . $endOfWeek->format('M d, Y');
+        }
+
         $bookingsCount = booking::where('pbb_vendor_id', $vendor->pbv_id)
-                                ->where('pbb_type', 'Online')
-                                ->whereIn('pbb_status', ['2', '4'])
-                                ->whereBetween('pbb_booking_date', [$startOfWeek, $endOfWeek])
-                                ->count();
-        // $bookingsCount = vendorPayoutItems::whereHas('booking', function($query) use ($vendor, $startOfWeek, $endOfWeek) {
-        //     $query->where('pbb_vendor_id', $vendor->pbv_id)
-        //         ->whereIn('pbb_status', ['2', '4'])
-        //         ->where('pbb_type', 'Online');
-        //         // ->whereBetween('pbb_booking_date', [$startOfWeek, $endOfWeek]);
-        //     })
-        //     ->where('pbvpi_status', '!=', '1')
-        //     ->count();
+                        ->where('pbb_type', 'Online')
+                        ->whereIn('pbb_status', ['2', '4'])
+                        ->whereBetween('pbb_booking_date', [$startOfWeek, $endOfWeek])
+                        ->count();
 
         $earnedAmount = PaymentTransection::whereHas('booking', function($query) use ($vendor, $startOfWeek, $endOfWeek) {
             $query->where('pbb_vendor_id', $vendor->pbv_id)
@@ -1335,7 +1349,7 @@ class CommonController extends Controller
         return response()->json([
             'success' => true,
             'data' => [
-                'bookingsCount' => $bookingsCount,
+                'bookingsCount' => $displayRange . ' : ' .$bookingsCount,
                 'earnedAmount' => $earnedAmount_formatted_currency,
                 'paidAmount' => $paidAmount,
                 'pendingAmount' => $pendingAmount
