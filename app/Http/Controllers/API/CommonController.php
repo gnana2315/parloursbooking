@@ -1300,12 +1300,12 @@ class CommonController extends Controller
         if ($today->dayOfWeek == Carbon::MONDAY) {
             $startOfWeek = $today->copy()->subWeek()->startOfWeek(Carbon::SUNDAY);
             $endOfWeek = $today->copy()->subWeek()->endOfWeek(Carbon::SATURDAY);
-            $displayRange = $startOfWeek->format('d-m') . ' - ' . $endOfWeek->format('d-m-Y');
+            $displayRange = $startOfWeek->format('d m') . ' - ' . $endOfWeek->format('d m Y');
         } else {
             // Tuesday to Sunday: show current week's data
             $startOfWeek = $today->copy()->startOfWeek(Carbon::SUNDAY);
             $endOfWeek = $today->copy()->endOfWeek(Carbon::SATURDAY);
-            $displayRange = $startOfWeek->format('d-m') . ' - ' . $endOfWeek->format('d-m-Y');
+            $displayRange = $startOfWeek->format('d m') . ' - ' . $endOfWeek->format('d m Y');
         }
 
         $bookingsCount = booking::where('pbb_vendor_id', $vendor->pbv_id)
