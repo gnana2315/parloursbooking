@@ -1328,9 +1328,19 @@ class CommonController extends Controller
         // $paidAmount = vendorPayouts::where('pbvp_vendor_id', $vendor->pbv_id)->sum('pbvp_total_paid');
         $paidAmount = vendorPayoutHistory::where('pbvph_vendor_id', $vendor->pbv_id)
                     ->whereBetween('created_at', [$lastStartofWeek, $lastEndOfWeek])
-                    ->sum('pbvph_amount');
+                    ->sum('pbvph_amount');        
+        
+        $pendingAmountStartOfWeek = null;
+        $pendingAmountEndOfWeek = null;
+        if($today->dayOfWeek == Carbon::SUNDAY){
+            $pendingAmountStartOfWeek = $today->copy()->subWeek()->startOfWeek(Carbon::SUNDAY);
+            $pendingAmountEndOfWeek = $today->copy()->subWeek()->endOfWeek(Carbon::SATURDAY);
+        }
 
-        $pendingAmount = vendorPayouts::where('pbvp_vendor_id', $vendor->pbv_id)->sum('pbvp_total_due');
+        $pendingAmount = vendorPayouts::where('pbvp_vendor_id', $vendor->pbv_id)
+                        ->whereBetween('created_at', [$pendingAmountStartOfWeek, $pendingAmountEndOfWeek])
+                        ->where('pbvpi_status', 1)
+                        ->sum('pbvp_total_due');
 
         // $pendingAmount = 930;
         // $pendingAmount_formatted_currency = number_format(($pendingAmount->pbvp_total_due != null) ? $pendingAmount->pbvp_total_due : 0, 2, '.', ',');
