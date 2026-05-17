@@ -422,27 +422,37 @@ class VendorController extends Controller
         
         Log::info('Step 4: Starting validation...');
 
-        $request->validate(
-            [
-                'address' => 'required',
-                'city_id' => 'required',
-                'service_area' => 'required',
-                'email' => 'required|email|unique:vendor,pbv_email',
-                'contact_no' => 'required|unique:vendor,pbv_contactno',
-                'nic_no' => 'required',
-            ],
-            [
-                'address.required' => 'Please enter your Business Address is required',
-                'city_id.required' => 'Please enter your Business City',
-                'service_area.required' => 'Please enter your Service area',
-                'email.email' => 'Email must be a valid email address',
-                'email.required' => 'Please enter your Business Email',
-                'email.unique' => 'Email already in use. Please try another.',
-                'contact_no.required' => 'Please enter your Business Contact No',
-                'contact_no.unique' => 'Contact number already in use. Please try another.',
-                'nic_no.required' => 'Please enter your Business NIC No',
-            ]
-        );
+        try {
+            $validated = $request->validate(
+                [
+                    'address' => 'required',
+                    'city_id' => 'required',
+                    'service_area' => 'required',
+                    'email' => 'required|email|unique:vendor,pbv_email',
+                    'contact_no' => 'required|unique:vendor,pbv_contactno',
+                    'nic_no' => 'required',
+                ],
+                [
+                    'address.required' => 'Please enter your Business Address is required',
+                    'city_id.required' => 'Please enter your Business City',
+                    'service_area.required' => 'Please enter your Service area',
+                    'email.email' => 'Email must be a valid email address',
+                    'email.required' => 'Please enter your Business Email',
+                    'email.unique' => 'Email already in use. Please try another.',
+                    'contact_no.required' => 'Please enter your Business Contact No',
+                    'contact_no.unique' => 'Contact number already in use. Please try another.',
+                    'nic_no.required' => 'Please enter your Business NIC No',
+                ]
+            );
+            Log::info('Therapist Validation successful', ['validated_data' => $validated]);
+        } catch (ValidationException $e) {
+            $firstError = collect($e->errors())->flatten()->first();
+            Log::error('Therapist Validation failed', ['message' => $firstError]);
+            return response()->json([
+                'message' => $firstError,
+                'data' => $user
+            ], 500);
+        }
 
         $therapist_name = $user->pbu_first_name . ' ' .$user->pbu_last_name;
         $vendorsUpdate = $vendor->update([ 

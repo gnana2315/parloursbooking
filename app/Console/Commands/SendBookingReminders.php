@@ -70,7 +70,7 @@ class SendBookingReminders extends Command
 
             Log::info("Preparing to send reminder for booking ID: {$booking->pbb_id} to customer user ID: {$customer->pbc_user_id}"); 
             // 🔔 Push Notification
-            $customerReminderNotification = $oneSignalService->sendToUser(
+            $customerReminderNotification = $oneSignalService->sendToCustomer(
                 $customer->pbc_user_id,
                 '⏰ Booking Reminder',
                 "Your appointment today at {$booking->pbb_booking_start_time->format('h:i A')} with {$vendorName}. For assistance, please contact the parlour at {$vendorContactNo}.",
