@@ -1280,39 +1280,39 @@ class CommonController extends Controller
             ], 404);
         }
 
-        // $startOfWeek = now()->startOfWeek(Carbon::SUNDAY);
-        // $endOfWeek = now()->endOfWeek(Carbon::SATURDAY);
+        $startOfWeek = now()->startOfWeek(Carbon::SUNDAY);
+        $endOfWeek = now()->endOfWeek(Carbon::SATURDAY);
 
         $lastStartofWeek = now()->subWeek()->startOfWeek();
         $lastEndOfWeek = now()->subWeek()->endOfWeek();
 
-        // $bookingsCount = booking::where('pbb_vendor_id', $vendor->pbv_id)
-        //                         ->where('pbb_type', 'Online')
-        //                         ->whereIn('pbb_status', ['2', '4'])
-        //                         ->whereBetween('pbb_booking_date', [$startOfWeek, $endOfWeek])
-        //                         ->count();
+        $bookingsCount = booking::where('pbb_vendor_id', $vendor->pbv_id)
+                                ->where('pbb_type', 'Online')
+                                ->whereIn('pbb_status', ['2', '4'])
+                                ->whereBetween('pbb_booking_date', [$startOfWeek, $endOfWeek])
+                                ->count();
         $today = now();
         $startOfWeek = null;
         $endOfWeek = null;
         $displayRange = '';
 
         // On Monday, show previous week's data (Sunday to Saturday of last week)
-        if ($today->dayOfWeek == Carbon::MONDAY) {
-            $startOfWeek = $today->copy()->subWeek()->startOfWeek(Carbon::SUNDAY);
-            $endOfWeek = $today->copy()->subWeek()->endOfWeek(Carbon::SATURDAY);
-            $displayRange = $startOfWeek->format('M d') . ' - ' . $endOfWeek->format('M d, Y');
-        } else {
-            // Tuesday to Sunday: show current week's data
-            $startOfWeek = $today->copy()->startOfWeek(Carbon::SUNDAY);
-            $endOfWeek = $today->copy()->endOfWeek(Carbon::SATURDAY);
-            $displayRange = $startOfWeek->format('M d') . ' - ' . $endOfWeek->format('M d, Y');
-        }
+        // if ($today->dayOfWeek == Carbon::MONDAY) {
+        //     $startOfWeek = $today->copy()->subWeek()->startOfWeek(Carbon::SUNDAY);
+        //     $endOfWeek = $today->copy()->subWeek()->endOfWeek(Carbon::SATURDAY);
+        //     $displayRange = $startOfWeek->format('M d') . ' - ' . $endOfWeek->format('M d, Y');
+        // } else {
+        //     // Tuesday to Sunday: show current week's data
+        //     $startOfWeek = $today->copy()->startOfWeek(Carbon::SUNDAY);
+        //     $endOfWeek = $today->copy()->endOfWeek(Carbon::SATURDAY);
+        //     $displayRange = $startOfWeek->format('M d') . ' - ' . $endOfWeek->format('M d, Y');
+        // }
 
-        $bookingsCount = booking::where('pbb_vendor_id', $vendor->pbv_id)
-                        ->where('pbb_type', 'Online')
-                        ->whereIn('pbb_status', ['2', '4'])
-                        ->whereBetween('pbb_booking_date', [$startOfWeek, $endOfWeek])
-                        ->count();
+        // $bookingsCount = booking::where('pbb_vendor_id', $vendor->pbv_id)
+        //                 ->where('pbb_type', 'Online')
+        //                 ->whereIn('pbb_status', ['2', '4'])
+        //                 ->whereBetween('pbb_booking_date', [$startOfWeek, $endOfWeek])
+        //                 ->count();
 
         $earnedAmount = PaymentTransection::whereHas('booking', function($query) use ($vendor, $startOfWeek, $endOfWeek) {
             $query->where('pbb_vendor_id', $vendor->pbv_id)
@@ -1325,10 +1325,10 @@ class CommonController extends Controller
         // $earnedAmount = 1575;
         $earnedAmount_formatted_currency = number_format($earnedAmount, 2, '.', ',');
 
-        // $paidAmount = vendorPayouts::where('pbvp_vendor_id', $vendor->pbv_id)->sum('pbvp_total_paid');
-        $paidAmount = vendorPayoutHistory::where('pbvph_vendor_id', $vendor->pbv_id)
-                    ->whereBetween('created_at', [$lastStartofWeek, $lastEndOfWeek])
-                    ->sum('pbvph_amount');        
+        $paidAmount = vendorPayouts::where('pbvp_vendor_id', $vendor->pbv_id)->sum('pbvp_total_paid');
+        // $paidAmount = vendorPayoutHistory::where('pbvph_vendor_id', $vendor->pbv_id)
+        //             ->whereBetween('created_at', [$lastStartofWeek, $lastEndOfWeek])
+        //             ->sum('pbvph_amount');        
         
         $pendingAmountStartOfWeek = null;
         $pendingAmountEndOfWeek = null;
@@ -1338,7 +1338,7 @@ class CommonController extends Controller
         }
 
         $pendingAmount = vendorPayoutItems::where('pbvpi_vendor_id', $vendor->pbv_id)
-                        ->whereBetween('created_at', [$pendingAmountStartOfWeek, $pendingAmountEndOfWeek])
+                        ->where('created_at', '<=', $pendingAmountEndOfWeek)
                         ->where('pbvpi_status', 0)
                         ->sum('pbvpi_vendor_amount');
 
