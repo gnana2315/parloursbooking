@@ -1348,10 +1348,8 @@ class CommonController extends Controller
         }
 
         $pendingAmount = vendorPayoutItems::with('booking')->where('pbvpi_vendor_id', $vendor->pbv_id)
-                        // ->where('created_at', '<=', $pendingAmountEndOfWeek)
                         ->whereHas('booking', function($query) use ($pendingAmountEndOfWeek) {
-                            $query->where('pbb_booking_date', '<=', $pendingAmountEndOfWeek)
-                                    ->orWhere('pbb_status_updated_at', '<=', $pendingAmountEndOfWeek);
+                            $query->where('pbb_status_updated_at', '<=', $pendingAmountEndOfWeek);
                         })
                         ->where('pbvpi_status', 0)
                         ->sum('pbvpi_vendor_amount');
