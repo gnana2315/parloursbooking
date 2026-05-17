@@ -1330,12 +1330,12 @@ class CommonController extends Controller
         //             ->whereBetween('created_at', [$lastStartofWeek, $lastEndOfWeek])
         //             ->sum('pbvph_amount');        
         
-        $pendingAmountStartOfWeek = null;
-        $pendingAmountEndOfWeek = null;
-        if($today->dayOfWeek == Carbon::SUNDAY){
+        // $pendingAmountStartOfWeek = null;
+        // $pendingAmountEndOfWeek = null;
+        // if($today->dayOfWeek == Carbon::SUNDAY){
             $pendingAmountStartOfWeek = $today->copy()->subWeek()->startOfWeek(Carbon::SUNDAY);
             $pendingAmountEndOfWeek = $today->copy()->subWeek()->endOfWeek(Carbon::SATURDAY);
-        }
+        // }
 
         $pendingAmount = vendorPayoutItems::where('pbvpi_vendor_id', $vendor->pbv_id)
                         ->where('created_at', '<=', $pendingAmountEndOfWeek)
