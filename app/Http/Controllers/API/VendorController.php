@@ -870,13 +870,14 @@ class VendorController extends Controller
             [
                 'bankid' => 'required',
                 'branch' => 'required',
-                'account_holder_name' => 'required',
+                'account_holder_name' => 'required|regex:/^[A-Za-z\s]+$/',
                 'accountno' => 'required|numeric',                
             ],
             [
                 'bankid.required' => 'Please select the Bank',
                 'branch.required' => 'Please enter the Branch name',
-                'account_holder_name' => 'Please enter the account holder name',
+                'account_holder_name.required' => 'Please enter the account holder name',
+                'account_holder_name.regex' => 'Account holder name must contain only letters and spaces. Numbers and special characters are not allowed.',
                 'accountno.required' => 'Please enter the bank Account No',
                 'accountno.numeric' => 'Bank no must be Numeric',
             ]
