@@ -1315,14 +1315,22 @@ class CommonController extends Controller
         //                 ->whereBetween('pbb_booking_date', [$startOfWeek, $endOfWeek])
         //                 ->count();
 
-        $earnedAmount = PaymentTransection::whereHas('booking', function($query) use ($vendor, $startOfWeek, $endOfWeek) {
-            $query->where('pbb_vendor_id', $vendor->pbv_id)
-                ->whereIn('pbb_status', ['2','4'])
-                ->where('pbb_type', 'Online')
-                ->whereBetween('pbb_booking_date', [$startOfWeek, $endOfWeek])
-                ->orWhereBetween('pbb_status_updated_at', [$startOfWeek, $endOfWeek]);
-            })
-            ->sum('pbpt_vendor_amount');
+        // $earnedAmount = PaymentTransection::whereHas('booking', function($query) use ($vendor, $startOfWeek, $endOfWeek) {
+        //     $query->where('pbb_vendor_id', $vendor->pbv_id)
+        //         ->whereIn('pbb_status', ['2','4'])
+        //         ->where('pbb_type', 'Online')
+        //         ->whereBetween('pbb_booking_date', [$startOfWeek, $endOfWeek])
+        //         ->orWhereBetween('pbb_status_updated_at', [$startOfWeek, $endOfWeek]);
+        //     })
+        //     ->sum('pbpt_vendor_amount');
+        $pendingAmount = vendorPayoutItems::with('booking')->where('pbvpi_vendor_id', $vendor->pbv_id)
+                        // ->where('created_at', '<=', $pendingAmountEndOfWeek)
+                        ->whereHas('booking', function($query) use ($startOfWeek) {
+                            $query->where('pbb_booking_date', '<=', $startOfWeek)
+                                    ->orWhere('pbb_status_updated_at', '<=', $startOfWeek);
+                        })
+                        ->where('pbvpi_status', 0)
+                        ->sum('pbvpi_vendor_amount');
 
         // $earnedAmount = 1575;
         $earnedAmount_formatted_currency = number_format($earnedAmount, 2, '.', ',');
