@@ -1340,8 +1340,7 @@ class CommonController extends Controller
         //             ->whereBetween('created_at', [$lastStartofWeek, $lastEndOfWeek])
         //             ->sum('pbvph_amount');        
         
-        $pendingAmountStartOfWeek = null;
-        $pendingAmountEndOfWeek = null;
+        $pendingAmount = 0;
 
         if($today->dayOfWeek >= Carbon::SUNDAY){
             $pendingAmountStartOfWeek = $today->copy()->subWeek()->startOfWeek(Carbon::SUNDAY);
