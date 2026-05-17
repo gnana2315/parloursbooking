@@ -1293,8 +1293,8 @@ class CommonController extends Controller
                                 ->orWhereBetween('pbb_status_updated_at', [$startOfWeek, $endOfWeek])
                                 ->count();
         $today = now();
-        $startOfWeek = null;
-        $endOfWeek = null;
+        // $startOfWeek = null;
+        // $endOfWeek = null;
         $displayRange = '';
 
         // On Monday, show previous week's data (Sunday to Saturday of last week)
@@ -1323,13 +1323,13 @@ class CommonController extends Controller
         //         ->orWhereBetween('pbb_status_updated_at', [$startOfWeek, $endOfWeek]);
         //     })
         //     ->sum('pbpt_vendor_amount');
-        $pendingAmount = vendorPayoutItems::with('booking')->where('pbvpi_vendor_id', $vendor->pbv_id)
+        $earnedAmount = vendorPayoutItems::with('booking')->where('pbvpi_vendor_id', $vendor->pbv_id)
+                        ->where('pbvpi_status', 0)
                         // ->where('created_at', '<=', $pendingAmountEndOfWeek)
                         ->whereHas('booking', function($query) use ($startOfWeek) {
                             $query->where('pbb_booking_date', '<=', $startOfWeek)
                                     ->orWhere('pbb_status_updated_at', '<=', $startOfWeek);
                         })
-                        ->where('pbvpi_status', 0)
                         ->sum('pbvpi_vendor_amount');
 
         // $earnedAmount = 1575;
