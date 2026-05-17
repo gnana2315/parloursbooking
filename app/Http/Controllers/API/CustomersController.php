@@ -35,6 +35,7 @@ class CustomersController extends Controller
                 'intial.required' => 'Customer Initial Required',
                 'first_name.required' => 'Customer First Name Required',
                 'last_name.required' => 'Customer Last Name Required',
+                'dob.required' => 'Customer Date of Birth Required',
                 'email.email' => 'Customer Email Not Valid',
                 'email.unique' => 'Customer Email already in use',
                 'nic_no.required' => 'Customer NIC No Required',
