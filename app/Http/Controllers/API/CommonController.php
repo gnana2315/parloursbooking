@@ -1340,26 +1340,40 @@ class CommonController extends Controller
         //             ->whereBetween('created_at', [$lastStartofWeek, $lastEndOfWeek])
         //             ->sum('pbvph_amount');        
         
-        $pendingAmountStartOfWeek = null;
-        $pendingAmountEndOfWeek = null;
-        if($today->dayOfWeek == Carbon::SUNDAY){
-            $pendingAmountStartOfWeek = $today->copy()->subWeek()->startOfWeek(Carbon::SUNDAY);
-            $pendingAmountEndOfWeek = $today->copy()->subWeek()->endOfWeek(Carbon::SATURDAY);
+        $pendingAmount = 0;
+        
+        // Only calculate on Sundays
+        if($today->dayOfWeek != Carbon::SUNDAY) {
+            return [
+                'pending_amount' => 0,
+                'message' => 'Not calculation day'
+            ];
         }
-
-        $pendingAmount = vendorPayoutItems::with('booking')->where('pbvpi_vendor_id', $vendor->pbv_id)
-                        ->whereHas('booking', function($query) use ($pendingAmountEndOfWeek) {
-                            $query->where('pbb_status_updated_at', '<=', $pendingAmountEndOfWeek);
-                        })
-                        ->where('pbvpi_status', 0)
-                        ->sum('pbvpi_vendor_amount');
+        
+        // Get the start date (previous Sunday)
+        $startDate = $today->copy()->subWeek()->startOfWeek(Carbon::SUNDAY);
+        
+        // Get ALL unpaid payouts from start date until now
+        // These will remain in pending until status changes to 1
+        $pendingAmount = vendorPayoutItems::where('pbvpi_vendor_id', $vendor->pbv_id)
+            ->where('created_at', '>=', $startDate)
+            ->where('pbvpi_status', 0) // Unpaid
+            ->sum('pbvpi_vendor_amount');
+        
+        // Also include older unpaid payouts if they exist
+        $olderUnpaid = vendorPayoutItems::where('pbvpi_vendor_id', $vendor->pbv_id)
+            ->where('created_at', '<', $startDate)
+            ->where('pbvpi_status', 0)
+            ->sum('pbvpi_vendor_amount');
+        
+        $totalPending = $pendingAmount + $olderUnpaid;
 
         // $pendingAmount = 930;
         // $pendingAmount_formatted_currency = number_format(($pendingAmount->pbvp_total_due != null) ? $pendingAmount->pbvp_total_due : 0, 2, '.', ',');
         Log::info('bookingsCount Response:', ['Response' => $bookingsCount]);
         Log::info('earnedAmount Response:', ['Response' => $earnedAmount_formatted_currency]);
         Log::info('paidAmount Response:', ['Response' => $paidAmount]);
-        Log::info('pendingAmount Response:', ['Response' => $pendingAmount]);
+        Log::info('pendingAmount Response:', ['Response' => $totalPending]);
         return response()->json([
             'success' => true,
             'data' => [
