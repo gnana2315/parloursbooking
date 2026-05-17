@@ -1225,6 +1225,29 @@ class BookingController extends Controller
                 $booking->save();
 
                 if($booking->pbb_type == 'Online'){
+                    // If booking is marked as completed, initiate payout process.
+                    $vendorPayout = vendorPayouts::firstOrCreate(
+                        ['pbvp_vendor_id' => $booking->pbb_vendor_id],
+                        ['pbvp_total_earned' => 0, 'pbvp_total_paid' => 0, 'pbvp_total_due' => 0]
+                    );
+
+                    Log::info('vendor payouts Response:', ['Response' => $vendorPayout]);
+
+                    $vendorPayout->increment('pbvp_total_earned', $paymentTransaction->pbpt_vendor_amount);
+                    $vendorPayout->increment('pbvp_total_due', $paymentTransaction->pbpt_vendor_amount);
+
+                    $payoutItem = vendorPayoutItems::create([
+                        'pbvpi_payout_id'   => $vendorPayout->pbvp_id,
+                        'pbvpi_booking_id'  => $paymentTransaction->pbpt_booking_id,
+                        'pbvpi_payment_id'  => $paymentTransaction->pbpt_id,
+                        'pbvpi_vendor_id'   => $paymentTransaction->pbpt_vendor_id,
+                        'pbvpi_amount'      => $paymentTransaction->pbpt_total_amount,
+                        'pbvpi_platform_fee'=> $paymentTransaction->pbpt_platform_fee,
+                        'pbvpi_vendor_amount'=> $paymentTransaction->pbpt_vendor_amount,
+                        'pbvpi_status'      => '0'
+                    ]);
+                    Log::info('vendor payout Item Response:', ['Response' => $payoutItem]);
+
                     // If booking is marked as 'No Customer', initiate notification.
                     $customerUser = customer::find($booking->pbb_customer_id);
                     
