@@ -43,6 +43,7 @@ class booking extends Model
         'pbb_discounts',
         'pbb_contact_no',
         'pbb_status',
+        'pbb_status_updated_at',
         'created_at',
         'updated_at',
         'deleted_at',

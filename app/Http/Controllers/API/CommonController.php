@@ -1290,6 +1290,7 @@ class CommonController extends Controller
                                 ->where('pbb_type', 'Online')
                                 ->whereIn('pbb_status', ['2', '4'])
                                 ->whereBetween('pbb_booking_date', [$startOfWeek, $endOfWeek])
+                                ->orWhereBetween('pbb_status_updated_at', [$startOfWeek, $endOfWeek])
                                 ->count();
         $today = now();
         $startOfWeek = null;
@@ -1318,7 +1319,8 @@ class CommonController extends Controller
             $query->where('pbb_vendor_id', $vendor->pbv_id)
                 ->whereIn('pbb_status', ['2','4'])
                 ->where('pbb_type', 'Online')
-                ->whereBetween('pbb_booking_date', [$startOfWeek, $endOfWeek]);
+                ->whereBetween('pbb_booking_date', [$startOfWeek, $endOfWeek])
+                ->orWhereBetween('pbb_status_updated_at', [$startOfWeek, $endOfWeek]);
             })
             ->sum('pbpt_vendor_amount');
 
@@ -1330,15 +1332,19 @@ class CommonController extends Controller
         //             ->whereBetween('created_at', [$lastStartofWeek, $lastEndOfWeek])
         //             ->sum('pbvph_amount');        
         
-        // $pendingAmountStartOfWeek = null;
-        // $pendingAmountEndOfWeek = null;
-        // if($today->dayOfWeek == Carbon::SUNDAY){
+        $pendingAmountStartOfWeek = null;
+        $pendingAmountEndOfWeek = null;
+        if($today->dayOfWeek == Carbon::SUNDAY){
             $pendingAmountStartOfWeek = $today->copy()->subWeek()->startOfWeek(Carbon::SUNDAY);
             $pendingAmountEndOfWeek = $today->copy()->subWeek()->endOfWeek(Carbon::SATURDAY);
-        // }
+        }
 
-        $pendingAmount = vendorPayoutItems::where('pbvpi_vendor_id', $vendor->pbv_id)
-                        ->where('created_at', '<=', $pendingAmountEndOfWeek)
+        $pendingAmount = vendorPayoutItems::with('booking')->where('pbvpi_vendor_id', $vendor->pbv_id)
+                        // ->where('created_at', '<=', $pendingAmountEndOfWeek)
+                        ->whereHas('booking', function($query) use ($pendingAmountEndOfWeek) {
+                            $query->where('pbb_booking_date', '<=', $pendingAmountEndOfWeek)
+                                    ->orWhere('pbb_status_updated_at', '<=', $pendingAmountEndOfWeek);
+                        })
                         ->where('pbvpi_status', 0)
                         ->sum('pbvpi_vendor_amount');
 

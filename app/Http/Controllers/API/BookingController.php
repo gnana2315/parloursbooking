@@ -1221,7 +1221,8 @@ class BookingController extends Controller
                     ], 403);
                 }
 
-                $booking->pbb_status = $request->booking_status; // Assuming 4 is the status code for DNA bookings
+                $booking->pbb_status = $request->booking_status;
+                $booking->pbb_status_updated_at = now();
                 $booking->save();
 
                 if($booking->pbb_type == 'Online'){
@@ -1335,7 +1336,9 @@ class BookingController extends Controller
                         'message' => 'Booking is already marked as Customer did not attened'
                     ], 403);
                 }
-                $booking->pbb_status = $request->booking_status; // Assuming 2 is the status code for completed bookings
+                
+                $booking->pbb_status = $request->booking_status;
+                $booking->pbb_status_updated_at = now();
                 $booking->save();
 
                 if($booking->pbb_type == 'Online'){
