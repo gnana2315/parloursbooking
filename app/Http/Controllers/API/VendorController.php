@@ -1784,10 +1784,10 @@ class VendorController extends Controller
             })
             ->get()
             ->sortByDesc(function ($transaction) {
+                Log::info('Payout Transections:', ['response' => $transaction->payoutItems]);
                 return $transaction->payoutItems->updated_at;
             })
             ->map(function ($transaction) {
-                Log::info('Payout Transections:', ['response' => $transaction->payoutItems]);
                 return [
                     'date' => Carbon::parse($transaction->payoutItems->updated_at)->format('Y-m-d'),
                     'booking_ref_no' => $transaction->booking->pbb_ref_no,
