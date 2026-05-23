@@ -2026,7 +2026,7 @@ class VendorController extends Controller
             })
             ->map(function ($transaction) {
                 return [
-                    'date' => $transaction->booking->pbb_status_updated_at->format('Y-m-d'),
+                    'date' => $transaction->booking->pbb_status_updated_at,
                     'booking_ref_no' => $transaction->booking->pbb_ref_no,
                     'amount' => number_format($transaction->payoutItems->pbvpi_vendor_amount, 2, '.', ''),
                 ];
