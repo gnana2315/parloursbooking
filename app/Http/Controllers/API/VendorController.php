@@ -1787,7 +1787,7 @@ class VendorController extends Controller
                 return $transaction->payoutItems->updated_at;
             })
             ->map(function ($transaction) {
-                dd($transaction->payoutItems);
+                Log::info('Payout Transections:', ['response' => $transaction->payoutItems]);
                 return [
                     'date' => Carbon::parse($transaction->payoutItems->updated_at)->format('Y-m-d'),
                     'booking_ref_no' => $transaction->booking->pbb_ref_no,
