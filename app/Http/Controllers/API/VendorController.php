@@ -1700,9 +1700,10 @@ class VendorController extends Controller
         $earnings = paymentTransection::with(['booking', 'payoutItems'])
             ->where('pbpt_vendor_id', $vendor->pbv_id)
             ->whereHas('booking', function ($q) {
-                $q->where('pbb_status', 2)
-                    ->orderBy('pbb_booking_date', 'desc');
-            }   )
+                $q->where('pbb_status', 2);
+            })
+            ->join('booking', 'payment_transections.pbpt_booking_id', '=', 'booking.pbb_id')
+            ->orderBy('booking.pbb_booking_date', 'desc') 
             ->get()
             ->map(function ($transaction) {
                 Log::info('Transeaction Response:', ['Response' => $transaction]);
@@ -1781,9 +1782,10 @@ class VendorController extends Controller
                 $query->where('pbvpi_status', 1);
             })
             ->whereHas('booking', function ($query) {
-                $query->where('pbb_status', 2)
-                    ->orderBy('pbb_booking_date', 'desc');
+                $query->where('pbb_status', 2);
             })
+            ->join('booking', 'payment_transections.pbpt_booking_id', '=', 'booking.pbb_id')
+            ->orderBy('booking.pbb_booking_date', 'desc') 
             ->get()
             ->map(function ($transaction) {
                 return [
