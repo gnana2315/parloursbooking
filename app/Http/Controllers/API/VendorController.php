@@ -1856,6 +1856,9 @@ class VendorController extends Controller
                 $q->where('pbb_status', 2); 
             })
             ->get()
+            ->sortByDesc(function ($transaction) {
+                return $transaction->booking->pbb_booking_date; // Sort by booking date
+            })
             ->map(function ($transaction) {
                 $status = $transaction->payoutItems->contains('pbvpi_status', 0)
                             ? 'Unpaid'
@@ -1866,7 +1869,7 @@ class VendorController extends Controller
                     'amount' => number_format($transaction->pbpt_vendor_amount, 2, '.', ''),
                     'status' => $status,
                 ];
-            })->toArray();
+            })->values()->toArray();
             
         Log::info('allEarnings Response:', ['Response' => $allEarnings]);
 
@@ -2020,13 +2023,16 @@ class VendorController extends Controller
                 $query->where('pbvpi_status', 1);
             })
             ->get()
+            ->sortByDesc(function ($transaction) {
+                return $transaction->booking->pbb_booking_date; // Sort by booking date
+            })
             ->map(function ($transaction) {
                 return [
                     'date' => $transaction->created_at->format('Y-m-d'),
                     'booking_ref_no' => $transaction->booking->pbb_ref_no,
                     'amount' => number_format($transaction->payoutItems->pbvpi_vendor_amount, 2, '.', ''),
                 ];
-            })->toArray();
+            })->values()->toArray();
 
         Log::info('toBePaidList Response:', ['Response' => $toBePaidList]);
 
