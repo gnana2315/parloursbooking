@@ -1797,20 +1797,17 @@ class VendorController extends Controller
         //         ];
         //     })->values()->toArray();
 
-        $payouts = vendorPayoutItems::with('paymentTransection.booking')
+        $payouts = vendorPayoutItems::with(['booking'])
             ->where('pbvpi_status', 1)
-            ->whereHas('paymentTransection.booking', function ($query) {
+            ->whereHas('booking', function ($query) {
                 $query->where('pbb_status', 2);
-            })
-            ->whereHas('paymentTransection', function ($query) use ($vendor) {
-                $query->where('pbpt_vendor_id', $vendor->pbv_id);
             })
             ->get()
             ->sortByDesc('updated_at')
             ->map(function ($item) {
                 return [
                     'date' => Carbon::parse($item->updated_at)->format('Y-m-d'),
-                    'booking_ref_no' => $item->paymentTransection->booking->pbb_ref_no,
+                    'booking_ref_no' => $item->booking->pbb_ref_no,
                     'amount' => number_format($item->pbvpi_vendor_amount, 2, '.', ''),
                 ];
             })->values()->toArray();
