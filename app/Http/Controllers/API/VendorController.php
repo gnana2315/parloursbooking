@@ -2024,7 +2024,7 @@ class VendorController extends Controller
             })
             ->get()
             ->sortByDesc(function ($transaction) {
-                return $transaction->booking->pbb_booking_date; // Sort by booking date
+                return $transaction->payoutItems->created_at;
             })
             ->map(function ($transaction) {
                 return [
