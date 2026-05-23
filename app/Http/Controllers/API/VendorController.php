@@ -20,11 +20,8 @@ use App\Models\booking;
 use App\Models\vendorPayouts;
 use App\Models\vendorPayoutItems;
 
-use Validator;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
 use Carbon\Carbon;
@@ -1774,29 +1771,47 @@ class VendorController extends Controller
             return response()->json(['message' => 'Vendor not found'], 404);
         }
 
-        $payouts = paymentTransection::with(['booking','payoutItems'])
-            ->where('pbpt_vendor_id', $vendor->pbv_id) 
-            ->whereHas('payoutItems', function ($query) {
-                $query->where('pbvpi_status', 1);
-            })
-            ->whereHas('booking', function ($query) {
+        // $payouts = paymentTransection::with(['booking','payoutItems'])
+        //     ->where('pbpt_vendor_id', $vendor->pbv_id) 
+        //     ->whereHas('payoutItems', function ($query) {
+        //         $query->where('pbvpi_status', 1);
+        //     })
+        //     ->whereHas('booking', function ($query) {
+        //         $query->where('pbb_status', 2);
+        //     })
+        //     ->get()
+        //     ->sortByDesc(function ($transaction) {
+        //         Log::info('Payout Transections:', ['response' => $transaction->payoutItems]);
+        //         return $transaction->payoutItems->updated_at;
+        //     })
+        //     ->map(function ($transaction) {
+        //         return [
+        //             'date' => Carbon::parse($transaction->payoutItems->updated_at)->format('Y-m-d'),
+        //             'booking_ref_no' => $transaction->booking->pbb_ref_no,
+        //             'amount' => number_format(
+        //                 $transaction->payoutItems->sum('pbvpi_vendor_amount'),
+        //                 2,
+        //                 '.',
+        //                 ''
+        //             ),
+        //         ];
+        //     })->values()->toArray();
+
+        $payouts = vendorPayoutItems::with('paymentTransection.booking')
+            ->where('pbvpi_status', 1)
+            ->whereHas('paymentTransection.booking', function ($query) {
                 $query->where('pbb_status', 2);
             })
-            ->get()
-            ->sortByDesc(function ($transaction) {
-                Log::info('Payout Transections:', ['response' => $transaction->payoutItems]);
-                return $transaction->payoutItems->updated_at;
+            ->whereHas('paymentTransection', function ($query) use ($vendor) {
+                $query->where('pbpt_vendor_id', $vendor->pbv_id);
             })
-            ->map(function ($transaction) {
+            ->get()
+            ->sortByDesc('updated_at')
+            ->map(function ($item) {
                 return [
-                    'date' => Carbon::parse($transaction->payoutItems->updated_at)->format('Y-m-d'),
-                    'booking_ref_no' => $transaction->booking->pbb_ref_no,
-                    'amount' => number_format(
-                        $transaction->payoutItems->sum('pbvpi_vendor_amount'),
-                        2,
-                        '.',
-                        ''
-                    ),
+                    'date' => Carbon::parse($item->updated_at)->format('Y-m-d'),
+                    'booking_ref_no' => $item->paymentTransection->booking->pbb_ref_no,
+                    'amount' => number_format($item->pbvpi_vendor_amount, 2, '.', ''),
                 ];
             })->values()->toArray();
 
