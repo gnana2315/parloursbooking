@@ -1726,7 +1726,7 @@ class VendorController extends Controller
                     'amount' => number_format($transaction->pbpt_vendor_amount, 2, '.', ''),
                     'status' => $status,
                 ];
-            })->toArray();
+            })->values()->toArray();
 
         Log::info('getThisWeekEarningsByVendor Response:', ['Response' => $earnings]);
         return response()->json([
@@ -1801,7 +1801,7 @@ class VendorController extends Controller
                         ''
                     ),
                 ];
-            })->toArray();
+            })->values()->toArray();
 
         Log::info('payouts Response:', ['Response' => $payouts]);
         return response()->json([
