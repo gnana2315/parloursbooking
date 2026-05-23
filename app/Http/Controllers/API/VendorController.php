@@ -1766,6 +1766,7 @@ class VendorController extends Controller
  * )
  */
     public function getPayoutHistoryByVendor(){
+        //this is used in paid tab
         Log::info('getPayoutHistoryByVendor Requests');
         $user = auth()->user();
         $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
@@ -1783,11 +1784,11 @@ class VendorController extends Controller
             })
             ->get()
             ->sortByDesc(function ($transaction) {
-                return $transaction->created_at;
+                return $transaction->payoutItems->updated_at;
             })
             ->map(function ($transaction) {
                 return [
-                    'date' => $transaction->created_at,
+                    'date' => Carbon::parse($transaction->payoutItems->updated_at)->format('Y-m-d'),
                     'booking_ref_no' => $transaction->booking->pbb_ref_no,
                     'amount' => number_format(
                         $transaction->payoutItems->sum('pbvpi_vendor_amount'),
@@ -1839,6 +1840,7 @@ class VendorController extends Controller
  * )
  */
     public function getAllEarningsByVendor(){
+        //this is used in earned and pending
         $user = auth()->user();
         $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
         if (!$vendor) {
