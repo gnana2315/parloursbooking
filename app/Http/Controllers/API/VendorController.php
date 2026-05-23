@@ -1692,10 +1692,6 @@ class VendorController extends Controller
             return response()->json(['message' => 'Vendor not found'], 404);
         }
         Log::info('getThisWeekEarningsByVendor Vendor Response:', ['Response' => $vendor]);
-        // $startOfWeek = now()->startOfWeek()->toDateString();;
-        // $endOfWeek = now()->endOfWeek()->toDateString();;
-
-        // Log::info('startOfWeek Response:', ['startOfWeek' => $startOfWeek, 'endOfWeek' => $endOfWeek]);
 
         $earnings = paymentTransection::with(['booking', 'payoutItems'])
             ->where('pbpt_vendor_id', $vendor->pbv_id)
@@ -1783,12 +1779,11 @@ class VendorController extends Controller
                 $query->where('pbvpi_status', 1);
             })
             ->whereHas('booking', function ($query) {
-                $query->where('pbb_status', 2)
-                    ->orderBy('pbb_booking_date', 'desc');
+                $query->where('pbb_status', 2);
             })
             ->get()
             ->sortByDesc(function ($transaction) {
-                return $transaction->booking->pbb_booking_date; // Sort by booking date
+                return $transaction->created_at;
             })
             ->map(function ($transaction) {
                 return [
@@ -1864,7 +1859,8 @@ class VendorController extends Controller
                             ? 'Unpaid'
                             : 'Paid';
                 return [
-                    'date' => $transaction->created_at->format('Y-m-d'),
+                    // 'date' => $transaction->created_at->format('Y-m-d'),
+                    'date' => $transaction->booking->pbb_booking_date,
                     'booking_ref_no' => $transaction->booking->pbb_ref_no,
                     'amount' => number_format($transaction->pbpt_vendor_amount, 2, '.', ''),
                     'status' => $status,
@@ -2022,13 +2018,16 @@ class VendorController extends Controller
             ->whereHas('payoutItems', function ($query) {
                 $query->where('pbvpi_status', 1);
             })
+            ->whereHas('booking', function ($query) {
+                $query->where('pbb_status', 2);
+            })
             ->get()
             ->sortByDesc(function ($transaction) {
-                return $transaction->payoutItems->created_at;
+                return $transaction->booking->pbb_status_updated_at;
             })
             ->map(function ($transaction) {
                 return [
-                    'date' => $transaction->created_at->format('Y-m-d'),
+                    'date' => $transaction->booking->pbb_status_updated_at->format('Y-m-d'),
                     'booking_ref_no' => $transaction->booking->pbb_ref_no,
                     'amount' => number_format($transaction->payoutItems->pbvpi_vendor_amount, 2, '.', ''),
                 ];
