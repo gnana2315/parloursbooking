@@ -1702,9 +1702,10 @@ class VendorController extends Controller
             ->whereHas('booking', function ($q) {
                 $q->where('pbb_status', 2);
             })
-            ->join('booking', 'payment_transections.pbpt_booking_id', '=', 'booking.pbb_id')
-            ->orderBy('booking.pbb_booking_date', 'desc') 
             ->get()
+            ->sortByDesc(function ($transaction) {
+                return $transaction->booking->pbb_booking_date; // Sort by booking date
+            })
             ->map(function ($transaction) {
                 Log::info('Transeaction Response:', ['Response' => $transaction]);
                 $status = 'Unpaid';
@@ -1782,11 +1783,13 @@ class VendorController extends Controller
                 $query->where('pbvpi_status', 1);
             })
             ->whereHas('booking', function ($query) {
-                $query->where('pbb_status', 2);
+                $query->where('pbb_status', 2)
+                    ->orderBy('pbb_booking_date', 'desc');
             })
-            ->join('booking', 'payment_transections.pbpt_booking_id', '=', 'booking.pbb_id')
-            ->orderBy('booking.pbb_booking_date', 'desc') 
             ->get()
+            ->sortByDesc(function ($transaction) {
+                return $transaction->booking->pbb_booking_date; // Sort by booking date
+            })
             ->map(function ($transaction) {
                 return [
                     'date' => $transaction->created_at->format('Y-m-d'),
