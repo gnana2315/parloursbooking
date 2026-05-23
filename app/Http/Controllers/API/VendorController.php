@@ -1852,15 +1852,14 @@ class VendorController extends Controller
             })
             ->get()
             ->sortByDesc(function ($transaction) {
-                return $transaction->booking->pbb_booking_date; // Sort by booking date
+                return $transaction->booking->pbb_status_updated_at; // Sort by booking date
             })
             ->map(function ($transaction) {
                 $status = $transaction->payoutItems->contains('pbvpi_status', 0)
                             ? 'Unpaid'
                             : 'Paid';
                 return [
-                    // 'date' => $transaction->created_at->format('Y-m-d'),
-                    'date' => $transaction->booking->pbb_booking_date,
+                    'date' => $transaction->booking->pbb_status_updated_at->format('Y-m-d'),
                     'booking_ref_no' => $transaction->booking->pbb_ref_no,
                     'amount' => number_format($transaction->pbpt_vendor_amount, 2, '.', ''),
                     'status' => $status,
