@@ -1800,7 +1800,7 @@ class VendorController extends Controller
         $payouts = vendorPayoutItems::with(['booking'])
             ->where('pbvpi_status', 1)
             ->whereHas('booking', function ($query) {
-                $query->where('pbb_status', 2);
+                $query->whereIn('pbb_status', ['2', '4']);
             })
             ->get()
             ->sortByDesc('updated_at')
@@ -1863,7 +1863,7 @@ class VendorController extends Controller
         $allEarnings = paymentTransection::with(['booking', 'payoutItems'])
             ->where('pbpt_vendor_id', $vendor->pbv_id)
             ->whereHas('booking', function ($q) {
-                $q->where('pbb_status', 2); 
+                $q->whereIn('pbb_status', ['2', '4']);
             })
             ->get()
             ->sortByDesc(function ($transaction) {
