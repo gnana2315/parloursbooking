@@ -72,14 +72,14 @@ class SendBookingReminders extends Command
             // 🔔 Push Notification
             $customerReminderNotification = $oneSignalService->sendToCustomer(
                 $customer->pbc_user_id,
-                '⏰ Booking Reminder',
-                "Your appointment today at {$booking->pbb_booking_start_time->format('h:i A')} with {$vendorName}. For assistance, please contact the parlour at {$vendorContactNo}.",
+                'Booking Reminder',
+                "Your appointment today at {$booking->pbb_booking_start_time->format('h:i A')} with {$vendorName}. For assistance, please contact the parlour at {$vendorContactNo}. Missed appointment cannot be cancelled or refunded.",
                 [
                     'booking_id' => $booking->pbb_id,
                     'booking_ref_no' => $booking->pbb_ref_no,
                 ]
             );
-            Log::info("OneSignal response for booking ID: {$booking->pbb_id}: " . json_encode($customerReminderNotification));
+            Log::info("Booking Reminder OneSignal response for booking ID: {$booking->pbb_id}: " . json_encode($customerReminderNotification));
 
             if ($customerReminderNotification) {
                 // ✅ Mark reminder sent

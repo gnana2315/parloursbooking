@@ -15,6 +15,8 @@ use App\Http\Controllers\admin\reportsController;
 use App\Http\Controllers\admin\servicesController;
 use App\Http\Controllers\admin\paymentsController;
 
+use App\Http\Controllers\admin\BookingController;
+
 use App\Http\Controllers\userAdminController;
 //use App\Http\Controllers\SendMailController;
 use App\Http\Controllers\MigrationController;
@@ -123,6 +125,12 @@ Route::group(['middleware' => 'auth.check'], function () {
             Route::post('/payouts/process', [paymentsController::class, 'processPayout'])->name('payouts.process');
             Route::get('/payouts/receipt/{payoutHistoryId}', [paymentsController::class, 'viewPayoutReceipt'])->name('payouts.receipt');
             Route::get('/reports', [reportsController::class, 'index']);
+
+            Route::prefix('bookings')->group(function () {
+                Route::get('/', [BookingController::class, 'index'])->name('admin-bookings-dashboard');
+                Route::get('/list', [BookingController::class, 'list'])->name('admin-bookings-list');
+                Route::get('/{id}/details', [BookingController::class, 'getBookingDetails'])->name('admin-bookings-details');
+            });
         });
         // Route::group(['middleware' => 'isSuperAdmin'], function () {
         //     Route::get('/superdashboard', [superAdminController::class, 'index']);
