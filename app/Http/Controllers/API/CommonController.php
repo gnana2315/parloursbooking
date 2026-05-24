@@ -1286,43 +1286,27 @@ class CommonController extends Controller
         $lastStartofWeek = now()->subWeek()->startOfWeek();
         $lastEndOfWeek = now()->subWeek()->endOfWeek();
 
-        $bookingsCount = booking::where('pbb_vendor_id', $vendor->pbv_id)
+        $bookings = booking::where('pbb_vendor_id', $vendor->pbv_id)
                                 ->where('pbb_type', 'Online')
                                 ->whereIn('pbb_status', ['2', '4'])
                                 ->whereBetween('pbb_booking_date', [$startOfWeek, $endOfWeek])
-                                ->orWhereBetween('pbb_status_updated_at', [$startOfWeek, $endOfWeek])
-                                ->count();
+                                ->orWhereBetween('pbb_status_updated_at', [$startOfWeek, $endOfWeek]);
+                                
+        Log::info('Bookings Query:', ['Query' => $bookings->toSql(), 'Bindings' => $bookings->getBindings()]);
+
+        $bookingsCount = $bookings->count();
+
+        // $bookingsCount = booking::where('pbb_vendor_id', $vendor->pbv_id)
+        //                         ->where('pbb_type', 'Online')
+        //                         ->whereIn('pbb_status', ['2', '4'])
+        //                         ->whereBetween('pbb_booking_date', [$startOfWeek, $endOfWeek])
+        //                         ->orWhereBetween('pbb_status_updated_at', [$startOfWeek, $endOfWeek])
+        //                         ->count();
         $today = now();
         // $startOfWeek = null;
         // $endOfWeek = null;
         $displayRange = '';
-
-        // On Monday, show previous week's data (Sunday to Saturday of last week)
-        // if ($today->dayOfWeek == Carbon::MONDAY) {
-        //     $startOfWeek = $today->copy()->subWeek()->startOfWeek(Carbon::SUNDAY);
-        //     $endOfWeek = $today->copy()->subWeek()->endOfWeek(Carbon::SATURDAY);
-        //     $displayRange = $startOfWeek->format('M d') . ' - ' . $endOfWeek->format('M d, Y');
-        // } else {
-        //     // Tuesday to Sunday: show current week's data
-        //     $startOfWeek = $today->copy()->startOfWeek(Carbon::SUNDAY);
-        //     $endOfWeek = $today->copy()->endOfWeek(Carbon::SATURDAY);
-        //     $displayRange = $startOfWeek->format('M d') . ' - ' . $endOfWeek->format('M d, Y');
-        // }
-
-        // $bookingsCount = booking::where('pbb_vendor_id', $vendor->pbv_id)
-        //                 ->where('pbb_type', 'Online')
-        //                 ->whereIn('pbb_status', ['2', '4'])
-        //                 ->whereBetween('pbb_booking_date', [$startOfWeek, $endOfWeek])
-        //                 ->count();
-
-        // $earnedAmount = PaymentTransection::whereHas('booking', function($query) use ($vendor, $startOfWeek, $endOfWeek) {
-        //     $query->where('pbb_vendor_id', $vendor->pbv_id)
-        //         ->whereIn('pbb_status', ['2','4'])
-        //         ->where('pbb_type', 'Online')
-        //         ->whereBetween('pbb_booking_date', [$startOfWeek, $endOfWeek])
-        //         ->orWhereBetween('pbb_status_updated_at', [$startOfWeek, $endOfWeek]);
-        //     })
-        //     ->sum('pbpt_vendor_amount');
+        
         $earnedAmount = vendorPayoutItems::with('booking')->where('pbvpi_vendor_id', $vendor->pbv_id)
                         ->where('pbvpi_status', 0)
                         // ->where('created_at', '<=', $pendingAmountEndOfWeek)
