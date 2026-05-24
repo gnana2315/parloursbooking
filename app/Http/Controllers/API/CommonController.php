@@ -1298,7 +1298,7 @@ class CommonController extends Controller
                                 });
 
         $bookingsCount = $bookings->count();
-        
+
         $today = now();
         // $startOfWeek = null;
         // $endOfWeek = null;
@@ -1306,7 +1306,6 @@ class CommonController extends Controller
         
         $earnedAmount = vendorPayoutItems::with('booking')->where('pbvpi_vendor_id', $vendor->pbv_id)
                         ->where('pbvpi_status', 0)
-                        // ->where('created_at', '<=', $pendingAmountEndOfWeek)
                         ->whereHas('booking', function($query) use ($startOfWeek, $endOfWeek) {
                             $query->whereBetween('pbb_booking_date', [$startOfWeek, $endOfWeek])
                                     ->orWhereBetween('pbb_status_updated_at', [$startOfWeek, $endOfWeek]);
@@ -1317,9 +1316,6 @@ class CommonController extends Controller
         $earnedAmount_formatted_currency = number_format($earnedAmount, 2, '.', ',');
 
         $paidAmount = vendorPayouts::where('pbvp_vendor_id', $vendor->pbv_id)->sum('pbvp_total_paid');
-        // $paidAmount = vendorPayoutHistory::where('pbvph_vendor_id', $vendor->pbv_id)
-        //             ->whereBetween('created_at', [$lastStartofWeek, $lastEndOfWeek])
-        //             ->sum('pbvph_amount');        
         
         $pendingAmount = 0;
 
