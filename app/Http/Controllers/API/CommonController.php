@@ -1292,7 +1292,7 @@ class CommonController extends Controller
                                 ->whereBetween('pbb_booking_date', [$startOfWeek, $endOfWeek])
                                 ->orWhereBetween('pbb_status_updated_at', [$startOfWeek, $endOfWeek]);
 
-        Log::info('Bookings Query:', ['Query' => $bookings->toSql(), 'Results' => $bookings]);
+        Log::info('Bookings Query:', ['Query' => $bookings->toSql(), 'Results' => $bookings->get()]);
 
         $bookingsCount = $bookings->count();
 
