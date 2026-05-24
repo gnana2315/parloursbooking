@@ -1255,8 +1255,8 @@ class BookingController extends Controller
                     Log::info('Customer User Details:', ['CustomerUser' => $customerUser]);
                     // Send notification to CUSTOMER for successful payment
                     if ($customerUser) {
-                        $customerNotificationTitle = 'Booking Cancelled!';
-                        $customerNotificationMessage = 'Booking Cancelled due to your absense. Your booking reference no: '. $booking->pbb_ref_no;
+                        $customerNotificationTitle = 'Missed Appointment!';
+                        $customerNotificationMessage = 'Booking Cancelled due to your absense. Your booking reference no: '. $booking->pbb_ref_no .'. Please ensure timely attendance for furture booking.';
                         $customerNotificationData = [
                             'booking_ref_no' => $booking->pbb_ref_no,
                             'booking_id' => $booking->pbb_id,

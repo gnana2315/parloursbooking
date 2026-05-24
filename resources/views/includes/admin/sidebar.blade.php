@@ -47,6 +47,20 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="{{ route('admin-bookings-dashboard') }}" class="nav-link">
+                        <i class="nav-icon fas fa-th"></i>
+                        <p>Bookings</p><i class="fas fa-angle-down right"></i></p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{{ route('admin-bookings-list') }}" class="nav-link">
+                                <i class="nav-icon fas fa-cash-register"></i>
+                                <p>Booking List</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item">
                     <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-money-bill-wave"></i>
                         <p>Payments</p><i class="fas fa-angle-down right"></i></p>
