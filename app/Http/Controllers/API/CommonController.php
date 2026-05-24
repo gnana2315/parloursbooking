@@ -1289,8 +1289,13 @@ class CommonController extends Controller
         $bookings = booking::where('pbb_vendor_id', $vendor->pbv_id)
                                 ->where('pbb_type', 'Online')
                                 ->whereIn('pbb_status', ['2', '4'])
-                                ->whereBetween('pbb_booking_date', [$startOfWeek, $endOfWeek])
-                                ->orWhereBetween('pbb_status_updated_at', [$startOfWeek, $endOfWeek]);
+                                ->whereBetween('pbb_booking_date', [$startOfWeek, $endOfWeek])                                
+                                ->orWhere(function($query) use ($startOfWeek, $endOfWeek, $vendor) {
+                                    $query->where('pbb_vendor_id', $vendor->pbv_id)
+                                        ->where('pbb_type', 'Online')
+                                        ->whereIn('pbb_status', ['2', '4'])
+                                        ->whereBetween('pbb_status_updated_at', [$startOfWeek, $endOfWeek]);
+                                });
 
         Log::info('Bookings Query:', ['Query' => $bookings->toSql(), 'Results' => $bookings->get()]);
 
