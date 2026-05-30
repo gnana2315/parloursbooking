@@ -255,6 +255,7 @@
                                         $txnStatusText = 'Paid';
                                     @else
                                         $txnStatusText = 'Unpaid';
+                                    @endif
                                 @endphp
                                 <span class="badge badge-{{ $txnClass }}">
                                     {{ ucfirst($booking->paymentTransections->pbpt_status ?? 'Unknown') }}
