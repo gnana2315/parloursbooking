@@ -128,6 +128,7 @@
         var bookingsListTable = $('#bookingsTable').DataTable({
             processing: true,
             serverSide: true,
+            searching: false,
             ajax: {
                 url: '{{ route("admin-bookings-list") }}',
                 data: function(d) {
@@ -141,25 +142,25 @@
                     data: 'pbb_ref_no',
                     name: 'pbb_ref_no',
                     orderable: true,
-                    searchable: true
+                    searchable: false
                 },
                 {
                     data: 'customer_name',
                     name: 'customer_name',
                     orderable: true,
-                    searchable: true
+                    searchable: false
                 },
                 {
                     data: 'vendor_name',
                     name: 'vendor_name',
                     orderable: true,
-                    searchable: true
+                    searchable: false
                 },
                 {
                     data: 'booking_date',
                     name: 'booking_date',
                     orderable: true,
-                    searchable: true
+                    searchable: false
                 },
                 {
                     data: 'total_amount',
