@@ -271,36 +271,38 @@
     @endif
     
     <!-- Ratings & Reviews -->
-    @if($booking->ratings && $booking->ratings->count() > 0)
-    <div class="card card-warning card-outline">
-        <div class="card-header">
-            <h6 class="card-title">
-                <i class="fas fa-star"></i> Customer Rating & Review
-            </h6>
-        </div>
-        <div class="card-body">
-            @foreach($booking->ratings as $rating)
-                <div class="border-bottom mb-2 pb-2">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            @for($i = 1; $i <= 5; $i++)
-                                @if($i <= ($rating->pbr_rating ?? 0))
-                                    <i class="fas fa-star text-warning"></i>
-                                @else
-                                    <i class="far fa-star text-muted"></i>
-                                @endif
-                            @endfor
-                            <strong class="ml-2">{{ $rating->pbr_rating ?? 0 }}/5</strong>
+    @if($booking->status == 2)
+        @if($booking->ratings && $booking->ratings->count() > 0)
+        <div class="card card-warning card-outline">
+            <div class="card-header">
+                <h6 class="card-title">
+                    <i class="fas fa-star"></i> Customer Rating & Review
+                </h6>
+            </div>
+            <div class="card-body">
+                @foreach($booking->ratings as $rating)
+                    <div class="border-bottom mb-2 pb-2">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                @for($i = 1; $i <= 5; $i++)
+                                    @if($i <= ($rating->pbr_rating ?? 0))
+                                        <i class="fas fa-star text-warning"></i>
+                                    @else
+                                        <i class="far fa-star text-muted"></i>
+                                    @endif
+                                @endfor
+                                <strong class="ml-2">{{ $rating->pbr_rating ?? 0 }}/5</strong>
+                            </div>
+                            <small class="text-muted">{{ isset($rating->created_at) ? $rating->created_at->format('d/m/Y') : 'N/A' }}</small>
                         </div>
-                        <small class="text-muted">{{ isset($rating->created_at) ? $rating->created_at->format('d/m/Y') : 'N/A' }}</small>
+                        @if($rating->pbr_review)
+                            <p class="mt-2 mb-0">{{ $rating->pbr_review }}</p>
+                        @endif
                     </div>
-                    @if($rating->pbr_review)
-                        <p class="mt-2 mb-0">{{ $rating->pbr_review }}</p>
-                    @endif
-                </div>
-            @endforeach
+                @endforeach
+            </div>
         </div>
-    </div>
+        @endif
     @endif
     
     <!-- Additional Notes -->
