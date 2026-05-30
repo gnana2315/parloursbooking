@@ -258,7 +258,7 @@
                                     }
                                 @endphp
                                 <span class="badge badge-{{ $txnClass }}">
-                                    {{ ucfirst($booking->paymentTransections->pbpt_status ?? 'Unknown') }}
+                                    {{ $txnStatusText }}
                                 </span>
                             </td>
                             <td>{{ isset($booking->paymentTransections->created_at) ? $booking->paymentTransections->created_at->format('d/m/Y H:i') : 'N/A' }}</td>
