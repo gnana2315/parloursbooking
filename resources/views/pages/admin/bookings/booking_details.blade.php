@@ -250,6 +250,11 @@
                                         '1' => 'success'
                                     ];
                                     $txnClass = $txnStatus[$booking->paymentTransections->pbpt_status] ?? 'secondary';
+                                    $txnStatusText = '';
+                                    @if($booking->paymentTransections->pbpt_status == 1)
+                                        $txnStatusText = 'Paid';
+                                    @else
+                                        $txnStatusText = 'Unpaid';
                                 @endphp
                                 <span class="badge badge-{{ $txnClass }}">
                                     {{ ucfirst($booking->paymentTransections->pbpt_status ?? 'Unknown') }}
