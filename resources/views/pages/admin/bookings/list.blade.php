@@ -19,24 +19,52 @@
 
 	<section class="content">
 		<div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                Booing List Filters
+                            </h3>
+                        </div>
+                        <dib class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <input type="text" id="booking_search" class="form-control form-control-sm" placeholder="Search by Booking Ref, Customer first Name or Vendor Name, Customer or Vendor Contact No">
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                        <span class="input-group-text">
+                                            <i class="far fa-calendar-alt"></i>
+                                        </span>
+                                        </div>
+                                        <input type="text" class="form-control float-right" id="booking_date_range">
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="input-group input-group-sm">
+                                        <select id="statusFilter" class="form-control">
+                                            <option value="">All Status</option>
+                                            <option value="0">Cancelled By Admin</option>
+                                            <option value="1">Upcoming</option>
+                                            <option value="2">Completed</option>
+                                            <option value="3">Payment Pending</option>
+                                            <option value="4">DNA</option>
+                                            <option value="5">Payment Failure</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </dib>
+                    </div>
+                </div>
+            </div>
 			<div class="row">
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header">
-                            <h3 class="card-title">Registered Vendor List</h3>
-                            <div class="card-tools">
-                                <div class="input-group input-group-sm" style="width: 150px;">
-                                    <select id="statusFilter" class="form-control">
-                                        <option value="">All Status</option>
-                                        <option value="0">Cancelled By Admin</option>
-                                        <option value="1">Upcoming</option>
-                                        <option value="2">Completed</option>
-                                        <option value="3">Payment Pending</option>
-                                        <option value="4">DNA</option>
-                                        <option value="5">Payment Failure</option>
-                                    </select>
-                                </div>
-                            </div>
+                            <h3 class="card-title">Booking List</h3>
                         </div>
                         <div class="card-body">
                             <table id="bookingsTable" class="table table-bordered table-striped">
@@ -81,12 +109,30 @@
 </div>
 <script>
     $(document).ready(function() {
+        $(function () {
+            $('#booking_date_range').daterangepicker({
+                autoUpdateInput: false,
+                autoApply: false,
+                locale: {
+                    format: 'YYYY-MM-DD',
+                    separator: ' - ',
+                    applyLabel: 'Apply',
+                    cancelLabel: 'Clear',
+                    fromLabel: 'From',
+                    toLabel: 'To',
+                    customRangeLabel: 'Custom'
+                }
+            });
+        });
+
         var bookingsListTable = $('#bookingsTable').DataTable({
             processing: true,
             serverSide: true,
             ajax: {
                 url: '{{ route("admin-bookings-list") }}',
                 data: function(d) {
+                    d.booking_search = $('#booking_search').val();
+                    d.booking_date_range = $('#booking_date_range').val();
                     d.status = $('#statusFilter').val();
                 }
             },
@@ -149,6 +195,23 @@
                 }
                 $('#totalAmountFooter').text('Rs. ' + totalAmount.toFixed(2));
             }
+        });
+
+        $('#booking_search').on('input', function() {
+            bookingsListTable.ajax.reload();
+        });
+
+        $('#booking_date_range').on('apply.daterangepicker', function(ev, picker) {
+            var startDate = picker.startDate.format('YYYY-MM-DD');
+            var endDate = picker.endDate.format('YYYY-MM-DD');
+            $(this).val(startDate + ' - ' + endDate);  
+            bookingsListTable.ajax.reload();
+        });
+
+
+        $('#booking_date_range').on('cancel.daterangepicker', function(ev, picker) {
+            $(this).val('');
+            bookingsListTable.ajax.reload();
         });
 
         $('#statusFilter').change(function() {

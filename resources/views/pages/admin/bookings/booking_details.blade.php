@@ -44,7 +44,7 @@
                     <table class="table table-sm table-borderless">
                         <tr>
                             <th width="35%">Name:</th>
-                            <td>{{ $booking->customer->pbc_name ?? 'N/A' }}</td>
+                            <td>{{ $booking->customer->pbc_first_name ?? 'N/A' }} {{ $booking->customer->pbc_last_name }}</td>
                         </tr>
                         <tr>
                             <th>Email:</th>
@@ -52,7 +52,7 @@
                         </tr>
                         <tr>
                             <th>Phone:</th>
-                            <td>{{ $booking->customer->pbc_phone ?? 'N/A' }}</td>
+                            <td>{{ $booking->customer->pbc_contact_no ?? 'N/A' }}</td>
                         </tr>
                         <tr>
                             <th>Address:</th>
@@ -109,19 +109,19 @@
             <table class="table table-sm table-borderless">
                 <tr>
                     <th width="30%">Promo Code:</th>
-                    <td><strong>{{ $booking->promoCode->pbc_code ?? 'N/A' }}</strong></td>
+                    <td><strong>{{ $booking->promoCode->pbpc_name ?? 'N/A' }} ({{ $booking->promoCode->pbpc_code ?? 'N/A' }})</strong></td>
                 </tr>
                 <tr>
                     <th>Discount Type:</th>
-                    <td>{{ ucfirst($booking->promoCode->pbc_discount_type ?? 'N/A') }}</td>
+                    <td>{{ ucfirst($booking->promoCode->pbpc_discount_type ?? 'N/A') }}</td>
                 </tr>
                 <tr>
                     <th>Discount Value:</th>
                     <td>
-                        @if(($booking->promoCode->pbc_discount_type ?? '') == 'percentage')
-                            {{ $booking->promoCode->pbc_discount_value ?? 0 }}%
+                        @if(($booking->promoCode->pbpc_discount_type ?? '') == 'percentage')
+                            {{ $booking->promoCode->pbpc_value ?? 0 }}%
                         @else
-                            Rs. {{ number_format($booking->promoCode->pbc_discount_value ?? 0, 2) }}
+                            Rs. {{ number_format($booking->promoCode->pbpc_value ?? 0, 2) }}
                         @endif
                     </td>
                 </tr>
@@ -143,8 +143,13 @@
                 <div class="col-md-6 mb-2">
                     <div class="small">
                         <strong>{{ $booking->vendors->pbv_business_name }}</strong><br>
-                        <small>Email: {{ $booking->vendors->pbv_email ?? 'N/A' }}</small><br>
-                        <small>Phone: {{ $booking->vendors->pbv_phone ?? 'N/A' }}</small>
+                        @if($booking->vendors->pbv_address)
+                            <small>Email: {{ $booking->vendors->pbv_address ?? 'N/A' }}</small><br>
+                        @endif
+                        @if($booking->vendors->pbv_email)
+                            <small>Email: {{ $booking->vendors->pbv_email ?? 'N/A' }}</small><br>
+                        @endif
+                        <small>Phone: {{ $booking->vendors->pbv_contactno?? 'N/A' }}</small>
                     </div>
                 </div>
             </div>

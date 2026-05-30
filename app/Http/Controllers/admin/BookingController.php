@@ -19,9 +19,36 @@ class BookingController extends Controller
 
     public function list(Request $request)
     {
-        if ($request->ajax()) {
-            $bookings = booking::with(['customer', 'vendors']);
+        if ($request->all()) {
+            $bookings = booking::with(['customer', 'vendors']);            
             
+            if($request->has('booking_search') && $request->booking_search !== '' && $request->booking_search !== null){
+                $bookings->where(function($query) use ($request) {
+                    $query->where('pbb_ref_no', 'like', '%' . $request->booking_search . '%')
+                            ->orWhereHas('customer', function($q) use ($request) {
+                                $q->where('pbc_first_name', 'like', '%' . $request->booking_search . '%')
+                                    ->orWhere('pbc_contact_no', 'like', '%' . $request->booking_search . '%');
+                            })
+                            ->orWhereHas('vendors', function($q) use ($request) {
+                                $q->where('pbv_business_name', 'like', '%' . $request->booking_search . '%')
+                                    ->orWhere('pbv_contactno', 'like', '%' . $request->booking_search . '%');
+                            });
+                        
+                });
+            }
+
+            if ($request->has('booking_date_range') && $request->booking_date_range !== '' && $request->booking_date_range !== null) {
+                $bookingDateRange = explode(' - ', $request->booking_date_range);
+                
+                if (count($bookingDateRange) == 2) {
+                    $startDate = Carbon::createFromFormat('Y-m-d', trim($bookingDateRange[0]))->startOfDay();
+                    $endDate = Carbon::createFromFormat('Y-m-d', trim($bookingDateRange[1]))->endOfDay();
+                    $bookings->whereBetween('pbb_booking_date', [$startDate, $endDate]);
+                } else {
+                    $bookings->whereDate('pbb_booking_date', Carbon::createFromFormat('Y-m-d', trim($request->booking_date_range))->format('Y-m-d'));
+                }
+            }
+
             if ($request->has('status') && $request->status !== '' && $request->status !== null) {
                 $bookings->where('pbb_status', $request->status);
             }
