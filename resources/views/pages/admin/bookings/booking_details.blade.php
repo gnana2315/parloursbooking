@@ -271,7 +271,7 @@
     @endif
     
     <!-- Ratings & Reviews -->
-    @if($booking->status == 2)
+    @if($booking->pbb_status == 2)
         @if($booking->ratings && $booking->ratings->count() > 0)
         <div class="card card-warning card-outline">
             <div class="card-header">
