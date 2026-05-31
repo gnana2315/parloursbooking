@@ -94,12 +94,12 @@
                                                 <button class="btn btn-success" type="button" title="Print Vendor Details" name="printVendor" id="printVendor" value="{{ $vendor->pbv_id }}"><i class="fa fa-print"></i></button>
                                                 |
                                                 @if(!empty($vendor->user) && $vendor->user->pbu_status == 1)
-                                                    <button class="btn btn-danger" type="button" title="Disable Vendor" name="disableVendor" id="disableVendor" value="{{ $vendor->user->pbu_id }}"><i class="fa fa-power-off"></i></button>
+                                                    <button class="btn btn-danger" type="button" title="Disable Vendor" name="disableVendor" id="disableVendor" value="{{ !empty($vendor->user) ? $vendor->user->pbu_id : '' }}"><i class="fa fa-power-off"></i></button>
                                                 @else
-                                                    <!--button class="btn btn-success" type="button" title="Approve Vendor" name="enableVendor" id="enableVendor" value="{{ $vendor->user->pbu_id }}"><i class="fa fa-power-off"></i></button-->
+                                                    <!--button class="btn btn-success" type="button" title="Approve Vendor" name="enableVendor" id="enableVendor" value="{{ !empty($vendor->user) ? $vendor->user->pbu_id : '' }}"><i class="fa fa-power-off"></i></button-->
                                                     <form action="/vendor/activate" method="POST">
                                                         @csrf
-                                                        <input type="hidden" name="id" value="{{ $vendor->user->pbu_id }}" />
+                                                        <input type="hidden" name="id" value="{{ !empty($vendor->user) ? $vendor->user->pbu_id : '' }}" />
                                                         <button class="btn btn-success" type="submit" title="Approve Vendor"><i class="fa fa-power-off"></i></button>
                                                     </form>
                                                 @endif
