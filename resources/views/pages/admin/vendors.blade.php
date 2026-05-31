@@ -93,7 +93,7 @@
                                                 |
                                                 <button class="btn btn-success" type="button" title="Print Vendor Details" name="printVendor" id="printVendor" value="{{ $vendor->pbv_id }}"><i class="fa fa-print"></i></button>
                                                 |
-                                                @if( $vendor->user->pbu_status == 1)
+                                                @if(!empty($vendor->user) && $vendor->user->pbu_status == 1)
                                                     <button class="btn btn-danger" type="button" title="Disable Vendor" name="disableVendor" id="disableVendor" value="{{ $vendor->user->pbu_id }}"><i class="fa fa-power-off"></i></button>
                                                 @else
                                                     <!--button class="btn btn-success" type="button" title="Approve Vendor" name="enableVendor" id="enableVendor" value="{{ $vendor->user->pbu_id }}"><i class="fa fa-power-off"></i></button-->
