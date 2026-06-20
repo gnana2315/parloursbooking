@@ -134,4 +134,5 @@ Route::middleware(['auth:sanctum', 'validate.token'])->group(function () {
     Route::get('/getAllEarningsByVendor', [VendorController::class, 'getAllEarningsByVendor']);
     Route::get('/getIncentivesByVendor', [VendorController::class, 'getIncentivesByVendor']);
     Route::get('/getToBePaidByVendor', [VendorController::class, 'getToBePaidByVendor']);
+    Route::get('/getAllEarningsByVendor_v1', [VendorController::class, 'getAllEarningsByVendor_v1']);
 });

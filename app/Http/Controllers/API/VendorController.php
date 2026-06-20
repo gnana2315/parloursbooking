@@ -1890,6 +1890,85 @@ class VendorController extends Controller
     }
     /**
  * @OA\Get(
+ *     path="/getAllEarningsByVendor_v1",
+ *     summary="Get all earnings for the authenticated vendor",
+ *     tags={"Transections"},
+ *     security={{"bearerAuth":{}}},
+ *     @OA\Response(
+ *         response=200,
+ *         description="All Earnings retrieved successfully",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="success", type="boolean", example=true),
+ *             @OA\Property(
+ *                 property="data",
+ *                 type="array",
+ *                 @OA\Items(
+ *                     type="object",
+ *                     @OA\Property(property="service_start_time", type="string", format="time", example="09:00 AM"),
+ *                     @OA\Property(property="service_time_slot", type="string", format="string", example="09:00 AM - 10:00 AM"),
+ *                     @OA\Property(property="date", type="string", format="date", example="2025-08-02"),
+ *                     @OA\Property(property="booking_ref_no", type="string", example="PBV-123456"),
+ *                     @OA\Property(property="booking_status", type="string", example="Completed/No-Show"),
+ *                     @OA\Property(property="amount", type="number", format="float", example=15000.00),
+ *                     @OA\Property(property="status", type="string", example="Completed")
+ *                 )
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=404,
+ *         description="Vendor not found",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="Vendor not found")
+ *         )
+ *     )
+ * )
+ */
+    public function getAllEarningsByVendor_v1(){
+        //this is used in earned and pending
+        $user = auth()->user();
+        $vendor = vendors::where('pbv_id', $user->pbu_vid)->first();
+        if (!$vendor) {
+            return response()->json(['message' => 'Vendor not found'], 404);
+        }
+
+        $allEarnings = paymentTransection::with(['booking', 'customer', 'payoutItems'])
+            ->where('pbpt_vendor_id', $vendor->pbv_id)
+            ->whereHas('booking', function ($q) {
+                $q->whereIn('pbb_status', ['2', '4']);
+            })
+            ->get()
+            ->sortByDesc(function ($transaction) {
+                return $transaction->booking->pbb_status_updated_at; 
+            })
+            ->map(function ($transaction) {
+                $status = $transaction->payoutItems->contains('pbvpi_status', 0)
+                            ? 'Pending'
+                            : 'Paid';
+                
+                $booking_status = $transaction->booking->pbb_status == 2 ? 'Completed' : ($transaction->booking->pbb_status == 4 ? 'No-Show' : 'Unknown');
+                
+                return [
+                    'service_start_time' => Carbon::parse($transaction->booking->pbb_booking_start_time)->format('H:i A'),
+                    'service_time_slot' => Carbon::parse($transaction->booking->pbb_booking_start_time->format('H:i A')). ' - ' .Carbon::parse($transaction->booking->pbb_booking_end_time->format('H:i A')),
+                    'date' => Carbon::parse($transaction->booking->pbb_status_updated_at)->format('Y-m-d'),
+                    'booking_ref_no' => $transaction->booking->pbb_ref_no,
+                    'booking_status' => $booking_status,
+                    'amount' => number_format($transaction->pbpt_vendor_amount, 2, '.', ''),
+                    'status' => $status,
+                ];
+            })->values()->toArray();
+            
+        Log::info('allEarnings Response V1:', ['Response' => $allEarnings]);
+
+        return response()->json([
+            'success' => true,
+            'data' => $allEarnings
+        ], 200);
+    }
+    /**
+ * @OA\Get(
  *     path="/getIncentivesByVendor",
  *     summary="Get Incentives for the authenticated vendor",
  *     tags={"Transections"},
