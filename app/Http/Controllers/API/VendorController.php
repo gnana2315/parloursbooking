@@ -1951,7 +1951,7 @@ class VendorController extends Controller
                 
                 return [
                     'service_start_time' => Carbon::parse($transaction->booking->pbb_booking_start_time)->format('H:i A'),
-                    'service_time_slot' => Carbon::parse($transaction->booking->pbb_booking_start_time->format('H:i A')). ' - ' .Carbon::parse($transaction->booking->pbb_booking_end_time->format('H:i A')),
+                    'service_time_slot' => Carbon::parse($transaction->booking->pbb_booking_start_time)->format('H:i A'). ' - ' .Carbon::parse($transaction->booking->pbb_booking_end_time)->format('H:i A'),
                     'date' => Carbon::parse($transaction->booking->pbb_status_updated_at)->format('Y-m-d'),
                     'booking_ref_no' => $transaction->booking->pbb_ref_no,
                     'booking_status' => $booking_status,
