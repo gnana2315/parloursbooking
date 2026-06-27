@@ -47,27 +47,7 @@ class paymentsController extends Controller
     public function processPayout(Request $request)
     {
         $user = auth()->user();
-
-        // $request->validate(
-        //     [
-        //         'payout_item_ids' => 'required|array', // e.g., [1, 2, 3]
-        //         'payout_item_ids.*' => 'integer|exists:vendor_payout_items,pbvpi_id',
-        //         'paying_amount' => 'required|numeric|min:0',
-        //         'payment_method' => 'required|string',
-        //     ],
-        //     [
-        //         'payout_item_ids.required' => 'Please select at least one item for payout.',
-        //         'payout_item_ids.array' => 'Invalid format for payout items.',
-        //         'payout_item_ids.*.integer' => 'Each payout item ID must be an integer.',
-        //         'payout_item_ids.*.exists' => 'One or more selected payout items do not exist.',
-        //         'paying_amount.required' => 'Please enter the amount to be paid.',
-        //         'paying_amount.numeric' => 'The paying amount must be a number.',
-        //         'paying_amount.min' => 'The paying amount must be at least 0.',
-        //         'payment_method.required' => 'Please select a payment method.',
-        //         'payment_method.string' => 'Invalid format for payment method.',
-        //     ]
-        // )
-        // ;
+        
         $vendorId = $request->input('vendor_id');
         $selectedItems = explode(',', $request->selected_items); // This should be an array of item IDs
         $paymentMethod = $request->input('payment_method');

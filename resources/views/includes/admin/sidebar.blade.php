@@ -73,9 +73,15 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('payouts.list') }}" class="nav-link">
+                            <a href="{{ route('admin-payouts') }}" class="nav-link">
                                 <i class="nav-icon fas fa-money-check"></i>
                                 <p>Payouts</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin-payouts-batches') }}" class="nav-link">
+                                <i class="nav-icon fas fa-list"></i>
+                                <p>Payout Batches List</p>
                             </a>
                         </li>
                     </ul>

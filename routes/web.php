@@ -16,6 +16,7 @@ use App\Http\Controllers\admin\servicesController;
 use App\Http\Controllers\admin\paymentsController;
 
 use App\Http\Controllers\admin\BookingController;
+use App\Http\Controllers\admin\PayoutController;
 
 use App\Http\Controllers\userAdminController;
 //use App\Http\Controllers\SendMailController;
@@ -130,6 +131,17 @@ Route::group(['middleware' => 'auth.check'], function () {
                 Route::get('/', [BookingController::class, 'index'])->name('admin-bookings-dashboard');
                 Route::get('/list', [BookingController::class, 'list'])->name('admin-bookings-list');
                 Route::get('/{id}/details', [BookingController::class, 'getBookingDetails'])->name('admin-bookings-details');
+            });
+
+            Route::prefix('payment-payouts')->group(function () {
+                Route::get('/', [PayoutController::class, 'index'])->name('admin-payouts');
+                Route::get('/list', [PayoutController::class, 'list'])->name('admin-payouts-list');
+                Route::post('/create-batch', [PayoutController::class, 'createPayoutsBatch'])->name('admin-payouts-create-batch');
+                Route::get('/payout-batches', [PayoutController::class, 'payoutBatches'])->name('admin-payouts-batches');
+                Route::get('/payout-batches/list', [PayoutController::class, 'payoutBatchesList'])->name('admin-payouts-batches-list');                
+                Route::get('/admin/payouts/batches/details', [PayoutController::class, 'getBatchDetails'])->name('admin-payouts-batches-details');
+                Route::get('/admin/payouts/batches/download-pdf', [PayoutController::class, 'downloadBatchPdf'])->name('admin-payouts-batches-download-pdf');
+                Route::get('/admin/payouts/batches/download-excel', [PayoutController::class, 'downloadBatchExcel'])->name('admin-payouts-batches-download-excel');
             });
         });
         // Route::group(['middleware' => 'isSuperAdmin'], function () {

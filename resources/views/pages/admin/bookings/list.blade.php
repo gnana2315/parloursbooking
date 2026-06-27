@@ -27,7 +27,7 @@
                                 Booing List Filters
                             </h3>
                         </div>
-                        <dib class="card-body">
+                        <div class="card-body">
                             <div class="row">
                                 <div class="col-md-6">
                                     <input type="text" id="booking_search" class="form-control form-control-sm" placeholder="Search by Booking Ref, Customer first Name or Vendor Name, Customer or Vendor Contact No">
