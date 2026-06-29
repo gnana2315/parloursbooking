@@ -112,8 +112,10 @@ class AuthController extends Controller
         
         // Store OTP to DB/Cache if needed here
         $smsEnable = filter_var($request->header('SMS_ENABLE', true), FILTER_VALIDATE_BOOLEAN);
+        Log::info('User Mobile No Register SMS Enable Status:', ['Status' => $request->header()]);
         if($smsEnable){
-            $result = $this->smsService->sendMessage($apiKey, [$request->phone_no], $message, $sender);       
+            $result = $this->smsService->sendMessage($apiKey, [$request->phone_no], $message, $sender); 
+            Log::info('User Mobile No Register SMS Result:', ['Result' => $result]);
         }
         
         return response()->json([
@@ -157,7 +159,8 @@ class AuthController extends Controller
         $message = "Your OTP code is {$verfivation_code}. It is valid for 10 minutes. Please do not share this code with anyone.";
 
         // Store OTP to DB/Cache if needed here
-        $result = $this->smsService->sendMessage($apiKey, [$user->pbu_mobileno], $message, $sender);
+        $result = $this->smsService->sendMessage($apiKey, [$user->pbu_mobileno], $message, $sender);         
+        Log::info('User Resend OTP SMS Result:', ['Result' => $result]);
         // optionally send OTP via SMS or email
         return response()->json([
             'message' => 'OTP resent successfully.',
