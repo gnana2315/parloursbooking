@@ -152,6 +152,162 @@
     </div>
 </div>
 
+<!-- Mark Batch Modal -->
+<div class="modal fade" id="markBatchModal" tabindex="-1" role="dialog" aria-labelledby="markBatchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-success">
+                <h5 class="modal-title" id="markBatchModalLabel">
+                    <i class="fas fa-check-circle"></i> Mark Batch as Paid
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="markBatchForm" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-body">
+                    <!-- Batch Summary -->
+                    <div class="alert alert-info">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <strong>Batch No:</strong> <span id="modalBatchNo">-</span>
+                            </div>
+                            <div class="col-md-4">
+                                <strong>Batch Name:</strong> <span id="modalBatchName">-</span>
+                            </div>
+                            <div class="col-md-4">
+                                <strong>Total Amount:</strong> <span id="modalBatchAmount">Rs. 0.00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Paid Date -->
+                    <div class="form-group">
+                        <label for="paid_date">Paid Date <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control" id="paid_date" name="paid_date" required>
+                        <small class="text-muted">Select the date when the payment was made.</small>
+                    </div>
+
+                    <!-- Payment Reference No -->
+                    <div class="form-group">
+                        <label for="paid_ref_no">Payment Reference No <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="paid_ref_no" name="paid_ref_no" 
+                               placeholder="Enter payment reference number" required>
+                        <small class="text-muted">Enter the bank transaction reference number.</small>
+                    </div>
+
+                    <!-- Paid By -->
+                    <div class="form-group">
+                        <label for="paid_by">Paid By <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="paid_by" name="paid_by" 
+                               placeholder="Enter the name of the person who made the payment" required>
+                        <small class="text-muted">Enter the name of the person who processed this payment.</small>
+                    </div>
+
+                    <!-- Payment Proof Upload -->
+                    <div class="form-group">
+                        <label for="payment_proof">Payment Proof <span class="text-danger">*</span></label>
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" id="payment_proof" name="payment_proof" 
+                                   accept=".jpg,.jpeg,.png,.pdf" required>
+                            <label class="custom-file-label" for="payment_proof">Choose file...</label>
+                        </div>
+                        <small class="text-muted">Upload payment proof (JPG, PNG, or PDF format, max 5MB).</small>
+                        <div id="filePreview" class="mt-2" style="display: none;">
+                            <div class="alert alert-success">
+                                <i class="fas fa-check-circle"></i> File selected: <span id="fileName"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Remarks -->
+                    <div class="form-group">
+                        <label for="remarks">Remarks</label>
+                        <textarea class="form-control" id="remarks" name="remarks" rows="3" 
+                                  placeholder="Add any additional notes about this payment..."></textarea>
+                        <small class="text-muted">Optional: Add any extra information about this payment.</small>
+                    </div>
+
+                    <input type="hidden" id="batch_id" name="batch_id">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                    <button type="submit" class="btn btn-success" id="submitMarkBatchBtn">
+                        <i class="fas fa-check"></i> Mark as Paid
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- View Payment Proof Modal -->
+<div class="modal fade" id="viewProofModal" tabindex="-1" role="dialog" aria-labelledby="viewProofModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-info">
+                <h5 class="modal-title" id="viewProofModalLabel">
+                    <i class="fas fa-file-invoice"></i> Payment Proof
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="viewProofContent">
+                <div class="text-center py-5">
+                    <div class="spinner-border text-info" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    <p class="mt-2">Loading payment proof...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    <i class="fas fa-times"></i> Close
+                </button>
+                <button type="button" class="btn btn-info" id="downloadProofBtn">
+                    <i class="fas fa-download"></i> Download
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- View Payment Receipt Modal -->
+<div class="modal fade" id="viewReceiptModal" tabindex="-1" role="dialog" aria-labelledby="viewReceiptModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-secondary">
+                <h5 class="modal-title" id="viewReceiptModalLabel">
+                    <i class="fas fa-receipt"></i> Payment Receipt
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="viewReceiptContent">
+                <div class="text-center py-5">
+                    <div class="spinner-border text-secondary" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    <p class="mt-2">Loading payment receipt...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    <i class="fas fa-times"></i> Close
+                </button>
+                <button type="button" class="btn btn-secondary" id="downloadReceiptBtn">
+                    <i class="fas fa-download"></i> Download
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     $(document).ready(function () {
         // Initialize date range picker
@@ -566,6 +722,469 @@
         $('#createBatchModal').on('hidden.bs.modal', function() {
             $('#createBatchForm')[0].reset();
             $('#submitBatchBtn').prop('disabled', false).html('<i class="fas fa-check"></i> Create Batch');
+        });
+
+        // Mark Batch Button Click
+        $(document).on('click', '.mark-batch-btn', function() {
+            var batchId = $(this).data('id');
+            
+            // Show loading
+            $('#markBatchModal .modal-body').html(`
+                <div class="text-center py-5">
+                    <div class="spinner-border text-success" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    <p class="mt-2">Loading batch details...</p>
+                </div>
+            `);
+            
+            // Open modal
+            $('#markBatchModal').modal('show');
+            
+            // Load batch details
+            $.ajax({
+                url: '{{ route("admin-payouts-batches-get-batch") }}',
+                method: 'GET',
+                data: { batchId: batchId },
+                success: function(response) {
+                    // Reset form and update modal content
+                    resetMarkBatchForm();
+                    
+                    // Fill batch summary
+                    $('#modalBatchNo').text(response.batch_no);
+                    $('#modalBatchName').text(response.batch_name || 'N/A');
+                    $('#modalBatchAmount').text('Rs. ' + response.total_amount);
+                    
+                    // Set batch ID
+                    $('#batch_id').val(batchId);
+                    
+                    // Set default paid date to today
+                    var today = new Date().toISOString().split('T')[0];
+                    $('#paid_date').val(today);
+                    
+                    // Reset file input
+                    $('#payment_proof').val('');
+                    $('#filePreview').hide();
+                    $('.custom-file-label').text('Choose file...');
+                    
+                    // Show the form
+                    $('#markBatchModal .modal-body').html(`
+                        <!-- Batch Summary -->
+                        <div class="alert alert-info">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <strong>Batch No:</strong> <span id="modalBatchNo">${response.batch_no}</span>
+                                </div>
+                                <div class="col-md-4">
+                                    <strong>Batch Name:</strong> <span id="modalBatchName">${response.batch_name || 'N/A'}</span>
+                                </div>
+                                <div class="col-md-4">
+                                    <strong>Total Amount:</strong> <span id="modalBatchAmount">Rs. ${response.total_amount}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Paid Date -->
+                        <div class="form-group">
+                            <label for="paid_date">Paid Date <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" id="paid_date" name="paid_date" value="${today}" required>
+                            <small class="text-muted">Select the date when the payment was made.</small>
+                        </div>
+
+                        <!-- Payment Reference No -->
+                        <div class="form-group">
+                            <label for="paid_ref_no">Payment Reference No <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="paid_ref_no" name="paid_ref_no" 
+                                placeholder="Enter payment reference number" required>
+                            <small class="text-muted">Enter the bank transaction reference number.</small>
+                        </div>
+
+                        <!-- Paid By -->
+                        <div class="form-group">
+                            <label for="paid_by">Paid By <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="paid_by" name="paid_by" 
+                                placeholder="Enter the name of the person who made the payment" required>
+                            <small class="text-muted">Enter the name of the person who processed this payment.</small>
+                        </div>
+
+                        <!-- Payment Proof Upload -->
+                        <div class="form-group">
+                            <label for="payment_proof">Payment Proof <span class="text-danger">*</span></label>
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="payment_proof" name="payment_proof" 
+                                    accept=".jpg,.jpeg,.png,.pdf" required>
+                                <label class="custom-file-label" for="payment_proof">Choose file...</label>
+                            </div>
+                            <small class="text-muted">Upload payment proof (JPG, PNG, or PDF format, max 5MB).</small>
+                            <div id="filePreview" class="mt-2" style="display: none;">
+                                <div class="alert alert-success">
+                                    <i class="fas fa-check-circle"></i> File selected: <span id="fileName"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Remarks -->
+                        <div class="form-group">
+                            <label for="remarks">Remarks</label>
+                            <textarea class="form-control" id="remarks" name="remarks" rows="3" 
+                                    placeholder="Add any additional notes about this payment..."></textarea>
+                            <small class="text-muted">Optional: Add any extra information about this payment.</small>
+                        </div>
+
+                        <input type="hidden" id="batch_id" name="batch_id" value="${batchId}">
+                    `);
+                    
+                    // Re-attach file input change event
+                    $('#payment_proof').on('change', function() {
+                        var fileName = $(this).val().split('\\').pop();
+                        $('.custom-file-label').text(fileName);
+                        if (fileName) {
+                            $('#fileName').text(fileName);
+                            $('#filePreview').show();
+                        } else {
+                            $('#filePreview').hide();
+                        }
+                    });
+                },
+                error: function(xhr) {
+                    $('#markBatchModal .modal-body').html(`
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-circle"></i> 
+                            Failed to load batch details. Please try again.
+                        </div>
+                    `);
+                }
+            });
+        });
+
+        // Reset Mark Batch Form
+        function resetMarkBatchForm() {
+            $('#markBatchForm')[0].reset();
+            $('#filePreview').hide();
+            $('.custom-file-label').text('Choose file...');
+            $('#submitMarkBatchBtn').prop('disabled', false).html('<i class="fas fa-check"></i> Mark as Paid');
+        }
+
+        // Handle Mark Batch Form Submission
+        $('#markBatchForm').on('submit', function(e) {
+            e.preventDefault();
+            
+            // Validate form
+            var paidDate = $('#paid_date').val();
+            var paidRefNo = $('#paid_ref_no').val().trim();
+            var paidBy = $('#paid_by').val().trim();
+            var paymentProof = $('#payment_proof')[0].files[0];
+            var batchId = $('#batch_id').val();
+            
+            if (!paidDate) {
+                Swal.fire('Error', 'Please select a paid date.', 'error');
+                return;
+            }
+            
+            if (!paidRefNo) {
+                Swal.fire('Error', 'Please enter a payment reference number.', 'error');
+                return;
+            }
+            
+            if (!paidBy) {
+                Swal.fire('Error', 'Please enter who made the payment.', 'error');
+                return;
+            }
+            
+            if (!paymentProof) {
+                Swal.fire('Error', 'Please upload a payment proof.', 'error');
+                return;
+            }
+            
+            // Show loading
+            $('#submitMarkBatchBtn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Processing...');
+            
+            // Create FormData
+            var formData = new FormData();
+            formData.append('_token', '{{ csrf_token() }}');
+            formData.append('batch_id', batchId);
+            formData.append('paid_date', paidDate);
+            formData.append('paid_ref_no', paidRefNo);
+            formData.append('paid_by', paidBy);
+            formData.append('payment_proof', paymentProof);
+            formData.append('remarks', $('#remarks').val().trim());
+            
+            // Send AJAX request
+            $.ajax({
+                url: '{{ route("admin-payouts-batches-mark") }}',
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: response.message || 'Batch marked as paid successfully.',
+                            confirmButtonColor: '#28a745'
+                        }).then(() => {
+                            // Close modal
+                            $('#markBatchModal').modal('hide');
+                            // Reload DataTable
+                            $('#payoutBatchListTable').DataTable().ajax.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.message || 'Failed to mark batch as paid.'
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    var errorMessage = 'An error occurred. Please try again.';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMessage = xhr.responseJSON.message;
+                    }
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: errorMessage
+                    });
+                },
+                complete: function() {
+                    $('#submitMarkBatchBtn').prop('disabled', false).html('<i class="fas fa-check"></i> Mark as Paid');
+                }
+            });
+        });
+
+        // Reset modal when closed
+        $('#markBatchModal').on('hidden.bs.modal', function() {
+            resetMarkBatchForm();
+        });
+
+        // View Payment Proof
+        $(document).on('click', '.view-proof-btn', function() {
+            var batchId = $(this).data('id');
+            
+            // Show loading
+            $('#viewProofContent').html(`
+                <div class="text-center py-5">
+                    <div class="spinner-border text-info" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    <p class="mt-2">Loading payment proof...</p>
+                </div>
+            `);
+            
+            // Open modal
+            $('#viewProofModal').modal('show');
+            
+            // Load proof
+            $.ajax({
+                url: '{{ route("admin-payouts-batches-view-proof") }}',
+                method: 'GET',
+                data: { batchId: batchId },
+                success: function(response) {
+                    if (response.success) {
+                        var html = '';
+                        
+                        if (response.file_type === 'pdf') {
+                            html = `
+                                <div class="text-center">
+                                    <embed src="${response.file_url}" type="application/pdf" width="100%" height="600px" />
+                                    <p class="mt-2 text-muted">File: ${response.file_name}</p>
+                                </div>
+                            `;
+                        } else if (response.file_type === 'image') {
+                            html = `
+                                <div class="text-center">
+                                    <img src="${response.file_url}" class="img-fluid" alt="Payment Proof" style="max-height: 600px;" />
+                                    <p class="mt-2 text-muted">File: ${response.file_name}</p>
+                                </div>
+                            `;
+                        } else {
+                            html = `
+                                <div class="text-center">
+                                    <i class="fas fa-file fa-5x text-muted"></i>
+                                    <p class="mt-3">File: ${response.file_name}</p>
+                                    <a href="${response.file_url}" class="btn btn-info" download>
+                                        <i class="fas fa-download"></i> Download File
+                                    </a>
+                                </div>
+                            `;
+                        }
+                        
+                        $('#viewProofContent').html(html);
+                        $('#downloadProofBtn').data('file-url', response.file_url);
+                        $('#downloadProofBtn').data('file-name', response.file_name);
+                    } else {
+                        $('#viewProofContent').html(`
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle"></i> 
+                                ${response.message || 'No payment proof found for this batch.'}
+                            </div>
+                        `);
+                        $('#downloadProofBtn').data('file-url', null);
+                    }
+                },
+                error: function(xhr) {
+                    $('#viewProofContent').html(`
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-circle"></i> 
+                            Failed to load payment proof. Please try again.
+                        </div>
+                    `);
+                    $('#downloadProofBtn').data('file-url', null);
+                }
+            });
+        });
+
+        // View Payment Receipt
+        $(document).on('click', '.view-payment-receipt-btn', function() {
+            var batchId = $(this).data('id');
+            
+            // Show loading
+            $('#viewReceiptContent').html(`
+                <div class="text-center py-5">
+                    <div class="spinner-border text-secondary" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    <p class="mt-2">Loading payment receipt...</p>
+                </div>
+            `);
+            
+            // Open modal
+            $('#viewReceiptModal').modal('show');
+            
+            // Load receipt
+            $.ajax({
+                url: '{{ route("admin-payouts-batches-view-receipt") }}',
+                method: 'GET',
+                data: { batchId: batchId },
+                success: function(response) {
+                    if (response.success) {
+                        // Build receipt HTML
+                        var html = `
+                            <div class="receipt-wrapper">
+                                <div class="receipt-header text-center">
+                                    <h4>PAYMENT RECEIPT</h4>
+                                    <p class="text-muted">Batch #${response.batch_no}</p>
+                                </div>
+                                <div class="receipt-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <p><strong>Batch No:</strong> ${response.batch_no}</p>
+                                            <p><strong>Batch Name:</strong> ${response.batch_name || 'N/A'}</p>
+                                            <p><strong>Total Amount:</strong> Rs. ${response.total_amount}</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p><strong>Paid Date:</strong> ${response.paid_date}</p>
+                                            <p><strong>Reference No:</strong> ${response.paid_ref_no || 'N/A'}</p>
+                                            <p><strong>Paid By:</strong> ${response.paid_by || 'N/A'}</p>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="vendor-details">
+                                        <h6>Vendor Payout Details</h6>
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>#</th>
+                                                        <th>Vendor Name</th>
+                                                        <th>Amount (Rs.)</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>`;
+                        
+                        if (response.vendors && response.vendors.length > 0) {
+                            response.vendors.forEach(function(vendor, index) {
+                                html += `
+                                                    <tr>
+                                                        <td>${index + 1}</td>
+                                                        <td>${vendor.vendor_name}</td>
+                                                        <td class="text-right">Rs. ${vendor.amount}</td>
+                                                    </tr>`;
+                            });
+                        }
+                        
+                        html += `
+                                                </tbody>
+                                                <tfoot>
+                                                    <tr class="font-weight-bold">
+                                                        <td colspan="2" class="text-right">Total:</td>
+                                                        <td class="text-right">Rs. ${response.total_amount}</td>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    ${response.remarks ? `
+                                    <div class="remarks mt-3">
+                                        <p><strong>Remarks:</strong> ${response.remarks}</p>
+                                    </div>` : ''}
+                                </div>
+                                <div class="receipt-footer text-center text-muted mt-4">
+                                    <small>Generated on ${new Date().toLocaleString()}</small>
+                                </div>
+                            </div>
+                        `;
+                        
+                        $('#viewReceiptContent').html(html);
+                        $('#downloadReceiptBtn').data('batch-id', batchId);
+                    } else {
+                        $('#viewReceiptContent').html(`
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle"></i> 
+                                ${response.message || 'No payment receipt found for this batch.'}
+                            </div>
+                        `);
+                        $('#downloadReceiptBtn').data('batch-id', null);
+                    }
+                },
+                error: function(xhr) {
+                    $('#viewReceiptContent').html(`
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-circle"></i> 
+                            Failed to load payment receipt. Please try again.
+                        </div>
+                    `);
+                    $('#downloadReceiptBtn').data('batch-id', null);
+                }
+            });
+        });
+
+        // Download Proof
+        $('#downloadProofBtn').on('click', function() {
+            var fileUrl = $(this).data('file-url');
+            var fileName = $(this).data('file-name') || 'payment-proof';
+            
+            if (fileUrl) {
+                var a = document.createElement('a');
+                a.href = fileUrl;
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            } else {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'No File',
+                    text: 'No payment proof available to download.'
+                });
+            }
+        });
+
+        // Download Receipt
+        $('#downloadReceiptBtn').on('click', function() {
+            var batchId = $(this).data('batch-id');
+            
+            if (batchId) {
+                window.open('{{ route("admin-payouts-batches-download-receipt") }}?batchId=' + batchId, '_blank');
+            } else {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'No Receipt',
+                    text: 'No payment receipt available to download.'
+                });
+            }
         });
     });
 </script>

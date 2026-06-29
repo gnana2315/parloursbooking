@@ -142,6 +142,11 @@ Route::group(['middleware' => 'auth.check'], function () {
                 Route::get('/admin/payouts/batches/details', [PayoutController::class, 'getBatchDetails'])->name('admin-payouts-batches-details');
                 Route::get('/admin/payouts/batches/download-pdf', [PayoutController::class, 'downloadBatchPdf'])->name('admin-payouts-batches-download-pdf');
                 Route::get('/admin/payouts/batches/download-excel', [PayoutController::class, 'downloadBatchExcel'])->name('admin-payouts-batches-download-excel');
+                Route::get('/admin/payouts/batches/get-batch', [PayoutController::class, 'getBatchData'])->name('admin-payouts-batches-get-batch');
+                Route::post('/admin/payouts/batches/mark', [PayoutController::class, 'markBatchAsPaid'])->name('admin-payouts-batches-mark');
+                Route::get('/admin/payouts/batches/view-proof', [PayoutController::class, 'viewPaymentProof'])->name('admin-payouts-batches-view-proof');
+                Route::get('/admin/payouts/batches/view-receipt', [PayoutController::class, 'viewPaymentReceipt'])->name('admin-payouts-batches-view-receipt');
+                Route::get('/admin/payouts/batches/download-receipt', [PayoutController::class, 'downloadPaymentReceipt'])->name('admin-payouts-batches-download-receipt');
             });
         });
         // Route::group(['middleware' => 'isSuperAdmin'], function () {

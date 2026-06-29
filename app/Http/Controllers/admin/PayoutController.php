@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Log;
 use Exception;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Storage;
 
 use App\Models\vendorPayouts;
 use App\Models\vendorPayoutHistory;
@@ -351,9 +352,32 @@ class PayoutController extends Controller
                     return '<span class="badge badge-' . $status['class'] . '">' . $status['text'] . '</span>';
                 })
                 ->addColumn('action', function($batch) {
-                    return '<button class="btn btn-sm btn-primary view-details-btn" data-id="' . $batch->pbpb_id . '">
-                        <i class="fas fa-eye"></i> View Details
-                    </button>';
+                    $button = '
+                        <div class="btn-group" role="group" style="min-width: 120px;">
+                            <button class="btn btn-sm btn-primary view-details-btn" data-id="' . $batch->pbpb_id . '" title="View Details">
+                                <i class="fas fa-eye"></i>
+                            </button>';
+
+                    if($batch->pbpb_status == 0) {
+                        $button .= '
+                            <button class="btn btn-sm btn-warning mark-batch-btn" data-id="' . $batch->pbpb_id . '" title="Mark as Paid">
+                                <i class="fas fa-check"></i>
+                            </button>';
+                    } else {
+                        $button .= '
+                            <button class="btn btn-sm btn-info view-proof-btn" data-id="' . $batch->pbpb_id . '" title="View Payment Proof">
+                                <i class="fas fa-file-invoice"></i>
+                            </button>';
+                        $button .= '
+                            <button class="btn btn-sm btn-secondary view-payment-receipt-btn" data-id="' . $batch->pbpb_id . '" title="View Payment Receipt">                                
+                                <i class="fas fa-receipt"></i>
+                            </button>';
+                    }
+
+                    $button .= '
+                        </div>';
+
+                    return $button;
                 })
                 ->rawColumns(['status', 'action'])
                 ->setRowId('pbpb_id')
@@ -482,6 +506,278 @@ class PayoutController extends Controller
             
         } catch (\Exception $e) {
             return back()->with('error', 'Failed to generate Excel: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Get batch data for marking
+     */
+    public function getBatchData(Request $request)
+    {
+        try {
+            $batchId = $request->batchId;
+            $batch = payoutsBatch::findOrFail($batchId);
+            
+            return response()->json([
+                'batch_no' => $batch->pbpb_batch_no,
+                'batch_name' => $batch->pbpb_batch_name,
+                'total_amount' => number_format($batch->pbpb_total_amount, 2)
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Failed to load batch data: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Mark batch as paid
+     */
+    public function markBatchAsPaid(Request $request)
+    {
+        try {
+            $request->validate([
+                'batch_id' => 'required|exists:payouts_batch,pbpb_id',
+                'paid_date' => 'required|date',
+                'paid_ref_no' => 'required|string|max:255',
+                'paid_by' => 'required|string|max:255',
+                'payment_proof' => 'required|file|mimes:jpg,jpeg,png,pdf|max:5120',
+                'remarks' => 'nullable|string|max:1000'
+            ]);
+            
+            $batchId = $request->batch_id;
+            $batch = payoutsBatch::findOrFail($batchId);
+            
+            // Check if batch is already paid
+            if ($batch->pbpb_status == 1) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'This batch has already been marked as paid.'
+                ], 400);
+            }
+            
+            if ($request->hasFile('payment_proof')) {
+                $file = $request->file('payment_proof');
+                
+                // Get vendor IDs from this batch
+                $vendorIds = payoutsBatchDetails::where('pbpbi_btach_id', $batchId)
+                    ->with('vendorPayoutItem.vendor')
+                    ->get()
+                    ->pluck('vendorPayoutItem.vendor.pbv_id')
+                    ->unique()
+                    ->toArray();
+                
+                if (count($vendorIds) === 1) {
+                    $vendorId = $vendorIds[0];
+                } else {
+                    // For multiple vendors, use 'batch_' prefix
+                    $vendorId = 'batch_' . $batchId;
+                }
+                
+                // Generate unique filename
+                $fileName = time() . '_' . $file->getClientOriginalName();
+                
+                // Create custom path: payouts/{vendor_id}/{batch_id}/
+                $customPath = 'payouts/' . $vendorId . '/' . $batchId;
+                
+                // Store the file
+                //$filePath = $file->storeAs($customPath, $fileName, 'public');
+                // Option 3: Using Storage facade to create directories
+                Storage::disk('public')->makeDirectory($customPath);
+                $filePath = $file->storeAs($customPath, $fileName, 'public');
+                
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Payment proof file is required.'
+                ], 400);
+            }
+            
+            DB::beginTransaction();
+            
+            try {
+                // Update batch
+                $batch->pbpb_status = 1; // Paid
+                $batch->pbpb_payout_date = Carbon::parse($request->paid_date)->format('Y-m-d H:i:s');
+                $batch->pbpb_paid_ref_no = $request->paid_ref_no;
+                $batch->pbpb_paid_by = $request->paid_by;
+                $batch->pbpb_paid_slip_url = $filePath;
+                $batch->pbpb_remarks = $request->remarks ?? $batch->pbpb_remarks;
+                $batch->pbpb_updated_by = auth()->id();
+                $batch->updated_at = now();
+                $batch->save();
+                
+                // Update all vendor payout items in this batch
+                vendorPayoutItems::where('pbvpi_batch_id', $batchId)
+                    ->update([
+                        'pbvpi_status' => 1, // Paid
+                        'updated_at' => now()
+                    ]);
+                
+                // Create history record (optional)
+                // payoutBatchHistory::create([...]);
+                
+                DB::commit();
+                
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Batch #' . $batch->pbpb_batch_no . ' marked as paid successfully.'
+                ]);
+                
+            } catch (\Exception $e) {
+                DB::rollBack();
+                throw $e;
+            }
+            
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            Log::error('Mark batch as paid failed: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to mark batch as paid: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * View payment proof
+     */
+    public function viewPaymentProof(Request $request)
+    {
+        try {
+            $batchId = $request->batchId;
+            $batch = payoutsBatch::findOrFail($batchId);
+            
+            if (empty($batch->pbpb_paid_slip_url)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No payment proof found for this batch.'
+                ]);
+            }
+            
+            // Check if file exists
+            if (!Storage::disk('public')->exists($batch->pbpb_paid_slip_url)) {
+                Log::error('File not found: ' . $batch->pbpb_paid_slip_url);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Payment proof file not found.'
+                ]);
+            }
+            
+            // Get file URL
+            $fileUrl = Storage::url($batch->pbpb_paid_slip_url);
+            $fileName = basename($batch->pbpb_paid_slip_url);
+            $fileSize = Storage::disk('public')->size($batch->pbpb_paid_slip_url);
+            $fileExtension = strtolower(pathinfo($batch->pbpb_paid_slip_url, PATHINFO_EXTENSION));
+            
+            if (in_array(strtolower($fileExtension), ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
+                $fileType = 'image';
+            } elseif (strtolower($fileExtension) == 'pdf') {
+                $fileType = 'pdf';
+            }
+            
+            return response()->json([
+                'success' => true,
+                'file_url' => $fileUrl,
+                'file_name' => $fileName,
+                'file_type' => $fileType
+            ]);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to load payment proof: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * View payment receipt
+     */
+    public function viewPaymentReceipt(Request $request)
+    {
+        try {
+            $batchId = $request->batchId;
+            $batch = payoutsBatch::findOrFail($batchId);
+            
+            // Get vendors in this batch
+            $vendors = payoutsBatchDetails::with([
+                'vendorPayoutItem.vendor'
+            ])
+            ->where('pbpbi_btach_id', $batchId)
+            ->get()
+            ->map(function($detail) {
+                $payoutItem = $detail->vendorPayoutItem;
+                return [
+                    'vendor_name' => $payoutItem->vendor->pbv_business_name ?? 'N/A',
+                    'amount' => number_format($payoutItem->pbvpi_vendor_amount ?? 0, 2)
+                ];
+            });
+            
+            return response()->json([
+                'success' => true,
+                'batch_no' => $batch->pbpb_batch_no,
+                'batch_name' => $batch->pbpb_batch_name,
+                'total_amount' => number_format($batch->pbpb_total_amount, 2),
+                'paid_date' => $batch->pbpb_payout_date ? Carbon::parse($batch->pbpb_payout_date)->format('d-M-Y H:i') : 'N/A',
+                'paid_ref_no' => $batch->pbpb_payout_ref_no,
+                'paid_by' => $batch->pbpb_paid_by,
+                'remarks' => $batch->pbpb_remarks,
+                'vendors' => $vendors
+            ]);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to load payment receipt: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Download payment receipt as PDF
+     */
+    public function downloadPaymentReceipt(Request $request)
+    {
+        try {
+            $batchId = $request->batchId;
+            $batch = payoutsBatch::findOrFail($batchId);
+            
+            $vendors = payoutsBatchDetails::with([
+                'vendorPayoutItem.vendor'
+            ])
+            ->where('pbpbi_btach_id', $batchId)
+            ->get()
+            ->map(function($detail) {
+                $payoutItem = $detail->vendorPayoutItem;
+                return (object) [
+                    'vendor_name' => $payoutItem->vendor->pbv_business_name ?? 'N/A',
+                    'amount' => $payoutItem->pbvpi_vendor_amount ?? 0
+                ];
+            });
+            
+            $data = [
+                'batch' => $batch,
+                'vendors' => $vendors,
+                'total_amount' => $batch->pbpb_total_amount,
+                'paid_date' => $batch->pbpb_payout_date ? Carbon::parse($batch->pbpb_payout_date)->format('d-M-Y H:i') : 'N/A',
+                'paid_ref_no' => $batch->pbpb_payout_ref_no,
+                'paid_by' => $batch->pbpb_paid_by,
+                'remarks' => $batch->pbpb_remarks
+            ];
+            
+            $pdf = Pdf::loadView('pdf.payment-receipt', $data);
+            $pdf->setPaper('a4', 'portrait');
+            
+            return $pdf->download('Payment_Receipt_' . $batch->pbpb_batch_no . '.pdf');
+            
+        } catch (\Exception $e) {
+            return back()->with('error', 'Failed to generate receipt: ' . $e->getMessage());
         }
     }
 
