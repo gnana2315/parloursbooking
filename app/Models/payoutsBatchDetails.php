@@ -16,10 +16,20 @@ class payoutsBatchDetails extends Model
 	protected $primaryKey = 'pbpbd_id';
 
     protected $fillable = [
-        'pbpbd_id',
-        'pbpbi_btach_id',
+        'pbpbi_id',
+        'pbpbi_batch_id',
+        'pbpbi_vendor_id',
         'pbpbi_vendor_payout_item_id',
+        'pbpbi_paid_date',
+        'pbpbi_paid_ref_no',
+        'pbpbi_paid_by',
+        'pbpbi_paid_slip_url',
+        'pbpbi_remarks',
         'pbpbi_status'
+    ];
+
+    protected $casts = [
+        'pbpbi_paid_date' => 'date',
     ];
 
     public function payoutBatchDetails()

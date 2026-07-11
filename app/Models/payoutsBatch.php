@@ -19,20 +19,14 @@ class payoutsBatch extends Model
         'pbpb_batch_name',
         'pbpb_total_amount',
         'pbpb_total_payouts',
-        'pbpb_payout_date',
         'pbpb_batch_valid_date',
         'pbpb_notes',
-        'pbpb_paid_ref_no',
-        'pbpb_paid_by',
-        'pbpb_paid_slip_url',
         'pbpb_status',
-        'pbpb_remarks',
         'pbpb_created_by',
         'pbpb_updated_by',
     ];
 
     protected $casts = [
-        'pbpb_payout_date' => 'date',
         'pbpb_batch_valid_date' => 'date',
     ];
 }

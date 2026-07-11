@@ -12,9 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('payouts_batch_details', function (Blueprint $table) {
-            $table->id('pbpbd_id');
-            $table->bigInteger('pbpbi_btach_id');
+            $table->id('pbpbi_id');
+            $table->bigInteger('pbpbi_batch_id');
+            $table->bigInteger('pbpbi_vendor_id');
             $table->bigInteger('pbpbi_vendor_payout_item_id');
+            $table->date('pbpbi_paid_date')->nullable();
+            $table->string('pbpbi_paid_ref_no')->nullable();
+            $table->string('pbpbi_paid_by')->nullable();
+            $table->string('pbpbi_paid_slip_url')->nullable();
+            $table->string('pbpbi_remarks')->nullable();
             $table->string('pbpbi_status')->nullable()->comment('0-pending, 1-paid, 2-failed');
             $table->timestamps();
         });

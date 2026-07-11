@@ -216,7 +216,8 @@ class PayoutController extends Controller
                 $batchDetails = [];
                 foreach ($selectedItems as $itemId) {
                     $batchDetails[] = [
-                        'pbpbi_btach_id' => $payoutsBatch->pbpb_id,
+                        'pbpbi_batach_id' => $payoutsBatch->pbpb_id,
+                        'pbpbi_vendor_id' => $user->id,
                         'pbpbi_vendor_payout_item_id' => $itemId,
                         'pbpbi_status' => 0, // 0 = Pending
                         'created_at' => now(),
