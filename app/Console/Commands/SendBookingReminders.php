@@ -73,7 +73,7 @@ class SendBookingReminders extends Command
             $customerReminderNotification = $oneSignalService->sendToCustomer(
                 $customer->pbc_user_id,
                 'Booking Reminder',
-                "Your appointment today at {$booking->pbb_booking_start_time->format('h:i A')} with {$vendorName}. For assistance, please contact the parlour at {$vendorContactNo}. Missed appointment cannot be cancelled or refunded.",
+                "You have an apoointment {$booking->pbb_booking_date->format('Y m d')} in {$vendorName} at {$booking->pbb_booking_start_time->format('h:i A')}. Missed appointment cannot be cancelled or refunded.",
                 [
                     'booking_id' => $booking->pbb_id,
                     'booking_ref_no' => $booking->pbb_ref_no,
