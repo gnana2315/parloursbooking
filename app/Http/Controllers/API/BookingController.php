@@ -1256,7 +1256,8 @@ class BookingController extends Controller
                     // Send notification to CUSTOMER for successful payment
                     if ($customerUser) {
                         $customerNotificationTitle = 'Missed Appointment!';
-                        $customerNotificationMessage = 'Booking Cancelled due to your absense. Your booking reference no: '. $booking->pbb_ref_no .'. Please ensure timely attendance for furture booking.';
+                        $vendorName = $booking->vendor ? $booking->vendor->pbv_business_name : 'the vendor';
+                        $customerNotificationMessage = 'You missed your appoitment on '. $booking->pbb_booking_date->format('Y m d') .' in '. $vendorName .' at '. $booking->pbb_booking_start_time->format('h:i A') .'. As per our policy, the full booking charge has been applied. Please ensure timely attendance for the future bookings.';
                         $customerNotificationData = [
                             'booking_ref_no' => $booking->pbb_ref_no,
                             'booking_id' => $booking->pbb_id,
