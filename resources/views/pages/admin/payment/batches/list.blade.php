@@ -58,66 +58,6 @@
     </div>
 </section>
 
-<!-- Create Batch Modal -->
-<div class="modal fade" id="markBatchModal" tabindex="-1" role="dialog" aria-labelledby="markBatchModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header bg-primary">
-                <h5 class="modal-title" id="markBatchModalLabel">
-                    <i class="fas fa-plus-circle"></i> Mark Payout Batch
-                </h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <form id="markBatchForm">
-                <div class="modal-body">
-                    <!-- Summary Section -->
-                    <div class="alert alert-info">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <strong>Selected Payouts:</strong> <span id="modalSelectedCount">0</span>
-                            </div>
-                            <div class="col-md-6">
-                                <strong>Total Amount:</strong> <span id="modalTotalAmount">Rs. 0.00</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="paid_date">Paid Date <span class="text-danger">*</span></label>
-                        <input type="date" class="form-control" id="paid_date" name="paid_date" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="paid_ref_no">Paid Ref No<span class="text-danger">*</span></label>
-                        <input type="number" class="form-control" id="paid_ref_no" name="paid_ref_no" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="payment_slip">Payment Slip <span class="text-danger">*</span></label>
-                        <input type="file" class="form-control" id="payment_slip" name="payment_slip" accept=".jpg,.jpeg,.png,.pdf" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="remarks">Remarks</label>
-                        <textarea class="form-control" id="remarks" name="remarks" rows="3" placeholder="Add any additional notes about this batch payment..."></textarea>
-                    </div>
-                    <input type="hidden" id="selected_items" name="selected_items">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                        <i class="fas fa-times"></i> Cancel
-                    </button>
-                    <button type="submit" class="btn btn-primary" id="submitBatchBtn">
-                        <i class="fas fa-check"></i> Mark Batch
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
 <!-- Batch Details Modal -->
 <div class="modal fade" id="batchDetailsModal" tabindex="-1" role="dialog" aria-labelledby="batchDetailsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl" role="document">
@@ -154,7 +94,7 @@
 
 <!-- Mark Batch Modal -->
 <div class="modal fade" id="markBatchModal" tabindex="-1" role="dialog" aria-labelledby="markBatchModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header bg-success">
                 <h5 class="modal-title" id="markBatchModalLabel">
@@ -167,70 +107,14 @@
             <form id="markBatchForm" enctype="multipart/form-data">
                 @csrf
                 <div class="modal-body">
-                    <!-- Batch Summary -->
-                    <div class="alert alert-info">
-                        <div class="row">
-                            <div class="col-md-4">
-                                <strong>Batch No:</strong> <span id="modalBatchNo">-</span>
-                            </div>
-                            <div class="col-md-4">
-                                <strong>Batch Name:</strong> <span id="modalBatchName">-</span>
-                            </div>
-                            <div class="col-md-4">
-                                <strong>Total Amount:</strong> <span id="modalBatchAmount">Rs. 0.00</span>
-                            </div>
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-success" role="status">
+                            <span class="sr-only">Loading...</span>
                         </div>
+                        <p class="mt-2">Loading batch details...</p>
                     </div>
-
-                    <!-- Paid Date -->
-                    <div class="form-group">
-                        <label for="paid_date">Paid Date <span class="text-danger">*</span></label>
-                        <input type="date" class="form-control" id="paid_date" name="paid_date" required>
-                        <small class="text-muted">Select the date when the payment was made.</small>
-                    </div>
-
-                    <!-- Payment Reference No -->
-                    <div class="form-group">
-                        <label for="paid_ref_no">Payment Reference No <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="paid_ref_no" name="paid_ref_no" 
-                               placeholder="Enter payment reference number" required>
-                        <small class="text-muted">Enter the bank transaction reference number.</small>
-                    </div>
-
-                    <!-- Paid By -->
-                    <div class="form-group">
-                        <label for="paid_by">Paid By <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="paid_by" name="paid_by" 
-                               placeholder="Enter the name of the person who made the payment" required>
-                        <small class="text-muted">Enter the name of the person who processed this payment.</small>
-                    </div>
-
-                    <!-- Payment Proof Upload -->
-                    <div class="form-group">
-                        <label for="payment_proof">Payment Proof <span class="text-danger">*</span></label>
-                        <div class="custom-file">
-                            <input type="file" class="custom-file-input" id="payment_proof" name="payment_proof" 
-                                   accept=".jpg,.jpeg,.png,.pdf" required>
-                            <label class="custom-file-label" for="payment_proof">Choose file...</label>
-                        </div>
-                        <small class="text-muted">Upload payment proof (JPG, PNG, or PDF format, max 5MB).</small>
-                        <div id="filePreview" class="mt-2" style="display: none;">
-                            <div class="alert alert-success">
-                                <i class="fas fa-check-circle"></i> File selected: <span id="fileName"></span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Remarks -->
-                    <div class="form-group">
-                        <label for="remarks">Remarks</label>
-                        <textarea class="form-control" id="remarks" name="remarks" rows="3" 
-                                  placeholder="Add any additional notes about this payment..."></textarea>
-                        <small class="text-muted">Optional: Add any extra information about this payment.</small>
-                    </div>
-
-                    <input type="hidden" id="batch_id" name="batch_id">
                 </div>
+
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">
                         <i class="fas fa-times"></i> Cancel
@@ -243,6 +127,7 @@
         </div>
     </div>
 </div>
+            
 
 <!-- View Payment Proof Modal -->
 <div class="modal fade" id="viewProofModal" tabindex="-1" role="dialog" aria-labelledby="viewProofModalLabel" aria-hidden="true">
@@ -749,90 +634,7 @@
                 success: function(response) {
                     // Reset form and update modal content
                     resetMarkBatchForm();
-                    
-                    // Fill batch summary
-                    $('#modalBatchNo').text(response.batch_no);
-                    $('#modalBatchName').text(response.batch_name || 'N/A');
-                    $('#modalBatchAmount').text('Rs. ' + response.total_amount);
-                    
-                    // Set batch ID
-                    $('#batch_id').val(batchId);
-                    
-                    // Set default paid date to today
-                    var today = new Date().toISOString().split('T')[0];
-                    $('#paid_date').val(today);
-                    
-                    // Reset file input
-                    $('#payment_proof').val('');
-                    $('#filePreview').hide();
-                    $('.custom-file-label').text('Choose file...');
-                    
-                    // Show the form
-                    $('#markBatchModal .modal-body').html(`
-                        <!-- Batch Summary -->
-                        <div class="alert alert-info">
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <strong>Batch No:</strong> <span id="modalBatchNo">${response.batch_no}</span>
-                                </div>
-                                <div class="col-md-4">
-                                    <strong>Batch Name:</strong> <span id="modalBatchName">${response.batch_name || 'N/A'}</span>
-                                </div>
-                                <div class="col-md-4">
-                                    <strong>Total Amount:</strong> <span id="modalBatchAmount">Rs. ${response.total_amount}</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Paid Date -->
-                        <div class="form-group">
-                            <label for="paid_date">Paid Date <span class="text-danger">*</span></label>
-                            <input type="date" class="form-control" id="paid_date" name="paid_date" value="${today}" required>
-                            <small class="text-muted">Select the date when the payment was made.</small>
-                        </div>
-
-                        <!-- Payment Reference No -->
-                        <div class="form-group">
-                            <label for="paid_ref_no">Payment Reference No <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="paid_ref_no" name="paid_ref_no" 
-                                placeholder="Enter payment reference number" required>
-                            <small class="text-muted">Enter the bank transaction reference number.</small>
-                        </div>
-
-                        <!-- Paid By -->
-                        <div class="form-group">
-                            <label for="paid_by">Paid By <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="paid_by" name="paid_by" 
-                                placeholder="Enter the name of the person who made the payment" required>
-                            <small class="text-muted">Enter the name of the person who processed this payment.</small>
-                        </div>
-
-                        <!-- Payment Proof Upload -->
-                        <div class="form-group">
-                            <label for="payment_proof">Payment Proof <span class="text-danger">*</span></label>
-                            <div class="custom-file">
-                                <input type="file" class="custom-file-input" id="payment_proof" name="payment_proof" 
-                                    accept=".jpg,.jpeg,.png,.pdf" required>
-                                <label class="custom-file-label" for="payment_proof">Choose file...</label>
-                            </div>
-                            <small class="text-muted">Upload payment proof (JPG, PNG, or PDF format, max 5MB).</small>
-                            <div id="filePreview" class="mt-2" style="display: none;">
-                                <div class="alert alert-success">
-                                    <i class="fas fa-check-circle"></i> File selected: <span id="fileName"></span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Remarks -->
-                        <div class="form-group">
-                            <label for="remarks">Remarks</label>
-                            <textarea class="form-control" id="remarks" name="remarks" rows="3" 
-                                    placeholder="Add any additional notes about this payment..."></textarea>
-                            <small class="text-muted">Optional: Add any extra information about this payment.</small>
-                        </div>
-
-                        <input type="hidden" id="batch_id" name="batch_id" value="${batchId}">
-                    `);
+                    $('#markBatchModal .modal-body').html(response);
                     
                     // Re-attach file input change event
                     $('#payment_proof').on('change', function() {

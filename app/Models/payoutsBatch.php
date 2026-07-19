@@ -29,4 +29,9 @@ class payoutsBatch extends Model
     protected $casts = [
         'pbpb_batch_valid_date' => 'date',
     ];
+
+    public function payoutBatchDetails()
+    {
+        return $this->hasMany(payoutsBatchDetails::class, 'pbpbi_batch_id', 'pbpb_id');
+    }
 }

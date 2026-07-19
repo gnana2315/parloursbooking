@@ -215,9 +215,10 @@ class PayoutController extends Controller
                 // Create batch details for each selected item
                 $batchDetails = [];
                 foreach ($selectedItems as $itemId) {
+                    $payoutItem = $validItems->where('pbvpi_id', $itemId)->first();
                     $batchDetails[] = [
-                        'pbpbi_batach_id' => $payoutsBatch->pbpb_id,
-                        'pbpbi_vendor_id' => $user->id,
+                        'pbpbi_batch_id' => $payoutsBatch->pbpb_id,
+                        'pbpbi_vendor_id' => $payoutItem ? $payoutItem->pbvpi_vendor_id : null,
                         'pbpbi_vendor_payout_item_id' => $itemId,
                         'pbpbi_status' => 0, // 0 = Pending
                         'created_at' => now(),
@@ -418,7 +419,7 @@ class PayoutController extends Controller
                 'vendorPayoutItem.booking',
                 'vendorPayoutItem.payment'
             ])
-            ->where('pbpbi_btach_id', $batchId)
+            ->where('pbpbi_batch_id', $batchId)
             ->get()
             ->map(function($detail) {
                 // Map the data for easier access
@@ -513,134 +514,65 @@ class PayoutController extends Controller
     /**
      * Get batch data for marking
      */
+    
     public function getBatchData(Request $request)
     {
         try {
             $batchId = $request->batchId;
+            
             $batch = payoutsBatch::findOrFail($batchId);
             
-            return response()->json([
-                'batch_no' => $batch->pbpb_batch_no,
-                'batch_name' => $batch->pbpb_batch_name,
-                'total_amount' => number_format($batch->pbpb_total_amount, 2)
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'error' => 'Failed to load batch data: ' . $e->getMessage()
-            ], 500);
-        }
-    }
+            $payoutBatchDetails = payoutsBatchDetails::with([
+                'vendorPayoutItem.vendor',
+                'vendorPayoutItem.vendor.bankInfo',
+                'vendorPayoutItem.vendor.bankInfo.bank',
+                'vendorPayoutItem.booking',
+                'vendorPayoutItem.payment'
+            ])
+            ->where('pbpbi_batch_id', $batchId)
+            ->get()
+            ->groupBy('pbpbi_vendor_id')
+            ->map(function($details) {
+                return $details->map(function($detail) {
+                    $payoutItem = $detail->vendorPayoutItem;
+                    $vendor = $payoutItem->vendor ?? null;
+                    $bankInfo = $vendor ? $vendor->bankInfo->first() : null;
+                    $bankName = $bankInfo && $bankInfo->bank ? $bankInfo->bank->pbb_name : ($bankInfo->pbvb_bankname ?? 'N/A');
+                    
+                    return (object) [
+                        'pbpbi_id' => $detail->pbpbi_id,
+                        'pbpbi_batch_id' => $detail->pbpbi_batch_id,
+                        'pbpbi_vendor_id' => $detail->pbpbi_vendor_id,
+                        'pbpbi_vendor_payout_item_id' => $detail->pbpbi_vendor_payout_item_id,
+                        'pbpbi_paid_date' => $detail->pbpbi_paid_date,
+                        'pbpbi_paid_ref_no' => $detail->pbpbi_paid_ref_no,
+                        'pbpbi_paid_slip_url' => $detail->pbpbi_paid_slip_url,
+                        'pbpbi_remarks' => $detail->pbpbi_remarks,
+                        'pbpbi_status' => $detail->pbpbi_status,
+                        'pbpbi_vendor_amount' => $payoutItem->pbvpi_vendor_amount ?? 0,
+                        'vendor' => $vendor,
+                        'vendor_name' => $vendor ? $vendor->pbv_business_name : 'N/A',
+                        'vendor_contact' => $vendor ? $vendor->pbv_contactno : 'N/A',
+                        'vendor_email' => $vendor ? $vendor->pbv_email : 'N/A',
+                        'bank_info' => $bankInfo,
+                        'bank_name' => $bankName,
+                        'bank_account_no' => $bankInfo->pbvb_accountno ?? 'N/A',
+                        'bank_holder_name' => $bankInfo->pbvb_holder_name ?? 'N/A',
+                        'bank_branch' => $bankInfo->pbvb_branch ?? 'N/A',
+                    ];
+                });
+            });
+        
+        // Calculate total amount
+        $totalAmount = $payoutBatchDetails->sum(function($vendorDetails) {
+            return $vendorDetails->sum('pbpbi_vendor_amount');
+        });
 
-    /**
-     * Mark batch as paid
-     */
-    public function markBatchAsPaid(Request $request)
-    {
-        try {
-            $request->validate([
-                'batch_id' => 'required|exists:payouts_batch,pbpb_id',
-                'paid_date' => 'required|date',
-                'paid_ref_no' => 'required|string|max:255',
-                'paid_by' => 'required|string|max:255',
-                'payment_proof' => 'required|file|mimes:jpg,jpeg,png,pdf|max:5120',
-                'remarks' => 'nullable|string|max:1000'
-            ]);
+        return view('pages.admin.payment.batches.components.markBatchAsPaidForm', compact('batch', 'payoutBatchDetails', 'totalAmount'));
             
-            $batchId = $request->batch_id;
-            $batch = payoutsBatch::findOrFail($batchId);
-            
-            // Check if batch is already paid
-            if ($batch->pbpb_status == 1) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'This batch has already been marked as paid.'
-                ], 400);
-            }
-            
-            if ($request->hasFile('payment_proof')) {
-                $file = $request->file('payment_proof');
-                
-                // Get vendor IDs from this batch
-                $vendorIds = payoutsBatchDetails::where('pbpbi_btach_id', $batchId)
-                    ->with('vendorPayoutItem.vendor')
-                    ->get()
-                    ->pluck('vendorPayoutItem.vendor.pbv_id')
-                    ->unique()
-                    ->toArray();
-                
-                if (count($vendorIds) === 1) {
-                    $vendorId = $vendorIds[0];
-                } else {
-                    // For multiple vendors, use 'batch_' prefix
-                    $vendorId = 'batch_' . $batchId;
-                }
-                
-                // Generate unique filename
-                $fileName = time() . '_' . $file->getClientOriginalName();
-                
-                // Create custom path: payouts/{vendor_id}/{batch_id}/
-                $customPath = 'payouts/' . $vendorId . '/' . $batchId;
-                
-                // Store the file
-                //$filePath = $file->storeAs($customPath, $fileName, 'public');
-                // Option 3: Using Storage facade to create directories
-                Storage::disk('public')->makeDirectory($customPath);
-                $filePath = $file->storeAs($customPath, $fileName, 'public');
-                
-            } else {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Payment proof file is required.'
-                ], 400);
-            }
-            
-            DB::beginTransaction();
-            
-            try {
-                // Update batch
-                $batch->pbpb_status = 1; // Paid
-                $batch->pbpb_payout_date = Carbon::parse($request->paid_date)->format('Y-m-d H:i:s');
-                $batch->pbpb_paid_ref_no = $request->paid_ref_no;
-                $batch->pbpb_paid_by = $request->paid_by;
-                $batch->pbpb_paid_slip_url = $filePath;
-                $batch->pbpb_remarks = $request->remarks ?? $batch->pbpb_remarks;
-                $batch->pbpb_updated_by = auth()->id();
-                $batch->updated_at = now();
-                $batch->save();
-                
-                // Update all vendor payout items in this batch
-                vendorPayoutItems::where('pbvpi_batch_id', $batchId)
-                    ->update([
-                        'pbvpi_status' => 1, // Paid
-                        'updated_at' => now()
-                    ]);
-                
-                // Create history record (optional)
-                // payoutBatchHistory::create([...]);
-                
-                DB::commit();
-                
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Batch #' . $batch->pbpb_batch_no . ' marked as paid successfully.'
-                ]);
-                
-            } catch (\Exception $e) {
-                DB::rollBack();
-                throw $e;
-            }
-            
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $e->errors()
-            ], 422);
         } catch (\Exception $e) {
-            Log::error('Mark batch as paid failed: ' . $e->getMessage());
             return response()->json([
-                'success' => false,
-                'message' => 'Failed to mark batch as paid: ' . $e->getMessage()
+                'error' => 'Failed to load batch details: ' . $e->getMessage()
             ], 500);
         }
     }
@@ -710,7 +642,7 @@ class PayoutController extends Controller
             $vendors = payoutsBatchDetails::with([
                 'vendorPayoutItem.vendor'
             ])
-            ->where('pbpbi_btach_id', $batchId)
+            ->where('pbpbi_batch_id', $batchId)
             ->get()
             ->map(function($detail) {
                 $payoutItem = $detail->vendorPayoutItem;
@@ -752,7 +684,7 @@ class PayoutController extends Controller
             $vendors = payoutsBatchDetails::with([
                 'vendorPayoutItem.vendor'
             ])
-            ->where('pbpbi_btach_id', $batchId)
+            ->where('pbpbi_batch_id', $batchId)
             ->get()
             ->map(function($detail) {
                 $payoutItem = $detail->vendorPayoutItem;
@@ -794,7 +726,7 @@ class PayoutController extends Controller
             'vendorPayoutItem.booking',
             'vendorPayoutItem.payment'
         ])
-        ->where('pbpbi_btach_id', $batchId)
+        ->where('pbpbi_batch_id', $batchId)
         ->get()
         ->map(function($detail) {
             $payoutItem = $detail->vendorPayoutItem;
@@ -826,6 +758,201 @@ class PayoutController extends Controller
             ];
         });
     }
+
+    /**
+     * Mark vendor payout as paid
+     */
+    public function markVendorPayout(Request $request)
+{
+    try {
+        $request->validate([
+            'vendor_id' => 'required|exists:vendors,pbv_id',
+            'batch_id' => 'required|exists:payouts_batch,pbpb_id',
+            'paid_date' => 'required|date',
+            'paid_ref_no' => 'required|string|max:255',
+            'payment_slip' => 'required|file|mimes:jpg,jpeg,png,pdf|max:5120',
+        ]);
+        
+        $vendorId = $request->vendor_id;
+        $batchId = $request->batch_id;
+        $paidDate = Carbon::parse($request->paid_date)->format('Y-m-d');
+        $paidRefNo = $request->paid_ref_no;
+        
+        // Get vendor details
+        $vendor = vendors::find($vendorId);
+        if (!$vendor) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Vendor not found.'
+            ]);
+        }
+        
+        // Get all pending payout details for this vendor in this batch
+        $payoutDetails = payoutsBatchDetails::where('pbpbi_batch_id', $batchId)
+            ->where('pbpbi_vendor_id', $vendorId)
+            ->where('pbpbi_status', 0) // Only pending
+            ->get();
+        
+        if ($payoutDetails->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No pending payouts found for this vendor.'
+            ]);
+        }
+        
+        // Calculate total amount for this vendor
+        $totalAmount = $payoutDetails->sum(function($detail) {
+            $payoutItem = vendorPayoutItems::find($detail->pbpbi_vendor_payout_item_id);
+            return $payoutItem ? $payoutItem->pbvpi_vendor_amount : 0;
+        });
+        
+        // Handle file upload
+        if ($request->hasFile('payment_slip')) {
+            $file = $request->file('payment_slip');
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $filePath = $file->storeAs('payouts/slips/' . $vendorId . '/' . $batchId, $fileName, 'public');
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Payment slip file is required.'
+            ]);
+        }
+        
+        DB::beginTransaction();
+        
+        try {
+            // Create vendor payout history record
+            $payoutHistory = vendorPayoutHistory::create([
+                'pbvph_payout_id' => $batchId,
+                'pbvph_vendor_id' => $vendorId,
+                'pbvph_amount' => $totalAmount,
+                'pbvph_payment_method' => 'Bank Transfer',
+                'pbvph_reference' => $paidRefNo,
+                'pbvph_description' => 'Payout for batch #' . $batchId . ' - ' . $vendor->pbv_business_name,
+                'pbvph_status' => 1, // 1 = Completed
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+            
+            // Update all payout details for this vendor
+            foreach ($payoutDetails as $detail) {
+                $detail->pbpbi_paid_date = $paidDate;
+                $detail->pbpbi_paid_ref_no = $paidRefNo;
+                $detail->pbpbi_paid_slip_url = $filePath;
+                $detail->pbpbi_status = 1; // Paid
+                $detail->updated_at = now();
+                $detail->save();
+                
+                // Update the vendor payout item with history ID
+                $payoutItem = vendorPayoutItems::find($detail->pbpbi_vendor_payout_item_id);
+                if ($payoutItem) {
+                    $payoutItem->pbvpi_status = 1; // Paid
+                    $payoutItem->pbvpi_payout_history_id = $payoutHistory->pbvph_id; // Link to history
+                    $payoutItem->pbvpi_paid_date = $paidDate;
+                    $payoutItem->pbvpi_paid_ref_no = $paidRefNo;
+                    $payoutItem->pbvpi_paid_slip_url = $filePath;
+                    $payoutItem->updated_at = now();
+                    $payoutItem->save();
+                }
+            }
+            
+            // Check if all vendors in this batch are now paid
+            $pendingCount = payoutsBatchDetails::where('pbpbi_batch_id', $batchId)
+                ->where('pbpbi_status', 0)
+                ->count();
+            
+            if ($pendingCount == 0) {
+                $batch = payoutsBatch::find($batchId);
+                if ($batch) {
+                    $batch->pbpb_status = 1; // Paid
+                    $batch->pbpb_payout_date = now();
+                    $batch->updated_at = now();
+                    $batch->save();
+                }
+            }
+            
+            DB::commit();
+            
+            // Send email with payout details to vendor (outside transaction)
+            try {
+                $this->sendPayoutEmail($vendor, $payoutHistory, $payoutDetails, $totalAmount, $paidDate, $paidRefNo, $filePath);
+            } catch (\Exception $e) {
+                // Log email error but don't fail the transaction
+                Log::error('Failed to send payout email to vendor ' . $vendorId . ': ' . $e->getMessage());
+            }
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Vendor marked as paid successfully. Payout details have been sent to the vendor\'s email.',
+                'pending_count' => $pendingCount,
+                'history_id' => $payoutHistory->pbvph_id
+            ]);
+            
+        } catch (\Exception $e) {
+            DB::rollBack();
+            // Delete uploaded file if transaction fails
+            if (isset($filePath) && Storage::disk('public')->exists($filePath)) {
+                Storage::disk('public')->delete($filePath);
+            }
+            throw $e;
+        }
+        
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Validation failed',
+            'errors' => $e->errors()
+        ], 422);
+    } catch (\Exception $e) {
+        Log::error('Mark vendor payout failed: ' . $e->getMessage());
+        Log::error($e->getTraceAsString());
+        
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to mark vendor as paid: ' . $e->getMessage()
+        ], 500);
+    }
+}
+
+/**
+ * Send payout email to vendor
+ */
+private function sendPayoutEmail($vendor, $payoutHistory, $payoutDetails, $totalAmount, $paidDate, $paidRefNo, $filePath)
+{
+    // Generate PDF
+    $pdfData = [
+        'vendor' => $vendor,
+        'payoutHistory' => $payoutHistory,
+        'payoutDetails' => $payoutDetails,
+        'totalAmount' => $totalAmount,
+        'paidDate' => $paidDate,
+        'paidRefNo' => $paidRefNo,
+        'filePath' => $filePath
+    ];
+    
+    $pdf = Pdf::loadView('pdf.vendor-payout', $pdfData);
+    $pdf->setPaper('a4', 'portrait');
+    
+    // Generate PDF filename
+    $pdfFilename = 'payout_' . $vendor->pbv_id . '_' . time() . '.pdf';
+    $pdfPath = storage_path('app/temp/' . $pdfFilename);
+    
+    // Ensure temp directory exists
+    if (!is_dir(storage_path('app/temp'))) {
+        mkdir(storage_path('app/temp'), 0777, true);
+    }
+    
+    // Save PDF temporarily
+    file_put_contents($pdfPath, $pdf->output());
+    
+    // Send email with PDF attachment
+    // Mail::to($vendor->pbv_email)->send(new VendorPayoutMail($vendor, $payoutHistory, $totalAmount, $paidDate, $paidRefNo, $pdfPath));
+    
+    // Delete temporary PDF file after sending
+    if (file_exists($pdfPath)) {
+        unlink($pdfPath);
+    }
+}
 
     /**
      * Generate a unique batch number

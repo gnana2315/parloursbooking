@@ -33,7 +33,7 @@ class BatchPayoutExport implements FromArray, WithHeadings, WithStyles, ShouldAu
             'vendorPayoutItem.booking',
             'vendorPayoutItem.payment'
         ])
-        ->where('pbpbi_btach_id', $this->batchId)
+        ->where('pbpbi_batch_id', $this->batchId)
         ->get();
 
         $data = [];

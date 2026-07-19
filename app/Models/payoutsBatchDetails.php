@@ -34,11 +34,16 @@ class payoutsBatchDetails extends Model
 
     public function payoutBatchDetails()
     {
-        return $this->belongsTo(payoutsBatch::class, 'pbpbi_btach_id', 'id');
+        return $this->belongsTo(payoutsBatch::class, 'pbpbi_batch_id', 'pbpb_id');
     }
 
     public function vendorPayoutItem()
     {
         return $this->belongsTo(vendorPayoutItems::class, 'pbpbi_vendor_payout_item_id', 'pbvpi_id');
+    }
+
+    public function vendor()
+    {
+        return $this->belongsTo(vendors::class, 'pbpbi_vendor_id', 'pbv_id');
     }
 }
