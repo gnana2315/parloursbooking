@@ -8,20 +8,13 @@ use Illuminate\Validation\Rule;
 use App\Models\User;
 use App\Models\customer;
 use App\Models\vendors;
-use App\Models\notification;
 use App\Services\DialogESMSService;
-use App\Models\deviceToken;
-use App\Services\FirebaseService;
 use App\Services\OneSignalService;
 
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\File;
 use Carbon\Carbon;
-use Validator;
 use Illuminate\Support\Facades\Log;
-
 
 /**
  * @OA\Info(
@@ -302,7 +295,7 @@ class AuthController extends Controller
             return response()->json(['message' => 'User not found'], 404);
         }
         if($user->pbu_mobileno_verified_at == null){
-            return response()->json(['message' => 'User Phone No not verfied yet.'], 500);
+            return response()->json(['message' => 'User Phone No not verfied yet.'], 401);
         }
         $userRegister = null;
         $user_data = null;
@@ -551,7 +544,7 @@ class AuthController extends Controller
      *         )
      *     ),
      *     @OA\Response(
-     *         response=500,
+     *         response=401,
      *         description="Invalid credentials or user not verified",
      *         @OA\JsonContent(
      *             @OA\Property(property="message", type="string", example="Invalid mobile number or password")
@@ -583,16 +576,16 @@ class AuthController extends Controller
         
         // Check if user exists and password is correct
         if (!$user || empty($user->password) || !Hash::check($request->password, $user->password)) {
-            return response()->json(['message' => 'Invalid mobile number or password'], 500);
+            return response()->json(['message' => 'Invalid mobile number or password'], 401);
         }
 
         //Check if user verified the mobile no
         if($user->pbu_mobileno_verified_at == null){
-            return response()->json(['message' => 'User not verfied yet.'], 500);
+            return response()->json(['message' => 'User not verfied yet.'], 401);
         }
 
         if($user->pbu_status == 0){
-            return response()->json(['message' => 'Please create the User.'], 500);   
+            return response()->json(['message' => 'Please create the User.'], 401);   
         }
         
         if($user->pbu_usertype == '1'){
